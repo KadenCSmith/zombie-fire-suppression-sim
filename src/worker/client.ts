@@ -29,6 +29,7 @@ export interface SimulationClient {
   pause: () => void
   setHeater: (enabled: boolean) => void
   setHeaterGeneration: (heatGenerationWm3: number) => void
+  setAtmosphericOxygen: (moleFraction: number) => void
   snapshot: () => void
   dispose: () => void
 }
@@ -90,6 +91,7 @@ export function createSimulationClient(handlers: {
     pause() { send({ type: 'pause' }) },
     setHeater(enabled) { send({ type: 'heater', enabled }) },
     setHeaterGeneration(heatGenerationWm3) { send({ type: 'heaterGeneration', heatGenerationWm3 }) },
+    setAtmosphericOxygen(moleFraction) { send({ type: 'atmosphericOxygen', moleFraction }) },
     snapshot() { send({ type: 'snapshot' }) },
     dispose() { disposed = true; worker.terminate() }
   }

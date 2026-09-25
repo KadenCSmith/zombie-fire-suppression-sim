@@ -19,6 +19,7 @@ export type SolverCommand =
   | { type: 'pause' }
   | { type: 'heater'; enabled: boolean }
   | { type: 'heaterGeneration'; heatGenerationWm3: number }
+  | { type: 'atmosphericOxygen'; moleFraction: number }
   | { type: 'snapshot' }
   | { type: 'dispose' }
 

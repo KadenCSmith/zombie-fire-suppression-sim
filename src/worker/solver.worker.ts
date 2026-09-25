@@ -233,6 +233,11 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
         simulation.setHeaterGeneration(command.heatGenerationWm3)
         emitSnapshot(simulation.snapshot())
       }
+    } else if (command.type === 'atmosphericOxygen') {
+      if (simulation) {
+        simulation.setAtmosphericOxygen(command.moleFraction)
+        emitSnapshot(simulation.snapshot())
+      }
     } else if (command.type === 'advance') {
       if (simulation && command.seconds > 0) startRun(simulation.timeSeconds + command.seconds)
     } else if (command.type === 'step') {

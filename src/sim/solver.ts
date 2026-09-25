@@ -68,6 +68,8 @@ function freshDiagnostics(): Diagnostics {
     cumulativeCO2InputKg: 0, cumulativeCO2OutflowKg: 0,
     cumulativeInterventionEnergyJ: 0, cumulativeInterventionGasSensibleJ: 0,
     cumulativeOxygenBoundaryInKg: 0, cumulativeFuelConsumedKg: 0,
+    cumulativeOxygenInterventionMol: 0,
+    cumulativeRootFuelConsumedKg: 0,
     cumulativeReactionHeatJ: 0, lastReactionPowerW: 0, reactingCellCount: 0,
     cumulativeWaterEvaporatedKg: 0, cumulativeGasBoundaryOutMol: 0,
   };
@@ -100,6 +102,9 @@ export class Simulation {
   private background: Float64Array;
   private vapor: Float64Array;
   private fuel: Float64Array;
+  private mineral: Float64Array;
+  private rootFuel: Float64Array;
+  private reactionRate: Float64Array;
   private water: Float64Array;
   private dryDensity: Float64Array;
   private solidHeatCapacity: Float64Array;
@@ -139,6 +144,7 @@ export class Simulation {
     const array = () => new Float64Array(this.cellCount);
     this.temperature = array(); this.oxygen = array(); this.co2 = array();
     this.background = array(); this.vapor = array(); this.fuel = array(); this.water = array();
+    this.mineral = array(); this.rootFuel = array(); this.reactionRate = array();
     this.dryDensity = array(); this.solidHeatCapacity = array(); this.thermalConductivity = array();
     this.porosity = array(); this.intrinsicH = array(); this.intrinsicV = array();
     this.effectiveH = array(); this.effectiveV = array(); this.effectiveDiffusivity = array();
@@ -252,6 +258,8 @@ export class Simulation {
       // Roots are added once to the base organic dry mass; never included in its fraction.
       const mineralOrganicFuelKg = bulkDensity * organic * this.cellVolume;
       this.fuel[i] = mineralOrganicFuelKg + rootFuelKg;
+      this.rootFuel[i] = rootFuelKg;
+      this.mineral[i] = bulkDensity * (1 - organic) * this.cellVolume;
       this.water[i] = porosity * this.cellVolume * saturation * LIQUID_WATER_DENSITY;
       this.dryDensity[i] = bulkDensity;
       this.solidHeatCapacity[i] = soil.solidHeatCapacityJKgK;
@@ -265,6 +273,7 @@ export class Simulation {
           hot.sizeXM, hot.sizeYM, hot.thicknessM, 0, 0.5)) {
           this.temperature[i] = Math.max(this.temperature[i], celsiusToKelvin(hot.temperatureC));
           this.fuel[i] *= hot.fuelFraction;
+          this.rootFuel[i] *= hot.fuelFraction;
         }
       }
       const n = s.atmosphere.pressurePa * this.gasVolume(i) / (R * this.temperature[i]);
@@ -347,6 +356,37 @@ export class Simulation {
     if (this.heaterGenerationWm3 === heatGenerationWm3) return;
     this.heaterGenerationWm3 = heatGenerationWm3;
     this.events.push({ timeSeconds: this.timeSeconds, type: 'heater-generation', value: heatGenerationWm3 });
+  }
+
+  /** Prescribed atmospheric boundary composition for a reduced oxygen-interruption benchmark. */
+  setAtmosphericOxygen(moleFraction: number): void {
+    const atmosphere = this.scenario.atmosphere;
+    const maximum = 1 - atmosphere.co2MoleFraction - atmosphere.waterVaporMoleFraction;
+    if (!Number.isFinite(moleFraction) || moleFraction < 0 || moleFraction > maximum) throw new Error('Atmospheric oxygen mole fraction is outside the mixture range.');
+    if (atmosphere.oxygenMoleFraction === moleFraction) return;
+    atmosphere.oxygenMoleFraction = moleFraction;
+    this.events.push({ timeSeconds: this.timeSeconds, type: 'atmospheric-oxygen', value: moleFraction });
+  }
+
+  /** Benchmark-only, prescribed inventory exchange at fixed total gas moles and temperature. */
+  setUniformOxygenFraction(moleFraction: number): void {
+    if (!Number.isFinite(moleFraction) || moleFraction < 0 || moleFraction > 1) throw new Error('Invalid benchmark oxygen fraction.');
+    const changes = new Float64Array(this.cellCount);
+    for (let i = 0; i < this.cellCount; i++) {
+      const target = this.totalGasAt(i) * moleFraction;
+      changes[i] = target - this.oxygen[i];
+      if (this.background[i] + 1e-12 < changes[i]) throw new Error('Insufficient background gas for prescribed oxygen exchange.');
+    }
+    let deltaOxygenMol = 0;
+    for (let i = 0; i < this.cellCount; i++) {
+      this.oxygen[i] += changes[i];
+      this.background[i] -= changes[i];
+      deltaOxygenMol += changes[i];
+    }
+    this.diagnostics.cumulativeOxygenInterventionMol += deltaOxygenMol;
+    this.events.push({ timeSeconds: this.timeSeconds, type: 'oxygen-inventory-benchmark', value: moleFraction,
+      externalOxygenMol: deltaOxygenMol, externalBackgroundMol: -deltaOxygenMol, externalEnergyJ: 0 });
+    this.updateDiagnostics();
   }
 
   /**
@@ -455,6 +495,7 @@ export class Simulation {
     const backupArrays = {
       temperature: this.temperature.slice(), oxygen: this.oxygen.slice(), co2: this.co2.slice(),
       background: this.background.slice(), vapor: this.vapor.slice(), fuel: this.fuel.slice(),
+      rootFuel: this.rootFuel.slice(), reactionRate: this.reactionRate.slice(),
       water: this.water.slice(), pressure: this.pressure.slice(),
       vx: this.vx.slice(), vy: this.vy.slice(), vz: this.vz.slice(),
     };
@@ -469,6 +510,7 @@ export class Simulation {
       this.temperature.set(backupArrays.temperature); this.oxygen.set(backupArrays.oxygen);
       this.co2.set(backupArrays.co2); this.background.set(backupArrays.background);
       this.vapor.set(backupArrays.vapor); this.fuel.set(backupArrays.fuel); this.water.set(backupArrays.water);
+      this.rootFuel.set(backupArrays.rootFuel); this.reactionRate.set(backupArrays.reactionRate);
       this.pressure.set(backupArrays.pressure); this.vx.set(backupArrays.vx); this.vy.set(backupArrays.vy); this.vz.set(backupArrays.vz);
       [this.dryIceMassKg, this.dryIceTemperatureK, this.heaterEnergyJ,
         this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
@@ -584,6 +626,7 @@ export class Simulation {
     let reactionHeatJ = 0;
     let reactingCellCount = 0;
     for (let i = 0; i < this.cellCount; i++) {
+      this.reactionRate[i] = 0;
       const temp = this.temperature[i];
       if (temp > model.minimumReactionTemperatureK && this.fuel[i] > 0 && this.oxygen[i] > 0) {
         const gas = this.totalGasAt(i);
@@ -595,6 +638,9 @@ export class Simulation {
         const oxygenLimitedFuelKg = this.oxygen[i] * O2_MOLAR_MASS / O2_PER_FUEL_KG;
         const reactedKg = Math.min(this.fuel[i], kineticFuelKg, oxygenLimitedFuelKg);
         if (reactedKg > 0) reactingCellCount++;
+        const rootReactedKg = reactedKg * this.rootFuel[i] / this.fuel[i];
+        this.rootFuel[i] -= rootReactedKg;
+        this.reactionRate[i] = reactedKg / dt;
         this.fuel[i] -= reactedKg;
         this.oxygen[i] -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
         this.co2[i] += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
@@ -603,6 +649,7 @@ export class Simulation {
         heatJ[i] += heatReleasedJ;
         reactionHeatJ += heatReleasedJ;
         this.diagnostics.cumulativeFuelConsumedKg += reactedKg;
+        this.diagnostics.cumulativeRootFuelConsumedKg += rootReactedKg;
         this.cumulativeGasSourceMol += reactedKg * (-O2_PER_FUEL_KG / O2_MOLAR_MASS + CO2_PER_FUEL_KG / CO2_MOLAR_MASS + H2O_PER_FUEL_KG / H2O_MOLAR_MASS);
       }
       if (temp > model.evaporationOnsetTemperatureK && this.water[i] > 0 && model.evaporationRateS > 0) {
@@ -844,6 +891,8 @@ export class Simulation {
     const fields: SnapshotFields = {
       temperatureK: new Float32Array(n), oxygen: new Float32Array(n), co2: new Float32Array(n),
       backgroundGas: new Float32Array(n), waterVapor: new Float32Array(n), fuel: new Float32Array(n),
+      mineralKg: new Float32Array(n), rootFuelKg: new Float32Array(n),
+      reactionRateKgS: new Float32Array(n), reactionPowerWm3: new Float32Array(n),
       moisture: new Float32Array(n), pressurePa: new Float32Array(n), porosity: new Float32Array(n),
       intrinsicPermeability: new Float32Array(n), effectivePermeability: new Float32Array(n),
       effectiveGasDiffusivity: new Float32Array(n), peatMask: new Float32Array(n),
@@ -858,6 +907,10 @@ export class Simulation {
       fields.backgroundGas[i] = totalGas > 0 ? this.background[i] / totalGas : 0;
       fields.waterVapor[i] = totalGas > 0 ? this.vapor[i] / totalGas : 0;
       fields.fuel[i] = this.fuel[i];
+      fields.mineralKg[i] = this.mineral[i];
+      fields.rootFuelKg[i] = this.rootFuel[i];
+      fields.reactionRateKgS[i] = this.reactionRate[i];
+      fields.reactionPowerWm3[i] = this.reactionRate[i] * this.scenario.model.heatOfCombustionJkg / this.cellVolume;
       fields.moisture[i] = this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume);
       fields.pressurePa[i] = this.pressure[i];
       fields.porosity[i] = this.porosity[i];
@@ -900,7 +953,8 @@ export class Simulation {
     const arrays: Record<string, number[]> = {};
     for (const [name, array] of Object.entries({
       temperature: this.temperature, oxygen: this.oxygen, co2: this.co2, background: this.background, vapor: this.vapor,
-      fuel: this.fuel, water: this.water, dryDensity: this.dryDensity, solidHeatCapacity: this.solidHeatCapacity,
+      fuel: this.fuel, rootFuel: this.rootFuel, mineral: this.mineral, reactionRate: this.reactionRate,
+      water: this.water, dryDensity: this.dryDensity, solidHeatCapacity: this.solidHeatCapacity,
       thermalConductivity: this.thermalConductivity, porosity: this.porosity, intrinsicH: this.intrinsicH,
       intrinsicV: this.intrinsicV, effectiveH: this.effectiveH, effectiveV: this.effectiveV,
       effectiveDiffusivity: this.effectiveDiffusivity, peatMask: this.peatMask, pressure: this.pressure,
@@ -929,27 +983,36 @@ export class Simulation {
     }
     const assignments: Record<string, Float64Array> = {
       temperature: sim.temperature, oxygen: sim.oxygen, co2: sim.co2, background: sim.background,
-      vapor: sim.vapor, fuel: sim.fuel, water: sim.water, dryDensity: sim.dryDensity,
+      vapor: sim.vapor, fuel: sim.fuel, rootFuel: sim.rootFuel, mineral: sim.mineral, reactionRate: sim.reactionRate,
+      water: sim.water, dryDensity: sim.dryDensity,
       solidHeatCapacity: sim.solidHeatCapacity, thermalConductivity: sim.thermalConductivity,
       porosity: sim.porosity, intrinsicH: sim.intrinsicH, intrinsicV: sim.intrinsicV,
       effectiveH: sim.effectiveH, effectiveV: sim.effectiveV,
       effectiveDiffusivity: sim.effectiveDiffusivity, peatMask: sim.peatMask, pressure: sim.pressure,
       vx: sim.vx, vy: sim.vy, vz: sim.vz,
     };
+    const initialRootFuel = Array.from(sim.rootFuel);
+    const initialFuel = Array.from(sim.fuel);
     for (const [name, array] of Object.entries(assignments)) {
-      const values = data.arrays[name];
+      let values = data.arrays[name];
+      if (values === undefined && name === 'mineral') values = Array.from(sim.mineral);
+      if (values === undefined && name === 'reactionRate') values = Array(sim.cellCount).fill(0);
+      if (values === undefined && name === 'rootFuel') values = initialRootFuel.map((initial, i) =>
+        initial * Math.min(1, data.arrays.fuel[i] / Math.max(1e-12, initialFuel[i])));
       if (!Array.isArray(values) || values.length !== sim.cellCount || values.some(v => !Number.isFinite(v))) throw new Error(`Invalid checkpoint array ${name}.`);
       array.set(values);
     }
-    for (const name of ['oxygen', 'co2', 'background', 'vapor', 'fuel', 'water']) {
-      if (data.arrays[name].some(value => value < 0)) throw new Error(`Negative inventory in checkpoint array ${name}.`);
+    for (const name of ['oxygen', 'co2', 'background', 'vapor', 'fuel', 'rootFuel', 'mineral', 'reactionRate', 'water']) {
+      if (Array.from(assignments[name]).some(value => value < 0)) throw new Error(`Negative inventory in checkpoint array ${name}.`);
     }
     if (data.arrays.temperature.some(value => value < 150 || value > 1200)
       || data.arrays.porosity.some(value => value <= 0 || value >= 1)
       || data.arrays.pressure.some(value => value <= 0)) throw new Error('Checkpoint temperature, porosity, or pressure is outside supported limits.');
     const ledger = data.arrays.__ledger;
     if (!Array.isArray(ledger) || ledger.length !== 9 || ledger.some(v => !Number.isFinite(v))) throw new Error('Invalid checkpoint ledger.');
-    if (![data.diagnostics.cumulativeReactionHeatJ, data.diagnostics.lastReactionPowerW,
+    const rootFuelConsumedKg = data.diagnostics.cumulativeRootFuelConsumedKg ??
+      sim.rootFuel.reduce((sum, value, i) => sum + Math.max(0, initialRootFuel[i] - value), 0);
+    if (![data.diagnostics.cumulativeReactionHeatJ, rootFuelConsumedKg, data.diagnostics.lastReactionPowerW,
       data.diagnostics.reactingCellCount].every(v => Number.isFinite(v) && v >= 0)
       || !Number.isInteger(data.diagnostics.reactingCellCount)) throw new Error('Invalid checkpoint reaction diagnostics.');
     [sim.initialGasMol, sim.cumulativeGasSourceMol, sim.cumulativeSourceHeaterJ,
@@ -959,7 +1022,9 @@ export class Simulation {
     sim.dryIceTemperatureK = data.dryIceTemperatureK; sim.heaterEnergyJ = data.heaterEnergyJ;
     sim.heaterEnabled = data.heaterEnabled; sim.heaterGenerationWm3 = data.heaterGenerationWm3;
     sim.events = data.events.map(e => ({ ...e }));
-    sim.diagnostics = { ...data.diagnostics, warnings: [...data.diagnostics.warnings] };
+    sim.diagnostics = { ...data.diagnostics, cumulativeRootFuelConsumedKg: rootFuelConsumedKg,
+      cumulativeOxygenInterventionMol: data.diagnostics.cumulativeOxygenInterventionMol ?? 0,
+      warnings: [...data.diagnostics.warnings] };
     sim.updateDiagnostics();
     if (Math.abs(sim.diagnostics.gasBalanceResidualMol) > 1e-6 * Math.max(1, sim.initialGasMol)) throw new Error('Checkpoint gas inventory does not match its conservation ledger.');
     return sim;

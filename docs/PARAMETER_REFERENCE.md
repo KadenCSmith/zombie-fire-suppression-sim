@@ -239,3 +239,11 @@ A literature citation for one constant does not calibrate the soil, source conta
 The one-click solid-CO₂ conversion is an operational event rather than an editable scenario parameter. Its converted mass and separately accounted external energy are recorded in solver diagnostics and the event log; see `PHYSICS_MODEL.md`.
 
 The displayed pressure-load proxy is a derived diagnostic, not a scenario input. It uses source-weighted excess pore pressure above atmosphere (Pa) times the fixed assumed support-plane area `π × source.supportRadiusM²` (m²), yielding newtons. Its validity status must accompany the value; see `PHYSICS_MODEL.md`.
+
+## New mechanics and fire benchmark inputs
+
+The mechanics-only mode's top traction is a prescribed downward surface load, 0–20,000 Pa in the UI, applied over the 6.096 m × 6.096 m footprint. It is not computed from source pressure. Its fixed demonstration material uses `E = 1 MPa`, `ν = 0.30`, Drucker–Prager cohesion `8 kPa`, friction slope `0.35`, dilation slope `0.05`, and hardening modulus `20 kPa`; bulk density comes from `soil.bulkDensityKgM3`. These are **not** measured peat parameters. The 4³ brick mesh and 1× visualization are fixed in this mode.
+
+During a slow fire run, the “Boundary oxygen” control is a prescribed atmospheric mole fraction, 0–0.3 in the UI and further limited by `xO₂ + xCO₂ + xH₂O ≤ 1`. Applying it records an operational event in physical solver time and changes only the atmospheric boundary composition. Interior gas responds through the transport solver. The separate programmatic `setUniformOxygenFraction` benchmark accepts 0–1 subject to available background gas, exchanges O₂ and background moles at fixed total gas moles, and records both signed mole amounts. Neither control is a dry-ice oxygen field.
+
+The fire snapshot now includes nonreacting mineral mass (`kg/cell`), supplemental root fuel (`kg/cell`, included once in total fuel), accepted-step oxidation rate (`kg/s/cell`), and reaction heat rate (`W/m³` of bulk cell). These are outputs, not independent editable inventories. The activity overlay distinguishes hot but nonreacting cells from cells with ongoing oxidation.

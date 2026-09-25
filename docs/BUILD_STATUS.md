@@ -2,6 +2,8 @@
 
 New branch mechanics-only mode: `src/mechanics/continuum.ts` solves 3D brick-element displacement, stress, strain, and plastic history for a prescribed top load, then renders 1× displacement in the existing scene. `npm run typecheck`, `npm run lint`, 46/46 tests, and `npm run build` passed sequentially on 2026-09-25. A live local Electron development window displayed the calculated result and force readouts. This is an unvalidated demonstration material, and the existing short-event link mechanics remains available separately.
 
+Fire extension: the existing 3D finite-volume solver now exposes reaction activity and distinct mineral/root inventories, and accepts recorded prescribed oxygen boundary changes. A benchmark-only species exchange makes inhibition/recovery reproducible with explicit O₂/background mole amounts. Typecheck, lint, 52/52 tests, and production build passed. This remains a single-step oxidation surrogate, not a matched peat/char kinetic model, and its 4³/6³ fire response is not spatially converged.
+
 Status reviewed against source on 2026-09-25. “Implemented” means code exists for the stated reduced or visual behavior; it does not imply experimental validation. Current native-window and automated-check results are recorded separately in `VALIDATION_STATUS.md`.
 
 | Requested area | Current status | Next concrete task or limit |

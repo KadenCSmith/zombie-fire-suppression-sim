@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "status": "numerical-sensitivity-not-mesh-converged",
+  "recordedAt": "2026-09-25",
+  "command": "npx vitest run tests/sim/fire.test.ts --reporter=verbose",
+  "case": "fixed-geometry heterogeneous source-off hot peat/root scenario from tests/sim/fire.test.ts, 600 physical seconds",
+  "units": {
+    "fuelConsumed": "kg",
+    "peakTemperature": "K",
+    "maxStep": "s"
+  },
+  "runs": [
+    { "grid": [4, 4, 4], "maxStep": 10, "fuelConsumed": 0.30053534857859066, "peakTemperature": 543.070252745801 },
+    { "grid": [4, 4, 4], "maxStep": 5, "fuelConsumed": 0.29897508470209877, "peakTemperature": 543.0692669909458 },
+    { "grid": [6, 6, 6], "maxStep": 10, "fuelConsumed": 0.5143521152296813, "peakTemperature": 544.114226259828 }
+  ],
+  "relativeFuelDifferenceTime": 0.00521870870292267,
+  "relativeFuelDifferenceMesh": 0.4157011516431926,
+  "validation": "No experimental or matched literature validation. Spatial sensitivity is material; no resolved-front claim."
+}

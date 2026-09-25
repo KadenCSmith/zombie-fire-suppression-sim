@@ -216,7 +216,10 @@ export interface Diagnostics {
   cumulativeInterventionGasSensibleJ: number;
   cumulativeCO2OutflowKg: number;
   cumulativeOxygenBoundaryInKg: number;
+  /** Signed prescribed benchmark oxygen change; background changes oppositely, mol. */
+  cumulativeOxygenInterventionMol: number;
   cumulativeFuelConsumedKg: number;
+  cumulativeRootFuelConsumedKg: number;
   /** Integrated heat released by the reduced dry-fuel oxidation reaction, J. */
   cumulativeReactionHeatJ: number;
   /** Reaction heat generated during the last accepted step divided by that step's duration, W. */
@@ -234,6 +237,14 @@ export interface SnapshotFields {
   backgroundGas: Float32Array;
   waterVapor: Float32Array;
   fuel: Float32Array;
+  /** Nonreacting mineral mass per bulk cell, kg. */
+  mineralKg: Float32Array;
+  /** Remaining supplemental root fuel, a subset of fuel, kg. */
+  rootFuelKg: Float32Array;
+  /** Accepted-step dry-fuel oxidation rate, kg/s per cell. */
+  reactionRateKgS: Float32Array;
+  /** Accepted-step reaction heat source per bulk cell volume, W/m³. */
+  reactionPowerWm3: Float32Array;
   moisture: Float32Array;
   pressurePa: Float32Array;
   porosity: Float32Array;
@@ -282,9 +293,11 @@ export interface ProbeSample {
 
 export interface OperationalEvent {
   timeSeconds: number;
-  type: 'heater-enabled' | 'heater-generation' | 'dry-ice-convert-all';
+  type: 'heater-enabled' | 'heater-generation' | 'dry-ice-convert-all' | 'atmospheric-oxygen' | 'oxygen-inventory-benchmark';
   value: boolean | number;
   externalEnergyJ?: number;
+  externalOxygenMol?: number;
+  externalBackgroundMol?: number;
 }
 
 export interface SerializedSimulation {

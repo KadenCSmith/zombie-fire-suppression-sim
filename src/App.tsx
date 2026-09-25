@@ -39,7 +39,7 @@ type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'path
 type SimClient = ReturnType<typeof createSimulationClient>
 
 const DAY = 86400
-const OVERLAYS: Overlay[] = ['temperature', 'oxygen', 'co2', 'pressure', 'moisture', 'fuel', 'porosity', 'permeability', 'effective-permeability', 'mobility']
+const OVERLAYS: Overlay[] = ['temperature', 'activity', 'oxygen', 'co2', 'pressure', 'moisture', 'fuel', 'porosity', 'permeability', 'effective-permeability', 'mobility']
 
 function formatClock(seconds: number) {
   const d = Math.floor(seconds / DAY)
@@ -95,6 +95,7 @@ function asSceneFrame(snapshot: Snapshot | null) {
       pressurePa: snapshot.fields.pressurePa,
       moistureSaturation: snapshot.fields.moisture,
       fuelKg: snapshot.fields.fuel,
+      reactionPowerWm3: snapshot.fields.reactionPowerWm3,
       porosity: snapshot.fields.porosity,
       intrinsicPermeabilityM2: snapshot.fields.intrinsicPermeability,
       effectivePermeabilityM2: snapshot.fields.effectivePermeability,
@@ -242,6 +243,7 @@ function App() {
   const [selectedPathway, setSelectedPathway] = useState(0)
   const [heaterEnabled, setHeaterEnabled] = useState(initial.source.enabled)
   const [heaterGeneration, setHeaterGeneration] = useState(initial.source.heatGenerationWm3)
+  const [boundaryOxygenInput, setBoundaryOxygenInput] = useState(initial.atmosphere.oxygenMoleFraction)
   const [operationalEvents, setOperationalEvents] = useState<{ timeSeconds: number; type: string; value: unknown }[]>([])
   const clientRef = useRef<SimClient | null>(null)
   const comparisonClientRef = useRef<SimClient | null>(null)
@@ -326,6 +328,7 @@ function App() {
       setFastPlaying(false)
       setHeaterEnabled(scenario.source.enabled)
       setHeaterGeneration(scenario.source.heatGenerationWm3)
+      setBoundaryOxygenInput(scenario.atmosphere.oxygenMoleFraction)
       lastRecordTime.current = -Infinity
       if (result.valid) setError('')
     }, 160)
@@ -446,7 +449,7 @@ function App() {
   const loadPreset = (key: ScenarioPreset) => { if (key === 'custom') return; setPreset(key); setScenario(makePreset(key, initial)); setOperationalEvents([]) }
   const start = () => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }
   const pause = () => { clientRef.current?.pause(); setPlaying(false) }
-  const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setFastRun(null); setContinuumResult(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
+  const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setBoundaryOxygenInput(scenario.atmosphere.oxygenMoleFraction); setFastRun(null); setContinuumResult(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
   const resetSettings = () => {
     pause()
     const defaults = createDefaultScenario()
@@ -490,6 +493,7 @@ function App() {
     setHistory([])
     setHeaterEnabled(defaults.source.enabled)
     setHeaterGeneration(defaults.source.heatGenerationWm3)
+    setBoundaryOxygenInput(defaults.atmosphere.oxygenMoleFraction)
     lastRecordTime.current = -Infinity
   }
   const toggleHeater = () => {
@@ -504,6 +508,10 @@ function App() {
       clientRef.current?.setHeaterGeneration(value)
       setOperationalEvents((old) => [...old, { timeSeconds: snapshot.timeSeconds, type: 'heater-generation', value }])
     } else update('source.heatGenerationWm3', value)
+  }
+  const applyBoundaryOxygen = () => {
+    clientRef.current?.setAtmosphericOxygen(boundaryOxygenInput)
+    setOperationalEvents((old) => [...old, { timeSeconds: snapshot?.timeSeconds ?? 0, type: 'atmospheric-oxygen', value: boundaryOxygenInput }])
   }
   const changeSourceDensity = (densityKgM3: number) => {
     setPreset('custom')
@@ -729,6 +737,11 @@ function App() {
             <Section title="Operational heater" detail="During the run">
               <div className="toggle-row"><div><strong>Heater enabled</strong><small>Changes are recorded as events</small></div><button type="button" role="switch" aria-checked={heaterEnabled} className={`switch ${heaterEnabled ? 'on' : ''}`} onClick={toggleHeater}><span /></button></div>
               <NumberControl label="Volumetric heat generation" symbol="q‴" value={heaterGeneration} min={0} max={200000} step={100} unit="W/m³" note="During a run, edits are recorded as operational events." onChange={changeHeaterGeneration} />
+            </Section>
+            <Section title="Atmospheric oxygen benchmark" detail="Prescribed boundary composition">
+              <NumberControl label="Boundary oxygen" value={boundaryOxygenInput} min={0} max={0.3} step={0.001} unit="mole frac." onChange={setBoundaryOxygenInput} note="A prescribed atmosphere change; the gas field evolves by transport after applying it." />
+              <button className="secondary-btn full" type="button" onClick={applyBoundaryOxygen} disabled={!snapshot || boundaryOxygenInput > 1 - scenario.atmosphere.co2MoleFraction - scenario.atmosphere.waterVaporMoleFraction}>Apply oxygen boundary</button>
+              <p className="control-note block">Use a low value temporarily, then restore the initial boundary value to examine source-free recovery and possible renewed oxidation. This is a benchmark boundary, not a dry-ice prediction.</p>
             </Section>
             <div className="tab-intro"><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><p>Manual soil-piece motion is a separate visual event. Its timing and extent are unrelated to source settings or calculated pressure.</p></div>
             <Section title="Illustrative soil rearrangement" detail="Independent event" open>

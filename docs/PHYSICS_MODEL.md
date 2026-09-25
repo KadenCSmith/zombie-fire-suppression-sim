@@ -36,6 +36,14 @@ An additional **pressure-load display proxy** uses near-source excess pore press
 
 ## Combustion and water
 
+### Fire milestone extension on `feature/predictive-soil-fire-physics`
+
+The implemented reaction remains a **single, complete oxidative surrogate** for dry organic fuel. It is not a calibrated multistep peat/char scheme. Drying is an independently accounted evaporation process; nonoxidative fuel decomposition and char oxidation are not included. The new state keeps nonreacting mineral mass (kg/cell) separate from organic fuel and tracks supplemental root fuel (kg/cell) as an explicit subset of the total fuel. Root and nonroot organic fuel are consumed in proportion to their remaining masses under the same surrogate rate; this is a numerical mixture assumption, not a measured root kinetic law. Minerals neither burn nor disappear. The dry bulk-density property remains fixed during this fire-only mode, so mechanical support after burnout is **not** calculated.
+
+Each accepted step stores the actual local oxidation rate in kg/s/cell and its heat source in W/m³ of bulk cell volume. A hot cell with zero oxidative reaction shows zero activity. The field overlay displays activity independently of temperature. A change of atmospheric O₂ mole fraction is a prescribed boundary event; it leaves the interior gas inventory unchanged until transport evolves it. For a separate inhibition/rebound benchmark, `setUniformOxygenFraction` replaces O₂ moles with equal background-gas moles at fixed total moles and temperature. Its event records signed external O₂ and background moles, and zero external energy under the solver's equal per-mole gas heat-capacity approximation. This is an imposed mixture exchange, **not** a CO₂/dry-ice prediction or physical injection design. After restoring O₂, oxidation can resume if fuel and temperature remain available; no irreversible extinguished flag is set. Cooling and depletion can instead prevent renewed activity. The treatment outcome depends on the chosen numerical state and is unvalidated.
+
+The published 30 cm peat-column study by [Huang and Rein (2017)](https://connectsci.au/wf/article/26/11/907/194558/Downward-spread-of-smouldering-peat-fire-the-role) uses measured peat properties, a different ignition protocol, and a multistep reaction model. The current 6.096 m demonstration with assumed kinetics does not match its geometry/material basis and must not be called a reproduced spread-rate benchmark. The [Gpyro Workbook v3](https://zenodo.org/records/13832584) identifies worked smoldering cases, but none has yet been matched with this solver. Independent experimental validation remains blocked on matched kinetic/property and boundary data.
+
 The version 0.1 fuel surrogate uses the mass-balanced complete-oxidation reaction
 
 ```text
