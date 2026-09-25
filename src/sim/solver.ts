@@ -21,6 +21,7 @@ const H2O_PER_FUEL_KG = 90 / 162;
 
 type Species = 'oxygen' | 'co2' | 'background' | 'vapor';
 const SPECIES: Species[] = ['oxygen', 'co2', 'background', 'vapor'];
+function zeroSpecies(): Record<Species, number> { return { oxygen: 0, co2: 0, background: 0, vapor: 0 }; }
 
 interface Face {
   a: number;
@@ -64,7 +65,8 @@ function freshDiagnostics(): Diagnostics {
     sourceExcessPressurePa: 0, sourceProjectedAreaM2: 0, sourcePressureLoadN: 0,
     sourcePressureLoadStatus: 'within-reduced-model',
     correctedMoles: 0, correctedWaterKg: 0, correctedFuelKg: 0,
-    gasBalanceResidualMol: 0, sourceEnergyResidualJ: 0, resolvedHeatResidualJ: 0,
+    gasBalanceResidualMol: 0, speciesBalanceResidualMol: zeroSpecies(),
+    sourceEnergyResidualJ: 0, resolvedHeatResidualJ: 0,
     cumulativeCO2InputKg: 0, cumulativeCO2OutflowKg: 0,
     cumulativeInterventionEnergyJ: 0, cumulativeInterventionGasSensibleJ: 0,
     cumulativeOxygenBoundaryInKg: 0, cumulativeFuelConsumedKg: 0,
@@ -124,6 +126,10 @@ export class Simulation {
   private sourceCells: Array<{ i: number; weight: number }> = [];
   private initialGasMol = 0;
   private cumulativeGasSourceMol = 0;
+  private initialSpeciesMol = zeroSpecies();
+  private cumulativeSpeciesSourceMol = zeroSpecies();
+  private cumulativeSpeciesBoundaryOutMol = zeroSpecies();
+  private cumulativeSpeciesCorrectionMol = zeroSpecies();
   private cumulativeSourceHeaterJ = 0;
   private cumulativeSourceSoilJ = 0;
   private cumulativeSourceSensibleJ = 0;
@@ -154,9 +160,16 @@ export class Simulation {
     this.heaterEnabled = scenario.source.enabled;
     this.heaterGenerationWm3 = scenario.source.heatGenerationWm3;
     this.initializeCells();
+    if (this.hasUnsupportedFrozenWater()) {
+      throw new Error('Initial liquid water is below 273.15 K; freezing and thawing are not modeled.');
+    }
     this.buildFaces();
     this.sourceCells = this.makeSourceWeights();
     this.initialGasMol = this.totalGasMol();
+    for (const species of SPECIES) {
+      const array = this.gasArray(species);
+      for (let i = 0; i < this.cellCount; i++) this.initialSpeciesMol[species] += array[i];
+    }
     this.updateDiagnostics();
   }
 
@@ -188,6 +201,12 @@ export class Simulation {
       case 'background': return this.background;
       case 'vapor': return this.vapor;
     }
+  }
+  private hasUnsupportedFrozenWater(): boolean {
+    for (let i = 0; i < this.cellCount; i++) {
+      if (this.water[i] > 0 && this.temperature[i] < 273.15 - 1e-9) return true;
+    }
+    return false;
   }
   private atmosphereFraction(species: Species): number {
     const a = this.scenario.atmosphere;
@@ -384,6 +403,8 @@ export class Simulation {
       deltaOxygenMol += changes[i];
     }
     this.diagnostics.cumulativeOxygenInterventionMol += deltaOxygenMol;
+    this.cumulativeSpeciesSourceMol.oxygen += deltaOxygenMol;
+    this.cumulativeSpeciesSourceMol.background -= deltaOxygenMol;
     this.events.push({ timeSeconds: this.timeSeconds, type: 'oxygen-inventory-benchmark', value: moleFraction,
       externalOxygenMol: deltaOxygenMol, externalBackgroundMol: -deltaOxygenMol, externalEnergyJ: 0 });
     this.updateDiagnostics();
@@ -415,6 +436,7 @@ export class Simulation {
     this.cumulativeSourceSensibleJ += solidSensibleJ;
     this.cumulativeSourceLatentJ += latentJ;
     this.cumulativeGasSourceMol += injectedMol;
+    this.cumulativeSpeciesSourceMol.co2 += injectedMol;
     this.diagnostics.cumulativeCO2InputKg += convertedMassKg;
     this.diagnostics.cumulativeInterventionEnergyJ += interventionEnergyJ;
     this.diagnostics.cumulativeInterventionGasSensibleJ += gasSensibleJ;
@@ -503,7 +525,11 @@ export class Simulation {
       this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
       this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
       this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ];
-    const backupDiagnostics: Diagnostics = { ...this.diagnostics, warnings: [...this.diagnostics.warnings] };
+    const backupSpeciesSource = { ...this.cumulativeSpeciesSourceMol };
+    const backupSpeciesBoundary = { ...this.cumulativeSpeciesBoundaryOutMol };
+    const backupSpeciesCorrection = { ...this.cumulativeSpeciesCorrectionMol };
+    const backupDiagnostics: Diagnostics = { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+      speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } };
     const rollback = () => {
       const failureStatus = this.diagnostics.status;
       const failureWarnings = this.diagnostics.warnings.filter(w => !backupDiagnostics.warnings.includes(w));
@@ -516,6 +542,9 @@ export class Simulation {
         this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
         this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
         this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ] = backupScalars;
+      this.cumulativeSpeciesSourceMol = backupSpeciesSource;
+      this.cumulativeSpeciesBoundaryOutMol = backupSpeciesBoundary;
+      this.cumulativeSpeciesCorrectionMol = backupSpeciesCorrection;
       this.diagnostics = { ...backupDiagnostics, status: failureStatus, warnings: [...backupDiagnostics.warnings, ...failureWarnings] };
       this.updateEffectiveProperties();
       this.updateDiagnostics();
@@ -537,6 +566,11 @@ export class Simulation {
         rollback();
         return;
       }
+    }
+    if (this.hasUnsupportedFrozenWater()) {
+      this.pause('validity-paused', 'Wet soil reached the freezing point; the model has no ice or thawing state.');
+      rollback();
+      return;
     }
     this.cumulativeResolvedHeatExpectedJ += expectedHeatJ;
     this.cumulativeResolvedHeatActualJ += actualHeatJ;
@@ -612,6 +646,7 @@ export class Simulation {
     }
     const addedMol = sublimatedKg / CO2_MOLAR_MASS;
     this.cumulativeGasSourceMol += addedMol;
+    this.cumulativeSpeciesSourceMol.co2 += addedMol;
     this.diagnostics.cumulativeCO2InputKg += sublimatedKg;
     for (const { i, weight } of this.sourceCells) {
       const mol = addedMol * weight;
@@ -645,6 +680,9 @@ export class Simulation {
         this.oxygen[i] -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
         this.co2[i] += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
         this.vapor[i] += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.oxygen -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.co2 += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.vapor += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
         const heatReleasedJ = reactedKg * model.heatOfCombustionJkg;
         heatJ[i] += heatReleasedJ;
         reactionHeatJ += heatReleasedJ;
@@ -659,6 +697,7 @@ export class Simulation {
         const evapKg = Math.min(this.water[i], kineticKg, availableSensibleJ / WATER_EVAPORATION_JKG);
         this.water[i] -= evapKg;
         this.vapor[i] += evapKg / H2O_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.vapor += evapKg / H2O_MOLAR_MASS;
         heatJ[i] -= evapKg * WATER_EVAPORATION_JKG;
         this.cumulativeGasSourceMol += evapKg / H2O_MOLAR_MASS;
         this.diagnostics.cumulativeWaterEvaporatedKg += evapKg;
@@ -835,6 +874,7 @@ export class Simulation {
           if (b >= 0) deltas[species][b] += transfer;
           else {
             this.diagnostics.cumulativeGasBoundaryOutMol += transfer;
+            this.cumulativeSpeciesBoundaryOutMol[species] += transfer;
             if (species === 'co2') this.diagnostics.cumulativeCO2OutflowKg += transfer * CO2_MOLAR_MASS;
             if (species === 'oxygen') this.diagnostics.cumulativeOxygenBoundaryInKg -= transfer * O2_MOLAR_MASS;
           }
@@ -849,6 +889,7 @@ export class Simulation {
             // Small roundoff is corrected explicitly and recorded; material negativity pauses.
             if (array[i] < -1e-8) { this.pause('numerical-paused', `${species} became negative at cell ${i}.`); return; }
             this.diagnostics.correctedMoles += -array[i];
+            this.cumulativeSpeciesCorrectionMol[species] -= array[i];
             array[i] = 0;
           }
         }
@@ -874,13 +915,22 @@ export class Simulation {
       ? 'within-reduced-model' : 'outside-validity';
     this.diagnostics.gasBalanceResidualMol = this.initialGasMol + this.cumulativeGasSourceMol
       - this.diagnostics.cumulativeGasBoundaryOutMol + this.diagnostics.correctedMoles - this.totalGasMol();
+    for (const species of SPECIES) {
+      const array = this.gasArray(species);
+      let currentMol = 0;
+      for (let i = 0; i < this.cellCount; i++) currentMol += array[i];
+      this.diagnostics.speciesBalanceResidualMol[species] = this.initialSpeciesMol[species]
+        + this.cumulativeSpeciesSourceMol[species] - this.cumulativeSpeciesBoundaryOutMol[species]
+        + this.cumulativeSpeciesCorrectionMol[species] - currentMol;
+    }
     this.diagnostics.sourceEnergyResidualJ = this.cumulativeSourceHeaterJ + this.cumulativeSourceSoilJ
       + this.diagnostics.cumulativeInterventionEnergyJ - this.diagnostics.cumulativeInterventionGasSensibleJ
       - this.cumulativeSourceSensibleJ - this.cumulativeSourceLatentJ - this.cumulativeSourceReturnJ;
     this.diagnostics.resolvedHeatResidualJ = this.cumulativeResolvedHeatExpectedJ - this.cumulativeResolvedHeatActualJ;
     if (![this.diagnostics.gasBalanceResidualMol, this.diagnostics.sourceEnergyResidualJ, this.diagnostics.resolvedHeatResidualJ,
       this.diagnostics.sourceExcessPressurePa, this.diagnostics.sourcePressureLoadN,
-      this.diagnostics.cumulativeReactionHeatJ, this.diagnostics.lastReactionPowerW].every(Number.isFinite)) {
+      this.diagnostics.cumulativeReactionHeatJ, this.diagnostics.lastReactionPowerW,
+      ...SPECIES.map(species => this.diagnostics.speciesBalanceResidualMol[species])].every(Number.isFinite)) {
       this.pause('numerical-paused', 'A conservation residual became non-finite.');
       this.diagnostics.sourcePressureLoadStatus = 'outside-validity';
     }
@@ -928,7 +978,8 @@ export class Simulation {
       dryIceDiameterM: diameterFromMass(this.dryIceMassKg, this.scenario.source.densityKgM3),
       dryIceTemperatureK: this.dryIceTemperatureK, heaterPowerW: this.heaterPowerW,
       heaterEnergyJ: this.heaterEnergyJ, peakTemperatureK, totalFuelKg,
-      diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings] },
+      diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+        speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } },
     };
   }
 
@@ -963,11 +1014,15 @@ export class Simulation {
     arrays.__ledger = [this.initialGasMol, this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ,
       this.cumulativeSourceSoilJ, this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ,
       this.cumulativeSourceReturnJ, this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ];
+    arrays.__speciesLedger = [this.initialSpeciesMol, this.cumulativeSpeciesSourceMol,
+      this.cumulativeSpeciesBoundaryOutMol, this.cumulativeSpeciesCorrectionMol]
+      .flatMap(totals => SPECIES.map(species => totals[species]));
     return { formatVersion: 1, scenario: JSON.parse(JSON.stringify(this.scenario)) as Scenario,
       timeSeconds: this.timeSeconds, dryIceMassKg: this.dryIceMassKg,
       dryIceTemperatureK: this.dryIceTemperatureK, heaterEnergyJ: this.heaterEnergyJ,
       heaterEnabled: this.heaterEnabled, heaterGenerationWm3: this.heaterGenerationWm3,
-      events: this.events.map(e => ({ ...e })), diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings] }, arrays };
+      events: this.events.map(e => ({ ...e })), diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+        speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } }, arrays };
   }
 
   static restore(data: SerializedSimulation): Simulation {
@@ -1008,6 +1063,7 @@ export class Simulation {
     if (data.arrays.temperature.some(value => value < 150 || value > 1200)
       || data.arrays.porosity.some(value => value <= 0 || value >= 1)
       || data.arrays.pressure.some(value => value <= 0)) throw new Error('Checkpoint temperature, porosity, or pressure is outside supported limits.');
+    if (sim.hasUnsupportedFrozenWater()) throw new Error('Checkpoint contains liquid water below 273.15 K without an ice state.');
     const ledger = data.arrays.__ledger;
     if (!Array.isArray(ledger) || ledger.length !== 9 || ledger.some(v => !Number.isFinite(v))) throw new Error('Invalid checkpoint ledger.');
     const rootFuelConsumedKg = data.diagnostics.cumulativeRootFuelConsumedKg ??
@@ -1018,15 +1074,40 @@ export class Simulation {
     [sim.initialGasMol, sim.cumulativeGasSourceMol, sim.cumulativeSourceHeaterJ,
       sim.cumulativeSourceSoilJ, sim.cumulativeSourceSensibleJ, sim.cumulativeSourceLatentJ,
       sim.cumulativeSourceReturnJ, sim.cumulativeResolvedHeatExpectedJ, sim.cumulativeResolvedHeatActualJ] = ledger;
+    const speciesLedger = data.arrays.__speciesLedger;
+    if (speciesLedger !== undefined) {
+      if (!Array.isArray(speciesLedger) || speciesLedger.length !== 16 || speciesLedger.some(v => !Number.isFinite(v))) {
+        throw new Error('Invalid checkpoint species ledger.');
+      }
+      [sim.initialSpeciesMol, sim.cumulativeSpeciesSourceMol, sim.cumulativeSpeciesBoundaryOutMol,
+        sim.cumulativeSpeciesCorrectionMol].forEach((totals, group) => {
+        SPECIES.forEach((species, index) => { totals[species] = speciesLedger[group * 4 + index]; });
+      });
+    } else {
+      // Legacy checkpoints did not retain component fluxes. Begin component accounting
+      // at the restored state; the original aggregate ledger still spans the full run.
+      for (const species of SPECIES) {
+        const array = sim.gasArray(species);
+        let currentMol = 0;
+        for (let i = 0; i < sim.cellCount; i++) currentMol += array[i];
+        sim.initialSpeciesMol[species] = currentMol;
+      }
+    }
     sim.timeSeconds = data.timeSeconds; sim.dryIceMassKg = data.dryIceMassKg;
     sim.dryIceTemperatureK = data.dryIceTemperatureK; sim.heaterEnergyJ = data.heaterEnergyJ;
     sim.heaterEnabled = data.heaterEnabled; sim.heaterGenerationWm3 = data.heaterGenerationWm3;
     sim.events = data.events.map(e => ({ ...e }));
     sim.diagnostics = { ...data.diagnostics, cumulativeRootFuelConsumedKg: rootFuelConsumedKg,
       cumulativeOxygenInterventionMol: data.diagnostics.cumulativeOxygenInterventionMol ?? 0,
+      speciesBalanceResidualMol: zeroSpecies(),
       warnings: [...data.diagnostics.warnings] };
     sim.updateDiagnostics();
     if (Math.abs(sim.diagnostics.gasBalanceResidualMol) > 1e-6 * Math.max(1, sim.initialGasMol)) throw new Error('Checkpoint gas inventory does not match its conservation ledger.');
+    for (const species of SPECIES) {
+      if (Math.abs(sim.diagnostics.speciesBalanceResidualMol[species]) > 1e-6 * Math.max(1, sim.initialSpeciesMol[species])) {
+        throw new Error(`Checkpoint ${species} inventory does not match its conservation ledger.`);
+      }
+    }
     return sim;
   }
 

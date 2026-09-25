@@ -205,6 +205,8 @@ export interface Diagnostics {
   correctedFuelKg: number;
   /** Integrated gas balance: initial + sources - boundary outflow - current, mol. */
   gasBalanceResidualMol: number;
+  /** Per-species initial + sources - signed boundary outflow + numerical correction - current, mol. */
+  speciesBalanceResidualMol: Record<'oxygen' | 'co2' | 'background' | 'vapor', number>;
   /** Integrated dry-ice heater + soil energy - sensible - latent, J. */
   sourceEnergyResidualJ: number;
   /** Diagnostic limited to resolved heat terms; excludes gas enthalpy at boundaries. */

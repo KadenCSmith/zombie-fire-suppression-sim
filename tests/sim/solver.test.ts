@@ -122,6 +122,21 @@ describe('reduced coupled fields', () => {
     expect(sim.diagnostics.cumulativeCO2InputKg).toBe(inputAtExhaustion);
     expect(inputAtExhaustion).toBeCloseTo(s.source.initialMassKg, 10);
   });
+  it('rejects initially frozen wet soil and pauses before an unsupported freezing step', () => {
+    const initial = quietClosedScenario();
+    initial.atmosphere.temperatureC = -1; initial.atmosphere.deepTemperatureC = -1;
+    expect(() => new Simulation(initial)).toThrow(/freezing and thawing are not modeled/);
+    const cooling = quietClosedScenario();
+    cooling.atmosphere.temperatureC = 0.00001; cooling.atmosphere.deepTemperatureC = 0.00001;
+    cooling.source.initialMassKg = 0.1; cooling.source.contactConductanceWm2K = 100;
+    const sim = new Simulation(cooling);
+    const before = sim.serialize();
+    const result = sim.advance(60);
+    expect(result.diagnostics.status).toBe('validity-paused');
+    expect(result.diagnostics.warnings.join(' ')).toMatch(/freezing point/);
+    expect(result.timeSeconds).toBe(0);
+    expect(sim.serialize().arrays.temperature).toEqual(before.arrays.temperature);
+  });
   it('converts all remaining solid once into CO₂ with explicit external energy and a replayable event', () => {
     const s = smallScenario();
     s.source.initialMassKg = 0.001;
@@ -147,6 +162,28 @@ describe('reduced coupled fields', () => {
     expect(sim.events.length).toBe(1);
     expect(sim.diagnostics.cumulativeCO2InputKg).toBeCloseTo(s.source.initialMassKg, 12);
     expect(Simulation.restore(after).snapshot().dryIceMassKg).toBe(0);
+  });
+  it('deposits a subgrid source conservatively at cell centers and junctions on two meshes', () => {
+    for (const resolution of [4, 8]) {
+      for (const fractionalCenter of [0.375, 0.5]) {
+        const s = quietClosedScenario();
+        s.domain.nx = resolution; s.domain.ny = resolution; s.domain.nz = resolution;
+        s.source.initialMassKg = 0.001; s.source.contactConductanceWm2K = 0;
+        s.source.centerXM = s.domain.widthM * fractionalCenter;
+        s.source.centerYM = s.domain.lengthM * fractionalCenter;
+        s.source.centerDepthM = s.domain.depthM * fractionalCenter;
+        const sim = new Simulation(s);
+        const before = sim.serialize();
+        sim.convertRemainingDryIce();
+        const after = sim.serialize();
+        const deposited = after.arrays.co2.map((value, i) => value - before.arrays.co2[i]);
+        const total = deposited.reduce((a, b) => a + b, 0);
+        expect(total).toBeCloseTo(s.source.initialMassKg / 0.0440095, 10);
+        expect(deposited.every(value => value >= -1e-14)).toBe(true);
+        expect(Math.abs(sim.diagnostics.speciesBalanceResidualMol.co2)).toBeLessThan(1e-10);
+        expect(Math.abs(sim.diagnostics.sourceEnergyResidualJ)).toBeLessThan(1e-6);
+      }
+    }
   });
   it('keeps the conversion visible but pauses before unsupported high-pressure flow', () => {
     const sim = createSimulation(createDefaultScenario());
@@ -185,6 +222,8 @@ describe('reduced coupled fields', () => {
     const cell = 21; const shift = initial.arrays.oxygen[cell] * 0.1;
     initial.arrays.oxygen[cell] += shift;
     initial.arrays.background[cell] -= shift;
+    initial.arrays.__speciesLedger[0] += shift;
+    initial.arrays.__speciesLedger[2] -= shift;
     const sim = Simulation.restore(initial);
     const oxygen0 = initial.arrays.oxygen.reduce((a, b) => a + b, 0);
     const total0 = initial.arrays.oxygen[cell];
@@ -263,6 +302,8 @@ describe('reduced coupled fields', () => {
     const cell = 21; const normalO2 = initial.arrays.oxygen[cell];
     const shift = normalO2 * 0.1;
     initial.arrays.oxygen[cell] += shift; initial.arrays.background[cell] -= shift;
+    initial.arrays.__speciesLedger[0] += shift;
+    initial.arrays.__speciesLedger[2] -= shift;
     const beforeX = initial.arrays.oxygen[cell] / (initial.arrays.oxygen[cell] + initial.arrays.co2[cell] + initial.arrays.background[cell] + initial.arrays.vapor[cell]);
     const ambientX = s.atmosphere.oxygenMoleFraction;
     const d = initial.arrays.effectiveDiffusivity[cell];
@@ -293,6 +334,9 @@ describe('reduced coupled fields', () => {
       }
       initial.arrays.__ledger[0] = ['oxygen', 'co2', 'background', 'vapor']
         .reduce((sum, species) => sum + initial.arrays[species].reduce((a, b) => a + b, 0), 0);
+      for (const [index, species] of ['oxygen', 'co2', 'background', 'vapor'].entries()) {
+        initial.arrays.__speciesLedger[index] = initial.arrays[species].reduce((a, b) => a + b, 0);
+      }
       const sim = Simulation.restore(initial);
       const after = sim.advance(durationS);
       expect(after.diagnostics.status).toBe('running');

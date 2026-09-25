@@ -13,6 +13,11 @@ function fireScenario(): Scenario {
 }
 
 const sum = (a: ArrayLike<number>) => Array.from(a).reduce((x, y) => x + y, 0)
+const expectSpeciesClosed = (sim: Simulation): void => {
+  for (const residual of Object.values(sim.diagnostics.speciesBalanceResidualMol)) {
+    expect(Math.abs(residual)).toBeLessThan(1e-7)
+  }
+}
 
 describe('fixed-geometry heterogeneous fire benchmark', () => {
   it('keeps mineral inventory inert and exposes actual oxidative activity', () => {
@@ -27,6 +32,7 @@ describe('fixed-geometry heterogeneous fire benchmark', () => {
     expect(after.fields.reactionPowerWm3.some(v => v > 0)).toBe(true)
     expect(sum(after.fields.reactionRateKgS) * 10).toBeCloseTo(after.diagnostics.cumulativeFuelConsumedKg, 5)
     expect(Math.abs(after.diagnostics.gasBalanceResidualMol)).toBeLessThan(1e-6)
+    expectSpeciesClosed(sim)
   })
 
   it('permits inhibition and renewed oxidation after a budgeted prescribed oxygen exchange', () => {
@@ -47,8 +53,10 @@ describe('fixed-geometry heterogeneous fire benchmark', () => {
     expect(sim.events.at(-1)?.externalOxygenMol).toBeGreaterThan(0)
     expect(sim.events.at(-1)?.externalEnergyJ).toBe(0)
     expect(Math.abs(recovered.diagnostics.gasBalanceResidualMol)).toBeLessThan(1e-6)
+    expectSpeciesClosed(sim)
     const restored = Simulation.restore(sim.serialize())
     expect(restored.snapshot().fields.reactionPowerWm3).toEqual(recovered.fields.reactionPowerWm3)
+    expectSpeciesClosed(restored)
   })
 
   it('responds to a changed atmospheric oxygen boundary without changing interior inventory instantly', () => {
@@ -76,6 +84,22 @@ describe('fixed-geometry heterogeneous fire benchmark', () => {
     expect(wetRun.diagnostics.cumulativeWaterEvaporatedKg).toBeGreaterThan(0)
     expect(wetRun.peakTemperatureK).not.toBe(dryRun.peakTemperatureK)
     expect(Number.isFinite(wetRun.diagnostics.resolvedHeatResidualJ)).toBe(true)
+    expect(Object.values(wetRun.diagnostics.speciesBalanceResidualMol).every(value => Math.abs(value) < 1e-7)).toBe(true)
+  })
+
+  it('rejects a checkpoint with altered species inventory and restores old aggregate-only checkpoints', () => {
+    const sim = new Simulation(fireScenario())
+    sim.advance(10)
+    const corrupted = sim.serialize()
+    corrupted.arrays.oxygen[0] += 0.01
+    corrupted.arrays.background[0] -= 0.01
+    expect(() => Simulation.restore(corrupted)).toThrow(/oxygen inventory/)
+    const legacy = sim.serialize()
+    delete legacy.arrays.__speciesLedger
+    const resumed = Simulation.restore(legacy)
+    expectSpeciesClosed(resumed)
+    resumed.advance(10)
+    expectSpeciesClosed(resumed)
   })
 
   it('does not ignite a cold state or consume absent fuel', () => {

@@ -1,0 +1,15 @@
+{
+  "status": "numerical comparison only; uncalibrated and not spatially converged",
+  "scenario": "tests/sim/integrated.test.ts commonScenario, 4x4x4 grid, 600 physical seconds, maximum 10 s step",
+  "initialState": "same default scenario and hot region before each listed intervention; named variants change only their declared inputs",
+  "prescribedSource": "0.001 kg solid CO2 where present; fixed support and optional 2500 W/m3 heater",
+  "results": {
+    "untreated": { "fuelConsumedKg": 0.30053534857859066, "remainingDryIceKg": 0, "peakTemperatureK": 543.070252745801 },
+    "dryIceHeaterOff": { "fuelConsumedKg": 0.30053170535199614, "remainingDryIceKg": 0.0008150416109125618, "peakTemperatureK": 543.0702347672353 },
+    "dryIceHeaterOn": { "fuelConsumedKg": 0.3004510422230329, "remainingDryIceKg": 0, "peakTemperatureK": 543.0710641976381 },
+    "wetHeaterOn": { "fuelConsumedKg": 0.2252725033776269, "remainingDryIceKg": 0, "peakTemperatureK": 542.9956833189327 },
+    "lowPermeabilityHeaterOn": { "fuelConsumedKg": 0.31037009305269103, "remainingDryIceKg": 0, "peakTemperatureK": 543.0771026884337 },
+    "assumedPathwayHeaterOn": { "fuelConsumedKg": 0.2989433879233168, "remainingDryIceKg": 0, "peakTemperatureK": 543.0702589880077 }
+  },
+  "limits": "fixed geometry, single oxidation surrogate, no ice or char state, no experimental comparison; the 4x4x4 versus 6x6x6 fire benchmark differed 41.57% in fuel consumed"
+}

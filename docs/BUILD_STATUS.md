@@ -1,5 +1,7 @@
 # Build status and handoff
 
+Remaining supported-physics pass: separate gas-species conservation ledgers, checkpoint corruption detection, subgrid source-deposition checks, a wet-soil freezing validity guard, and six reproducible integrated comparison cases have been added after the fire milestone. They do not constitute two-way soil/fire coupling or experimental validation. Exact open physics and affected outputs are listed in `VALIDATION_STATUS.md`.
+
 New branch mechanics-only mode: `src/mechanics/continuum.ts` solves 3D brick-element displacement, stress, strain, and plastic history for a prescribed top load, then renders 1× displacement in the existing scene. `npm run typecheck`, `npm run lint`, 46/46 tests, and `npm run build` passed sequentially on 2026-09-25. A live local Electron development window displayed the calculated result and force readouts. This is an unvalidated demonstration material, and the existing short-event link mechanics remains available separately.
 
 Fire extension: the existing 3D finite-volume solver now exposes reaction activity and distinct mineral/root inventories, and accepts recorded prescribed oxygen boundary changes. A benchmark-only species exchange makes inhibition/recovery reproducible with explicit O₂/background mole amounts. Typecheck, lint, 52/52 tests, and production build passed. This remains a single-step oxidation surrogate, not a matched peat/char kinetic model, and its 4³/6³ fire response is not spatially converged.
@@ -44,4 +46,4 @@ Status reviewed against source on 2026-09-25. “Implemented” means code exist
 
 ## Next agent task
 
-Check the remaining pace/replay settings, imports and exports, and sustained performance. The next physics priority is measured soil, peat, source-contact, and short-event material properties with controlled experimental comparisons before adding higher-consequence claims.
+The immediate physics dependencies are measured peat/root material and source-contact properties, a dry-gas effective-stress/storage formulation with a conservative interface to the FEM mesh, and a matched peat-column benchmark. Then add independently checked liquid/ice and multistep char chemistry only within measured validity ranges. Check the remaining pace/replay settings, imports and exports, and sustained performance separately. Do not interpret the six coarse-grid comparisons as field suppression predictions.
