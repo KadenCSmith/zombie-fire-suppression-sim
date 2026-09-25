@@ -1,6 +1,6 @@
 # Short-time gas and soil-response event
 
-**Status:** separate, exploratory reduced model. It is a two-second radial aggregate of one three-dimensional solver snapshot, usually taken just after the one-click solid-CO₂ conversion. It is not a continuation of the slow Darcy calculation, a shock solver, a calibrated soil-failure analysis, or evidence that a field event would occur.
+**Status:** separate, exploratory reduced model. It is a two-second radial aggregate of one three-dimensional solver snapshot, usually taken just after the one-click solid-CO₂ conversion. Its pressure frames now load a separate reduced vertical mechanics worker described in [`MECHANICS_MODEL.md`](MECHANICS_MODEL.md). It is not a continuation of the slow Darcy calculation, a shock solver, a calibrated soil-failure analysis, or evidence that a field event would occur.
 
 ## Handoff and clocks
 
@@ -27,7 +27,7 @@ yield index = max(0, deficit / 20,000 Pa)
 
 The 0.8 pressure coefficient and 20 kPa cohesion are **uncalibrated demonstration assumptions**. Overburden uses the base soil dry density, not a resolved layer-by-layer weight or measured total stress. The damage indicator grows as `d_next = 1 − (1 − d) exp(−3 × yield index × Δt)` and raises effective permeability by up to tenfold through `k = k₀[1 + 9d]`. This is an assumed feedback in the radial event only. It does not calculate crack surfaces, displacement, strain, fracture energy, soil-piece trajectories, or lasting permeability changes in the multiday grid. Visible soil motion remains illustrative.
 
-Each frame also reports an algebraic pressure-load proxy: `max(0, first-shell pressure − atmospheric pressure) × π × fixed support radius²`, in newtons. The area is an imagined plane, not an integrated soil interface. Neither that number nor the yield/damage indicator is a measured uplift force, rupture threshold, or blast force. The separate slow-solver pressure-load diagnostic uses a trilinear cell-pressure average rather than this first radial group. The frame-zero short-event pressure/load may therefore differ from the slow snapshot at the same time: this is a consequence of coarse remapping, not an instantaneous pressure change caused by additional gas.
+Each frame also reports an algebraic pressure-load proxy: `max(0, first-shell pressure − atmospheric pressure) × π × fixed support radius²`, in newtons. The area is an imagined plane, not an integrated soil interface. Neither that number nor the yield/damage indicator is a measured uplift force, rupture threshold, or blast force. The separate slow-solver pressure-load diagnostic uses a trilinear cell-pressure average rather than this first radial group. The frame-zero short-event pressure/load may therefore differ from the slow snapshot at the same time: this is a consequence of coarse remapping, not an instantaneous pressure change caused by additional gas. The separate mechanics worker calculates vertical displacement and a tensile-yield flag from pressure loading; these outputs are distinct from this event's illustrative damage index.
 
 ## Evidence and limits
 

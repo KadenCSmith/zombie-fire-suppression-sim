@@ -28,6 +28,8 @@ import { PARAMETER_REGISTRY, SOIL_PRESETS, applySoilPreset as applyPresetToScena
 import type { Scenario, Snapshot, ProbeSample } from './sim/types'
 import type { FastEventRun } from './fastEvent'
 import { createSimulationClient } from './worker/client'
+import { mechanicsSizing, type MechanicsChecks, type MechanicsFrame, type MechanicsResolution } from './mechanics/model'
+import { derivePlumeSources, type PlumeSource } from './plumes/model'
 
 type Checkpoint = { snapshot: Snapshot; probe: ProbeSample | null }
 type Tab = 'setup' | 'simulation' | 'results' | 'event'
@@ -219,6 +221,18 @@ function App() {
   const [fastDuration, setFastDuration] = useState(2)
   const [fastFrameCount, setFastFrameCount] = useState(61)
   const [fastOverlay, setFastOverlay] = useState<FastOverlay>('pressure')
+  const [mechanicsResolution, setMechanicsResolution] = useState<MechanicsResolution>(4)
+  const [mechanicsFrames, setMechanicsFrames] = useState<MechanicsFrame[]>([])
+  const [mechanicsChecks, setMechanicsChecks] = useState<MechanicsChecks | null>(null)
+  const [mechanicsRunning, setMechanicsRunning] = useState(false)
+  const [mechanicsProgress, setMechanicsProgress] = useState(0)
+  const [mechanicsSpeed, setMechanicsSpeed] = useState(0)
+  const [smallChecksPassed, setSmallChecksPassed] = useState(false)
+  const [mechanicsView, setMechanicsView] = useState<'displacement' | 'yield'>('displacement')
+  const [showSmoke, setShowSmoke] = useState(true)
+  const [showSteam, setShowSteam] = useState(true)
+  const [plumeQuality, setPlumeQuality] = useState(3)
+  const [plumeSources, setPlumeSources] = useState<PlumeSource[]>([])
   const [selectedPeat, setSelectedPeat] = useState(0)
   const [selectedLayer, setSelectedLayer] = useState(0)
   const [selectedHot, setSelectedHot] = useState(0)
@@ -233,15 +247,23 @@ function App() {
   const lastRecordTime = useRef(-Infinity)
   const probeRef = useRef<ProbeLocation | null>(null)
   const atmosphereRef = useRef(initial.atmosphere.pressurePa)
+  const ambientTemperatureRef = useRef(initial.atmosphere.temperatureC + 273.15)
   const durationRef = useRef(durationDays)
+  const previousPlumeSnapshot = useRef<Snapshot | null>(null)
+  const fastRunRef = useRef<FastEventRun | null>(null)
+  const mechanicsChecksRef = useRef<MechanicsChecks | null>(null)
+  const mechanicsResolutionRef = useRef<MechanicsResolution>(4)
 
   useEffect(() => { probeRef.current = probe }, [probe])
   useEffect(() => { atmosphereRef.current = scenario.atmosphere.pressurePa }, [scenario.atmosphere.pressurePa])
+  useEffect(() => { ambientTemperatureRef.current = scenario.atmosphere.temperatureC + 273.15 }, [scenario.atmosphere.temperatureC])
   useEffect(() => { durationRef.current = durationDays }, [durationDays])
 
   useEffect(() => {
     const client = createSimulationClient({
       onSnapshot: (next: Snapshot) => {
+        if (previousPlumeSnapshot.current) setPlumeSources(derivePlumeSources(previousPlumeSnapshot.current, next, ambientTemperatureRef.current))
+        previousPlumeSnapshot.current = next
         setSnapshot(next)
         const interval = Math.max(30, next.timeSeconds / 400)
         if (next.timeSeconds === 0 || next.timeSeconds - lastRecordTime.current >= interval || next.diagnostics.status !== 'running') {
@@ -260,7 +282,21 @@ function App() {
       },
       onError: (message: string) => { setError(message); setPlaying(false) },
       onProgress: (progress) => { setThroughput(progress.throughput); if (!progress.running) setPlaying(false) },
-      onFastEvent: (run) => { setError(''); setFastRun(run); setFastMode(true); setFastIndex(0); setFastPlaying(run.frames.length > 1); setComparison(false); setMotionPlaying(false); setIllustration(0); setTab('event') },
+      onFastEvent: (run) => { fastRunRef.current = run; setError(''); setFastRun(run); setFastMode(true); setFastIndex(0); setFastPlaying(false); setMechanicsFrames([]); setMechanicsChecks(null); setSmallChecksPassed(false); setMechanicsRunning(run.status === 'complete'); setComparison(false); setMotionPlaying(false); setIllustration(0); setTab('event') },
+      onMechanicsFrame: (frame, checks) => {
+        mechanicsChecksRef.current = checks
+        setMechanicsChecks(checks)
+        setMechanicsFrames(old => [...old, frame])
+        const run = fastRunRef.current
+        if (run) setFastIndex(Math.max(0, run.frames.findIndex(g => Math.abs(g.eventTimeS - frame.eventTimeS) < 1e-6)))
+      },
+      onMechanicsProgress: (p) => {
+        setMechanicsRunning(p.running); setMechanicsProgress(p.progress); setMechanicsSpeed(p.achievedSpeed)
+        if (!p.running && !p.cancelled && p.progress >= 0.999 && mechanicsResolutionRef.current === 4) {
+          const c = mechanicsChecksRef.current
+          if (c && Math.abs(c.massResidualKg) < 1e-6 && c.maxMomentumResidualN < 1e-5 && c.warnings.length === 0) setSmallChecksPassed(true)
+        }
+      },
     })
     clientRef.current = client
     return () => { client.dispose(); clientRef.current = null }
@@ -280,6 +316,7 @@ function App() {
       setPlayback(false)
       setPlaying(false)
       setFastRun(null)
+      fastRunRef.current = null; previousPlumeSnapshot.current = null; setPlumeSources([]); setMechanicsFrames([]); setMechanicsChecks(null); setSmallChecksPassed(false)
       setFastMode(false)
       setFastPlaying(false)
       setHeaterEnabled(scenario.source.enabled)
@@ -369,6 +406,10 @@ function App() {
   const sceneFrame = useMemo(() => asSceneFrame(alignedComparisonSnapshot), [alignedComparisonSnapshot])
   const compareFrame = useMemo(() => asSceneFrame(compareSnapshot), [compareSnapshot])
   const fastFrame = fastRun?.frames[Math.min(fastIndex, Math.max(0, fastRun.frames.length - 1))] ?? null
+  const mechanicsFrame = mechanicsFrames[Math.min(fastIndex, Math.max(0, mechanicsFrames.length - 1))] ?? null
+  const mechanicsEstimate = mechanicsSizing(mechanicsResolution, fastDuration, scenario)
+  const smokeRate = plumeSources.reduce((sum, p) => sum + p.smokeKgS, 0)
+  const steamRate = plumeSources.reduce((sum, p) => sum + p.condensedSteamKgS, 0)
   const legendRange = useMemo(() => {
     const info = OVERLAY_INFO[overlay]
     if (!sceneFrame || fixedScale || comparison) return [info.min, info.max]
@@ -484,10 +525,20 @@ function App() {
     pause()
     clientRef.current?.startFastEvent({ durationS: fastDuration, frameCount: fastFrameCount, convertRemainingDryIce: false })
   }
+  const runSelectedMechanics = () => {
+    if (!fastRun || (mechanicsResolution > 4 && !smallChecksPassed)) return
+    if (mechanicsFrames.length > 0 && mechanicsProgress < 1 && mechanicsResolutionRef.current === mechanicsResolution) {
+      setMechanicsRunning(true); clientRef.current?.resumeMechanics(); return
+    }
+    mechanicsResolutionRef.current = mechanicsResolution
+    mechanicsChecksRef.current = null
+    setMechanicsFrames([]); setMechanicsProgress(0); setMechanicsRunning(true); setFastPlaying(false)
+    clientRef.current?.startMechanics(mechanicsResolution)
+  }
   const replayFastEvent = () => { if (!fastRun) return; setTab('event'); setFastMode(true); setFastIndex(0); setFastPlaying(true); setComparison(false) }
   const exportFastEvent = () => {
     if (!fastRun) return
-    download('zombie-fire-fast-event.json', JSON.stringify({ format: 'zombie-fire-fast-event', modelId: fastRun.modelId, status: fastRun.status, startSolverTimeS: fastRun.startSolverTimeS, durationS: fastRun.durationS, shellRadiusM: fastRun.shellRadiusM, sourceProjectedAreaM2: fastRun.sourceProjectedAreaM2, assumptions: fastRun.assumptions, diagnostics: fastRun.diagnostics, frames: fastRun.frames.map((frame) => ({ ...frame, shellPressurePa: Array.from(frame.shellPressurePa), shellCO2MoleFraction: Array.from(frame.shellCO2MoleFraction), shellYieldIndex: Array.from(frame.shellYieldIndex), shellDamage: Array.from(frame.shellDamage) })), note: 'Short-time radial aggregate. Pressure and CO2 are reduced model outputs; yield/damage and visible soil motion are illustrative, not validated fracture or blast predictions.' }, null, 2), 'application/json')
+    download('zombie-fire-fast-event.json', JSON.stringify({ format: 'zombie-fire-fast-event', modelId: fastRun.modelId, status: fastRun.status, startSolverTimeS: fastRun.startSolverTimeS, durationS: fastRun.durationS, shellRadiusM: fastRun.shellRadiusM, sourceProjectedAreaM2: fastRun.sourceProjectedAreaM2, assumptions: fastRun.assumptions, diagnostics: fastRun.diagnostics, frames: fastRun.frames.map((frame) => ({ ...frame, shellPressurePa: Array.from(frame.shellPressurePa), shellCO2MoleFraction: Array.from(frame.shellCO2MoleFraction), shellYieldIndex: Array.from(frame.shellYieldIndex), shellDamage: Array.from(frame.shellDamage) })), note: 'Radial gas pressure and CO2 are reduced model outputs. Shell damage is illustrative. Separate calculated vertical mechanics frames use assumed parameters and do not predict validated rupture or blast.' }, null, 2), 'application/json')
   }
   const chooseProbe = (p: ProbeLocation) => { setProbe(p); setHistory((old) => old.map((item) => ({ ...item, probe: sampleSnapshot(item.snapshot, p, scenario.atmosphere.pressurePa) }))) }
   const chooseScenarioFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -559,7 +610,7 @@ function App() {
 
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.1</span></small></div></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.2</span></small></div></div>
       <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
       <div className="topbar-actions"><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>
@@ -680,7 +731,7 @@ function App() {
               <button className="primary-btn full" type="button" onClick={triggerIllustration} disabled={motionPlaying}>Show soil opening and settling</button>
               <p className="motion-warning">Illustration — not a calculated shockwave. This event does not change the simulation.</p>
             </Section>
-            <Section title="Physics scope" open><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Heat, porous gas transport, smoldering, finite dry-ice inventory</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Soil-piece movement</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Rupture, blast, calibrated geomechanics, char yield</span></div></div></Section>
+            <Section title="Physics scope" open><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Heat, porous gas transport, smoldering, finite dry-ice inventory, and event soil mechanics</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Separate manual soil-piece movement</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Rupture, blast, calibrated geomechanics, char yield</span></div></div></Section>
           </>}
           {tab === 'results' && <>
             <div className="tab-intro"><StatusChip kind="reduced">RECORDED SOLVER STATE</StatusChip><p>Inspect modeled fields, a virtual sensor, conservation ledgers, and saved checkpoints. Results are exploratory and unvalidated.</p></div>
@@ -696,7 +747,7 @@ function App() {
             <Section title="Model interpretation"><p className="control-note block">Pressure load is a pressure × assumed area proxy on an imaginary plane. It does not predict soil displacement, fracture, or blast force.</p></Section>
           </>}
           {tab === 'event' && <>
-            <div className="tab-intro"><StatusChip kind="reduced">REDUCED SHORT-TIME GAS MODEL</StatusChip><p>This separate radial shell calculation spans at most two simulated seconds. It starts from the current 3D slow-run state and uses its own event clock.</p><StatusChip kind="illustrative">ILLUSTRATIVE SOIL RESPONSE</StatusChip><p>Yield, damage, visible cracking, and soil-piece motion are uncalibrated indicators. They do not predict fracture, uplift, or blast force.</p></div>
+            <div className="tab-intro"><StatusChip kind="reduced">REDUCED SHORT-TIME GAS MODEL</StatusChip><p>This separate radial shell calculation spans at most two simulated seconds. It starts from the current 3D slow-run state and uses its own event clock.</p><StatusChip kind="reduced">CALCULATED VERTICAL SOIL MOTION</StatusChip><p>Lumped soil elements calculate pressure loading, gravity, inertia, elastic motion, and tensile yielding with assumed properties.</p></div>
             <Section title="Short-time event" detail="Separate solver clock" open>
               <NumberControl label="Event duration" value={fastDuration} min={0.1} max={2} step={0.05} unit="s" note="Bounded short-time calculation; independent of the multiday clock." onChange={setFastDuration} />
               <NumberControl label="Recorded frames" value={fastFrameCount} min={2} max={100} step={1} unit="frames" onChange={(v) => setFastFrameCount(Math.round(v))} />
@@ -704,7 +755,23 @@ function App() {
               <p className="conversion-note">One-click numerical gas release. The slow-flow solver may pause at its validity limit; the separate event is a reduced radial calculation.</p>
               <button className="primary-btn full" type="button" onClick={runFastFromCurrent} disabled={!snapshot || !validation.valid}>Compute event from current slow state</button>
               <button className="secondary-btn full" type="button" onClick={replayFastEvent} disabled={!fastRun}>Replay recorded short event</button>
-              <p className="control-note block">Neither the pressure load nor the illustrative damage and soil motion are validated blast or fracture predictions.</p>
+              <p className="control-note block">Gas pressure drives the mechanics run. The legacy damage index remains illustrative; displacement and yield are calculated separately.</p>
+            </Section>
+            <Section title="Soil mechanics" detail="Worker · live frames" open>
+              <label className="control-note block" htmlFor="mechanics-resolution">Resolution: {mechanicsResolution} × {mechanicsResolution} × {mechanicsResolution}</label>
+              <input id="mechanics-resolution" className="timeline-range" type="range" min={0} max={2} step={1} value={[4, 6, 8].indexOf(mechanicsResolution)} onChange={e => setMechanicsResolution(([4, 6, 8] as MechanicsResolution[])[Number(e.target.value)])} />
+              <p className="control-note block">{mechanicsEstimate.elements} elements · {mechanicsEstimate.materialPoints} material points · ~{(mechanicsEstimate.estimatedMemoryBytes / 1024).toFixed(1)} KiB state · ~{mechanicsEstimate.expectedSteps} steps / {(mechanicsEstimate.elements * mechanicsEstimate.expectedSteps).toLocaleString()} element updates · stable Δt ≤ {mechanicsEstimate.stableStepS.toFixed(4)} s</p>
+              <button className="primary-btn full" type="button" onClick={runSelectedMechanics} disabled={!fastRun || mechanicsRunning || (mechanicsResolution > 4 && !smallChecksPassed)}>{mechanicsFrames.length > 0 && mechanicsProgress < 1 && mechanicsResolutionRef.current === mechanicsResolution ? 'Resume mechanics' : 'Run selected resolution'}</button>
+              <div className="file-actions"><button type="button" onClick={() => { clientRef.current?.pauseMechanics(); setMechanicsRunning(false) }} disabled={!mechanicsRunning}>Pause</button><button type="button" onClick={() => { clientRef.current?.cancelMechanics(); setMechanicsRunning(false); setMechanicsFrames([]); setMechanicsChecks(null); mechanicsChecksRef.current = null; setMechanicsProgress(0) }} disabled={!mechanicsRunning && mechanicsProgress === 0}>Cancel</button></div>
+              <p className="control-note block">{mechanicsRunning ? 'Calculating' : mechanicsProgress >= 1 ? 'Complete' : 'Ready'} · {(mechanicsProgress * 100).toFixed(0)}% · {mechanicsSpeed.toFixed(2)} simulated s / wall s. {smallChecksPassed ? 'Small-mesh mass and momentum checks passed; choose a larger resolution and click Run.' : 'Larger runs unlock after the small run passes mass, momentum, and stability checks.'}</p>
+              <div className="file-actions"><button type="button" onClick={() => setMechanicsView('displacement')}>Displacement</button><button type="button" onClick={() => setMechanicsView('yield')}>Yielded regions</button></div>
+              {mechanicsFrame && <div className="probe-readout"><div><span>Maximum displacement</span><strong>{mechanicsFrame.maxDisplacementM.toFixed(4)} m</strong></div><div><span>Yielded elements</span><strong>{mechanicsFrame.yieldedElements}</strong></div><div><span>Solver time</span><strong>{mechanicsFrame.eventTimeS.toFixed(3)} s</strong></div><div><span>Bottom overburden</span><strong>{mechanicsChecks?.initialOverburdenPa.toFixed(0)} Pa</strong></div><div><span>Initial effective stress</span><strong>{mechanicsChecks?.initialEffectiveStressPa.toFixed(0)} Pa</strong></div><div><span>Momentum residual</span><strong>{mechanicsChecks?.maxMomentumResidualN.toExponential(2)} N</strong></div></div>}
+              <p className="control-note block">Assumed E = 1 MPa, shear modulus = 0.35 MPa, Biot coefficient = 0.8, tensile limit = 20 kPa. Horizontal deformation and rupture paths remain unresolved.</p>
+            </Section>
+            <Section title="Smoke and steam" detail="Modeled source rates" open>
+              <div className="file-actions"><label><input type="checkbox" checked={showSmoke} onChange={e => setShowSmoke(e.target.checked)} /> Smoke</label><label><input type="checkbox" checked={showSteam} onChange={e => setShowSteam(e.target.checked)} /> Steam</label></div>
+              <label className="control-note block" htmlFor="plume-quality">Visual quality: {plumeQuality}</label><input id="plume-quality" className="timeline-range" type="range" min={1} max={6} value={plumeQuality} onChange={e => setPlumeQuality(Number(e.target.value))} />
+              <p className="control-note block">Smoke {smokeRate.toExponential(2)} kg/s (assumed 2% particulate yield from modeled peat oxidation). Condensed steam {steamRate.toExponential(2)} kg/s from modeled water loss and atmospheric cooling. Plume shapes and entrainment are visual approximations. CO₂ remains invisible.</p>
             </Section>
             <Section title="Event results" detail={fastRun ? fastRun.status : 'No event recorded'}>
               {fastRun && fastFrame ? <div className="probe-readout"><div><span>Event clock</span><strong>{fastFrame.eventTimeS.toFixed(3)} s</strong></div><div><span>Slow-run start time</span><strong>{formatClock(fastRun.startSolverTimeS)}</strong></div><div><span>Near-source pressure load</span><strong>{formatLoad(fastFrame.sourcePressureLoadN)} N</strong></div><div><span>Maximum shell pressure</span><strong>{Math.max(...Array.from(fastFrame.shellPressurePa)).toFixed(0)} Pa</strong></div><div><span>Maximum yield index</span><strong>{Math.max(...Array.from(fastFrame.shellYieldIndex)).toFixed(3)} assumed</strong></div><div><span>Maximum damage index</span><strong>{Math.max(...Array.from(fastFrame.shellDamage)).toFixed(3)} illustrative</strong></div><div><span>Gas balance residual</span><strong>{fastRun.diagnostics.gasBalanceResidualMol.toExponential(2)} mol</strong></div><div><span>CO₂ balance residual</span><strong>{fastRun.diagnostics.co2BalanceResidualMol.toExponential(2)} mol</strong></div></div> : <p className="control-note block">Run an event to inspect the separate pressure and CO₂ shell histories.</p>}
@@ -722,7 +789,7 @@ function App() {
       <main className="main-view">
         <div className="view-toolbar"><div className="toolbar-group"><span className="toolbar-label">VIEW</span>{([['orbit', '3D orbit'], ['top', 'Top'], ['section-x', 'X section'], ['section-y', 'Y section']] as [View, string][]).map(([id, label]) => <button type="button" key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}>{label}</button>)}</div><div className="toolbar-group right"><IconButton title="Open the separate short-time event" active={fastMode} disabled={!fastRun} onClick={() => selectTab('event')}><Zap size={17} /></IconButton><IconButton title="Show modeled flow arrows (direction amplified)" active={showFlow} disabled={fastMode} onClick={() => setShowFlow((v) => !v)}><Waves size={17} /></IconButton><IconButton title="Show roots" active={showRoots} onClick={() => setShowRoots((v) => !v)}><Leaf size={17} /></IconButton><IconButton title="A/B comparison: same initial scenario and seed, heater off baseline" active={comparison} disabled={fastMode} onClick={() => setComparison((v) => !v)}><ArrowLeftRight size={17} /></IconButton></div></div>
         <div className={`scene-area ${comparison && !fastMode ? 'comparing' : ''}`}>
-          <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: heaterEnabled, heatGenerationWm3: heaterGeneration } }} snapshot={sceneFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={comparison || fixedScale} illustration={illustration} probe={probe} onProbe={chooseProbe} lockCamera={comparison && !fastMode} fastEvent={fastMode && fastRun && fastFrame ? { run: fastRun, frame: fastFrame, overlay: fastOverlay } : null} /><div className="scene-tag">{fastMode ? 'SHORT-TIME RADIAL EVENT' : comparison ? 'A · CURRENT SCENARIO' : 'UNDERGROUND CUTAWAY'}<span>{fastMode && fastFrame ? `event clock ${fastFrame.eventTimeS.toFixed(3)} s · slow clock held at ${formatClock(fastRun?.startSolverTimeS ?? 0)}` : comparison ? `matched checkpoint ${formatClock(alignedComparisonSnapshot?.timeSeconds ?? 0)} · linked camera` : view === 'orbit' ? 'drag to orbit · choose Top / X / Y to see fields and place a sensor' : 'drag to orbit · scroll to zoom · click colored field to place sensor'}</span></div>{!fastMode && activeSmolderCells > 0 && <div className="smolder-scene-tag">● SMOLDERING PEAT <span>{displayed?.diagnostics.lastReactionPowerW.toFixed(1)} W modeled reaction heat</span></div>}{scenario.pathways.length > 0 && <div className="hypothetical-tag">Assumed pathway geometry · hypothetical transport</div>}{fastMode && <div className="illustration-tag">RADIAL GAS MODEL · SOIL MOTION ILLUSTRATIVE · NO VALIDATED FRACTURE / BLAST</div>}{!fastMode && illustration > 0 && <div className="illustration-tag">ILLUSTRATION — NOT A CALCULATED SHOCKWAVE</div>}</div>
+          <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: heaterEnabled, heatGenerationWm3: heaterGeneration } }} snapshot={sceneFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={comparison || fixedScale} illustration={illustration} probe={probe} onProbe={chooseProbe} lockCamera={comparison && !fastMode} fastEvent={fastMode && fastRun && fastFrame ? { run: fastRun, frame: fastFrame, overlay: fastOverlay } : null} mechanics={fastMode ? mechanicsFrame : null} mechanicsView={mechanicsView} plumes={plumeSources} showSmoke={showSmoke} showSteam={showSteam} plumeQuality={plumeQuality} /><div className="scene-tag">{fastMode ? 'SHORT-TIME GAS + SOIL MECHANICS' : comparison ? 'A · CURRENT SCENARIO' : 'UNDERGROUND CUTAWAY'}<span>{fastMode && fastFrame ? `event clock ${fastFrame.eventTimeS.toFixed(3)} s · slow clock held at ${formatClock(fastRun?.startSolverTimeS ?? 0)}` : comparison ? `matched checkpoint ${formatClock(alignedComparisonSnapshot?.timeSeconds ?? 0)} · linked camera` : view === 'orbit' ? 'drag to orbit · choose Top / X / Y to see fields and place a sensor' : 'drag to orbit · scroll to zoom · click colored field to place sensor'}</span></div>{!fastMode && activeSmolderCells > 0 && <div className="smolder-scene-tag">● SMOLDERING PEAT <span>{displayed?.diagnostics.lastReactionPowerW.toFixed(1)} W modeled reaction heat</span></div>}{scenario.pathways.length > 0 && <div className="hypothetical-tag">Assumed pathway geometry · hypothetical transport</div>}{fastMode && <div className="illustration-tag">CALCULATED VERTICAL MOTION · ASSUMED SOIL PROPERTIES · NO VALIDATED RUPTURE / BLAST</div>}{!fastMode && illustration > 0 && <div className="illustration-tag">ILLUSTRATION — NOT A CALCULATED SHOCKWAVE</div>}</div>
           {comparison && !fastMode && <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: false } }} snapshot={compareFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={true} illustration={0} probe={probe} lockCamera /><div className="scene-tag">B · HEATER OFF BASELINE <span>same seed · {formatClock(compareSnapshot?.timeSeconds ?? 0)} · linked camera</span></div></div>}
         </div>
         {fastMode && fastRun && fastFrame && <div className="fast-event-bar">
@@ -742,7 +809,7 @@ function App() {
           {tab === 'setup' && <div className="setup-overview"><span className="eyebrow">CURRENT SCENARIO</span><h3>{scenario.name}</h3><p>{scenario.description}</p><div className="probe-readout"><div><span>Dry-ice diameter</span><strong>{diameterFromMass(scenario.source.initialMassKg, scenario.source.densityKgM3).toFixed(3)} m</strong></div><div><span>Soil layers</span><strong>{scenario.soilLayers.length}</strong></div><div><span>Peat regions</span><strong>{scenario.peatRegions.length}</strong></div><div><span>Initial hot regions</span><strong>{scenario.hotRegions.length}</strong></div><div><span>Grid</span><strong>{scenario.domain.nx} × {scenario.domain.ny} × {scenario.domain.nz}</strong></div></div><button className="primary-btn full" type="button" onClick={() => selectTab('simulation')} disabled={!validation.valid}>Continue to simulation</button><p className="control-note block">This is an exploratory reduced model. Change a setting to restart the physical run.</p></div>}
           {tab !== 'setup' && <>
           <div className="run-status"><span className={`status-dot ${displayed?.diagnostics.status ?? 'idle'}`} /> <strong>{displayed?.diagnostics.status === 'validity-paused' ? 'Validity limit reached' : displayed?.diagnostics.status === 'numerical-paused' ? 'Numerical pause' : playing ? 'Computing' : playback ? 'Recorded playback' : 'Ready / paused'}</strong><span>{formatClock(time)}</span></div>
-          {fastMode && fastRun && fastFrame && <div className={`fast-readout ${fastRun.status}`}><div><Zap size={15} /><strong>SHORT EVENT · {fastFrame.eventTimeS.toFixed(3)} s</strong></div><p>{fastRun.status === 'validity-paused' ? 'Short-time validity limit reached. Shown values are outside the model range.' : 'Reduced radial gas calculation; soil response is illustrative.'}</p></div>}
+          {fastMode && fastRun && fastFrame && <div className={`fast-readout ${fastRun.status}`}><div><Zap size={15} /><strong>SHORT EVENT · {fastFrame.eventTimeS.toFixed(3)} s</strong></div><p>{fastRun.status === 'validity-paused' ? 'Short-time validity limit reached. Shown values are outside the model range.' : 'Reduced radial gas pressure with calculated vertical soil response and assumed material values.'}</p></div>}
           {error && <div className="alert-box">{error}</div>}
           {displayed?.diagnostics.warnings?.length ? <div className="alert-box">{displayed.diagnostics.warnings[displayed.diagnostics.warnings.length - 1]}</div> : null}
           {(tab === 'simulation' || tab === 'results') && <div className={`smolder-card ${activeSmolderCells > 0 ? 'active' : ''}`}><div className="smolder-title"><span className="smolder-indicator" /><strong>Smoldering peat</strong></div><p>{smolderStatus}</p><div className="probe-readout"><div><span>Reaction heat, latest step</span><strong>{displayed ? displayed.diagnostics.lastReactionPowerW.toFixed(1) : '—'} W</strong></div><div><span>Fuel consumed</span><strong>{displayed ? displayed.diagnostics.cumulativeFuelConsumedKg.toFixed(3) : '—'} kg</strong></div><div><span>Cumulative reaction heat</span><strong>{displayed ? (displayed.diagnostics.cumulativeReactionHeatJ / 1e6).toFixed(3) : '—'} MJ</strong></div><div><span>Reacting cells</span><strong>{displayed?.diagnostics.reactingCellCount ?? '—'}</strong></div></div><small>Heat and consumption come from the reduced oxidation solver, not the decorative glow.</small></div>}
@@ -750,7 +817,7 @@ function App() {
           {(tab === 'simulation' || tab === 'results') && <Section title="Sensor 01" detail={probe ? `${probe.xM.toFixed(1)}, ${probe.yM.toFixed(1)}, −${probe.depthM.toFixed(1)} m` : 'Choose a section view'} open><div className="probe-readout">{probeValue ? <><div><span>Temperature</span><strong>{(probeValue.temperatureK - 273.15).toFixed(1)} °C</strong></div><div><span>O₂ / CO₂</span><strong>{(probeValue.oxygenMoleFraction * 100).toFixed(1)}% / {(probeValue.co2MoleFraction * 100).toFixed(1)}%</strong></div><div><span>O₂ partial pressure</span><strong>{(probeValue.oxygenPartialPressurePa / 1000).toFixed(1)} kPa</strong></div><div><span>Pressure</span><strong>{(probeValue.pressurePa - scenario.atmosphere.pressurePa).toFixed(1)} Pa gauge</strong></div><div><span>Moisture</span><strong>{(probeValue.moistureSaturation * 100).toFixed(0)}% pore vol.</strong></div></> : <div className="probe-prompt"><MousePointer2 size={19} /> Choose Top, X section, or Y section, then click a colored cell to place a virtual sensor.</div>}</div></Section>}
           {tab === 'results' && <Section title="Recorded histories" detail={`${history.length} checkpoints`} open><MiniChart points={history} label="Peak temperature" unit="°C" accessor={(p) => p.snapshot.peakTemperatureK - 273.15} /><MiniChart points={history} label="Smolder reaction heat" unit="W" color="#ec946a" accessor={(p) => p.snapshot.diagnostics.lastReactionPowerW} /><MiniChart points={history.filter((p) => p.probe)} label="Sensor O₂" unit="%" color="#7cbfd0" accessor={(p) => (p.probe?.oxygenMoleFraction ?? 0) * 100} /></Section>}
           {tab === 'results' && <Section title="Mass & energy ledger" detail="Diagnostics"><div className="probe-readout"><div><span>CO₂ from dry ice</span><strong>{displayed?.diagnostics.cumulativeCO2InputKg.toFixed(3) ?? '—'} kg</strong></div><div><span>CO₂ boundary outflow</span><strong>{displayed?.diagnostics.cumulativeCO2OutflowKg.toFixed(3) ?? '—'} kg</strong></div><div><span>Gas balance residual</span><strong>{displayed?.diagnostics.gasBalanceResidualMol.toExponential(2) ?? '—'} mol</strong></div><div><span>Source energy residual</span><strong>{displayed?.diagnostics.sourceEnergyResidualJ.toExponential(2) ?? '—'} J</strong></div><div><span>Conversion intervention energy</span><strong>{displayed ? (displayed.diagnostics.cumulativeInterventionEnergyJ / 1000).toFixed(2) : '—'} kJ</strong></div><div><span>Numerical correction</span><strong>{displayed?.diagnostics.correctedMoles.toExponential(2) ?? '—'} mol</strong></div><div><span>Last physical step</span><strong>{displayed?.diagnostics.lastStepS.toFixed(1) ?? '—'} s</strong></div><div><span>Peak Darcy speed</span><strong>{displayed?.diagnostics.maxDarcyVelocityMS.toExponential(2) ?? '—'} m/s</strong></div><div><span>Pressure residual</span><strong>{displayed?.diagnostics.pressureResidualPa.toExponential(2) ?? '—'} Pa</strong></div></div></Section>}
-          {tab === 'event' && <div className="event-overview"><span className="eyebrow">SEPARATE EVENT CLOCK</span><h3>{fastRun && fastFrame ? `${fastFrame.eventTimeS.toFixed(3)} seconds` : 'No event computed yet'}</h3><p>{fastRun ? 'The short-time radial gas calculation begins from the selected slow-run state. Soil motion and damage are illustrative indicators.' : 'Run the slow model or use its initialized state, then compute a short event from the Event controls.'}</p>{fastRun && fastFrame && <div className="probe-readout"><div><span>Shell pressure peak</span><strong>{Math.max(...Array.from(fastFrame.shellPressurePa)).toFixed(0)} Pa</strong></div><div><span>Pressure load proxy</span><strong>{formatLoad(fastFrame.sourcePressureLoadN)} N</strong></div><div><span>Maximum damage index</span><strong>{Math.max(...Array.from(fastFrame.shellDamage)).toFixed(3)}</strong></div></div>}</div>}
+          {tab === 'event' && <div className="event-overview"><span className="eyebrow">SEPARATE EVENT CLOCK</span><h3>{fastRun && fastFrame ? `${fastFrame.eventTimeS.toFixed(3)} seconds` : 'No event computed yet'}</h3><p>{fastRun ? 'Radial gas pressure loads the vertical soil elements. Displacement and yield are calculated; the shell damage index is illustrative.' : 'Run the slow model or use its initialized state, then compute a short event from the Event controls.'}</p>{fastRun && fastFrame && <div className="probe-readout"><div><span>Shell pressure peak</span><strong>{Math.max(...Array.from(fastFrame.shellPressurePa)).toFixed(0)} Pa</strong></div><div><span>Pressure load proxy</span><strong>{formatLoad(fastFrame.sourcePressureLoadN)} N</strong></div><div><span>Maximum damage index</span><strong>{Math.max(...Array.from(fastFrame.shellDamage)).toFixed(3)}</strong></div></div>}</div>}
           {tab === 'results' && <div className="model-status-card"><div><CircleHelp size={17} /><strong>Model status</strong></div><p>Reduced porous transport and reaction; qualitative soil-motion illustration. No blast, rupture, or field outcome prediction.</p></div>}
           </>}
         </div>
@@ -759,7 +826,7 @@ function App() {
     </div>
 
     {(tab === 'simulation' || tab === 'results') && <footer className="timeline"><div className="transport"><button className="play-btn" type="button" onClick={playing ? pause : start} disabled={!validation.valid} aria-label={playing ? 'Pause solver' : 'Run solver'}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><IconButton title="One physical solver step" onClick={() => clientRef.current?.step()} disabled={!validation.valid || playing}><StepForward size={17} /></IconButton><IconButton title="Reset physical run" onClick={reset}><RotateCcw size={17} /></IconButton><IconButton title="Fast forward at up to 3600 simulated seconds per real second; physical solver steps remain stable" onClick={() => { setPlayback(false); setComputeRate(3600); clientRef.current?.setComputeRate(3600); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }} disabled={!validation.valid}><SkipForward size={17} /></IconButton></div><div className="timeline-main"><div className="timeline-head"><span>PHYSICAL SOLVER TIME <strong>{formatClock(time)}</strong></span><span>{progress.toFixed(0)}% of {durationDays}-day window</span></div><input className="timeline-range" type="range" min={0} max={Math.max(1, history.length - 1)} step={1} value={playback ? playbackIndex : Math.max(0, history.length - 1)} onChange={(e) => { pause(); setPlayback(true); setPlaybackIndex(Number(e.target.value)) }} aria-label="Recorded run playback scrubber" /><div className="timeline-ticks"><span>0</span><span>1d</span><span>{durationDays}d</span></div></div><div className="timeline-options"><div className="compute-rate"><label>SOLVER PACE</label><select aria-label="Target simulated seconds per wall second" value={computeRate} onChange={(e) => setComputeRate(Number(e.target.value))} title="Requested pace; actual throughput may be lower"><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div><div className="duration-pills">{[1, 3, 7].map((d) => <button key={d} type="button" className={durationDays === d ? 'active' : ''} onClick={() => setDurationDays(d)}>{d}d</button>)}</div><div className="run-to"><label>RUN TO</label><input type="number" min={0} max={durationDays * 24} step={1} value={runToHour} onChange={(e) => setRunToHour(Number(e.target.value))} /><span>h</span><button type="button" onClick={() => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(Math.min(durationDays * DAY, runToHour * 3600)) }} disabled={!validation.valid}>Go</button></div><div className="throughput">{throughput > 0 ? `${throughput.toFixed(0)} sim s / wall s` : 'Throughput measured during run'}</div></div><div className="playback-controls"><span>RECORDED PLAYBACK</span><button type="button" onClick={() => { pause(); setPlayback((v) => !v) }} disabled={history.length < 2}>{playback ? 'Pause' : 'Play'}</button><select aria-label="Recorded playback speed" value={playbackSpeed} onChange={(e) => setPlaybackSpeed(Number(e.target.value))}><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div></footer>}
-    {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.1</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manually triggered soil-piece motion, separate from the solver.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture, quantitative geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
+    {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.2</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manual soil-piece motion and radial shell damage; event displacement is calculated separately.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture surfaces, horizontal geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
   </div>
 }
 

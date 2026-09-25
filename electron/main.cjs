@@ -65,13 +65,18 @@ function serveBuiltApp(distDir) {
 }
 
 async function createWindow() {
-  const distDir = path.join(app.getAppPath(), 'dist');
-  server = serveBuiltApp(distDir);
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  appOrigin = `http://127.0.0.1:${server.address().port}`;
+  const devOrigin = process.env.ZOMBIE_DEV_ORIGIN;
+  if (devOrigin && /^http:\/\/127\.0\.0\.1:\d+$/.test(devOrigin)) {
+    appOrigin = devOrigin;
+  } else {
+    const distDir = path.join(app.getAppPath(), 'dist');
+    server = serveBuiltApp(distDir);
+    await new Promise((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1', resolve);
+    });
+    appOrigin = `http://127.0.0.1:${server.address().port}`;
+  }
 
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   session.defaultSession.setPermissionCheckHandler(() => false);
@@ -100,6 +105,21 @@ async function createWindow() {
   });
   mainWindow.once('ready-to-show', () => mainWindow.show());
   await mainWindow.loadURL(`${appOrigin}/`);
+  if (devOrigin) {
+    // A File Provider notification can briefly restart Vite during a reload.
+    // Recover a page whose entry modules failed to load in that interval.
+    let lastRetry = 0;
+    const recovery = setInterval(async () => {
+      if (!mainWindow || mainWindow.isDestroyed()) { clearInterval(recovery); return; }
+      try {
+        const empty = await mainWindow.webContents.executeJavaScript(
+          'document.readyState === "complete" && document.querySelector("#root")?.childElementCount === 0', true);
+        if (!empty || Date.now() - lastRetry < 10_000) return;
+        const response = await fetch(`${appOrigin}/src/main.tsx`, { signal: AbortSignal.timeout(1500) });
+        if (response.ok) { lastRetry = Date.now(); mainWindow.webContents.reload(); }
+      } catch { /* wait for the local server to recover */ }
+    }, 5000);
+  }
 }
 
 if (!app.requestSingleInstanceLock()) {

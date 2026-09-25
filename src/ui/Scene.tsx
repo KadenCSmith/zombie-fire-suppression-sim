@@ -5,6 +5,8 @@ import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
+import type { MechanicsFrame } from '../mechanics/model'
+import type { PlumeSource } from '../plumes/model'
 
 export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
 export type View = 'orbit' | 'top' | 'section-x' | 'section-y'
@@ -30,6 +32,12 @@ type SceneProps = {
   illustration: number
   lockCamera?: boolean
   fastEvent?: { run: FastEventRun; frame: FastEventFrame; overlay: FastOverlay } | null
+  mechanics?: MechanicsFrame | null
+  mechanicsView?: 'displacement' | 'yield'
+  plumes?: PlumeSource[]
+  showSmoke?: boolean
+  showSteam?: boolean
+  plumeQuality?: number
   probe?: ProbeLocation | null
   onProbe?: (probe: ProbeLocation) => void
   className?: string
@@ -405,6 +413,66 @@ function SoilMotion({ amount }: { amount: number }) {
   })}</group>
 }
 
+function MechanicsElements({ scenario, frame, view }: { scenario: any; frame: MechanicsFrame; view: 'displacement' | 'yield' }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const n = frame.resolution
+  const count = n ** 3
+  const dx = Number(scenario.domain.widthM) / n
+  const dy = Number(scenario.domain.lengthM) / n
+  const dz = Number(scenario.domain.depthM) / n
+  useEffect(() => {
+    if (!mesh.current) return
+    const object = new THREE.Object3D()
+    const color = new THREE.Color()
+    const scale = Math.max(0.01, frame.maxDisplacementM)
+    for (let q = 0; q < count; q++) {
+      const i = q % n; const j = Math.floor(q / n) % n; const k = Math.floor(q / (n * n))
+      object.position.set(-W / 2 + (i + 0.5) * dx, -(k + 0.5) * dz + frame.displacementM[q], -W / 2 + (j + 0.5) * dy)
+      object.scale.set(dx * 0.91, dz * 0.88, dy * 0.91)
+      object.updateMatrix()
+      mesh.current.setMatrixAt(q, object.matrix)
+      if (view === 'yield') color.set(frame.yielded[q] ? '#ff654f' : '#456774')
+      else color.set('#357a91').lerp(new THREE.Color('#f4d481'), Math.min(1, Math.abs(frame.displacementM[q]) / scale))
+      mesh.current.setColorAt(q, color)
+    }
+    mesh.current.instanceMatrix.needsUpdate = true
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
+  }, [frame, count, dx, dy, dz, n, view])
+  return <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+    <boxGeometry args={[1, 1, 1]} />
+    <meshStandardMaterial transparent opacity={0.59} roughness={0.9} depthWrite={false} side={THREE.DoubleSide} />
+  </instancedMesh>
+}
+
+function Plumes({ sources, smoke, steam, quality }: { sources: PlumeSource[]; smoke: boolean; steam: boolean; quality: number }) {
+  const group = useRef<THREE.Group>(null)
+  useFrame(({ clock }) => {
+    if (!group.current) return
+    const t = clock.getElapsedTime()
+    group.current.children.forEach((piece, index) => {
+      const source = sources[Math.floor(index / (quality * 2))]
+      if (!source) return
+      const kind = Math.floor(index / quality) % 2
+      const phase = index % quality / quality
+      const speed = Math.max(0.08, source.riseMS)
+      const flight = ((t * speed * 0.22 + phase) % 1)
+      piece.position.set(source.xM - W / 2 + source.vxMS * flight * 2 + Math.sin(index * 13.1) * flight * 0.08,
+        -source.depthM + flight * (source.depthM + 1.4),
+        source.yM - W / 2 + source.vyMS * flight * 2 + Math.cos(index * 8.7) * flight * 0.08)
+      const strength = kind === 0 ? source.smokeKgS : source.condensedSteamKgS
+      piece.visible = Boolean(kind === 0 ? smoke : steam) && strength > 0 && flight > Math.min(0.75, 0.12 / Math.max(speed, 0.08))
+      piece.scale.setScalar((kind === 0 ? 0.07 : 0.06) + flight * (kind === 0 ? 0.25 : 0.19))
+    })
+  })
+  return <group ref={group}>{sources.flatMap((source, s) => [0, 1].flatMap((kind) => Array.from({ length: quality }, (_, i) => {
+    const rate = kind === 0 ? source.smokeKgS : source.condensedSteamKgS
+    return <mesh key={`${s}-${kind}-${i}`} visible={rate > 0}>
+      <sphereGeometry args={[1, 8, 6]} />
+      <meshBasicMaterial color={kind === 0 ? '#4c514e' : '#d8e9e7'} transparent opacity={Math.min(0.42, 0.1 + Math.log1p(rate * 1000) * 0.12)} depthWrite={false} />
+    </mesh>
+  })))}</group>
+}
+
 function ScaleLabels({ depth }: { depth: number }) {
   return <group>
     <Html position={[-W / 2, 0.18, W / 2]} distanceFactor={9}><span className="scale-scene-label">0 m</span></Html>
@@ -431,7 +499,9 @@ function World(props: SceneProps) {
     {props.fastEvent ? <FastEventShells scenario={props.scenario} event={props.fastEvent} /> : props.view !== 'orbit' ? <FieldSlice {...props} /> : null}
     {!props.fastEvent && props.showFlow && <FlowArrows snapshot={props.snapshot} view={props.view} slice={props.slice} />}
     <Probe position={props.probe} />
-    <SoilMotion amount={props.fastEvent ? Math.max(props.illustration, Math.max(...Array.from(props.fastEvent.frame.shellDamage), 0) * 0.65) : props.illustration} />
+    {props.mechanics && <MechanicsElements scenario={props.scenario} frame={props.mechanics} view={props.mechanicsView ?? 'displacement'} />}
+    <SoilMotion amount={props.fastEvent ? 0 : props.illustration} />
+    {!!props.plumes?.length && <Plumes sources={props.plumes} smoke={props.showSmoke ?? true} steam={props.showSteam ?? true} quality={props.plumeQuality ?? 3} />}
     <ScaleLabels depth={depth} />
   </>
 }
