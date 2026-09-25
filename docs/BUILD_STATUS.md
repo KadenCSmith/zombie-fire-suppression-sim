@@ -30,10 +30,10 @@ Status reviewed against source on 2026-09-25. “Implemented” means code exist
 | Identical-seed A/B heater-off comparison | Partial | Both panels now use one view preset and fixed color scale; their cameras are locked while comparing. Interactive linked orbit and strict same-time pausing are not implemented. |
 | Scenario JSON validation, CSV, PNG, recorded-state JSON | Implemented in source | Browser-smoke import/export and screenshot. UI imports scenarios, but does not resume from the exported recording. |
 | Five reusable JSON demonstration scenarios | Implemented in `examples/` | Refresh if defaults or schema change, then validate imports in the browser. |
-| One-step Mac launch outside Chrome | Implemented in `run-mac.command` | Requires Node.js 22.12+; installs lockfile dependencies if needed, starts local Vite, and opens Safari. Confirm Finder double-click on the target Mac. |
+| One-step Mac launch outside Chrome | Implemented and terminal-tested in `run-mac.command` | Requires Node.js 22.12+; installs lockfile dependencies if needed, starts local Vite, and opens Safari. Finder double-click remains to check. |
 | Unit/conservation/restart/numerical tests | Implemented and passed locally | Full suite passes 32/32 in two files: 24 slow-solver and 8 short-event checks, including conservation, heat refinement, validity pauses, conversion, two seven-day runs, and default-grid first-hour coverage. Typecheck, lint, fresh production build, and targeted browser retest passed after the pressure-solver repair; see `VALIDATION_STATUS.md`. |
 | Performance target near 30 fps and Apple-silicon M3 verification | Not measured | Benchmark on the user's M3 Mac after browser smoke; report machine/browser rather than assuming performance. |
-| Private GitHub repository | Created at [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim) | Commit and push the tested local project; verify the remote default branch contents. |
+| Private GitHub repository | Published at [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim) | The tested project is committed and pushed on `main`. |
 
 ## Next agent task
 
