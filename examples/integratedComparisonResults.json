@@ -1,5 +1,9 @@
 {
   "status": "numerical comparison only; uncalibrated and not spatially converged",
+  "branch": "feature/predictive-soil-fire-physics",
+  "codeCommit": "5befddd3161ffa1fe2bbdd76d86233d27c788621",
+  "method": "3D finite-volume heat, ideal-gas storage, Darcy flow, species transport, reduced oxidation; fixed geometry and prescribed source",
+  "materialProvenance": "demonstration assumptions; not calibrated to measured peat",
   "scenario": "tests/sim/integrated.test.ts commonScenario, 4x4x4 grid, 600 physical seconds, maximum 10 s step",
   "initialState": "same default scenario and hot region before each listed intervention; named variants change only their declared inputs",
   "prescribedSource": "0.001 kg solid CO2 where present; fixed support and optional 2500 W/m3 heater",

@@ -1,5 +1,9 @@
 {
   "status": "single-process numerical runtime observation; not sustained multiday throughput",
+  "branch": "feature/predictive-soil-fire-physics",
+  "codeCommit": "5befddd3161ffa1fe2bbdd76d86233d27c788621",
+  "method": "3D finite-volume heat, ideal-gas storage, Darcy flow, species transport, reduced oxidation; fixed geometry",
+  "materialProvenance": "demonstration assumptions; not calibrated to measured peat",
   "grid": [61, 61, 30],
   "cellSizeM": [0.0999344262295082, 0.0999344262295082, 0.1],
   "cellCount": 111630,

@@ -2,6 +2,10 @@
   "schemaVersion": 1,
   "status": "numerical-sensitivity-not-mesh-converged",
   "recordedAt": "2026-09-25",
+  "branch": "feature/predictive-soil-fire-physics",
+  "codeCommit": "5befddd3161ffa1fe2bbdd76d86233d27c788621",
+  "method": "3D finite-volume heat, ideal-gas storage, Darcy flow, species transport, reduced oxidation; fixed geometry",
+  "materialProvenance": "demonstration assumptions; not calibrated to measured peat",
   "command": "npx vitest run tests/sim/fire.test.ts --reporter=verbose",
   "case": "fixed-geometry heterogeneous source-off hot peat/root scenario from tests/sim/fire.test.ts, 600 physical seconds",
   "units": {
