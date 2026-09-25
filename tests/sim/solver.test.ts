@@ -217,7 +217,46 @@ describe('reduced coupled fields', () => {
     expect(co2ProducedKg).toBeCloseTo(fuelConsumed * 264 / 162, 7);
     expect(vaporProducedKg).toBeCloseTo(fuelConsumed * 90 / 162, 7);
     expect(oxygenConsumedKg + fuelConsumed).toBeCloseTo(co2ProducedKg + vaporProducedKg, 7);
+    expect(Math.abs(sim.diagnostics.cumulativeReactionHeatJ - fuelConsumed * s.model.heatOfCombustionJkg)
+      / sim.diagnostics.cumulativeReactionHeatJ).toBeLessThan(1e-9);
+    expect(sim.diagnostics.lastReactionPowerW).toBeCloseTo(sim.diagnostics.cumulativeReactionHeatJ / 10, 5);
+    expect(sim.diagnostics.reactingCellCount).toBeGreaterThan(0);
   });
+  it('makes default untreated peat generate bounded heat while oxygen and fuel are available', () => {
+    const active = createSimulation(SCENARIOS.untreated);
+    const inertScenario = structuredClone(SCENARIOS.untreated);
+    inertScenario.model.smolderRateS = 0;
+    const inert = createSimulation(inertScenario);
+    const initialPeakK = active.snapshot().peakTemperatureK;
+    const hour = active.advance(3600);
+    const inertHour = inert.advance(3600);
+    expect(hour.diagnostics.status).toBe('running');
+    expect(hour.heaterEnergyJ).toBe(0);
+    expect(hour.diagnostics.cumulativeCO2InputKg).toBe(0);
+    expect(hour.diagnostics.cumulativeFuelConsumedKg).toBeGreaterThan(0.08);
+    expect(hour.diagnostics.cumulativeReactionHeatJ).toBeGreaterThan(1e6);
+    expect(Math.abs(hour.diagnostics.cumulativeReactionHeatJ
+      - hour.diagnostics.cumulativeFuelConsumedKg * active.scenario.model.heatOfCombustionJkg)
+      / hour.diagnostics.cumulativeReactionHeatJ).toBeLessThan(1e-9);
+    expect(hour.diagnostics.lastReactionPowerW).toBeGreaterThan(20);
+    expect(hour.diagnostics.reactingCellCount).toBeGreaterThanOrEqual(8);
+    expect(hour.peakTemperatureK - inertHour.peakTemperatureK).toBeGreaterThan(1);
+    expect(inertHour.diagnostics.cumulativeFuelConsumedKg).toBe(0);
+    expect(inertHour.diagnostics.cumulativeReactionHeatJ).toBe(0);
+    expect(inertHour.diagnostics.lastReactionPowerW).toBe(0);
+    expect(inertHour.diagnostics.reactingCellCount).toBe(0);
+    const restored = Simulation.restore(active.serialize()).snapshot();
+    expect(restored.diagnostics.cumulativeReactionHeatJ).toBe(hour.diagnostics.cumulativeReactionHeatJ);
+    expect(restored.diagnostics.lastReactionPowerW).toBe(hour.diagnostics.lastReactionPowerW);
+    expect(restored.diagnostics.reactingCellCount).toBe(hour.diagnostics.reactingCellCount);
+    const day = active.advanceTo(86400);
+    expect(day.diagnostics.status).toBe('running');
+    expect(day.peakTemperatureK).toBeLessThan(hour.peakTemperatureK);
+    expect(day.peakTemperatureK).toBeLessThan(initialPeakK);
+    expect(day.diagnostics.lastReactionPowerW).toBeGreaterThan(0);
+    expect(day.diagnostics.cumulativeReactionHeatJ).toBeGreaterThan(hour.diagnostics.cumulativeReactionHeatJ);
+    expect(Math.abs(day.diagnostics.gasBalanceResidualMol)).toBeLessThan(1e-5);
+  }, 20000);
   it('matches a one-step finite-volume diffusion flux to within 0.2%', () => {
     const s = quietClosedScenario(); s.model.maxStepS = 10;
     const initial = createSimulation(s).serialize();

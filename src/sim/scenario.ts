@@ -62,6 +62,7 @@ const DEFAULT: Scenario = {
     'source.heatGenerationWm3': 'assumed',
     'soil': 'assumed',
     'peatRegions': 'assumed',
+    'hotRegions': 'assumed',
     'model': 'assumed',
   },
   domain: { widthM: 6.096, lengthM: 6.096, depthM: 3, nx: 12, ny: 12, nz: 8 },
@@ -90,12 +91,12 @@ const DEFAULT: Scenario = {
   peatRegions: [{
     id: 'peat-1', shape: 'ellipsoid', centerXM: 3, centerYM: 3, centerDepthM: 1.55,
     sizeXM: 2.4, sizeYM: 2.2, thicknessM: 1.05, rotationDeg: 20,
-    organicFraction: 0.75, bulkDensityKgM3: 300, moistureSaturation: 0.48, seed: 17,
+    organicFraction: 0.75, bulkDensityKgM3: 300, moistureSaturation: 0.20, seed: 17,
   }],
   root: { amountKgM3: 1.5, meanDepthM: 0.45, distributionDepthM: 0.45, thicknessM: 0.015, seed: 4103 },
   hotRegions: [{
-    id: 'hot-1', shape: 'ellipsoid', centerXM: 2.55, centerYM: 3.0, centerDepthM: 1.65,
-    sizeXM: 1.1, sizeYM: 0.9, thicknessM: 0.55, temperatureC: 270, fuelFraction: 1,
+    id: 'hot-1', shape: 'ellipsoid', centerXM: 2.8, centerYM: 3.0, centerDepthM: 1.55,
+    sizeXM: 1.6, sizeYM: 1.4, thicknessM: 0.8, temperatureC: 270, fuelFraction: 1,
   }],
   source: {
     centerXM: 3.45, centerYM: 3.05, centerDepthM: 1.35,

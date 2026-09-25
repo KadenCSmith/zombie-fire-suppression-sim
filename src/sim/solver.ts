@@ -68,6 +68,7 @@ function freshDiagnostics(): Diagnostics {
     cumulativeCO2InputKg: 0, cumulativeCO2OutflowKg: 0,
     cumulativeInterventionEnergyJ: 0, cumulativeInterventionGasSensibleJ: 0,
     cumulativeOxygenBoundaryInKg: 0, cumulativeFuelConsumedKg: 0,
+    cumulativeReactionHeatJ: 0, lastReactionPowerW: 0, reactingCellCount: 0,
     cumulativeWaterEvaporatedKg: 0, cumulativeGasBoundaryOutMol: 0,
   };
 }
@@ -580,6 +581,8 @@ export class Simulation {
 
   private applyReactionAndEvaporation(dt: number, heatJ: Float64Array): void {
     const model = this.scenario.model;
+    let reactionHeatJ = 0;
+    let reactingCellCount = 0;
     for (let i = 0; i < this.cellCount; i++) {
       const temp = this.temperature[i];
       if (temp > model.minimumReactionTemperatureK && this.fuel[i] > 0 && this.oxygen[i] > 0) {
@@ -591,11 +594,14 @@ export class Simulation {
         const kineticFuelKg = this.fuel[i] * (1 - Math.exp(-Math.min(50, model.smolderRateS * arrhenius * oxygenFactor * dt)));
         const oxygenLimitedFuelKg = this.oxygen[i] * O2_MOLAR_MASS / O2_PER_FUEL_KG;
         const reactedKg = Math.min(this.fuel[i], kineticFuelKg, oxygenLimitedFuelKg);
+        if (reactedKg > 0) reactingCellCount++;
         this.fuel[i] -= reactedKg;
         this.oxygen[i] -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
         this.co2[i] += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
         this.vapor[i] += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
-        heatJ[i] += reactedKg * model.heatOfCombustionJkg;
+        const heatReleasedJ = reactedKg * model.heatOfCombustionJkg;
+        heatJ[i] += heatReleasedJ;
+        reactionHeatJ += heatReleasedJ;
         this.diagnostics.cumulativeFuelConsumedKg += reactedKg;
         this.cumulativeGasSourceMol += reactedKg * (-O2_PER_FUEL_KG / O2_MOLAR_MASS + CO2_PER_FUEL_KG / CO2_MOLAR_MASS + H2O_PER_FUEL_KG / H2O_MOLAR_MASS);
       }
@@ -611,6 +617,9 @@ export class Simulation {
         this.diagnostics.cumulativeWaterEvaporatedKg += evapKg;
       }
     }
+    this.diagnostics.cumulativeReactionHeatJ += reactionHeatJ;
+    this.diagnostics.lastReactionPowerW = reactionHeatJ / dt;
+    this.diagnostics.reactingCellCount = reactingCellCount;
   }
 
   private solvePressureAndTransport(dt: number): void {
@@ -823,7 +832,8 @@ export class Simulation {
       - this.cumulativeSourceSensibleJ - this.cumulativeSourceLatentJ - this.cumulativeSourceReturnJ;
     this.diagnostics.resolvedHeatResidualJ = this.cumulativeResolvedHeatExpectedJ - this.cumulativeResolvedHeatActualJ;
     if (![this.diagnostics.gasBalanceResidualMol, this.diagnostics.sourceEnergyResidualJ, this.diagnostics.resolvedHeatResidualJ,
-      this.diagnostics.sourceExcessPressurePa, this.diagnostics.sourcePressureLoadN].every(Number.isFinite)) {
+      this.diagnostics.sourceExcessPressurePa, this.diagnostics.sourcePressureLoadN,
+      this.diagnostics.cumulativeReactionHeatJ, this.diagnostics.lastReactionPowerW].every(Number.isFinite)) {
       this.pause('numerical-paused', 'A conservation residual became non-finite.');
       this.diagnostics.sourcePressureLoadStatus = 'outside-validity';
     }
@@ -939,6 +949,9 @@ export class Simulation {
       || data.arrays.pressure.some(value => value <= 0)) throw new Error('Checkpoint temperature, porosity, or pressure is outside supported limits.');
     const ledger = data.arrays.__ledger;
     if (!Array.isArray(ledger) || ledger.length !== 9 || ledger.some(v => !Number.isFinite(v))) throw new Error('Invalid checkpoint ledger.');
+    if (![data.diagnostics.cumulativeReactionHeatJ, data.diagnostics.lastReactionPowerW,
+      data.diagnostics.reactingCellCount].every(v => Number.isFinite(v) && v >= 0)
+      || !Number.isInteger(data.diagnostics.reactingCellCount)) throw new Error('Invalid checkpoint reaction diagnostics.');
     [sim.initialGasMol, sim.cumulativeGasSourceMol, sim.cumulativeSourceHeaterJ,
       sim.cumulativeSourceSoilJ, sim.cumulativeSourceSensibleJ, sim.cumulativeSourceLatentJ,
       sim.cumulativeSourceReturnJ, sim.cumulativeResolvedHeatExpectedJ, sim.cumulativeResolvedHeatActualJ] = ledger;

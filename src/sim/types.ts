@@ -217,6 +217,12 @@ export interface Diagnostics {
   cumulativeCO2OutflowKg: number;
   cumulativeOxygenBoundaryInKg: number;
   cumulativeFuelConsumedKg: number;
+  /** Integrated heat released by the reduced dry-fuel oxidation reaction, J. */
+  cumulativeReactionHeatJ: number;
+  /** Reaction heat generated during the last accepted step divided by that step's duration, W. */
+  lastReactionPowerW: number;
+  /** Grid cells with positive dry-fuel oxidation during the last accepted step. */
+  reactingCellCount: number;
   cumulativeWaterEvaporatedKg: number;
   cumulativeGasBoundaryOutMol: number;
 }

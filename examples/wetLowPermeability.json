@@ -20,6 +20,7 @@
     "source.heatGenerationWm3": "assumed",
     "soil": "assumed",
     "peatRegions": "assumed",
+    "hotRegions": "assumed",
     "model": "assumed"
   },
   "domain": {
@@ -94,12 +95,12 @@
     {
       "id": "hot-1",
       "shape": "ellipsoid",
-      "centerXM": 2.55,
+      "centerXM": 2.8,
       "centerYM": 3,
-      "centerDepthM": 1.65,
-      "sizeXM": 1.1,
-      "sizeYM": 0.9,
-      "thicknessM": 0.55,
+      "centerDepthM": 1.55,
+      "sizeXM": 1.6,
+      "sizeYM": 1.4,
+      "thicknessM": 0.8,
       "temperatureC": 270,
       "fuelFraction": 1
     }

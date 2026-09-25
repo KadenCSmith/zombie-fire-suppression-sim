@@ -1,6 +1,34 @@
 # Third-party notices
 
-This project does not select a license for its original code. The notices below reproduce license text for direct runtime dependencies installed by the pinned package manifest on 2026-09-25. The lockfile and each installed package contain the authoritative version and license metadata. Build artifacts may contain additional transitive dependencies whose notices must also be retained when distributing them.
+This project does not select a license for its original code. The notices below reproduce license text for direct runtime dependencies installed by the pinned package manifest on 2026-09-25. The lockfile and each installed package contain the authoritative version and license metadata. The packaged macOS app also embeds this file, `THIRD_PARTY_LICENSES/index.json` with installed production dependency licenses and notices, Electron's `LICENSE`, and Electron's `LICENSES.chromium.html` under the app's `Contents/Resources` directory.
+
+## Electron 44.3.0 — MIT
+
+```text
+Copyright (c) Electron contributors
+Copyright (c) 2013-2020 GitHub Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+Electron's bundled Chromium and other components have their own notices in the app's `LICENSES.chromium.html` resource. `@electron/packager` and `@electron/osx-sign` are pinned build tools and are not shipped as application modules.
 
 ## three 0.186.1 — MIT
 

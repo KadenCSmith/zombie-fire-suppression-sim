@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "mac": "./run-mac.command",
+    "package:mac": "npm run build && node scripts/package-mac.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
@@ -22,9 +23,12 @@
     "three": "0.186.1"
   },
   "devDependencies": {
+    "@electron/osx-sign": "2.6.0",
+    "@electron/packager": "20.3.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/three": "0.186.0",
+    "electron": "44.3.0",
     "oxlint": "1.85.0",
     "typescript": "7.0.2",
     "vite": "7.3.6",

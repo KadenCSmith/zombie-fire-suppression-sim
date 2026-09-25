@@ -174,7 +174,7 @@ function getPeatVisual(region: any, depth: number) {
   return { x, z, d, rx: Number.isFinite(rx) ? rx : 1.1, rz: Number.isFinite(rz) ? rz : 0.9, ry: Number.isFinite(ry) ? ry : 0.42 }
 }
 
-function PeatAndHotspots({ scenario, depth, timeSeconds }: { scenario: any; depth: number; timeSeconds: number }) {
+function PeatAndHotspots({ scenario, depth, snapshot }: { scenario: any; depth: number; snapshot?: Frame | null }) {
   const peat = Array.isArray(scenario?.peatRegions) ? scenario.peatRegions : []
   const hot = Array.isArray(scenario?.hotRegions) ? scenario.hotRegions : []
   return <group>
@@ -193,16 +193,24 @@ function PeatAndHotspots({ scenario, depth, timeSeconds }: { scenario: any; dept
       const rx = Number(h.radiusXM ?? h.radiusM ?? (h.sizeXM ?? 0.76) / 2)
       const rz = Number(h.radiusYM ?? h.radiusM ?? (h.sizeYM ?? 0.64) / 2)
       const ry = Number(h.radiusDepthM ?? h.radiusM ?? (h.thicknessM ?? 0.6) / 2)
+      const grid = snapshot?.grid
+      const ix = grid ? THREE.MathUtils.clamp(Math.floor(Number(h.centerXM ?? W / 2) / (grid.nx * grid.dxM) * grid.nx), 0, grid.nx - 1) : 0
+      const iz = grid ? THREE.MathUtils.clamp(Math.floor(Number(h.centerYM ?? W / 2) / (grid.ny * grid.dyM) * grid.ny), 0, grid.ny - 1) : 0
+      const iy = grid ? THREE.MathUtils.clamp(Math.floor(d / (grid.nz * grid.dzM) * grid.nz), 0, grid.nz - 1) : 0
+      const cell = grid ? (iy * grid.ny + iz) * grid.nx + ix : 0
+      const temperatureC = Number(snapshot?.fields.temperatureC?.[cell] ?? h.temperatureC ?? 20)
+      const ambientC = Number(scenario?.atmosphere?.temperatureC ?? 20)
+      const warmth = THREE.MathUtils.clamp((temperatureC - ambientC) / 180, 0, 1)
       return <group key={`h${i}`} position={[x, -d, z]}>
         <mesh scale={[rx * 1.25, ry * 1.25, rz * 1.25]}>
           <sphereGeometry args={[1, 20, 14]} />
-          <meshBasicMaterial color="#d47e50" transparent opacity={timeSeconds > 0 ? 0.015 : 0.09} depthWrite={false} />
+          <meshBasicMaterial color="#d47e50" transparent opacity={0.04 + 0.14 * warmth} depthWrite={false} />
         </mesh>
         <mesh scale={[rx, ry, rz]}>
           <sphereGeometry args={[1, 24, 16]} />
-          <meshStandardMaterial color="#a85136" emissive="#ac452c" emissiveIntensity={timeSeconds > 0 ? 0.08 : 0.72} roughness={1} transparent opacity={timeSeconds > 0 ? 0.18 : 0.72} />
+          <meshStandardMaterial color="#a85136" emissive="#ac452c" emissiveIntensity={0.18 + 0.9 * warmth} roughness={1} transparent opacity={0.16 + 0.46 * warmth} depthWrite={false} />
         </mesh>
-        {timeSeconds <= 0 && <pointLight color="#db7950" intensity={0.32} distance={2.1} />}
+        {warmth > 0.08 && <pointLight color="#db7950" intensity={0.12 + warmth * 0.24} distance={2.1} />}
       </group>
     })}
   </group>
@@ -314,7 +322,7 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
   }
   return <instancedMesh ref={ref} args={[undefined, undefined, n]} onClick={handleClick}>
     <boxGeometry args={[1, 1, 1]} />
-    <meshBasicMaterial vertexColors transparent opacity={0.76} side={THREE.DoubleSide} depthWrite={false} />
+    <meshBasicMaterial transparent opacity={0.82} side={THREE.DoubleSide} depthWrite={false} />
   </instancedMesh>
 }
 
@@ -417,10 +425,10 @@ function World(props: SceneProps) {
     <SoilBlock scenario={props.scenario} depth={depth} illustration={props.illustration} />
     <Grass />
     {props.showRoots && <Roots root={props.scenario?.root} depth={depth} />}
-    <PeatAndHotspots scenario={props.scenario} depth={depth} timeSeconds={props.snapshot?.timeSeconds ?? 0} />
+    <PeatAndHotspots scenario={props.scenario} depth={depth} snapshot={props.snapshot} />
     <Pathways pathways={Array.isArray(props.scenario?.pathways) ? props.scenario.pathways : []} />
     <Source scenario={props.scenario} snapshot={props.snapshot} />
-    {props.fastEvent ? <FastEventShells scenario={props.scenario} event={props.fastEvent} /> : <FieldSlice {...props} />}
+    {props.fastEvent ? <FastEventShells scenario={props.scenario} event={props.fastEvent} /> : props.view !== 'orbit' ? <FieldSlice {...props} /> : null}
     {!props.fastEvent && props.showFlow && <FlowArrows snapshot={props.snapshot} view={props.view} slice={props.slice} />}
     <Probe position={props.probe} />
     <SoilMotion amount={props.fastEvent ? Math.max(props.illustration, Math.max(...Array.from(props.fastEvent.frame.shellDamage), 0) * 0.65) : props.illustration} />

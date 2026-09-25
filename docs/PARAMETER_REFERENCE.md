@@ -2,7 +2,7 @@
 
 The canonical machine-readable registry is [`src/sim/parameters.ts`](../src/sim/parameters.ts). This table is generated from its entries and the default scenario on 2026-09-25. `R` means implemented reduced model; `I` means illustrative only. Source `A` is an uncalibrated demonstration assumption configurable through the scenario schema, although some entries have no direct UI control; `H` is an explicitly hypothetical pathway assumption; `E` is a short-event run/output setting; `V` is an artistic or display setting; `G` is a derived geometric or fixed-support identity. The 6.096 m surface length is supplied by the user brief (20 ft exactly), while the 3 m depth and all property/kinetic defaults are demonstration settings. “Within block” also requires geometry extents to fit the domain; scenario validation is authoritative.
 
-The registry describes full parameter ranges and dependencies. UI slider ranges can be narrower; JSON imports are checked against the schema limits. Initial-condition edits restart the run. The heater enable switch is a live event.
+The registry describes full parameter ranges and dependencies. UI slider ranges can be narrower; JSON imports are checked against the schema limits. Setup edits source diameter and density and derives `source.initialMassKg` internally; there is no duplicate mass entry. Initial-condition edits restart the run. The heater enable switch is a live event.
 
 ## Scenario
 
@@ -69,7 +69,7 @@ Default values below are from the first (surface) layer. The second default laye
 | `peatRegions[].rotationDeg` | Peat orientation (theta_p) | 20 | -360–360 | °; Rotation in x-y plane | — | A / R |
 | `peatRegions[].organicFraction` | Peat organic fraction (fp,org) | 0.75 | 0–1 | fraction; Dry peat bulk mass | — | A / R |
 | `peatRegions[].bulkDensityKgM3` | Peat dry bulk density (rho_p) | 300 | 50–2500 | kg/m³; Dry solids per bulk peat volume | — | A / R |
-| `peatRegions[].moistureSaturation` | Peat initial saturation (Sp,w) | 0.48 | 0–0.95 | fraction; Liquid volume per peat pore volume | — | A / R |
+| `peatRegions[].moistureSaturation` | Peat initial saturation (Sp,w) | 0.20 | 0–0.95 | fraction; Liquid volume per peat pore volume | — | A / R |
 | `peatRegions[].seed` | Irregular peat seed (sp) | 17 | 0–2.147e+9 | integer; Deterministic cell noise | — | A / R |
 
 ## Roots
@@ -88,12 +88,12 @@ Default values below are from the first (surface) layer. The second default laye
 | --- | --- | ---: | --- | --- | --- | --- |
 | `hotRegions[].id` | Hot region identifier (idh) | hot-1 | unique text | text; Scenario initial-condition object | — | A / R |
 | `hotRegions[].shape` | Initial hot shape (Sh) | ellipsoid | ellipsoid \| slab | enum; Ellipsoid or slab | — | A / R |
-| `hotRegions[].centerXM` | Hot center x (xh) | 2.55 | within block | m; Surface x coordinate | — | A / R |
+| `hotRegions[].centerXM` | Hot center x (xh) | 2.8 | within block | m; Surface x coordinate | — | A / R |
 | `hotRegions[].centerYM` | Hot center y (yh) | 3 | within block | m; Surface y coordinate | — | A / R |
-| `hotRegions[].centerDepthM` | Hot center depth (zh) | 1.65 | within block | m; Positive below surface | — | A / R |
-| `hotRegions[].sizeXM` | Hot x size (hx) | 1.1 | 0.05–100 | m; Full horizontal extent | — | A / R |
-| `hotRegions[].sizeYM` | Hot y size (hy) | 0.9 | 0.05–100 | m; Full horizontal extent | — | A / R |
-| `hotRegions[].thicknessM` | Hot vertical size (hz) | 0.55 | 0.05–30 | m; Full vertical extent | — | A / R |
+| `hotRegions[].centerDepthM` | Hot center depth (zh) | 1.55 | within block | m; Positive below surface | — | A / R |
+| `hotRegions[].sizeXM` | Hot x size (hx) | 1.6 | 0.05–100 | m; Full horizontal extent | — | A / R |
+| `hotRegions[].sizeYM` | Hot y size (hy) | 1.4 | 0.05–100 | m; Full horizontal extent | — | A / R |
+| `hotRegions[].thicknessM` | Hot vertical size (hz) | 0.8 | 0.05–30 | m; Full vertical extent | — | A / R |
 | `hotRegions[].temperatureC` | Initial hot temperature (Th,0) | 270 | -20–900 | °C; Initial field only; never held fixed | — | A / R |
 | `hotRegions[].fuelFraction` | Initial available fuel (fh,0) | 1 | 0–1 | fraction; Fraction of local dry fuel inventory retained | — | A / R |
 
@@ -181,6 +181,10 @@ These registered outputs are calculated from the evolving field; they are not ed
 | `diagnostics.sourceExcessPressurePa` | Source excess pore pressure (dPs) | 0 | nonnegative | Pa; Positive part of trilinear source-weighted cell pressure minus atmospheric pressure | `source.centerXM`<br>`source.centerYM`<br>`source.centerDepthM`<br>`atmosphere.pressurePa` | G / R |
 | `diagnostics.sourceProjectedAreaM2` | Assumed source support projected area (As) | 0.045239 | positive | m²; Fixed imaginary plane area `π × supportRadius²`, not a coherent soil failure surface | `source.supportRadiusM` | G / R |
 | `diagnostics.sourcePressureLoadN` | Pressure-area load proxy (Fs,proxy) | 0 | nonnegative | N; Source excess pressure × fixed projected support area; no soil failure or blast mechanics | `diagnostics.sourceExcessPressurePa`<br>`diagnostics.sourceProjectedAreaM2` | G / R |
+
+### Additional reaction readouts
+
+These live solver diagnostics are not scenario inputs or registry entries. `cumulativeReactionHeatJ` is the sum of reacted dry-fuel mass times `model.heatOfCombustionJkg` in joules. `lastReactionPowerW` is heat released in the last accepted physical step divided by that step's duration in watts. `reactingCellCount` counts cells with positive oxidation in that accepted step. They reset with a new run and are restored with checkpoints; none is a measured combustion rate.
 
 ## Short-event controls
 
