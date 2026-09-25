@@ -1,0 +1,686 @@
+import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Activity from 'lucide-react/dist/esm/icons/activity.mjs'
+import ArrowDownToLine from 'lucide-react/dist/esm/icons/arrow-down-to-line.mjs'
+import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.mjs'
+import BookOpen from 'lucide-react/dist/esm/icons/book-open.mjs'
+import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down.mjs'
+import CircleHelp from 'lucide-react/dist/esm/icons/circle-help.mjs'
+import Clock3 from 'lucide-react/dist/esm/icons/clock-3.mjs'
+import Download from 'lucide-react/dist/esm/icons/download.mjs'
+import Gauge from 'lucide-react/dist/esm/icons/gauge.mjs'
+import Layers3 from 'lucide-react/dist/esm/icons/layers-3.mjs'
+import Leaf from 'lucide-react/dist/esm/icons/leaf.mjs'
+import MousePointer2 from 'lucide-react/dist/esm/icons/mouse-pointer-2.mjs'
+import Pause from 'lucide-react/dist/esm/icons/pause.mjs'
+import Play from 'lucide-react/dist/esm/icons/play.mjs'
+import RotateCcw from 'lucide-react/dist/esm/icons/rotate-ccw.mjs'
+import Save from 'lucide-react/dist/esm/icons/save.mjs'
+import Settings2 from 'lucide-react/dist/esm/icons/settings-2.mjs'
+import SkipForward from 'lucide-react/dist/esm/icons/skip-forward.mjs'
+import StepForward from 'lucide-react/dist/esm/icons/step-forward.mjs'
+import Thermometer from 'lucide-react/dist/esm/icons/thermometer.mjs'
+import Upload from 'lucide-react/dist/esm/icons/upload.mjs'
+import Waves from 'lucide-react/dist/esm/icons/waves.mjs'
+import Zap from 'lucide-react/dist/esm/icons/zap.mjs'
+import { Scene, OVERLAY_INFO, type FastOverlay, type Overlay, type ProbeLocation, type View } from './ui/Scene'
+import { createDefaultScenario, diameterFromMass, massFromDiameter, validateScenario } from './sim'
+import { PARAMETER_REGISTRY, SOIL_PRESETS, applySoilPreset as applyPresetToScenario } from './sim/parameters'
+import type { Scenario, Snapshot, ProbeSample } from './sim/types'
+import type { FastEventRun } from './fastEvent'
+import { createSimulationClient } from './worker/client'
+
+type Checkpoint = { snapshot: Snapshot; probe: ProbeSample | null }
+type Tab = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced' | 'motion' | 'fast'
+type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway' | 'hypothetical'
+type SimClient = ReturnType<typeof createSimulationClient>
+
+const DAY = 86400
+const OVERLAYS: Overlay[] = ['temperature', 'oxygen', 'co2', 'pressure', 'moisture', 'fuel', 'porosity', 'permeability', 'effective-permeability', 'mobility']
+
+function formatClock(seconds: number) {
+  const d = Math.floor(seconds / DAY)
+  const h = Math.floor((seconds % DAY) / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  return `${d}d ${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m`
+}
+
+function finite(value: unknown, fallback = 0) { return typeof value === 'number' && Number.isFinite(value) ? value : fallback }
+function formatLoad(value: number | undefined) { return value === undefined ? '—' : Math.abs(value) >= 10000 ? value.toExponential(2) : value.toFixed(2) }
+function clone<T>(value: T): T { return JSON.parse(JSON.stringify(value)) as T }
+function setPath(object: any, path: string, value: unknown) {
+  const next = clone(object)
+  const parts = path.split('.')
+  let at: any = next
+  for (const part of parts.slice(0, -1)) at = at[part]
+  at[parts[parts.length - 1]] = value
+  return next
+}
+
+function getPath(object: any, path: string): any { return path.split('.').reduce((v, p) => v?.[p], object) }
+
+function makePreset(key: ScenarioPreset, base: Scenario): Scenario {
+  const s = clone(base)
+  s.seed = 240925
+  s.name = {
+    custom: 'Custom scenario', untreated: 'Untreated smoldering', cold: 'Dry ice · heater off',
+    heated: 'Dry ice · heater on', wet: 'Wet, low permeability', pathway: 'Preferential pathway',
+    hypothetical: 'Hypothetical altered geometry',
+  }[key]
+  s.description = 'Demonstration assumption; not calibrated against field measurements.'
+  s.illustrativeEvent = { triggeredAtS: null, intensity: 0 }
+  if (key === 'untreated') { s.source.initialMassKg = 0; s.source.enabled = false }
+  if (key === 'cold') s.source.enabled = false
+  if (key === 'heated') s.source.enabled = true
+  if (key === 'wet') { s.soil.moistureSaturation = 0.72; s.soil.intrinsicPermeabilityHorizontalM2 = 2e-13; s.soil.intrinsicPermeabilityVerticalM2 = 4e-14; s.source.enabled = true }
+  if (key === 'pathway' || key === 'hypothetical') {
+    s.pathways = [{ id: 'assumed-path-1', centerXM: 3.65, centerYM: 3.05, centerDepthM: 1.4, sizeXM: 0.28, sizeYM: 0.28, thicknessM: 2.1, rotationDeg: 0, permeabilityMultiplier: 20 }]
+  }
+  if (key === 'hypothetical') s.description = 'Assumed post-rearrangement pathway geometry. This is a separate hypothesis, not a prediction from dry ice or the illustrative motion.'
+  return s
+}
+
+function asSceneFrame(snapshot: Snapshot | null) {
+  if (!snapshot) return null
+  return {
+    timeSeconds: snapshot.timeSeconds,
+    grid: { nx: snapshot.nx, ny: snapshot.ny, nz: snapshot.nz, dxM: snapshot.widthM / snapshot.nx, dyM: snapshot.lengthM / snapshot.ny, dzM: snapshot.depthM / snapshot.nz },
+    fields: {
+      temperatureC: snapshot.fields.temperatureK.map((v) => v - 273.15),
+      oxygenMoleFraction: snapshot.fields.oxygen,
+      co2MoleFraction: snapshot.fields.co2,
+      pressurePa: snapshot.fields.pressurePa,
+      moistureSaturation: snapshot.fields.moisture,
+      fuelKg: snapshot.fields.fuel,
+      porosity: snapshot.fields.porosity,
+      intrinsicPermeabilityM2: snapshot.fields.intrinsicPermeability,
+      effectivePermeabilityM2: snapshot.fields.effectivePermeability,
+      effectiveGasDiffusivityM2S: snapshot.fields.effectiveGasDiffusivity,
+      fluxXMps: snapshot.fields.fluxXMps,
+      fluxYMps: snapshot.fields.fluxYMps,
+      fluxZMps: snapshot.fields.fluxZMps,
+    },
+    source: { equivalentDiameterM: snapshot.dryIceDiameterM, remainingMassKg: snapshot.dryIceMassKg },
+  }
+}
+
+function sampleSnapshot(snapshot: Snapshot | null, location: ProbeLocation | null, atmospherePa: number): ProbeSample | null {
+  if (!snapshot || !location) return null
+  const i = Math.min(snapshot.nx - 1, Math.max(0, Math.floor(location.xM / snapshot.widthM * snapshot.nx)))
+  const j = Math.min(snapshot.ny - 1, Math.max(0, Math.floor(location.yM / snapshot.lengthM * snapshot.ny)))
+  const k = Math.min(snapshot.nz - 1, Math.max(0, Math.floor(location.depthM / snapshot.depthM * snapshot.nz)))
+  const q = (k * snapshot.ny + j) * snapshot.nx + i
+  const p = snapshot.fields.pressurePa[q]
+  return {
+    xM: location.xM, yM: location.yM, depthM: location.depthM,
+    temperatureK: snapshot.fields.temperatureK[q], oxygenMoleFraction: snapshot.fields.oxygen[q],
+    co2MoleFraction: snapshot.fields.co2[q], oxygenPartialPressurePa: snapshot.fields.oxygen[q] * (p || atmospherePa),
+    pressurePa: p, moistureSaturation: snapshot.fields.moisture[q], fuelKg: snapshot.fields.fuel[q],
+    darcyVelocityMS: [snapshot.fields.fluxXMps[q], snapshot.fields.fluxYMps[q], snapshot.fields.fluxZMps[q]],
+  }
+}
+
+function download(name: string, contents: string, mime: string) {
+  const blob = new Blob([contents], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  window.setTimeout(() => URL.revokeObjectURL(url), 5000)
+}
+
+function StatusChip({ kind, children }: { kind: 'reduced' | 'illustrative' | 'missing'; children: ReactNode }) {
+  return <span className={`status-chip ${kind}`}>{children}</span>
+}
+
+function IconButton({ title, children, onClick, active, disabled }: { title: string; children: ReactNode; onClick?: () => void; active?: boolean; disabled?: boolean }) {
+  return <button className={`icon-btn ${active ? 'active' : ''}`} type="button" title={title} aria-label={title} onClick={onClick} disabled={disabled}>{children}</button>
+}
+
+function Section({ title, detail, children, open = false }: { title: string; detail?: string; children: ReactNode; open?: boolean }) {
+  return <details className="control-section" open={open}>
+    <summary><span>{title}</span><small>{detail}</small><ChevronDown size={15} /></summary>
+    <div className="section-body">{children}</div>
+  </details>
+}
+
+type NumberControlProps = {
+  label: string; value: number; min: number; max: number; step?: number; unit?: string; symbol?: string; note?: string; metadataTitle?: string; log?: boolean; precision?: number; onChange: (value: number) => void
+}
+function NumberControl({ label, value, min, max, step = 0.01, unit = '', symbol, note, metadataTitle, log, precision, onChange }: NumberControlProps) {
+  const display = precision === undefined ? Number(value.toPrecision(4)) : Number(value.toFixed(precision))
+  const [draft, setDraft] = useState(String(display))
+  useEffect(() => setDraft(String(display)), [display])
+  const commit = () => {
+    const n = Number(draft)
+    if (draft.trim() === '' || !Number.isFinite(n)) { setDraft(String(display)); return }
+    const bounded = Math.min(max, Math.max(min, n))
+    setDraft(String(bounded))
+    onChange(bounded)
+  }
+  const sliderValue = log ? (Math.log10(Math.max(value, min)) - Math.log10(min)) / (Math.log10(max) - Math.log10(min)) * 1000 : value
+  const sliderMin = log ? 0 : min
+  const sliderMax = log ? 1000 : max
+  const sliderStep = log ? 1 : step
+  return <div className="number-control" title={metadataTitle ?? note}>
+    <div className="control-top"><label>{label}{symbol && <span className="symbol">{symbol}</span>}</label><div className="number-entry"><input type="number" min={min} max={max} step={step} value={draft} onChange={(e) => setDraft(e.target.value)} onBlur={commit} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur() }} /><span>{unit}</span></div></div>
+    <input className="range" type="range" min={sliderMin} max={sliderMax} step={sliderStep} value={sliderValue} onChange={(e) => onChange(log ? Math.pow(10, Math.log10(min) + Number(e.target.value) / 1000 * (Math.log10(max) - Math.log10(min))) : Number(e.target.value))} aria-label={label} />
+    {note && <small className="control-note">{note}</small>}
+  </div>
+}
+
+function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { points: Checkpoint[]; color?: string; label: string; unit: string; accessor: (p: Checkpoint) => number }) {
+  const values = points.map(accessor).filter(Number.isFinite)
+  if (values.length < 2) return <div className="empty-chart">Run the model to record a history.</div>
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const range = Math.max(1e-9, max - min)
+  const path = values.map((v, i) => `${i === 0 ? 'M' : 'L'}${(i / (values.length - 1) * 280).toFixed(1)},${(54 - (v - min) / range * 48).toFixed(1)}`).join(' ')
+  return <div className="mini-chart"><div className="chart-heading"><span>{label}</span><strong>{values[values.length - 1].toFixed(1)} {unit}</strong></div><svg viewBox="0 0 280 60" preserveAspectRatio="none" aria-label={`${label} history`}><path d="M0 55 H280" stroke="#556365" strokeWidth="1" /><path d={path} stroke={color} strokeWidth="2.2" fill="none" vectorEffect="non-scaling-stroke" /></svg><div className="chart-axis"><span>{min.toFixed(1)}</span><span>{max.toFixed(1)} {unit}</span></div></div>
+}
+
+function App() {
+  const initial = useMemo(() => createDefaultScenario(), [])
+  const [scenario, setScenario] = useState<Scenario>(initial)
+  const [preset, setPreset] = useState<ScenarioPreset>('heated')
+  const [tab, setTab] = useState<Tab>('source')
+  const [overlay, setOverlay] = useState<Overlay>('temperature')
+  const [view, setView] = useState<View>('orbit')
+  const [slice, setSlice] = useState(0)
+  const [showRoots, setShowRoots] = useState(true)
+  const [showFlow, setShowFlow] = useState(false)
+  const [fixedScale, setFixedScale] = useState(true)
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
+  const [compareSnapshot, setCompareSnapshot] = useState<Snapshot | null>(null)
+  const [history, setHistory] = useState<Checkpoint[]>([])
+  const [comparison, setComparison] = useState(false)
+  const [probe, setProbe] = useState<ProbeLocation | null>(null)
+  const [durationDays, setDurationDays] = useState(3)
+  const [playing, setPlaying] = useState(false)
+  const [playback, setPlayback] = useState(false)
+  const [playbackIndex, setPlaybackIndex] = useState(0)
+  const [playbackSpeed, setPlaybackSpeed] = useState(30)
+  const [computeRate, setComputeRate] = useState(30)
+  const [runToHour, setRunToHour] = useState(24)
+  const [throughput, setThroughput] = useState(0)
+  const [error, setError] = useState('')
+  const [importError, setImportError] = useState('')
+  const [showInfo, setShowInfo] = useState(false)
+  const [illustration, setIllustration] = useState(0)
+  const [motionIntensity, setMotionIntensity] = useState(0.65)
+  const [motionPlaying, setMotionPlaying] = useState(false)
+  const [fastRun, setFastRun] = useState<FastEventRun | null>(null)
+  const [fastMode, setFastMode] = useState(false)
+  const [fastIndex, setFastIndex] = useState(0)
+  const [fastPlaying, setFastPlaying] = useState(false)
+  const [fastPlaybackRate, setFastPlaybackRate] = useState(1)
+  const [fastDuration, setFastDuration] = useState(2)
+  const [fastFrameCount, setFastFrameCount] = useState(61)
+  const [fastOverlay, setFastOverlay] = useState<FastOverlay>('pressure')
+  const [selectedPeat, setSelectedPeat] = useState(0)
+  const [selectedLayer, setSelectedLayer] = useState(0)
+  const [selectedHot, setSelectedHot] = useState(0)
+  const [selectedPathway, setSelectedPathway] = useState(0)
+  const [heaterEnabled, setHeaterEnabled] = useState(initial.source.enabled)
+  const [heaterGeneration, setHeaterGeneration] = useState(initial.source.heatGenerationWm3)
+  const [operationalEvents, setOperationalEvents] = useState<{ timeSeconds: number; type: string; value: unknown }[]>([])
+  const clientRef = useRef<SimClient | null>(null)
+  const comparisonClientRef = useRef<SimClient | null>(null)
+  const importRef = useRef<HTMLInputElement>(null)
+  const controlsScrollRef = useRef<HTMLDivElement>(null)
+  const lastRecordTime = useRef(-Infinity)
+  const probeRef = useRef<ProbeLocation | null>(null)
+  const atmosphereRef = useRef(initial.atmosphere.pressurePa)
+  const durationRef = useRef(durationDays)
+
+  useEffect(() => { probeRef.current = probe }, [probe])
+  useEffect(() => { atmosphereRef.current = scenario.atmosphere.pressurePa }, [scenario.atmosphere.pressurePa])
+  useEffect(() => { durationRef.current = durationDays }, [durationDays])
+
+  useEffect(() => {
+    const client = createSimulationClient({
+      onSnapshot: (next: Snapshot) => {
+        setSnapshot(next)
+        const interval = Math.max(30, next.timeSeconds / 400)
+        if (next.timeSeconds === 0 || next.timeSeconds - lastRecordTime.current >= interval || next.diagnostics.status !== 'running') {
+          lastRecordTime.current = next.timeSeconds
+          setHistory((old) => {
+            const p = sampleSnapshot(next, probeRef.current, atmosphereRef.current)
+            const list = [...old, { snapshot: next, probe: p }]
+            const approximateBytes = next.nx * next.ny * next.nz * 18 * 4
+            const capacity = Math.min(600, Math.max(80, Math.floor(60_000_000 / approximateBytes)))
+            if (list.length <= capacity) return list
+            const older = list.slice(0, -32).filter((_, index) => index === 0 || index % 2 === 0)
+            return [...older, ...list.slice(-32)]
+          })
+        }
+        if (next.diagnostics.status !== 'running' || next.timeSeconds >= durationRef.current * DAY - 0.01) setPlaying(false)
+      },
+      onError: (message: string) => { setError(message); setPlaying(false) },
+      onProgress: (progress) => { setThroughput(progress.throughput); if (!progress.running) setPlaying(false) },
+      onFastEvent: (run) => { setError(''); setFastRun(run); setFastMode(true); setFastIndex(0); setFastPlaying(run.frames.length > 1); setComparison(false); setMotionPlaying(false); setIllustration(0); setTab('fast') },
+    })
+    clientRef.current = client
+    return () => { client.dispose(); clientRef.current = null }
+  }, [])
+
+  useEffect(() => { clientRef.current?.setComputeRate(computeRate) }, [computeRate])
+  useEffect(() => { if (controlsScrollRef.current) controlsScrollRef.current.scrollTop = 0 }, [tab])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      clientRef.current?.pause()
+      const result = validateScenario(scenario)
+      if (result.valid) clientRef.current?.init(scenario)
+      else setError(result.errors.join('; '))
+      setSnapshot(null)
+      setHistory([])
+      setPlayback(false)
+      setPlaying(false)
+      setFastRun(null)
+      setFastMode(false)
+      setFastPlaying(false)
+      setHeaterEnabled(scenario.source.enabled)
+      setHeaterGeneration(scenario.source.heatGenerationWm3)
+      lastRecordTime.current = -Infinity
+      if (result.valid) setError('')
+    }, 160)
+    return () => window.clearTimeout(timer)
+  }, [scenario])
+
+  useEffect(() => {
+    if (!comparison) { comparisonClientRef.current?.dispose(); comparisonClientRef.current = null; setCompareSnapshot(null); return }
+    const baseline = clone(scenario)
+    baseline.name = `${scenario.name} · heater off comparison`
+    baseline.source.enabled = false
+    const client = createSimulationClient({ onSnapshot: setCompareSnapshot, onError: setError })
+    comparisonClientRef.current = client
+    client.setComputeRate(3600)
+    client.init(baseline)
+    const t = snapshot?.timeSeconds ?? 0
+    if (t > 0) client.runTo(t)
+    return () => { client.dispose(); comparisonClientRef.current = null }
+  }, [comparison, scenario])
+
+  useEffect(() => {
+    if (comparison && snapshot && comparisonClientRef.current && snapshot.timeSeconds > (compareSnapshot?.timeSeconds ?? 0) + 300) comparisonClientRef.current.runTo(snapshot.timeSeconds)
+  }, [comparison, snapshot?.timeSeconds])
+
+  useEffect(() => {
+    if (!motionPlaying) return
+    let frame = 0
+    const start = performance.now()
+    const animate = (now: number) => {
+      const elapsed = (now - start) / 1400
+      const progress = Math.min(1, elapsed)
+      setIllustration(Math.sin(Math.PI * progress) * motionIntensity)
+      if (progress < 1) frame = requestAnimationFrame(animate)
+      else { setIllustration(0); setMotionPlaying(false) }
+    }
+    frame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(frame)
+  }, [motionPlaying, motionIntensity])
+
+  useEffect(() => {
+    if (!playback || history.length < 2) return
+    const firstTime = history[Math.min(playbackIndex, history.length - 1)].snapshot.timeSeconds
+    const startWall = performance.now()
+    const id = window.setInterval(() => {
+      const targetTime = firstTime + (performance.now() - startWall) / 1000 * playbackSpeed
+      let index = 0
+      while (index + 1 < history.length && history[index + 1].snapshot.timeSeconds <= targetTime) index++
+      setPlaybackIndex(index)
+      if (targetTime >= history[history.length - 1].snapshot.timeSeconds) setPlayback(false)
+    }, 100)
+    return () => window.clearInterval(id)
+  }, [playback, playbackSpeed, history])
+
+  useEffect(() => {
+    if (!fastPlaying || !fastRun || fastRun.frames.length < 2) return
+    const startTime = fastRun.frames[Math.min(fastIndex, fastRun.frames.length - 1)].eventTimeS
+    const startWall = performance.now()
+    const id = window.setInterval(() => {
+      const targetTime = startTime + (performance.now() - startWall) / 1000 * fastPlaybackRate
+      let index = 0
+      while (index + 1 < fastRun.frames.length && fastRun.frames[index + 1].eventTimeS <= targetTime) index++
+      setFastIndex(index)
+      if (targetTime >= fastRun.frames[fastRun.frames.length - 1].eventTimeS) setFastPlaying(false)
+    }, 16)
+    return () => window.clearInterval(id)
+  }, [fastPlaying, fastRun, fastPlaybackRate])
+
+  const update = useCallback((path: string, value: unknown) => { setPreset('custom'); setScenario((old) => setPath(old, path, value)) }, [])
+  const field = (path: string, label: string, min: number, max: number, step: number, unit = '', note = '', log = false, symbol?: string) => {
+    const registryPath = path.replace(/\.\d+\./g, '[].')
+    const meta = PARAMETER_REGISTRY.find((entry) => entry.path === registryPath)
+    const metadataTitle = meta ? `${meta.name} (${meta.symbol}) · ${meta.units}. Basis: ${meta.basis}. Source: ${meta.source}. Dependencies: ${meta.dependencies.join(', ') || 'none'}. Status: ${meta.status}.` : note
+    return <NumberControl key={path} label={label} value={finite(getPath(scenario, path))} min={min} max={max} step={step} unit={unit} note={note || meta?.basis} metadataTitle={metadataTitle} log={log} symbol={symbol ?? meta?.symbol} onChange={(v) => update(path, v)} />
+  }
+
+  const displayed = playback && history[playbackIndex] ? history[playbackIndex].snapshot : snapshot
+  const alignedComparisonSnapshot = useMemo(() => {
+    if (!comparison || !compareSnapshot || !history.length) return displayed
+    const target = compareSnapshot.timeSeconds
+    for (let i = history.length - 1; i >= 0; i--) if (history[i].snapshot.timeSeconds <= target + 1e-6) return history[i].snapshot
+    return history[0].snapshot
+  }, [comparison, compareSnapshot, history, displayed])
+  const sceneFrame = useMemo(() => asSceneFrame(alignedComparisonSnapshot), [alignedComparisonSnapshot])
+  const compareFrame = useMemo(() => asSceneFrame(compareSnapshot), [compareSnapshot])
+  const fastFrame = fastRun?.frames[Math.min(fastIndex, Math.max(0, fastRun.frames.length - 1))] ?? null
+  const legendRange = useMemo(() => {
+    const info = OVERLAY_INFO[overlay]
+    if (!sceneFrame || fixedScale || comparison) return [info.min, info.max]
+    const values = (sceneFrame.fields as Record<string, ArrayLike<number>>)[info.field]
+    if (!values?.length) return [info.min, info.max]
+    let lo = Infinity; let hi = -Infinity
+    for (let i = 0; i < values.length; i++) {
+      const raw = values[i]
+      const value = overlay === 'pressure' ? raw - scenario.atmosphere.pressurePa : info.log ? Math.log10(Math.max(raw, 1e-30)) : raw
+      if (Number.isFinite(value)) { lo = Math.min(lo, value); hi = Math.max(hi, value) }
+    }
+    return Number.isFinite(lo) && hi > lo ? [lo, hi] : [info.min, info.max]
+  }, [sceneFrame, overlay, fixedScale, comparison, scenario.atmosphere.pressurePa])
+  const probeValue = useMemo(() => sampleSnapshot(displayed, probe, scenario.atmosphere.pressurePa), [displayed, probe, scenario.atmosphere.pressurePa])
+  const time = displayed?.timeSeconds ?? 0
+  const progress = Math.min(100, time / (durationDays * DAY) * 100)
+  const validation = useMemo(() => validateScenario(scenario), [scenario])
+  const topCover = scenario.source.centerDepthM - diameterFromMass(scenario.source.initialMassKg, scenario.source.densityKgM3) / 2
+  const sourcePower = heaterGeneration * (4 / 3 * Math.PI * Math.pow(scenario.source.supportRadiusM, 3))
+  const pressureLoad = displayed?.diagnostics.sourcePressureLoadN
+  const loadOutsideValidity = displayed?.diagnostics.sourcePressureLoadStatus === 'outside-validity'
+  const shownPressureLoad = fastMode && fastFrame ? fastFrame.sourcePressureLoadN : pressureLoad
+  const shownLoadOutsideValidity = fastMode && fastFrame ? fastFrame.status === 'validity-paused' || fastRun?.status === 'validity-paused' : loadOutsideValidity
+
+  const loadPreset = (key: ScenarioPreset) => { if (key === 'custom') return; setPreset(key); setScenario(makePreset(key, initial)); setOperationalEvents([]) }
+  const start = () => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }
+  const pause = () => { clientRef.current?.pause(); setPlaying(false) }
+  const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setFastRun(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
+  const toggleHeater = () => {
+    const next = !heaterEnabled
+    setHeaterEnabled(next)
+    clientRef.current?.setHeater(next)
+    setOperationalEvents((old) => [...old, { timeSeconds: snapshot?.timeSeconds ?? 0, type: 'heater-enabled', value: next }])
+  }
+  const changeHeaterGeneration = (value: number) => {
+    if (snapshot && snapshot.timeSeconds > 0) {
+      setHeaterGeneration(value)
+      clientRef.current?.setHeaterGeneration(value)
+      setOperationalEvents((old) => [...old, { timeSeconds: snapshot.timeSeconds, type: 'heater-generation', value }])
+    } else update('source.heatGenerationWm3', value)
+  }
+  const triggerIllustration = () => {
+    setOperationalEvents((old) => [...old, { timeSeconds: snapshot?.timeSeconds ?? 0, type: 'illustrative-soil-motion', value: { intensity: motionIntensity, status: 'illustrative only' } }])
+    setMotionPlaying(true)
+  }
+  const convertRemainingDryIce = () => {
+    if (!snapshot || snapshot.dryIceMassKg <= 0) return
+    setPlayback(false)
+    pause()
+    clientRef.current?.startFastEvent({ convertRemainingDryIce: true, durationS: fastDuration, frameCount: fastFrameCount })
+    setOperationalEvents((old) => [...old, { timeSeconds: snapshot.timeSeconds, type: 'dry-ice-convert-all', value: snapshot.dryIceMassKg }])
+  }
+  const runFastFromCurrent = () => {
+    if (!snapshot) return
+    setPlayback(false)
+    pause()
+    clientRef.current?.startFastEvent({ durationS: fastDuration, frameCount: fastFrameCount, convertRemainingDryIce: false })
+  }
+  const replayFastEvent = () => { if (!fastRun) return; setFastMode(true); setFastIndex(0); setFastPlaying(true); setComparison(false) }
+  const exportFastEvent = () => {
+    if (!fastRun) return
+    download('zombie-fire-fast-event.json', JSON.stringify({ format: 'zombie-fire-fast-event', modelId: fastRun.modelId, status: fastRun.status, startSolverTimeS: fastRun.startSolverTimeS, durationS: fastRun.durationS, shellRadiusM: fastRun.shellRadiusM, sourceProjectedAreaM2: fastRun.sourceProjectedAreaM2, assumptions: fastRun.assumptions, diagnostics: fastRun.diagnostics, frames: fastRun.frames.map((frame) => ({ ...frame, shellPressurePa: Array.from(frame.shellPressurePa), shellCO2MoleFraction: Array.from(frame.shellCO2MoleFraction), shellYieldIndex: Array.from(frame.shellYieldIndex), shellDamage: Array.from(frame.shellDamage) })), note: 'Short-time radial aggregate. Pressure and CO2 are reduced model outputs; yield/damage and visible soil motion are illustrative, not validated fracture or blast predictions.' }, null, 2), 'application/json')
+  }
+  const chooseProbe = (p: ProbeLocation) => { setProbe(p); setHistory((old) => old.map((item) => ({ ...item, probe: sampleSnapshot(item.snapshot, p, scenario.atmosphere.pressurePa) }))) }
+  const chooseScenarioFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try {
+      const parsed = JSON.parse(await file.text())
+      const candidate = parsed.scenario ?? parsed
+      const result = validateScenario(candidate)
+      if (!result.valid) throw new Error(result.errors.join('; '))
+      setScenario(candidate)
+      setPreset('custom')
+      setOperationalEvents(Array.isArray(parsed.operationalEvents) ? parsed.operationalEvents : [])
+      setImportError('')
+    } catch (e) { setImportError(`Import rejected: ${e instanceof Error ? e.message : String(e)}`) }
+    event.target.value = ''
+  }
+  const exportConfig = () => download('zombie-fire-scenario.json', JSON.stringify({ format: 'zombie-fire-scenario', schemaVersion: 1, scenario, operationalEvents, modelStatus: { transport: 'implemented reduced model', soilMotion: 'illustrative only', rupture: 'not modeled', pressureLoad: 'algebraic pressure-area force proxy, not soil force or blast prediction' }, units: 'SI' }, null, 2), 'application/json')
+  const exportCsv = () => {
+    const rows = ['time_s,dry_ice_mass_kg,heater_power_W,heater_energy_J,peak_temp_C,total_fuel_kg,co2_input_kg,co2_outflow_kg,gas_residual_mol,source_energy_residual_J,near_source_excess_pressure_Pa,assumed_projected_area_m2,modeled_pressure_load_N,pressure_load_status,conversion_intervention_energy_J,probe_temp_C,probe_o2_mole_fraction,probe_co2_mole_fraction']
+    for (const item of history) {
+      const s = item.snapshot; const p = item.probe
+      rows.push([s.timeSeconds, s.dryIceMassKg, s.heaterPowerW, s.heaterEnergyJ, s.peakTemperatureK - 273.15, s.totalFuelKg, s.diagnostics.cumulativeCO2InputKg, s.diagnostics.cumulativeCO2OutflowKg, s.diagnostics.gasBalanceResidualMol, s.diagnostics.sourceEnergyResidualJ, s.diagnostics.sourceExcessPressurePa, s.diagnostics.sourceProjectedAreaM2, s.diagnostics.sourcePressureLoadN, s.diagnostics.sourcePressureLoadStatus, s.diagnostics.cumulativeInterventionEnergyJ, p ? p.temperatureK - 273.15 : '', p?.oxygenMoleFraction ?? '', p?.co2MoleFraction ?? ''].join(','))
+    }
+    download('zombie-fire-history.csv', rows.join('\n'), 'text/csv')
+  }
+  const exportRecording = () => download('zombie-fire-recording.json', JSON.stringify({ format: 'zombie-fire-recording', schemaVersion: 1, scenario, operationalEvents, checkpoints: history.map((c) => ({ ...c.snapshot, fields: Object.fromEntries(Object.entries(c.snapshot.fields).map(([k, a]) => [k, Array.from(a)])), probe: c.probe })), note: 'Sparse solver checkpoints. Playback does not create new physical states. Pressure load is a pressure-area proxy and may be outside reduced-model validity.' }), 'application/json')
+  const screenshot = () => {
+    const canvas = document.querySelector('.scene-canvas canvas') as HTMLCanvasElement | null
+    if (!canvas) return
+    const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = 'zombie-fire-scene.png'; a.click()
+  }
+
+  const setMineralFraction = (key: 'sandFraction' | 'siltFraction' | 'clayFraction', value: number) => {
+    const keys = ['sandFraction', 'siltFraction', 'clayFraction'] as const
+    const other = keys.filter((k) => k !== key)
+    const sum = scenario.soil[other[0]] + scenario.soil[other[1]]
+    const remainder = 1 - value
+    const soil = { ...scenario.soil, [key]: value, [other[0]]: sum > 0 ? remainder * scenario.soil[other[0]] / sum : remainder / 2, [other[1]]: sum > 0 ? remainder * scenario.soil[other[1]] / sum : remainder / 2 }
+    setPreset('custom'); setScenario((old) => ({ ...old, soil }))
+  }
+
+  const applySoilPreset = (key: keyof typeof SOIL_PRESETS) => { setPreset('custom'); setScenario((old) => applyPresetToScenario(old, key)) }
+
+  const peat = scenario.peatRegions[selectedPeat]
+  const hot = scenario.hotRegions[selectedHot]
+  const path = scenario.pathways[selectedPathway]
+  const addPeat = () => setScenario((old) => ({ ...old, peatRegions: [...old.peatRegions, { ...clone(old.peatRegions[0]), id: `peat-${Date.now()}`, centerXM: Math.min(4.5, 3 + old.peatRegions.length * 0.4) }] }))
+  const addHot = () => setScenario((old) => ({ ...old, hotRegions: [...old.hotRegions, { ...clone(old.hotRegions[0]), id: `hot-${Date.now()}`, centerXM: Math.min(4.5, 3 + old.hotRegions.length * 0.3) }] }))
+  const addPath = () => setScenario((old) => ({ ...old, pathways: [...old.pathways, { id: `path-${Date.now()}`, centerXM: 3.048, centerYM: 3.048, centerDepthM: 1.5, sizeXM: 0.3, sizeYM: 0.3, thicknessM: 1.5, rotationDeg: 0, permeabilityMultiplier: 12 }] }))
+  const removeAt = (array: 'peatRegions' | 'hotRegions' | 'pathways', i: number) => setScenario((old) => ({ ...old, [array]: old[array].filter((_, n) => n !== i) }))
+  const changeDepth = (value: number) => { setPreset('custom'); setScenario((old) => ({ ...old, domain: { ...old.domain, depthM: value }, soilLayers: old.soilLayers.map((layer) => ({ ...layer, thicknessM: layer.thicknessM * value / old.domain.depthM })) })) }
+  const changeLayerThickness = (index: number, value: number) => {
+    setPreset('custom')
+    setScenario((old) => {
+      const layers = old.soilLayers.map((l) => ({ ...l }))
+      if (layers.length < 2) return old
+      const partner = index === layers.length - 1 ? index - 1 : layers.length - 1
+      const fixed = layers.reduce((sum, layer, i) => sum + (i === index || i === partner ? 0 : layer.thicknessM), 0)
+      const constrained = Math.max(0.1, Math.min(old.domain.depthM - fixed - 0.1, value))
+      layers[index].thicknessM = constrained
+      layers[partner].thicknessM = old.domain.depthM - fixed - constrained
+      return { ...old, soilLayers: layers }
+    })
+  }
+  const addLayer = () => { setPreset('custom'); setScenario((old) => { const layers = old.soilLayers.map((l) => ({ ...l })); const last = layers[layers.length - 1]; if (last.thicknessM < 0.25) return old; last.thicknessM /= 2; layers.push({ ...last, id: `soil-layer-${Date.now()}`, thicknessM: last.thicknessM }); return { ...old, soilLayers: layers } }) }
+  const removeLayer = (index: number) => { if (scenario.soilLayers.length <= 1) return; setPreset('custom'); setScenario((old) => { const layers = old.soilLayers.map((l) => ({ ...l })); const removed = layers.splice(index, 1)[0]; layers[Math.min(index, layers.length - 1)].thicknessM += removed.thicknessM; return { ...old, soilLayers: layers } }); setSelectedLayer(0) }
+  const layer = scenario.soilLayers[selectedLayer]
+
+  return <div className="app-shell">
+    <header className="topbar">
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.1</span></small></div></div>
+      <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
+      <div className="topbar-actions"><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
+    </header>
+
+    <div className="workspace">
+      <aside className="sidebar left-sidebar">
+        <div className="panel-heading"><div><small>MODEL INPUTS</small><h2>Scenario setup</h2></div><Settings2 size={18} /></div>
+        <div className="scenario-select"><label htmlFor="scenario-preset">DEMONSTRATION SCENARIO</label><select id="scenario-preset" value={preset} onChange={(e) => loadPreset(e.target.value as ScenarioPreset)}><option value="custom">Custom scenario</option><option value="untreated">Untreated smoldering</option><option value="cold">Dry ice · heater off</option><option value="heated">Dry ice · heater on</option><option value="wet">Wet, low permeability</option><option value="pathway">Preferential pathway</option><option value="hypothetical">Hypothetical altered geometry</option></select><p>{scenario.description}</p></div>
+        <div className="tab-strip" role="tablist" aria-label="Parameter groups">
+          {([['source', 'Source'], ['ground', 'Ground'], ['fire', 'Fire'], ['boundary', 'Air'], ['advanced', 'Model'], ['motion', 'Motion'], ['fast', 'Event']] as [Tab, string][]).map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? 'selected' : ''} onClick={() => setTab(id)}>{label}</button>)}
+        </div>
+        <div className="controls-scroll" ref={controlsScrollRef}>
+          {tab === 'source' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>Dry ice sublimates from finite stored mass. Heat is applied over a fixed numerical support volume.</p></div>
+            <Section title="Buried dry ice" detail="Initial condition" open>
+              {field('source.centerXM', 'East / west position', 0, 6.096, 0.05, 'm', 'Coordinates run from 0 to 6.096 m.', false, 'x')}
+              {field('source.centerYM', 'North / south position', 0, 6.096, 0.05, 'm', 'Coordinates run from 0 to 6.096 m.', false, 'y')}
+              {field('source.centerDepthM', 'Center burial depth', 0.2, scenario.domain.depthM - 0.1, 0.05, 'm', 'Positive downward.', false, 'z')}
+              <NumberControl label="Initial dry-ice mass" symbol="m₀" value={scenario.source.initialMassKg} min={0} max={200} step={0.1} unit="kg" note="Mass and initial diameter are linked by the selected density." onChange={(v) => update('source.initialMassKg', v)} />
+              <NumberControl label="Initial sphere diameter" symbol="d₀" value={diameterFromMass(scenario.source.initialMassKg, scenario.source.densityKgM3)} min={0} max={Math.min(scenario.domain.depthM, 2)} step={0.005} unit="m" note="Changing diameter recalculates mass; volume-equivalent sphere." onChange={(v) => update('source.initialMassKg', massFromDiameter(v, scenario.source.densityKgM3))} />
+              {field('source.densityKgM3', 'Dry-ice density', 1200, 1650, 10, 'kg/m³', 'Demonstration property; initial geometry updates with density.', false, 'ρ')}
+              {field('source.initialTemperatureK', 'Initial source temperature', 150, 194.65, 0.1, 'K', 'Near-atmospheric reduced sublimation range only.')}
+              <div className="derived-row"><span>Top-of-sphere cover</span><strong>{topCover.toFixed(2)} m</strong></div>
+              <div className="derived-row"><span>Remaining mass</span><strong>{displayed?.dryIceMassKg.toFixed(2) ?? '—'} kg</strong></div>
+              <div className="derived-row"><span>Equivalent diameter</span><strong>{displayed?.dryIceDiameterM.toFixed(3) ?? '—'} m</strong></div>
+              <div className="derived-row"><span>Near-source excess pressure</span><strong>{displayed?.diagnostics.sourceExcessPressurePa.toFixed(1) ?? '—'} Pa</strong></div>
+              <div className="derived-row"><span>Assumed projected area</span><strong>{displayed?.diagnostics.sourceProjectedAreaM2.toFixed(4) ?? '—'} m²</strong></div>
+              <div className="pressure-load-inline"><span>Modeled pressure load</span><strong>{formatLoad(pressureLoad)} N</strong><small>Excess pore pressure × π × fixed support radius². Force proxy on an imaginary plane; no soil fracture or blast prediction.{loadOutsideValidity ? ' Outside reduced-model validity.' : ''}</small></div>
+              <button className="conversion-btn" type="button" onClick={convertRemainingDryIce} disabled={!snapshot || snapshot.dryIceMassKg <= 0 || !validation.valid}>Convert remaining solid CO₂ and view event</button>
+              <p className="conversion-note">One-click numerical gas release followed by a separate short-time radial event. The slow-flow run may pause at its validity limit. Neither model is a validated blast or fracture prediction.</p>
+            </Section>
+            <Section title="Core heater" detail="Fixed support volume" open>
+              <div className="toggle-row"><div><strong>Heater enabled</strong><small>Operational on/off event during a run</small></div><button type="button" role="switch" aria-checked={heaterEnabled} className={`switch ${heaterEnabled ? 'on' : ''}`} onClick={toggleHeater}><span /></button></div>
+              <NumberControl label="Volumetric heat generation" symbol="q‴" value={heaterGeneration} min={0} max={200000} step={100} unit="W/m³" note="Fixed support volume. This is power per volume, not a temperature difference. During a run, edits are recorded as operational events." onChange={changeHeaterGeneration} />
+              {field('source.supportRadiusM', 'Support radius', 0.05, 0.5, 0.01, 'm', 'Fixed during the run; independent of the shrinking source.')}
+              {field('source.startTimeS', 'Start time', 0, 7 * DAY, 3600, 's', 'Heater schedule, measured from initial time.')}
+              {field('source.durationS', 'Duration', 0, 7 * DAY, 3600, 's', 'Prescribed on interval.')}
+              <div className="derived-row"><span>Nominal heater power</span><strong>{sourcePower.toFixed(1)} W</strong></div>
+              <div className="derived-row"><span>Actual heater power</span><strong>{displayed?.heaterPowerW.toFixed(1) ?? '—'} W</strong></div>
+              <div className="derived-row"><span>Cumulative heater energy</span><strong>{displayed ? (displayed.heaterEnergyJ / 1000).toFixed(1) : '—'} kJ</strong></div>
+              <div className="derived-row"><span>Source temperature</span><strong>{displayed ? (displayed.dryIceTemperatureK - 273.15).toFixed(1) : '—'} °C</strong></div>
+              <div className="derived-row"><span>Soil at sensor</span><strong>{probeValue ? (probeValue.temperatureK - 273.15).toFixed(1) : '—'} °C</strong></div>
+              <div className="derived-row"><span>Source / sensor ΔT</span><strong>{displayed && probeValue ? (displayed.dryIceTemperatureK - probeValue.temperatureK).toFixed(1) : '—'} K</strong></div>
+            </Section>
+          </>}
+          {tab === 'ground' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>Mineral texture fractions are dry mineral mass fractions and always sum to one. Organic fraction uses total dry bulk mass.</p></div>
+            <Section title="Soil volume" detail="6.096 × 6.096 m" open>
+              <NumberControl label="Soil depth" value={scenario.domain.depthM} min={1} max={6} step={0.1} unit="m" note="All layer thicknesses scale with a depth edit; this is the computational vertical extent." onChange={changeDepth} />
+              <div className="preset-row"><span>Property preset</span>{(['sandy', 'silty', 'clayey', 'organic'] as const).map((p) => <button key={p} type="button" onClick={() => applySoilPreset(p)}>{p}</button>)}</div>
+              {(['sandFraction', 'siltFraction', 'clayFraction'] as const).map((key) => <NumberControl key={key} label={`${key.replace('Fraction', '')} · mineral fraction`} value={scenario.soil[key]} min={0} max={1} step={0.01} unit="mass" note="Other mineral fractions renormalize proportionally." onChange={(v) => setMineralFraction(key, v)} />)}
+              <div className="derived-row"><span>Mineral fraction sum</span><strong>{(scenario.soil.sandFraction + scenario.soil.siltFraction + scenario.soil.clayFraction).toFixed(3)}</strong></div>
+              {field('soil.organicFraction', 'Organic matter', 0, 0.8, 0.01, 'dry mass', 'Root fuel supplements the organic material; it is tracked separately.')}
+              {field('soil.bulkDensityKgM3', 'Dry bulk density', 300, 1900, 10, 'kg/m³')}
+              {field('soil.porosity', 'Porosity', 0.1, 0.8, 0.01, 'volume')}
+              {field('soil.moistureSaturation', 'Moisture saturation', 0, 0.99, 0.01, 'pore vol.')}
+              {field('soil.compaction', 'Compaction modifier', 0, 1, 0.01, 'index', 'Demonstration permeability relation; not calibrated mechanics.')}
+              {field('soil.intrinsicPermeabilityHorizontalM2', 'Horizontal permeability', 1e-16, 1e-9, 1e-16, 'm²', 'Intrinsic permeability; logarithmic slider.', true, 'kₕ')}
+              {field('soil.intrinsicPermeabilityVerticalM2', 'Vertical permeability', 1e-16, 1e-9, 1e-16, 'm²', 'Intrinsic permeability; logarithmic slider.', true, 'kᵥ')}
+            </Section>
+            <Section title="Soil layers" detail={`${scenario.soilLayers.length} layers · sum ${scenario.soilLayers.reduce((sum, item) => sum + item.thicknessM, 0).toFixed(2)} m`} open>
+              <div className="region-toolbar"><select aria-label="Soil layer" value={selectedLayer} onChange={(e) => setSelectedLayer(Number(e.target.value))}>{scenario.soilLayers.map((item, i) => <option key={item.id} value={i}>{item.id}</option>)}</select><button onClick={addLayer} type="button">+ Add</button><button onClick={() => removeLayer(selectedLayer)} type="button" disabled={scenario.soilLayers.length <= 1}>Remove</button></div>
+              {layer && <><NumberControl label="Layer thickness" value={layer.thicknessM} min={0.1} max={scenario.domain.depthM - 0.1 * Math.max(0, scenario.soilLayers.length - 1)} step={0.01} unit="m" note="Another layer adjusts so total thickness always matches domain depth." onChange={(v) => changeLayerThickness(selectedLayer, v)} />
+              {field(`soilLayers.${selectedLayer}.dryDensityMultiplier`, 'Dry density multiplier', 0.2, 3, 0.01, '×')}{field(`soilLayers.${selectedLayer}.porosityOffset`, 'Porosity offset', -0.25, 0.25, 0.01, 'fraction')}{field(`soilLayers.${selectedLayer}.moistureSaturationOffset`, 'Moisture saturation offset', -0.5, 0.5, 0.01, 'fraction')}{field(`soilLayers.${selectedLayer}.permeabilityMultiplier`, 'Permeability multiplier', 0.01, 100, 0.01, '×', 'Applied to intrinsic horizontal and vertical permeability.', true)}{field(`soilLayers.${selectedLayer}.thermalConductivityMultiplier`, 'Conductivity multiplier', 0.2, 3, 0.01, '×')}</>}
+            </Section>
+            <Section title="Peat regions" detail={`${scenario.peatRegions.length} region${scenario.peatRegions.length === 1 ? '' : 's'}`} open>
+              <div className="region-toolbar"><select aria-label="Peat region" value={selectedPeat} onChange={(e) => setSelectedPeat(Number(e.target.value))}>{scenario.peatRegions.map((p, i) => <option key={p.id} value={i}>Peat {i + 1}</option>)}</select><button onClick={addPeat} type="button">+ Add</button><button onClick={() => { removeAt('peatRegions', selectedPeat); setSelectedPeat(0) }} type="button" disabled={scenario.peatRegions.length <= 1}>Remove</button></div>
+              {peat && <><div className="select-row"><label>Shape</label><select value={peat.shape} onChange={(e) => update(`peatRegions.${selectedPeat}.shape`, e.target.value)}><option value="ellipsoid">Ellipsoid</option><option value="slab">Layer / slab</option><option value="irregular">Seeded irregular</option></select></div>
+              {field(`peatRegions.${selectedPeat}.centerXM`, 'Center X', 0, 6.096, 0.05, 'm')}{field(`peatRegions.${selectedPeat}.centerYM`, 'Center Y', 0, 6.096, 0.05, 'm')}{field(`peatRegions.${selectedPeat}.centerDepthM`, 'Center depth', 0.1, scenario.domain.depthM - 0.1, 0.05, 'm')}
+              {field(`peatRegions.${selectedPeat}.sizeXM`, 'Width X', 0.2, 6, 0.05, 'm')}{field(`peatRegions.${selectedPeat}.sizeYM`, 'Length Y', 0.2, 6, 0.05, 'm')}{field(`peatRegions.${selectedPeat}.thicknessM`, 'Thickness', 0.1, scenario.domain.depthM, 0.05, 'm')}{field(`peatRegions.${selectedPeat}.rotationDeg`, 'Orientation', -180, 180, 1, '°')}
+              {field(`peatRegions.${selectedPeat}.organicFraction`, 'Organic fraction', 0, 1, 0.01, 'dry mass')}{field(`peatRegions.${selectedPeat}.bulkDensityKgM3`, 'Dry bulk density', 100, 1200, 10, 'kg/m³')}{field(`peatRegions.${selectedPeat}.moistureSaturation`, 'Moisture saturation', 0, 0.99, 0.01, 'pore vol.')}{field(`peatRegions.${selectedPeat}.seed`, 'Irregularity seed', 0, 99999, 1, '')}</>}
+            </Section>
+            <Section title="Roots" detail="Supplemental fuel">
+              {field('root.amountKgM3', 'Root fuel near surface', 0, 30, 0.1, 'kg/m³', 'Additional root inventory; it does not replace peat fuel.')}
+              {field('root.meanDepthM', 'Mean root depth', 0.05, 3, 0.05, 'm')}
+              {field('root.distributionDepthM', 'Depth spread', 0.05, 3, 0.05, 'm')}
+              {field('root.thicknessM', 'Typical thickness', 0.001, 0.05, 0.001, 'm', 'Visual and material descriptor; reduced model uses distributed fuel.')}
+              {field('root.seed', 'Deterministic seed', 0, 99999, 1)}
+            </Section>
+          </>}
+          {tab === 'fire' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>Hot regions initialize temperature and fuel. They are not held hot after the run begins.</p></div>
+            <Section title="Initial smoldering" detail={`${scenario.hotRegions.length} region${scenario.hotRegions.length === 1 ? '' : 's'}`} open>
+              <div className="region-toolbar"><select aria-label="Hot region" value={selectedHot} onChange={(e) => setSelectedHot(Number(e.target.value))}>{scenario.hotRegions.map((h, i) => <option key={h.id} value={i}>Hot region {i + 1}</option>)}</select><button onClick={addHot} type="button">+ Add</button><button onClick={() => { removeAt('hotRegions', selectedHot); setSelectedHot(0) }} type="button" disabled={scenario.hotRegions.length <= 1}>Remove</button></div>
+              {hot && <><div className="select-row"><label>Shape</label><select value={hot.shape} onChange={(e) => update(`hotRegions.${selectedHot}.shape`, e.target.value)}><option value="ellipsoid">Ellipsoid</option><option value="slab">Slab</option></select></div>
+              {field(`hotRegions.${selectedHot}.centerXM`, 'Center X', 0, 6.096, 0.05, 'm')}{field(`hotRegions.${selectedHot}.centerYM`, 'Center Y', 0, 6.096, 0.05, 'm')}{field(`hotRegions.${selectedHot}.centerDepthM`, 'Center depth', 0.1, scenario.domain.depthM - 0.1, 0.05, 'm')}
+              {field(`hotRegions.${selectedHot}.sizeXM`, 'Width X', 0.1, 3, 0.05, 'm')}{field(`hotRegions.${selectedHot}.sizeYM`, 'Length Y', 0.1, 3, 0.05, 'm')}{field(`hotRegions.${selectedHot}.thicknessM`, 'Thickness', 0.1, 2, 0.05, 'm')}
+              {field(`hotRegions.${selectedHot}.temperatureC`, 'Initial temperature', 20, 500, 1, '°C')}{field(`hotRegions.${selectedHot}.fuelFraction`, 'Available local fuel', 0, 1, 0.01, 'fraction')}</>}
+            </Section>
+            <Section title="Modeled pathways" detail="Assumed geometry">
+              <p className="control-note block">Pathway changes initialize a new transport run. They are assumptions, not predicted soil damage.</p>
+              <div className="region-toolbar"><select aria-label="Pathway" value={selectedPathway} onChange={(e) => setSelectedPathway(Number(e.target.value))}>{scenario.pathways.length ? scenario.pathways.map((p, i) => <option key={p.id} value={i}>Pathway {i + 1}</option>) : <option value={0}>None</option>}</select><button type="button" onClick={addPath}>+ Add</button><button type="button" disabled={!path} onClick={() => { removeAt('pathways', selectedPathway); setSelectedPathway(0) }}>Remove</button></div>
+              {path && <>{field(`pathways.${selectedPathway}.centerXM`, 'Center X', 0, 6.096, 0.05, 'm')}{field(`pathways.${selectedPathway}.centerYM`, 'Center Y', 0, 6.096, 0.05, 'm')}{field(`pathways.${selectedPathway}.centerDepthM`, 'Center depth', 0.1, scenario.domain.depthM - 0.1, 0.05, 'm')}{field(`pathways.${selectedPathway}.sizeXM`, 'Width X', 0.05, 2, 0.05, 'm')}{field(`pathways.${selectedPathway}.sizeYM`, 'Length Y', 0.05, 2, 0.05, 'm')}{field(`pathways.${selectedPathway}.thicknessM`, 'Thickness', 0.1, 3, 0.05, 'm')}{field(`pathways.${selectedPathway}.rotationDeg`, 'Orientation', -180, 180, 1, '°')}{field(`pathways.${selectedPathway}.permeabilityMultiplier`, 'Permeability multiplier', 1, 1000, 1, '×', 'Logarithmic artistic scenario control on an assumed geometry.', true)}</>}
+            </Section>
+          </>}
+          {tab === 'boundary' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>The default surface exchanges with the atmosphere. Side boundaries are selectable computational conditions.</p></div>
+            <Section title="Initial and boundary gas" open>
+              {field('atmosphere.oxygenMoleFraction', 'Atmospheric O₂', 0, 0.3, 0.001, 'mole frac.')}{field('atmosphere.co2MoleFraction', 'Atmospheric CO₂', 0, 0.1, 0.0001, 'mole frac.')}{field('atmosphere.waterVaporMoleFraction', 'Water vapor', 0, 0.1, 0.001, 'mole frac.')}{field('atmosphere.pressurePa', 'Ambient pressure', 80000, 120000, 100, 'Pa')}{field('atmosphere.exchangeVelocityMS', 'Surface gas exchange', 1e-8, 1e-3, 1e-8, 'm/s', 'Open surface exchange coefficient.', true)}
+              <div className="select-row"><label>Top gas boundary</label><select value={scenario.atmosphere.topGasBoundary} onChange={(e) => update('atmosphere.topGasBoundary', e.target.value)}><option value="atmospheric">Open atmosphere</option><option value="noFlux">No flux</option></select></div>
+              <div className="select-row"><label>Side gas boundary</label><select value={scenario.atmosphere.sideGasBoundary} onChange={(e) => update('atmosphere.sideGasBoundary', e.target.value)}><option value="noFlux">No flux</option><option value="atmospheric">Atmospheric exchange</option></select></div>
+            </Section>
+            <Section title="Thermal boundaries" open>
+              {field('atmosphere.temperatureC', 'Atmospheric temperature', -20, 50, 0.5, '°C')}{field('atmosphere.deepTemperatureC', 'Deep ground temperature', -10, 40, 0.5, '°C')}{field('atmosphere.surfaceHeatTransferWm2K', 'Surface heat transfer', 0, 40, 0.1, 'W/m²/K')}{field('atmosphere.bottomHeatTransferWm2K', 'Bottom heat transfer', 0, 20, 0.1, 'W/m²/K')}
+            </Section>
+          </>}
+          {tab === 'advanced' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>These reduced coefficients include demonstration assumptions. See the source and parameter reference in the repository.</p></div>
+            <Section title="Grid quality" detail="Reset required" open><div className="quality-grid">{([['Low', 12, 12, 8], ['Medium', 18, 18, 12], ['High', 24, 24, 16]] as const).map(([name, nx, ny, nz]) => <button className={scenario.domain.nx === nx ? 'selected' : ''} key={name} type="button" onClick={() => { setScenario((old) => ({ ...old, domain: { ...old.domain, nx, ny, nz } })); setPreset('custom') }}>{name}<small>{nx}×{ny}×{nz}</small></button>)}</div><p className="control-note block">A full 3D finite-volume grid. Editing quality restarts the physical run.</p></Section>
+            <Section title="Heat and gas transport" open>{field('soil.thermalConductivityWmK', 'Thermal conductivity', 0.05, 3, 0.01, 'W/m/K')}{field('soil.solidHeatCapacityJKgK', 'Solid heat capacity', 300, 3000, 10, 'J/kg/K')}{field('soil.gasDiffusivityM2S', 'Molecular gas diffusivity', 1e-7, 1e-4, 1e-7, 'm²/s', '', true)}{field('soil.tortuosity', 'Tortuosity', 1, 8, 0.1, 'factor')}{field('source.contactConductanceWm2K', 'Source / soil conductance', 0.1, 100, 0.1, 'W/m²/K', '', true)}</Section>
+            <Section title="Smoldering surrogate" open>{field('model.smolderRateS', 'Reference rate', 1e-8, 1e-3, 1e-8, 's⁻¹', 'Uncalibrated first-order rate.', true)}{field('model.referenceTemperatureK', 'Reference temperature', 300, 800, 1, 'K')}{field('model.activationEnergyJMol', 'Activation energy', 5000, 150000, 500, 'J/mol')}{field('model.minimumReactionTemperatureK', 'Reaction cutoff', 280, 700, 1, 'K')}{field('model.oxygenHalfSaturation', 'O₂ half saturation', 0.001, 0.2, 0.001, 'mole frac.')}{field('model.heatOfCombustionJkg', 'Heat of oxidation', 1e6, 3e7, 100000, 'J/kg', '', true)}</Section>
+            <Section title="Moisture and validity" open>{field('model.evaporationRateS', 'Evaporation rate', 1e-8, 1e-3, 1e-8, 's⁻¹', '', true)}{field('model.evaporationOnsetTemperatureK', 'Evaporation onset', 275, 370, 1, 'K')}{field('model.boilingTemperatureK', 'Boiling reference', 320, 400, 1, 'K')}{field('model.minPressurePa', 'Minimum supported pressure', 80000, scenario.atmosphere.pressurePa, 100, 'Pa')}{field('model.maxPressurePa', 'Maximum supported pressure', scenario.atmosphere.pressurePa, 150000, 100, 'Pa')}{field('model.maxDarcyVelocityMS', 'Darcy validity limit', 1e-6, 0.02, 1e-6, 'm/s', 'Run pauses if exceeded.', true)}{field('model.maxStepS', 'Maximum physical step', 1, 3600, 1, 's', 'Solver may choose a smaller stable step.')}</Section>
+          </>}
+          {tab === 'motion' && <>
+            <div className="tab-intro"><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><p>Manual soil-piece motion is a separate visual event. Its timing and extent are unrelated to source settings or calculated pressure.</p></div>
+            <Section title="Illustrative soil rearrangement" detail="Independent event" open>
+              <NumberControl label="Artistic movement" value={motionIntensity} min={0.1} max={1} step={0.01} unit="visual" onChange={setMotionIntensity} note="Uncalibrated visual amount; no displacement prediction." />
+              <button className="primary-btn full" type="button" onClick={triggerIllustration} disabled={motionPlaying}>Show soil opening and settling</button>
+              <p className="motion-warning">Illustration — not a calculated shockwave. This event does not change the simulation.</p>
+            </Section>
+            <Section title="Physics scope" open><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Heat, porous gas transport, smoldering, finite dry-ice inventory</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Soil-piece movement</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Rupture, blast, calibrated geomechanics, char yield</span></div></div></Section>
+          </>}
+          {tab === 'fast' && <>
+            <div className="tab-intro"><StatusChip kind="reduced">REDUCED SHORT-TIME GAS MODEL</StatusChip><p>This separate radial shell calculation spans at most two simulated seconds. It starts from the current 3D slow-run state and uses its own event clock.</p><StatusChip kind="illustrative">ILLUSTRATIVE SOIL RESPONSE</StatusChip><p>Yield, damage, visible cracking, and soil-piece motion are uncalibrated indicators. They do not predict fracture, uplift, or blast force.</p></div>
+            <Section title="Short-time event" detail="Separate solver clock" open>
+              <NumberControl label="Event duration" value={fastDuration} min={0.1} max={2} step={0.05} unit="s" note="Bounded short-time calculation; independent of the multiday clock." onChange={setFastDuration} />
+              <NumberControl label="Recorded frames" value={fastFrameCount} min={2} max={100} step={1} unit="frames" onChange={(v) => setFastFrameCount(Math.round(v))} />
+              <button className="primary-btn full" type="button" onClick={runFastFromCurrent} disabled={!snapshot || !validation.valid}>Compute event from current slow state</button>
+              <button className="secondary-btn full" type="button" onClick={replayFastEvent} disabled={!fastRun}>Replay recorded short event</button>
+              <p className="control-note block">The dry-ice conversion button on Source also computes this event after releasing the remaining solid CO₂ as a numerical intervention.</p>
+            </Section>
+            <Section title="Event results" detail={fastRun ? fastRun.status : 'No event recorded'} open>
+              {fastRun && fastFrame ? <div className="probe-readout"><div><span>Event clock</span><strong>{fastFrame.eventTimeS.toFixed(3)} s</strong></div><div><span>Slow-run start time</span><strong>{formatClock(fastRun.startSolverTimeS)}</strong></div><div><span>Near-source pressure load</span><strong>{formatLoad(fastFrame.sourcePressureLoadN)} N</strong></div><div><span>Maximum shell pressure</span><strong>{Math.max(...Array.from(fastFrame.shellPressurePa)).toFixed(0)} Pa</strong></div><div><span>Maximum yield index</span><strong>{Math.max(...Array.from(fastFrame.shellYieldIndex)).toFixed(3)} assumed</strong></div><div><span>Maximum damage index</span><strong>{Math.max(...Array.from(fastFrame.shellDamage)).toFixed(3)} illustrative</strong></div><div><span>Gas balance residual</span><strong>{fastRun.diagnostics.gasBalanceResidualMol.toExponential(2)} mol</strong></div><div><span>CO₂ balance residual</span><strong>{fastRun.diagnostics.co2BalanceResidualMol.toExponential(2)} mol</strong></div></div> : <p className="control-note block">Run an event to inspect the separate pressure and CO₂ shell histories.</p>}
+              {fastRun?.diagnostics.warnings.map((warning, i) => <p key={i} className="event-warning">{warning}</p>)}
+              {fastRun?.limitations.map((limitation, i) => <p key={`limit-${i}`} className="control-note block">{limitation}</p>)}
+              <button className="secondary-btn full" type="button" onClick={exportFastEvent} disabled={!fastRun}><Download size={14} /> Export event JSON</button>
+            </Section>
+            <Section title="Fixed model assumptions" open>{fastRun ? <div className="probe-readout"><div><span>Spatial reduction</span><strong>8 radial groups</strong></div><div><span>Momentum</span><strong>Finite relaxation</strong></div><div><span>Overburden assumption</span><strong>{fastRun.assumptions.overburdenPa.toFixed(0)} Pa</strong></div><div><span>Cohesion assumption</span><strong>{fastRun.assumptions.cohesionPa.toFixed(0)} Pa</strong></div><div><span>Biot coefficient</span><strong>{fastRun.assumptions.biotCoefficient.toFixed(2)}</strong></div><div><span>Max supported pressure</span><strong>{fastRun.assumptions.maxSupportedPressurePa.toFixed(0)} Pa</strong></div></div> : <p className="control-note block">Fixed coefficients are reported with the computed event.</p>}</Section>
+          </>}
+        </div>
+        <div className="sidebar-footer"><div className="file-actions"><button type="button" onClick={() => importRef.current?.click()}><Upload size={15} /> Import</button><button type="button" onClick={exportConfig}><Save size={15} /> Scenario</button></div><input ref={importRef} type="file" accept="application/json,.json" hidden onChange={chooseScenarioFile} />{importError && <p className="error-text">{importError}</p>}{!validation.valid && <p className="error-text">{validation.errors.slice(0, 2).join('; ')}</p>}</div>
+      </aside>
+
+      <main className="main-view">
+        <div className="view-toolbar"><div className="toolbar-group"><span className="toolbar-label">VIEW</span>{([['orbit', '3D orbit'], ['top', 'Top'], ['section-x', 'X section'], ['section-y', 'Y section']] as [View, string][]).map(([id, label]) => <button type="button" key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}>{label}</button>)}</div><div className="toolbar-group right"><IconButton title="Switch between multiday fields and the separate short-time event" active={fastMode} disabled={!fastRun} onClick={() => { setFastMode((v) => !v); setComparison(false) }}><Zap size={17} /></IconButton><IconButton title="Show modeled flow arrows (direction amplified)" active={showFlow} disabled={fastMode} onClick={() => setShowFlow((v) => !v)}><Waves size={17} /></IconButton><IconButton title="Show roots" active={showRoots} onClick={() => setShowRoots((v) => !v)}><Leaf size={17} /></IconButton><IconButton title="A/B comparison: same initial scenario and seed, heater off baseline" active={comparison} disabled={fastMode} onClick={() => setComparison((v) => !v)}><ArrowLeftRight size={17} /></IconButton></div></div>
+        <div className={`scene-area ${comparison && !fastMode ? 'comparing' : ''}`}>
+          <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: heaterEnabled, heatGenerationWm3: heaterGeneration } }} snapshot={sceneFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={comparison || fixedScale} illustration={illustration} probe={probe} onProbe={chooseProbe} lockCamera={comparison && !fastMode} fastEvent={fastMode && fastRun && fastFrame ? { run: fastRun, frame: fastFrame, overlay: fastOverlay } : null} /><div className="scene-tag">{fastMode ? 'SHORT-TIME RADIAL EVENT' : comparison ? 'A · CURRENT SCENARIO' : 'UNDERGROUND CUTAWAY'}<span>{fastMode && fastFrame ? `event clock ${fastFrame.eventTimeS.toFixed(3)} s · slow clock held at ${formatClock(fastRun?.startSolverTimeS ?? 0)}` : comparison ? `matched checkpoint ${formatClock(alignedComparisonSnapshot?.timeSeconds ?? 0)} · linked camera` : 'drag to orbit · scroll to zoom · click slice to probe'}</span></div>{scenario.pathways.length > 0 && <div className="hypothetical-tag">Assumed pathway geometry · hypothetical transport</div>}{fastMode && <div className="illustration-tag">RADIAL GAS MODEL · SOIL MOTION ILLUSTRATIVE · NO VALIDATED FRACTURE / BLAST</div>}{!fastMode && illustration > 0 && <div className="illustration-tag">ILLUSTRATION — NOT A CALCULATED SHOCKWAVE</div>}</div>
+          {comparison && !fastMode && <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: false } }} snapshot={compareFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={true} illustration={0} probe={probe} lockCamera /><div className="scene-tag">B · HEATER OFF BASELINE <span>same seed · {formatClock(compareSnapshot?.timeSeconds ?? 0)} · linked camera</span></div></div>}
+        </div>
+        {fastMode && fastRun && fastFrame ? <div className="fast-event-bar">
+          <div className="event-clock"><Zap size={16} /><span>SHORT EVENT</span><strong>{fastFrame.eventTimeS.toFixed(3)} / {fastRun.durationS.toFixed(2)} s</strong></div>
+          <button className="event-play" type="button" onClick={() => setFastPlaying((v) => !v)}>{fastPlaying ? <Pause size={15} /> : <Play size={15} />}{fastPlaying ? 'Pause' : 'Play'}</button>
+          <input className="event-scrub" type="range" min={0} max={Math.max(0, fastRun.frames.length - 1)} step={1} value={fastIndex} onChange={(e) => { setFastPlaying(false); setFastIndex(Number(e.target.value)) }} aria-label="Short event frame scrubber" />
+          <select aria-label="Fast event overlay" value={fastOverlay} onChange={(e) => setFastOverlay(e.target.value as FastOverlay)}><option value="pressure">Shell pressure</option><option value="co2">Shell CO₂</option><option value="damage">Damage index · illustrative</option></select>
+          <select aria-label="Fast event playback rate" value={fastPlaybackRate} onChange={(e) => setFastPlaybackRate(Number(e.target.value))}><option value={0.1}>0.1×</option><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={2}>2×</option><option value={4}>4×</option></select>
+          <span className="event-force" title="Radial model pressure-area proxy, not blast or fracture force">LOAD {formatLoad(fastFrame.sourcePressureLoadN)} N</span>
+        </div> :
+        <div className="overlay-toolbar"><div className="overlay-title"><Layers3 size={17} /><span>FIELD OVERLAY</span></div><select value={overlay} onChange={(e) => setOverlay(e.target.value as Overlay)} aria-label="Field overlay">{OVERLAYS.map((o) => <option key={o} value={o}>{OVERLAY_INFO[o].label}</option>)}</select><span className="overlay-separator" /><label className="tiny-check"><input type="checkbox" checked={comparison || fixedScale} disabled={comparison} onChange={(e) => setFixedScale(e.target.checked)} /> Fixed scale</label><div className="slice-control"><span>CLIP</span><input type="range" min={-1} max={1} step={0.01} value={slice} onChange={(e) => setSlice(Number(e.target.value))} aria-label="Clipping plane position" /><strong>{slice.toFixed(2)}</strong></div><div className="color-scale"><span>{Number(legendRange[0].toPrecision(3))}</span><i /><span>{Number(legendRange[1].toPrecision(3))} {OVERLAY_INFO[overlay].unit}</span></div>{overlay === 'pressure' && <div className={`overlay-load ${loadOutsideValidity ? 'outside' : ''}`} title="Excess pore pressure × fixed heater support area; pressure-area force proxy, not rupture force">LOAD {formatLoad(pressureLoad)} N{loadOutsideValidity ? ' · outside validity' : ''}</div>}</div>}
+      </main>
+
+      <aside className="sidebar right-sidebar">
+        <div className="panel-heading"><div><small>LIVE READOUT</small><h2>{fastMode ? 'Event + slow state' : 'Model state'}</h2></div><Gauge size={18} /></div>
+        <div className="readout-scroll">
+          <div className="run-status"><span className={`status-dot ${displayed?.diagnostics.status ?? 'idle'}`} /> <strong>{displayed?.diagnostics.status === 'validity-paused' ? 'Validity limit reached' : displayed?.diagnostics.status === 'numerical-paused' ? 'Numerical pause' : playing ? 'Computing' : playback ? 'Recorded playback' : 'Ready / paused'}</strong><span>{formatClock(time)}</span></div>
+          {fastMode && fastRun && fastFrame && <div className={`fast-readout ${fastRun.status}`}><div><Zap size={15} /><strong>SHORT EVENT · {fastFrame.eventTimeS.toFixed(3)} s</strong></div><p>{fastRun.status === 'validity-paused' ? 'Short-time validity limit reached. Shown values are outside the model range.' : 'Reduced radial gas calculation; soil response is illustrative.'}</p></div>}
+          {error && <div className="alert-box">{error}</div>}
+          {displayed?.diagnostics.warnings?.length ? <div className="alert-box">{displayed.diagnostics.warnings[displayed.diagnostics.warnings.length - 1]}</div> : null}
+          <div className="metric-grid"><div className="metric primary"><span>PEAK TEMPERATURE</span><strong>{displayed ? (displayed.peakTemperatureK - 273.15).toFixed(1) : '—'}<small> °C</small></strong><Thermometer size={19} /></div><div className="metric"><span>DRY ICE LEFT</span><strong>{displayed?.dryIceMassKg.toFixed(2) ?? '—'}<small> kg</small></strong></div><div className="metric"><span>HEATER POWER</span><strong>{displayed?.heaterPowerW.toFixed(1) ?? '—'}<small> W</small></strong></div><div className="metric"><span>FUEL REMAINING</span><strong>{displayed?.totalFuelKg.toFixed(1) ?? '—'}<small> kg</small></strong></div><div className={`metric pressure-load-metric ${shownLoadOutsideValidity ? 'outside' : ''}`} title="Excess near-source pore pressure × π × fixed heater support radius²; algebraic force proxy, not a soil displacement or blast force calculation"><span>MODELED PRESSURE LOAD · FORCE PROXY</span><strong>{formatLoad(shownPressureLoad)}<small> N</small></strong><em>{shownLoadOutsideValidity ? 'Outside reduced-model validity' : 'Assumed projected support area'}</em></div></div>
+          <Section title="Sensor 01" detail={probe ? `${probe.xM.toFixed(1)}, ${probe.yM.toFixed(1)}, −${probe.depthM.toFixed(1)} m` : 'Click a field cell'} open><div className="probe-readout">{probeValue ? <><div><span>Temperature</span><strong>{(probeValue.temperatureK - 273.15).toFixed(1)} °C</strong></div><div><span>O₂ / CO₂</span><strong>{(probeValue.oxygenMoleFraction * 100).toFixed(1)}% / {(probeValue.co2MoleFraction * 100).toFixed(1)}%</strong></div><div><span>O₂ partial pressure</span><strong>{(probeValue.oxygenPartialPressurePa / 1000).toFixed(1)} kPa</strong></div><div><span>Pressure</span><strong>{(probeValue.pressurePa - scenario.atmosphere.pressurePa).toFixed(1)} Pa gauge</strong></div><div><span>Moisture</span><strong>{(probeValue.moistureSaturation * 100).toFixed(0)}% pore vol.</strong></div></> : <div className="probe-prompt"><MousePointer2 size={19} /> Click a colored slice cell to place a virtual sensor.</div>}</div></Section>
+          <Section title="Recorded histories" detail={`${history.length} checkpoints`} open><MiniChart points={history} label="Peak temperature" unit="°C" accessor={(p) => p.snapshot.peakTemperatureK - 273.15} /><MiniChart points={history.filter((p) => p.probe)} label="Sensor O₂" unit="%" color="#7cbfd0" accessor={(p) => (p.probe?.oxygenMoleFraction ?? 0) * 100} /></Section>
+          <Section title="Mass & energy ledger" detail="Diagnostics"><div className="probe-readout"><div><span>CO₂ from dry ice</span><strong>{displayed?.diagnostics.cumulativeCO2InputKg.toFixed(3) ?? '—'} kg</strong></div><div><span>CO₂ boundary outflow</span><strong>{displayed?.diagnostics.cumulativeCO2OutflowKg.toFixed(3) ?? '—'} kg</strong></div><div><span>Gas balance residual</span><strong>{displayed?.diagnostics.gasBalanceResidualMol.toExponential(2) ?? '—'} mol</strong></div><div><span>Source energy residual</span><strong>{displayed?.diagnostics.sourceEnergyResidualJ.toExponential(2) ?? '—'} J</strong></div><div><span>Conversion intervention energy</span><strong>{displayed ? (displayed.diagnostics.cumulativeInterventionEnergyJ / 1000).toFixed(2) : '—'} kJ</strong></div><div><span>Numerical correction</span><strong>{displayed?.diagnostics.correctedMoles.toExponential(2) ?? '—'} mol</strong></div><div><span>Last physical step</span><strong>{displayed?.diagnostics.lastStepS.toFixed(1) ?? '—'} s</strong></div><div><span>Peak Darcy speed</span><strong>{displayed?.diagnostics.maxDarcyVelocityMS.toExponential(2) ?? '—'} m/s</strong></div><div><span>Pressure residual</span><strong>{displayed?.diagnostics.pressureResidualPa.toExponential(2) ?? '—'} Pa</strong></div></div></Section>
+          <div className="model-status-card"><div><CircleHelp size={17} /><strong>Model status</strong></div><p>Reduced porous transport and reaction; qualitative soil-motion illustration. No blast, rupture, or field outcome prediction.</p></div>
+        </div>
+        <div className="sidebar-footer"><div className="file-actions"><button onClick={exportCsv} type="button" disabled={!history.length}><Download size={15} /> CSV</button><button onClick={screenshot} type="button"><ArrowDownToLine size={15} /> Image</button><button onClick={exportRecording} type="button" disabled={!history.length}><Download size={15} /> States</button></div></div>
+      </aside>
+    </div>
+
+    <footer className="timeline"><div className="transport"><button className="play-btn" type="button" onClick={playing ? pause : start} disabled={!validation.valid} aria-label={playing ? 'Pause solver' : 'Run solver'}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><IconButton title="One physical solver step" onClick={() => clientRef.current?.step()} disabled={!validation.valid || playing}><StepForward size={17} /></IconButton><IconButton title="Reset physical run" onClick={reset}><RotateCcw size={17} /></IconButton><IconButton title="Fast forward at up to 3600 simulated seconds per real second; physical solver steps remain stable" onClick={() => { setPlayback(false); setComputeRate(3600); clientRef.current?.setComputeRate(3600); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }} disabled={!validation.valid}><SkipForward size={17} /></IconButton></div><div className="timeline-main"><div className="timeline-head"><span>PHYSICAL SOLVER TIME <strong>{formatClock(time)}</strong></span><span>{progress.toFixed(0)}% of {durationDays}-day window</span></div><input className="timeline-range" type="range" min={0} max={Math.max(1, history.length - 1)} step={1} value={playback ? playbackIndex : Math.max(0, history.length - 1)} onChange={(e) => { pause(); setPlayback(true); setPlaybackIndex(Number(e.target.value)) }} aria-label="Recorded run playback scrubber" /><div className="timeline-ticks"><span>0</span><span>1d</span><span>{durationDays}d</span></div></div><div className="timeline-options"><div className="compute-rate"><label>SOLVER PACE</label><select aria-label="Target simulated seconds per wall second" value={computeRate} onChange={(e) => setComputeRate(Number(e.target.value))} title="Requested pace; actual throughput may be lower"><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div><div className="duration-pills">{[1, 3, 7].map((d) => <button key={d} type="button" className={durationDays === d ? 'active' : ''} onClick={() => setDurationDays(d)}>{d}d</button>)}</div><div className="run-to"><label>RUN TO</label><input type="number" min={0} max={durationDays * 24} step={1} value={runToHour} onChange={(e) => setRunToHour(Number(e.target.value))} /><span>h</span><button type="button" onClick={() => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(Math.min(durationDays * DAY, runToHour * 3600)) }} disabled={!validation.valid}>Go</button></div><div className="throughput">{throughput > 0 ? `${throughput.toFixed(0)} sim s / wall s` : 'Throughput measured during run'}</div></div><div className="playback-controls"><span>RECORDED PLAYBACK</span><button type="button" onClick={() => { pause(); setPlayback((v) => !v) }} disabled={history.length < 2}>{playback ? 'Pause' : 'Play'}</button><select aria-label="Recorded playback speed" value={playbackSpeed} onChange={(e) => setPlaybackSpeed(Number(e.target.value))}><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div></footer>
+    {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.1</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manually triggered soil-piece motion, separate from the solver.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture, quantitative geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
+  </div>
+}
+
+export default App

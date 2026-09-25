@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "modelId": "zombie-reduced-porous-v0.1",
+  "unitMetadata": {
+    "system": "SI",
+    "coordinates": "x-y-horizontal-depth-positive-down",
+    "temperature": "K-in-solver-C-for-configured-ambient-and-hot-regions",
+    "gasComposition": "mole-fraction",
+    "gasInventory": "mol-per-cell",
+    "solidLiquidInventory": "kg-per-cell"
+  },
+  "name": "Hypothetical edited pathway",
+  "description": "Assumed post-rearrangement pathway geometry, not predicted soil failure.",
+  "seed": 20260925,
+  "provenance": {
+    "domain.widthM": "assumed",
+    "domain.lengthM": "assumed",
+    "source.densityKgM3": "assumed",
+    "source.initialMassKg": "assumed",
+    "source.heatGenerationWm3": "assumed",
+    "soil": "assumed",
+    "peatRegions": "assumed",
+    "model": "assumed"
+  },
+  "domain": {
+    "widthM": 6.096,
+    "lengthM": 6.096,
+    "depthM": 3,
+    "nx": 12,
+    "ny": 12,
+    "nz": 8
+  },
+  "soil": {
+    "sandFraction": 0.5,
+    "siltFraction": 0.35,
+    "clayFraction": 0.15,
+    "organicFraction": 0.03,
+    "bulkDensityKgM3": 1250,
+    "porosity": 0.45,
+    "moistureSaturation": 0.35,
+    "thermalConductivityWmK": 0.65,
+    "solidHeatCapacityJKgK": 850,
+    "intrinsicPermeabilityHorizontalM2": 3e-11,
+    "intrinsicPermeabilityVerticalM2": 8e-12,
+    "gasDiffusivityM2S": 0.000016,
+    "tortuosity": 3,
+    "compaction": 0.1
+  },
+  "soilLayers": [
+    {
+      "id": "surface-soil",
+      "thicknessM": 0.8,
+      "dryDensityMultiplier": 0.9,
+      "porosityOffset": 0.03,
+      "moistureSaturationOffset": -0.05,
+      "permeabilityMultiplier": 1.5,
+      "thermalConductivityMultiplier": 0.8
+    },
+    {
+      "id": "deep-soil",
+      "thicknessM": 2.2,
+      "dryDensityMultiplier": 1,
+      "porosityOffset": 0,
+      "moistureSaturationOffset": 0,
+      "permeabilityMultiplier": 1,
+      "thermalConductivityMultiplier": 1
+    }
+  ],
+  "peatRegions": [
+    {
+      "id": "peat-1",
+      "shape": "ellipsoid",
+      "centerXM": 3,
+      "centerYM": 3,
+      "centerDepthM": 1.55,
+      "sizeXM": 2.4,
+      "sizeYM": 2.2,
+      "thicknessM": 1.05,
+      "rotationDeg": 20,
+      "organicFraction": 0.75,
+      "bulkDensityKgM3": 300,
+      "moistureSaturation": 0.48,
+      "seed": 17
+    }
+  ],
+  "root": {
+    "amountKgM3": 1.5,
+    "meanDepthM": 0.45,
+    "distributionDepthM": 0.45,
+    "thicknessM": 0.015,
+    "seed": 4103
+  },
+  "hotRegions": [
+    {
+      "id": "hot-1",
+      "shape": "ellipsoid",
+      "centerXM": 2.55,
+      "centerYM": 3,
+      "centerDepthM": 1.65,
+      "sizeXM": 1.1,
+      "sizeYM": 0.9,
+      "thicknessM": 0.55,
+      "temperatureC": 270,
+      "fuelFraction": 1
+    }
+  ],
+  "source": {
+    "centerXM": 3.45,
+    "centerYM": 3.05,
+    "centerDepthM": 1.35,
+    "densityKgM3": 1560,
+    "initialMassKg": 4,
+    "initialTemperatureK": 194.65,
+    "supportRadiusM": 0.12,
+    "heatGenerationWm3": 2500,
+    "startTimeS": 0,
+    "durationS": 86400,
+    "enabled": true,
+    "contactConductanceWm2K": 1.5
+  },
+  "atmosphere": {
+    "temperatureC": 10,
+    "deepTemperatureC": 8,
+    "pressurePa": 101325,
+    "oxygenMoleFraction": 0.2095,
+    "co2MoleFraction": 0.00042,
+    "waterVaporMoleFraction": 0.01,
+    "exchangeVelocityMS": 0.000005,
+    "surfaceHeatTransferWm2K": 4,
+    "bottomHeatTransferWm2K": 0.5,
+    "topGasBoundary": "atmospheric",
+    "sideGasBoundary": "noFlux"
+  },
+  "model": {
+    "smolderRateS": 0.000002,
+    "referenceTemperatureK": 550,
+    "activationEnergyJMol": 35000,
+    "minimumReactionTemperatureK": 390,
+    "oxygenHalfSaturation": 0.06,
+    "heatOfCombustionJkg": 15000000,
+    "evaporationRateS": 0.000001,
+    "evaporationOnsetTemperatureK": 310,
+    "boilingTemperatureK": 373.15,
+    "minPressurePa": 80000,
+    "maxPressurePa": 150000,
+    "maxDarcyVelocityMS": 0.02,
+    "maxStepS": 120
+  },
+  "pathways": [
+    {
+      "id": "assumed-path-1",
+      "centerXM": 3.2,
+      "centerYM": 3.05,
+      "centerDepthM": 0.95,
+      "sizeXM": 0.4,
+      "sizeYM": 0.35,
+      "thicknessM": 1.7,
+      "rotationDeg": 0,
+      "permeabilityMultiplier": 80
+    }
+  ],
+  "illustrativeEvent": {
+    "triggeredAtS": null,
+    "intensity": 0.5
+  }
+}
