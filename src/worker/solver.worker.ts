@@ -1,6 +1,7 @@
 import { Simulation } from '../sim/index'
 import { runFastEvent } from '../fastEvent'
 import { SoilMechanics, type MechanicsResolution } from '../mechanics/model'
+import { ContinuumMechanics } from '../mechanics/continuum'
 import type { FastEventRun } from '../fastEvent'
 import type { Snapshot } from '../sim/types'
 import type { SolverCommand, SolverResponse } from './protocol'
@@ -23,6 +24,7 @@ let pacedUntilTimeSeconds = 0
 let lastPaceWallMs = 0
 let gasEvent: FastEventRun | null = null
 let mechanics: SoilMechanics | null = null
+let continuum: ContinuumMechanics | null = null
 let mechanicsGeneration = 0
 let mechanicsFrameIndex = 0
 let mechanicsStartWallMs = 0
@@ -148,6 +150,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
     if (command.type === 'init') {
       runGeneration++
       mechanicsGeneration++; gasEvent = null; mechanics = null
+      continuum = null
       runActive = false
       simulation = new Simulation(command.scenario)
       activeTarget = 0
@@ -155,6 +158,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
     } else if (command.type === 'dispose') {
       runGeneration++
       mechanicsGeneration++; gasEvent = null; mechanics = null
+      continuum = null
       runActive = false
       simulation = null
     } else if (command.type === 'pause') {
@@ -194,6 +198,17 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
       }
     } else if (command.type === 'startMechanics') {
       beginMechanics(command.resolution)
+    } else if (command.type === 'solveContinuum') {
+      if (!simulation) throw new Error('Initialize a scenario before calculating soil mechanics.')
+      if (!continuum) {
+        const domain = simulation.scenario.domain
+        continuum = new ContinuumMechanics(4, 4, 4, domain.widthM, domain.lengthM, domain.depthM,
+          undefined, simulation.scenario.soil.bulkDensityKgM3)
+      }
+      const result = continuum.solveTopTraction(command.tractionPa)
+      scope.postMessage({ type: 'continuumResult', result, tractionPa: command.tractionPa, resolution: 4 },
+        [result.displacementM.buffer, result.stressPa.buffer, result.strain.buffer, result.plasticStrain.buffer,
+          result.accumulatedPlasticStrain.buffer, result.yielded.buffer])
     } else if (command.type === 'resumeMechanics') {
       if (mechanics && gasEvent && mechanicsFrameIndex < gasEvent.frames.length) {
         mechanicsGeneration++

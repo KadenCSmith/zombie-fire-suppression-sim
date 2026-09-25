@@ -29,6 +29,7 @@ import type { Scenario, Snapshot, ProbeSample } from './sim/types'
 import type { FastEventRun } from './fastEvent'
 import { createSimulationClient } from './worker/client'
 import { mechanicsSizing, type MechanicsChecks, type MechanicsFrame, type MechanicsResolution } from './mechanics/model'
+import type { ContinuumResult } from './mechanics/continuum'
 import { derivePlumeSources, type PlumeSource } from './plumes/model'
 
 type Checkpoint = { snapshot: Snapshot; probe: ProbeSample | null }
@@ -229,6 +230,8 @@ function App() {
   const [mechanicsSpeed, setMechanicsSpeed] = useState(0)
   const [smallChecksPassed, setSmallChecksPassed] = useState(false)
   const [mechanicsView, setMechanicsView] = useState<'displacement' | 'yield'>('displacement')
+  const [continuumTractionPa, setContinuumTractionPa] = useState(1000)
+  const [continuumResult, setContinuumResult] = useState<ContinuumResult | null>(null)
   const [showSmoke, setShowSmoke] = useState(true)
   const [showSteam, setShowSteam] = useState(true)
   const [plumeQuality, setPlumeQuality] = useState(3)
@@ -297,6 +300,7 @@ function App() {
           if (c && Math.abs(c.massResidualKg) < 1e-6 && c.maxMomentumResidualN < 1e-5 && c.warnings.length === 0) setSmallChecksPassed(true)
         }
       },
+      onContinuumResult: (result) => { setContinuumResult(result); setError(''); setFastMode(false); setTab('event') },
     })
     clientRef.current = client
     return () => { client.dispose(); clientRef.current = null }
@@ -316,6 +320,7 @@ function App() {
       setPlayback(false)
       setPlaying(false)
       setFastRun(null)
+      setContinuumResult(null)
       fastRunRef.current = null; previousPlumeSnapshot.current = null; setPlumeSources([]); setMechanicsFrames([]); setMechanicsChecks(null); setSmallChecksPassed(false)
       setFastMode(false)
       setFastPlaying(false)
@@ -441,7 +446,7 @@ function App() {
   const loadPreset = (key: ScenarioPreset) => { if (key === 'custom') return; setPreset(key); setScenario(makePreset(key, initial)); setOperationalEvents([]) }
   const start = () => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }
   const pause = () => { clientRef.current?.pause(); setPlaying(false) }
-  const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setFastRun(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
+  const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setFastRun(null); setContinuumResult(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
   const resetSettings = () => {
     pause()
     const defaults = createDefaultScenario()
@@ -747,6 +752,13 @@ function App() {
             <Section title="Model interpretation"><p className="control-note block">Pressure load is a pressure × assumed area proxy on an imaginary plane. It does not predict soil displacement, fracture, or blast force.</p></Section>
           </>}
           {tab === 'event' && <>
+            <Section title="3D soil mechanics" detail="Mechanics only · prescribed top load" open>
+              <p className="control-note block">Eight-node brick FEM solves three displacement components and equilibrium on a 4 × 4 × 4 mesh. Fire and dry ice are excluded from this calculation. The initial gravity state is equilibrated; top traction is prescribed, not predicted gas pressure. Material values are demonstration assumptions.</p>
+              <NumberControl label="Downward top traction" value={continuumTractionPa} min={0} max={20000} step={100} unit="Pa" onChange={setContinuumTractionPa} />
+              <button className="primary-btn full" type="button" onClick={() => { setFastMode(false); clientRef.current?.solveContinuum(continuumTractionPa) }} disabled={!snapshot || !validation.valid}>Calculate 3D deformation</button>
+              {continuumResult && <div className="probe-readout"><div><span>Maximum nodal displacement</span><strong>{Math.max(...Array.from(continuumResult.displacementM, Math.abs)).toExponential(2)} m</strong></div><div><span>Yielded elements</span><strong>{continuumResult.yielded.reduce((a, b) => a + b, 0)} / 64</strong></div><div><span>Largest free force residual</span><strong>{continuumResult.residualN.toExponential(2)} N</strong></div><div><span>Top force</span><strong>{continuumResult.appliedForceN[2].toFixed(1)} N</strong></div><div><span>Base reaction</span><strong>{continuumResult.reactionN[2].toFixed(1)} N</strong></div></div>}
+              <p className="control-note block">Displacement is drawn at 1× physical scale. Drucker-Prager shear plasticity retains permanent strain; it does not predict cracks, peat creep, or source-driven uplift.</p>
+            </Section>
             <div className="tab-intro"><StatusChip kind="reduced">REDUCED SHORT-TIME GAS MODEL</StatusChip><p>This separate radial shell calculation spans at most two simulated seconds. It starts from the current 3D slow-run state and uses its own event clock.</p><StatusChip kind="reduced">CALCULATED VERTICAL SOIL MOTION</StatusChip><p>Lumped soil elements calculate pressure loading, gravity, inertia, elastic motion, and tensile yielding with assumed properties.</p></div>
             <Section title="Short-time event" detail="Separate solver clock" open>
               <NumberControl label="Event duration" value={fastDuration} min={0.1} max={2} step={0.05} unit="s" note="Bounded short-time calculation; independent of the multiday clock." onChange={setFastDuration} />
@@ -789,7 +801,7 @@ function App() {
       <main className="main-view">
         <div className="view-toolbar"><div className="toolbar-group"><span className="toolbar-label">VIEW</span>{([['orbit', '3D orbit'], ['top', 'Top'], ['section-x', 'X section'], ['section-y', 'Y section']] as [View, string][]).map(([id, label]) => <button type="button" key={id} className={view === id ? 'active' : ''} onClick={() => setView(id)}>{label}</button>)}</div><div className="toolbar-group right"><IconButton title="Open the separate short-time event" active={fastMode} disabled={!fastRun} onClick={() => selectTab('event')}><Zap size={17} /></IconButton><IconButton title="Show modeled flow arrows (direction amplified)" active={showFlow} disabled={fastMode} onClick={() => setShowFlow((v) => !v)}><Waves size={17} /></IconButton><IconButton title="Show roots" active={showRoots} onClick={() => setShowRoots((v) => !v)}><Leaf size={17} /></IconButton><IconButton title="A/B comparison: same initial scenario and seed, heater off baseline" active={comparison} disabled={fastMode} onClick={() => setComparison((v) => !v)}><ArrowLeftRight size={17} /></IconButton></div></div>
         <div className={`scene-area ${comparison && !fastMode ? 'comparing' : ''}`}>
-          <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: heaterEnabled, heatGenerationWm3: heaterGeneration } }} snapshot={sceneFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={comparison || fixedScale} illustration={illustration} probe={probe} onProbe={chooseProbe} lockCamera={comparison && !fastMode} fastEvent={fastMode && fastRun && fastFrame ? { run: fastRun, frame: fastFrame, overlay: fastOverlay } : null} mechanics={fastMode ? mechanicsFrame : null} mechanicsView={mechanicsView} plumes={plumeSources} showSmoke={showSmoke} showSteam={showSteam} plumeQuality={plumeQuality} /><div className="scene-tag">{fastMode ? 'SHORT-TIME GAS + SOIL MECHANICS' : comparison ? 'A · CURRENT SCENARIO' : 'UNDERGROUND CUTAWAY'}<span>{fastMode && fastFrame ? `event clock ${fastFrame.eventTimeS.toFixed(3)} s · slow clock held at ${formatClock(fastRun?.startSolverTimeS ?? 0)}` : comparison ? `matched checkpoint ${formatClock(alignedComparisonSnapshot?.timeSeconds ?? 0)} · linked camera` : view === 'orbit' ? 'drag to orbit · choose Top / X / Y to see fields and place a sensor' : 'drag to orbit · scroll to zoom · click colored field to place sensor'}</span></div>{!fastMode && activeSmolderCells > 0 && <div className="smolder-scene-tag">● SMOLDERING PEAT <span>{displayed?.diagnostics.lastReactionPowerW.toFixed(1)} W modeled reaction heat</span></div>}{scenario.pathways.length > 0 && <div className="hypothetical-tag">Assumed pathway geometry · hypothetical transport</div>}{fastMode && <div className="illustration-tag">CALCULATED VERTICAL MOTION · ASSUMED SOIL PROPERTIES · NO VALIDATED RUPTURE / BLAST</div>}{!fastMode && illustration > 0 && <div className="illustration-tag">ILLUSTRATION — NOT A CALCULATED SHOCKWAVE</div>}</div>
+          <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: heaterEnabled, heatGenerationWm3: heaterGeneration } }} snapshot={sceneFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={comparison || fixedScale} illustration={illustration} probe={probe} onProbe={chooseProbe} lockCamera={comparison && !fastMode} fastEvent={fastMode && fastRun && fastFrame ? { run: fastRun, frame: fastFrame, overlay: fastOverlay } : null} mechanics={fastMode ? mechanicsFrame : null} continuum={!fastMode && tab === 'event' ? continuumResult : null} mechanicsView={mechanicsView} plumes={plumeSources} showSmoke={showSmoke} showSteam={showSteam} plumeQuality={plumeQuality} /><div className="scene-tag">{fastMode ? 'SHORT-TIME GAS + SOIL MECHANICS' : comparison ? 'A · CURRENT SCENARIO' : 'UNDERGROUND CUTAWAY'}<span>{fastMode && fastFrame ? `event clock ${fastFrame.eventTimeS.toFixed(3)} s · slow clock held at ${formatClock(fastRun?.startSolverTimeS ?? 0)}` : comparison ? `matched checkpoint ${formatClock(alignedComparisonSnapshot?.timeSeconds ?? 0)} · linked camera` : view === 'orbit' ? 'drag to orbit · choose Top / X / Y to see fields and place a sensor' : 'drag to orbit · scroll to zoom · click colored field to place sensor'}</span></div>{!fastMode && activeSmolderCells > 0 && <div className="smolder-scene-tag">● SMOLDERING PEAT <span>{displayed?.diagnostics.lastReactionPowerW.toFixed(1)} W modeled reaction heat</span></div>}{scenario.pathways.length > 0 && <div className="hypothetical-tag">Assumed pathway geometry · hypothetical transport</div>}{fastMode && <div className="illustration-tag">CALCULATED VERTICAL MOTION · ASSUMED SOIL PROPERTIES · NO VALIDATED RUPTURE / BLAST</div>}{!fastMode && illustration > 0 && <div className="illustration-tag">ILLUSTRATION — NOT A CALCULATED SHOCKWAVE</div>}</div>
           {comparison && !fastMode && <div className="scene-panel"><Scene scenario={{ ...scenario, source: { ...scenario.source, enabled: false } }} snapshot={compareFrame} overlay={overlay} view={view} slice={slice} showRoots={showRoots} showFlow={showFlow} fixedScale={true} illustration={0} probe={probe} lockCamera /><div className="scene-tag">B · HEATER OFF BASELINE <span>same seed · {formatClock(compareSnapshot?.timeSeconds ?? 0)} · linked camera</span></div></div>}
         </div>
         {fastMode && fastRun && fastFrame && <div className="fast-event-bar">

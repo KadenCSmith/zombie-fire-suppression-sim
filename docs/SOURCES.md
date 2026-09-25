@@ -24,6 +24,8 @@ The pinned package manifest and lockfile identify exact installed versions. Reac
 
 ## Reuse boundary
 
+For the mechanics-only milestone, the [MOOSE Solid Mechanics overview](https://mooseframework.inl.gov/modules/solid_mechanics/index.html) and [Drucker–Prager material description](https://mooseframework.inl.gov/releases/moose/2021-09-15/source/userobjects/TensorMechanicsPlasticDruckerPrager.html) were inspected on 2026-09-25 as method references. No MOOSE source, binary, coefficients, or benchmark output was copied into the TypeScript solver. The local implementation uses assumed parameters and its own unit tests; it is not a MOOSE-equivalent validated backend.
+
 The implementation favors a local TypeScript app with a small inspectable solver. Three.js is appropriate for visualization. Electron gives the built interface a dedicated Mac window without changing its solver. MOOSE PorousFlow and FiPy provide directions for later solver work, but embedding either in this release would add substantial setup without making an uncalibrated peat scenario predictive. Rapier is useful only if the illustration needs rigid-body collisions; movement remains artistic even with a physics engine.
 
 No license is granted here for the project's original code. Installed dependencies retain their own licenses; consult their package license files and the lockfile for the exact distributed versions. Scientific references are cited, not redistributed.

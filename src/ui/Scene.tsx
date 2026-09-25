@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
 import type { MechanicsFrame } from '../mechanics/model'
+import type { ContinuumResult } from '../mechanics/continuum'
 import type { PlumeSource } from '../plumes/model'
 
 export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
@@ -33,6 +34,7 @@ type SceneProps = {
   lockCamera?: boolean
   fastEvent?: { run: FastEventRun; frame: FastEventFrame; overlay: FastOverlay } | null
   mechanics?: MechanicsFrame | null
+  continuum?: ContinuumResult | null
   mechanicsView?: 'displacement' | 'yield'
   plumes?: PlumeSource[]
   showSmoke?: boolean
@@ -444,6 +446,36 @@ function MechanicsElements({ scenario, frame, view }: { scenario: any; frame: Me
   </instancedMesh>
 }
 
+function ContinuumElements({ scenario, result }: { scenario: any; result: ContinuumResult }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const n = 4, dx = Number(scenario.domain.widthM) / n, dy = Number(scenario.domain.lengthM) / n, dz = Number(scenario.domain.depthM) / n
+  useEffect(() => {
+    if (!mesh.current) return
+    const object = new THREE.Object3D(), color = new THREE.Color()
+    const disp = result.displacementM
+    let max = 0
+    for (const value of disp) max = Math.max(max, Math.abs(value))
+    const node = (i: number, j: number, k: number) => (k * (n + 1) + j) * (n + 1) + i
+    for (let k = 0; k < n; k++) for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const q = (k * n + j) * n + i
+      const center = [0, 0, 0]
+      for (let c = 0; c <= 1; c++) for (let b = 0; b <= 1; b++) for (let a = 0; a <= 1; a++) {
+        const p = node(i + a, j + b, k + c) * 3
+        for (let axis = 0; axis < 3; axis++) center[axis] += disp[p + axis] / 8
+      }
+      object.position.set(-W / 2 + (i + 0.5) * dx + center[0], -(k + 0.5) * dz - center[2], -W / 2 + (j + 0.5) * dy + center[1])
+      object.scale.set(dx * 0.9, dz * 0.9, dy * 0.9)
+      object.updateMatrix()
+      mesh.current.setMatrixAt(q, object.matrix)
+      color.set(result.yielded[q] ? '#ff654f' : '#357a91').lerp(new THREE.Color('#f4d481'), result.yielded[q] ? 0 : Math.min(1, Math.hypot(...center) / Math.max(1e-8, max)))
+      mesh.current.setColorAt(q, color)
+    }
+    mesh.current.instanceMatrix.needsUpdate = true
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
+  }, [result, dx, dy, dz])
+  return <instancedMesh ref={mesh} args={[undefined, undefined, n ** 3]}><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial transparent opacity={0.6} roughness={0.9} depthWrite={false} /></instancedMesh>
+}
+
 function Plumes({ sources, smoke, steam, quality }: { sources: PlumeSource[]; smoke: boolean; steam: boolean; quality: number }) {
   const group = useRef<THREE.Group>(null)
   useFrame(({ clock }) => {
@@ -500,6 +532,7 @@ function World(props: SceneProps) {
     {!props.fastEvent && props.showFlow && <FlowArrows snapshot={props.snapshot} view={props.view} slice={props.slice} />}
     <Probe position={props.probe} />
     {props.mechanics && <MechanicsElements scenario={props.scenario} frame={props.mechanics} view={props.mechanicsView ?? 'displacement'} />}
+    {props.continuum && <ContinuumElements scenario={props.scenario} result={props.continuum} />}
     <SoilMotion amount={props.fastEvent ? 0 : props.illustration} />
     {!!props.plumes?.length && <Plumes sources={props.plumes} smoke={props.showSmoke ?? true} steam={props.showSteam ?? true} quality={props.plumeQuality ?? 3} />}
     <ScaleLabels depth={depth} />

@@ -1,5 +1,7 @@
 # Build status and handoff
 
+New branch mechanics-only mode: `src/mechanics/continuum.ts` solves 3D brick-element displacement, stress, strain, and plastic history for a prescribed top load, then renders 1× displacement in the existing scene. `npm run typecheck`, `npm run lint`, 46/46 tests, and `npm run build` passed sequentially on 2026-09-25. A live local Electron development window displayed the calculated result and force readouts. This is an unvalidated demonstration material, and the existing short-event link mechanics remains available separately.
+
 Status reviewed against source on 2026-09-25. “Implemented” means code exists for the stated reduced or visual behavior; it does not imply experimental validation. Current native-window and automated-check results are recorded separately in `VALIDATION_STATUS.md`.
 
 | Requested area | Current status | Next concrete task or limit |
