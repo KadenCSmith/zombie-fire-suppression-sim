@@ -100,25 +100,26 @@ function runChunk(generation: number): void {
       setTimeout(() => runChunk(generation), 25)
       return
     }
-    const snapshot = simulation.advanceTo(before + delta, 24)
-    if (snapshot.timeSeconds <= before + 1e-10) {
-      if (snapshot.diagnostics.status !== 'running') {
+    simulation.advanceUntil(before + delta, simulation.cellCount > 50_000 ? 1 : 24)
+    if (simulation.timeSeconds <= before + 1e-10) {
+      if (simulation.diagnostics.status !== 'running') {
         runActive = false
-        emitSnapshot(snapshot)
+        emitSnapshot(simulation.snapshot())
         emitProgress(false)
         return
       }
       throw new Error('Solver did not advance; inspect diagnostics.')
     }
     const now = performance.now()
-    if (now - lastFrameWallMs >= 100 || snapshot.timeSeconds - lastFrameSimSeconds >= 1800 || snapshot.timeSeconds >= activeTarget || snapshot.diagnostics.status !== 'running') {
-      emitSnapshot(snapshot)
+    const minFrameWallMs = simulation.cellCount > 50_000 ? 500 : 100
+    if (now - lastFrameWallMs >= minFrameWallMs || simulation.timeSeconds - lastFrameSimSeconds >= 1800 || simulation.timeSeconds >= activeTarget || simulation.diagnostics.status !== 'running') {
+      emitSnapshot(simulation.snapshot())
       lastFrameWallMs = now
-      lastFrameSimSeconds = snapshot.timeSeconds
-      emitProgress(snapshot.timeSeconds < activeTarget && snapshot.diagnostics.status === 'running')
+      lastFrameSimSeconds = simulation.timeSeconds
+      emitProgress(simulation.timeSeconds < activeTarget && simulation.diagnostics.status === 'running')
     }
-    if (snapshot.timeSeconds < activeTarget && snapshot.diagnostics.status === 'running') {
-      setTimeout(() => runChunk(generation), snapshot.timeSeconds >= permittedTime - 1e-8 ? 25 : 0)
+    if (simulation.timeSeconds < activeTarget && simulation.diagnostics.status === 'running') {
+      setTimeout(() => runChunk(generation), simulation.timeSeconds >= permittedTime - 1e-8 ? 25 : 0)
     } else {
       runActive = false
     }

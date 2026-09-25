@@ -184,7 +184,7 @@ export function validateScenario(raw: unknown): ValidationResult {
   if (!s.provenance || typeof s.provenance !== 'object') errors.push('Scenario provenance is required.');
   check('nx', d.nx, 4, 64); check('ny', d.ny, 4, 64); check('nz', d.nz, 4, 48);
   if (![d.nx, d.ny, d.nz].every(Number.isInteger)) errors.push('Grid dimensions must be integers.');
-  if (d.nx * d.ny * d.nz > 65536) errors.push('Grid exceeds the 65,536-cell browser limit.');
+  if (d.nx * d.ny * d.nz > 131072) errors.push('Grid exceeds the 131,072-cell browser limit.');
   for (const [label, value] of Object.entries({
     sandFraction: soil.sandFraction, siltFraction: soil.siltFraction, clayFraction: soil.clayFraction,
     organicFraction: soil.organicFraction, porosity: soil.porosity, moistureSaturation: soil.moistureSaturation,

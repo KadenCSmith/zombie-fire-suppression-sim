@@ -105,6 +105,7 @@ export class Simulation {
   private vapor: Float64Array;
   private fuel: Float64Array;
   private mineral: Float64Array;
+  private materialClass: Uint8Array;
   private rootFuel: Float64Array;
   private reactionRate: Float64Array;
   private water: Float64Array;
@@ -151,6 +152,7 @@ export class Simulation {
     this.temperature = array(); this.oxygen = array(); this.co2 = array();
     this.background = array(); this.vapor = array(); this.fuel = array(); this.water = array();
     this.mineral = array(); this.rootFuel = array(); this.reactionRate = array();
+    this.materialClass = new Uint8Array(this.cellCount);
     this.dryDensity = array(); this.solidHeatCapacity = array(); this.thermalConductivity = array();
     this.porosity = array(); this.intrinsicH = array(); this.intrinsicV = array();
     this.effectiveH = array(); this.effectiveV = array(); this.effectiveDiffusivity = array();
@@ -239,6 +241,7 @@ export class Simulation {
       }
       let bulkDensity = soil.bulkDensityKgM3;
       let organic = soil.organicFraction;
+      let materialClass = organic > 0 ? 1 : 0;
       let saturation = soil.moistureSaturation;
       let porosity = soil.porosity;
       let kThermal = soil.thermalConductivityWmK;
@@ -262,6 +265,7 @@ export class Simulation {
           kThermal = 0.16 + 0.6 * saturation; // uncalibrated peat heat-conduction mixture
           kH *= 4; kV *= 2; // demonstration peat pathway assumption
           this.peatMask[i] = 1;
+          materialClass = 2;
         }
       }
       for (const path of s.pathways) {
@@ -279,6 +283,7 @@ export class Simulation {
       this.fuel[i] = mineralOrganicFuelKg + rootFuelKg;
       this.rootFuel[i] = rootFuelKg;
       this.mineral[i] = bulkDensity * (1 - organic) * this.cellVolume;
+      this.materialClass[i] = materialClass;
       this.water[i] = porosity * this.cellVolume * saturation * LIQUID_WATER_DENSITY;
       this.dryDensity[i] = bulkDensity;
       this.solidHeatCapacity[i] = soil.solidHeatCapacityJKgK;
@@ -498,8 +503,14 @@ export class Simulation {
 
   /** Advance to an absolute physical time; maxSteps permits responsive worker chunking. */
   advanceTo(targetTimeSeconds: number, maxSteps = Number.POSITIVE_INFINITY): Snapshot {
+    this.advanceUntil(targetTimeSeconds, maxSteps);
+    return this.snapshot();
+  }
+
+  /** Advance without allocating a full display snapshot; used by fine-grid worker chunks. */
+  advanceUntil(targetTimeSeconds: number, maxSteps = Number.POSITIVE_INFINITY): void {
     if (!Number.isFinite(targetTimeSeconds) || targetTimeSeconds < this.timeSeconds - 1e-9) throw new Error('Target time must be finite and not earlier than current solver time.');
-    if (maxSteps <= 0) return this.snapshot();
+    if (maxSteps <= 0) return;
     let steps = 0;
     while (this.timeSeconds + 1e-9 < targetTimeSeconds && this.diagnostics.status === 'running' && steps < maxSteps) {
       const dt = this.nextStepLimit(targetTimeSeconds - this.timeSeconds);
@@ -508,7 +519,6 @@ export class Simulation {
       steps++;
     }
     if (Math.abs(this.timeSeconds - targetTimeSeconds) <= 1e-8) this.timeSeconds = targetTimeSeconds;
-    return this.snapshot();
   }
 
   private performStep(dt: number): void {
@@ -942,6 +952,8 @@ export class Simulation {
       temperatureK: new Float32Array(n), oxygen: new Float32Array(n), co2: new Float32Array(n),
       backgroundGas: new Float32Array(n), waterVapor: new Float32Array(n), fuel: new Float32Array(n),
       mineralKg: new Float32Array(n), rootFuelKg: new Float32Array(n),
+      materialClass: new Float32Array(n), dryDensityKgM3: new Float32Array(n),
+      thermalConductivityWmK: new Float32Array(n),
       reactionRateKgS: new Float32Array(n), reactionPowerWm3: new Float32Array(n),
       moisture: new Float32Array(n), pressurePa: new Float32Array(n), porosity: new Float32Array(n),
       intrinsicPermeability: new Float32Array(n), effectivePermeability: new Float32Array(n),
@@ -958,6 +970,9 @@ export class Simulation {
       fields.waterVapor[i] = totalGas > 0 ? this.vapor[i] / totalGas : 0;
       fields.fuel[i] = this.fuel[i];
       fields.mineralKg[i] = this.mineral[i];
+      fields.materialClass[i] = this.materialClass[i];
+      fields.dryDensityKgM3[i] = this.dryDensity[i];
+      fields.thermalConductivityWmK[i] = this.thermalConductivity[i];
       fields.rootFuelKg[i] = this.rootFuel[i];
       fields.reactionRateKgS[i] = this.reactionRate[i];
       fields.reactionPowerWm3[i] = this.reactionRate[i] * this.scenario.model.heatOfCombustionJkg / this.cellVolume;
@@ -993,7 +1008,10 @@ export class Simulation {
     const i = this.idx(x, y, z);
     const totalGas = this.totalGasAt(i);
     const o2 = totalGas > 0 ? this.oxygen[i] / totalGas : 0;
-    return { xM, yM, depthM, temperatureK: this.temperature[i], oxygenMoleFraction: o2,
+    return { xM, yM, depthM, materialClass: this.materialClass[i],
+      dryDensityKgM3: this.dryDensity[i], thermalConductivityWmK: this.thermalConductivity[i],
+      porosity: this.porosity[i], intrinsicPermeabilityM2: Math.sqrt(this.intrinsicH[i] * this.intrinsicV[i]),
+      rootFuelKg: this.rootFuel[i], temperatureK: this.temperature[i], oxygenMoleFraction: o2,
       co2MoleFraction: totalGas > 0 ? this.co2[i] / totalGas : 0,
       oxygenPartialPressurePa: o2 * this.pressure[i], pressurePa: this.pressure[i],
       moistureSaturation: this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume),

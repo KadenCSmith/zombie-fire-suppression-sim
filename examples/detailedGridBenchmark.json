@@ -1,0 +1,14 @@
+{
+  "status": "single-process numerical runtime observation; not sustained multiday throughput",
+  "grid": [61, 61, 30],
+  "cellSizeM": [0.0999344262295082, 0.0999344262295082, 0.1],
+  "cellCount": 111630,
+  "scenario": "default material geometry and hot region, dry ice and heater disabled",
+  "stepRequestedS": 120,
+  "snapshotMiB": 9.794197082519531,
+  "observedInitializationMs": 78.75804199999999,
+  "observedOneStepMs": 866.246292,
+  "observedProcessRssMiB": 246.46875,
+  "source": "tests/sim/detail.test.ts output on 2026-09-25, Apple M3 Pro host",
+  "limits": "Test process RSS includes Vitest and Node overhead; one step does not establish multiday rate, convergence, field validity, or calibrated material properties."
+}

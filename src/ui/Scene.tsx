@@ -9,7 +9,7 @@ import type { MechanicsFrame } from '../mechanics/model'
 import type { ContinuumResult } from '../mechanics/continuum'
 import type { PlumeSource } from '../plumes/model'
 
-export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'activity' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
+export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'activity' | 'material' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
 export type View = 'orbit' | 'top' | 'section-x' | 'section-y'
 export type ProbeLocation = { xM: number; yM: number; depthM: number }
 export type FastOverlay = 'pressure' | 'co2' | 'damage'
@@ -61,6 +61,7 @@ export const OVERLAY_INFO: Record<Overlay, { label: string; unit: string; min: n
   moisture: { label: 'Moisture saturation', unit: 'fraction', min: 0, max: 1, field: 'moistureSaturation' },
   fuel: { label: 'Remaining fuel', unit: 'kg/cell', min: 0, max: 1, field: 'fuelKg' },
   activity: { label: 'Oxidation heat rate', unit: 'W/m³', min: 0, max: 10000, field: 'reactionPowerWm3' },
+  material: { label: 'Material class (0 mineral · 1 mixed · 2 peat)', unit: 'class', min: 0, max: 2, field: 'materialClass' },
   char: { label: 'Char', unit: 'kg/cell', min: 0, max: 0.2, field: 'charKg' },
   porosity: { label: 'Porosity', unit: 'fraction', min: 0, max: 0.7, field: 'porosity' },
   permeability: { label: 'Intrinsic permeability', unit: 'log₁₀(m²)', min: -15, max: -9, field: 'intrinsicPermeabilityM2', log: true },

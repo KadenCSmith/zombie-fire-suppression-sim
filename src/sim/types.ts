@@ -241,6 +241,11 @@ export interface SnapshotFields {
   fuel: Float32Array;
   /** Nonreacting mineral mass per bulk cell, kg. */
   mineralKg: Float32Array;
+  /** 0 mineral, 1 mixed mineral/organic soil, 2 peat; roots and paths modify this matrix. */
+  materialClass: Float32Array;
+  /** Resolved dry bulk density and thermal conductivity for the chosen cell material. */
+  dryDensityKgM3: Float32Array;
+  thermalConductivityWmK: Float32Array;
   /** Remaining supplemental root fuel, a subset of fuel, kg. */
   rootFuelKg: Float32Array;
   /** Accepted-step dry-fuel oxidation rate, kg/s per cell. */
@@ -283,6 +288,13 @@ export interface ProbeSample {
   xM: number;
   yM: number;
   depthM: number;
+  /** 0 mineral, 1 mixed mineral/organic soil, 2 peat matrix. */
+  materialClass: number;
+  dryDensityKgM3: number;
+  thermalConductivityWmK: number;
+  porosity: number;
+  intrinsicPermeabilityM2: number;
+  rootFuelKg: number;
   temperatureK: number;
   oxygenMoleFraction: number;
   co2MoleFraction: number;

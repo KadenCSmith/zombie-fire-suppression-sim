@@ -1,5 +1,7 @@
 # Build status and handoff
 
+Detailed-grid follow-up: the Setup screen offers ≤10 cm volumes for the default domain (61 × 61 × 30), a material overlay, and sensor readouts of each volume's resolved properties. The fine-grid numerical test and runtime measurement are in `VALIDATION_STATUS.md`; the fast default remains available for longer exploratory runs. This preset refines the finite-volume heat/gas/fire solver, not the separate 4³ FEM mechanics benchmark.
+
 Remaining supported-physics pass: separate gas-species conservation ledgers, checkpoint corruption detection, subgrid source-deposition checks, a wet-soil freezing validity guard, and six reproducible integrated comparison cases have been added after the fire milestone. They do not constitute two-way soil/fire coupling or experimental validation. Exact open physics and affected outputs are listed in `VALIDATION_STATUS.md`.
 
 New branch mechanics-only mode: `src/mechanics/continuum.ts` solves 3D brick-element displacement, stress, strain, and plastic history for a prescribed top load, then renders 1× displacement in the existing scene. `npm run typecheck`, `npm run lint`, 46/46 tests, and `npm run build` passed sequentially on 2026-09-25. A live local Electron development window displayed the calculated result and force readouts. This is an unvalidated demonstration material, and the existing short-event link mechanics remains available separately.
