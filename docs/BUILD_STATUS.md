@@ -4,7 +4,17 @@
 
 Scene studio now lands the dry ice at 4 s, waits exactly five playback seconds, and hides the solid instantaneously at 9 s while gas tracers expand and 88 soil/rock fragments move outward and settle. The inverted cage defaults to 10 cm high and 95 cm wide, with an open underside, editable dimensions and a visibility switch. Height was the stated assumption for the unspecified 10 cm measurement. It is lowered after landing. All four views use the shared timeline. These effects are prescribed illustration; gas pressure, molecular dynamics, cage collisions/containment and new fracture physics are not calculated.
 
-Two new tests verify the exact conversion boundary and reproducible fragment poses under reverse seeking. Typecheck, lint, 93 tests and production build passed during integration. Native development inspection confirmed disappearance, the expanding particle field, moving/settled fragments and the 10 cm cage. A particle-uniform update issue found during visual review was corrected by updating the actual shader material each rendered frame. The independently modified Stage 2 Blender file is preserved and excluded. Release verification follows when completed.
+Two new tests verify the exact conversion boundary and reproducible fragment poses under reverse seeking. Typecheck, lint, 93 tests and production build passed during integration. Native development inspection confirmed disappearance, the expanding particle field, moving/settled fragments and the 10 cm cage. A particle-uniform update issue found during visual review was corrected by updating the actual shader material each rendered frame. The independently modified Stage 2 Blender file is preserved and excluded. Release verification is recorded below.
+
+
+
+## Desktop release 0.6.0 verification (2026-09-26)
+
+The universal Mac DMG/ZIP, Windows x64/ARM64 ZIPs and Linux x64/ARM64 archives are built from `f4547708de51c38af5380bda311ff3fe66320d8d`. The [private GitHub release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.6.0) is published, with all nine uploaded asset sizes and SHA-256 digests verified against the local files. Local copies are in `~/Downloads/Zombie Fire Sim/v0.6.0/`. The manifest records source, architecture, size and SHA-256. Strict Mac signatures, clean ZIP extraction, DMG integrity, target executable architectures and archive integrity passed. The Mac app remains ad-hoc signed and not notarized; Windows/Linux packages are portable archives.
+
+All 93 tests, typecheck, lint, production builds and native Electron smoke checks passed on macOS, Windows and Ubuntu runners ([CI run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36230145553)). Smoke coverage includes the five-second hold, the 9 s release and cage label, reverse seeking back to the solid, and preservation of the 120 s numerical workspace state. Windows/Linux runners use software graphics. ARM Windows/Linux and Intel Mac native execution remain untested separately.
+
+Native M3 development inspection confirmed the default cage, solid disappearance, the rapid expanding cloud and upward tracer vent, and moved/settled fragments. The Mac locked before the cage-dimension interaction check and installed-app replacement. Therefore version 0.5 remains in `~/Applications` until it can be closed and replaced; the 0.6 installer is ready. A locked desktop does not prevent packaging or CI, but no further native interaction or installed-version check is claimed.
 
 
 ## Desktop release 0.5.0 (2026-09-26)
