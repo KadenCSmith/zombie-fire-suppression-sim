@@ -8,10 +8,13 @@ const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'zombie-fire-smoke-'));
 app.setPath('userData', profile);
 app.getAppPath = () => root;
 process.argv.push('--simulation');
-// Hosted runners have virtual displays rather than a supported physical GPU.
-// These software-rendering flags are confined to this CI harness.
-app.commandLine.appendSwitch('use-angle', 'swiftshader');
-app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+// Windows/Linux hosted runners use a software GPU; macOS uses its native
+// graphics backend because SwiftShader Vulkan cannot initialize on that runner.
+// These flags are confined to this CI harness.
+if (process.platform !== 'darwin') {
+  app.commandLine.appendSwitch('use-angle', 'swiftshader');
+  app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+}
 const errors = [];
 const timeout = setTimeout(() => finish('Desktop smoke test timed out.'), 90000);
 function finish(error) {
