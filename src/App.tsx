@@ -175,7 +175,7 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 }
 
 function App() {
-  const [workspace, setWorkspace] = useState<'study' | 'simulation'>('study')
+  const [workspace, setWorkspace] = useState<'study' | 'simulation'>(() => new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
   const initial = useMemo(() => createDefaultScenario(), [])
   const [scenario, setScenario] = useState<Scenario>(initial)
   const [preset, setPreset] = useState<ScenarioPreset>('heated')
@@ -627,6 +627,22 @@ function App() {
     setMotionPlaying(false)
     setWorkspace('study')
   }
+
+  useEffect(() => {
+    const switchWorkspace = (event: Event) => {
+      const target = (event as CustomEvent<unknown>).detail
+      if (target !== 'study' && target !== 'simulation') return
+      clientRef.current?.pause()
+      comparisonClientRef.current?.pause()
+      setPlaying(false)
+      setPlayback(false)
+      setFastPlaying(false)
+      setMotionPlaying(false)
+      setWorkspace(target)
+    }
+    window.addEventListener('workspace-request', switchWorkspace)
+    return () => window.removeEventListener('workspace-request', switchWorkspace)
+  }, [])
 
   if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
     <StudyWorkspace onOpenSimulation={() => setWorkspace('simulation')} />

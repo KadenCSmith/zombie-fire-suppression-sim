@@ -2,7 +2,7 @@
 
 **Interactive scene studio and a separate, unvalidated scientific model.**
 
-A local macOS application that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration; its colors and motion are prescribed and are not solver results.
+A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration; its colors and motion are prescribed and are not solver results.
 
 Choose **Open simulation** for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
 
@@ -14,48 +14,34 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 [Profile guide](docs/RESEARCH_PROFILES.md) · [Material audit and ASCE citations](docs/MATERIAL_EVIDENCE_ASCE.md). The user-supplied working document was included in the review. Unsupported settings remain labeled assumptions; selecting a paper does not experimentally validate the simulation.
 
-## Run locally
+## Download and launch
 
-After packaging, extract **Zombie Fire Suppression Sim.app.zip** from the directory directly beside this repository into `~/Applications`, replacing the previous app bundle as a whole (do not merge its contents), then open **Zombie Fire Suppression Sim.app** there. It opens its own window, needs no browser or separate Node.js installation, and works without an API key or cloud service. The app bundles the built interface and serves it to its own window through a random `127.0.0.1` port; closing the app stops that local server. The archive is a generated deliverable outside the source repository, not a file committed to Git. The packaging script signs it locally for this Mac; it is not Apple notarized for general distribution. See [build status](docs/BUILD_STATUS.md) for the latest recorded packaging result.
+[**Download version 0.5.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.5.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
-The repository's [run-mac.command](run-mac.command), or `npm run mac`, opens the installed app in `~/Applications`. To rebuild the Mac app from source, install Node.js 22.12+ and npm, then run:
+[Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
+
+On this Mac, open either workspace directly:
+
+```sh
+open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --simulation
+open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --studio
+```
+
+Mac requires macOS 13+. The app is locally signed, not Apple notarized; Windows and Linux packages are portable archives. See the installation guide for first launch and whole-bundle replacement instructions.
+
+Version 0.5 improves surface/contact thermal stability, consistent reaction yields and current-mass transfer from the flow mesh to mechanics. It retains historical reaction yields for older imported files. The model remains experimentally unvalidated. [Equations and limitations](docs/PHYSICS_MODEL.md).
+
+For development, install Node.js 22.12+ and run:
 
 ```sh
 npm ci
-npm run package:mac
-```
-
-The build places `Zombie Fire Suppression Sim.app.zip` directly in this repository's parent directory (`../Zombie Fire Suppression Sim.app.zip`). Run this extraction command from the repository folder to keep macOS File Provider metadata out of the app bundle:
-
-```sh
-mkdir -p "$HOME/Applications"
-ditto -x -k --norsrc --noextattr --noqtn '../Zombie Fire Suppression Sim.app.zip' "$HOME/Applications"
-```
-
-Then open the app in `~/Applications`. For source development in its own live-reloading Mac window, run:
-
-```sh
-npm run dev:mac
-```
-
-Keep that command running while editing source files. It uses Electron and Vite on loopback without opening Safari or Chrome. The browser development server is also available with:
-
-```sh
-npm ci
-npm run dev
-```
-
-Open the local URL printed by Vite. To run checks or prepare a static build:
-
-```sh
 npm run typecheck
 npm run lint
 npm test
-npm run build
-npm run preview
+npm run dev:mac
 ```
 
-Dependency versions are pinned in `package.json` and `package-lock.json`; `npm ci` installs the locked set.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.5.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 

@@ -12,7 +12,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "typecheck": "node scripts/typecheck.mjs",
-    "lint": "oxlint src tests"
+    "lint": "oxlint src tests",
+    "package:all": "npm run build && node scripts/package-all.mjs"
   },
   "dependencies": {
     "@react-three/drei": "10.7.8",

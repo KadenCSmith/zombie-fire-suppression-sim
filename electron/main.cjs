@@ -23,6 +23,18 @@ const contentTypes = {
 let server;
 let mainWindow;
 let appOrigin;
+let requestedWorkspace = workspaceFromArguments(process.argv);
+function workspaceFromArguments(args) {
+  if (args.includes('--simulation')) return 'simulation';
+  if (args.includes('--studio')) return 'study';
+  return null;
+}
+function sendWorkspaceRequest() {
+  if (!requestedWorkspace || !mainWindow || mainWindow.isDestroyed()) return;
+  // Only these two fixed values can reach the renderer, never arbitrary CLI text.
+  const target = requestedWorkspace === 'simulation' ? 'simulation' : 'study';
+  mainWindow.webContents.executeJavaScript(`window.dispatchEvent(new CustomEvent('workspace-request', {detail: '${target}'}))`).catch(console.error);
+}
 
 function serveBuiltApp(distDir) {
   return createServer(async (request, response) => {
@@ -116,7 +128,8 @@ async function createWindow() {
     event.preventDefault();
   });
   mainWindow.once('ready-to-show', () => mainWindow.show());
-  await mainWindow.loadURL(`${appOrigin}/`);
+  await mainWindow.loadURL(`${appOrigin}/${requestedWorkspace ? `?workspace=${requestedWorkspace}` : ''}`);
+  sendWorkspaceRequest();
   if (devOrigin) {
     // A File Provider notification can briefly restart Vite during a reload.
     // Recover a page whose entry modules failed to load in that interval.
@@ -137,7 +150,9 @@ async function createWindow() {
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (_event, argv) => {
+    requestedWorkspace = workspaceFromArguments(argv);
+    sendWorkspaceRequest();
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
