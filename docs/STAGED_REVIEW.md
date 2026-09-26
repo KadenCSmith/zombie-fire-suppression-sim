@@ -80,18 +80,17 @@ is a baseline observation, not a new optimization result.
 
 ## Continuing numerical and research work
 
-The original requests remain pending: benchmark further efficiency changes,
-integrate and test each substantive change before pushing it, and deliver a
-separate research report explaining source necessity with ASCE-style citations.
+The numerical efficiency review and separate research report are now delivered in
+[Solver optimization review](SOLVER_OPTIMIZATION_REVIEW.md) and
+[Research review with ASCE citations](RESEARCH_REVIEW_ASCE.md). The FEM code
+reuses identical local brick operators and caches degree-of-freedom indices;
+measured cases match the original outputs exactly. The FV solver already uses
+a matrix-free neighbor stencil. Material calibration and coupled freezing/peat
+chemistry remain future scientific work requiring matched measurements.
 
-Initial inspection found that the continuum FEM already uses per-element
-24 × 24 stiffness submatrices and matrix-free assembly. Its homogeneous regular
-bricks currently rebuild identical stiffness blocks; sharing these blocks and
-precomputing degree-of-freedom mappings are candidates for a measured,
-physics-preserving optimization. The finite-volume pressure solver already
-uses a sparse grid stencil and a symmetric Gauss-Seidel preconditioner. Further
-block preconditioning should be adopted only after matched-state accuracy and
-runtime measurements. No optimization or physics change is claimed in Stage 1.
+The later app-screen request is delivered separately in [Scene studio](SCENE_STUDIO.md):
+four switchable views with illustrative playback. That app work does not mark
+the six Blender review stages above as approved or change the saved source scene.
 
 The Blender scene is a prescribed conceptual illustration. The numerical app
 uses a different default domain (6.096 m square). No coupling, matched geometry,

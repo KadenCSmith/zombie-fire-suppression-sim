@@ -1,6 +1,5 @@
-import { Component, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Component, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Html } from '@react-three/drei/web/Html.js'
 import { Line } from '@react-three/drei/core/Line.js'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
 import { useGLTF } from '@react-three/drei/core/Gltf.js'
@@ -115,7 +114,7 @@ export function prepareStudyBatches(root: THREE.Object3D, uniforms: DisplayUnifo
 }
 
 function StudyModel({ view, time }: Pick<StudySceneProps, 'view' | 'time'>) {
-  const { scene } = useGLTF(MODEL_URL)
+  const { scene } = useGLTF(MODEL_URL, false, false)
   const invalidate = useThree(state => state.invalidate)
   const uniforms = useMemo<DisplayUniforms>(() => ({ thermal: { value: 0 }, cold: { value: 0 }, warmth: { value: 1 }, sourceY: { value: 3.5 } }), [])
   const batches = useMemo(() => prepareStudyBatches(scene, uniforms), [scene, uniforms])
@@ -209,21 +208,43 @@ function WarmEmbers({ time }: { time: number }) {
   </instancedMesh>
 }
 
-function SceneLabels({ view, time }: Pick<StudySceneProps, 'view' | 'time'>) {
-  const sourceY = STUDY_SOURCE[1] + studyAnimation(time).sourceOffsetY
-  if (view === 'root') return <>
-    <Html position={[1.2, 0.45, -0.4]} center><span className="study-scene-label">Living trunk & roots</span></Html>
-    <Html position={[0.6, -0.9, 0.35]} center><span className="study-scene-label study-scene-label--warm">Charred peat interface</span></Html>
-  </>
+type LabelDescriptor = { id: string; position: [number, number, number]; text: ReactNode; tone?: 'warm' | 'cool' }
+function studyLabels(view: StudyView, time: number): LabelDescriptor[] {
+  if (view === 'root') return [
+    { id: 'root', position: [1.2, 0.45, -0.4], text: 'Living trunk & roots' },
+    { id: 'char', position: [0.6, -0.9, 0.35], text: 'Charred peat interface', tone: 'warm' },
+  ]
+  const result: LabelDescriptor[] = [
+    { id: 'source', position: [-1.4, STUDY_SOURCE[1] + studyAnimation(time).sourceOffsetY - 0.39, 0.6], text: 'Dry ice · Ø 0.50 m', tone: 'cool' },
+    { id: 'peat', position: [1.5, -0.23, 0.1], text: 'Buried smoldering peat', tone: 'warm' },
+  ]
+  if (view !== 'top') result.push({ id: 'depth', position: [-3.25, -1.2, 0.3], text: <>2.44 m<br /><small>Borehole depth</small></> })
+  return result
+}
+
+/** React owns label DOM throughout resize, error recovery and StrictMode remounts. */
+function ProjectLabels({ labels, elements }: { labels: LabelDescriptor[]; elements: RefObject<Map<string, HTMLDivElement>> }) {
+  const point = useMemo(() => new THREE.Vector3(), [])
+  const invalidate = useThree(state => state.invalidate)
+  useLayoutEffect(() => { invalidate() }, [labels, invalidate])
+  useFrame(({ camera, size }) => {
+    camera.updateMatrixWorld()
+    labels.forEach(label => {
+      const element = elements.current.get(label.id)
+      if (!element) return
+      point.set(...label.position).project(camera)
+      element.style.visibility = point.z < -1 || point.z > 1 ? 'hidden' : 'visible'
+      element.style.transform = `translate3d(${(point.x + 1) * size.width / 2}px,${(1 - point.y) * size.height / 2}px,0) translate(-50%,-50%)`
+    })
+  })
+  return null
+}
+
+function DepthGuide() {
   return <>
-    <Html position={[-1.4, sourceY - 0.39, 0.6]} center><span className="study-scene-label study-scene-label--cool">Dry ice · Ø 0.50 m</span></Html>
-    <Html position={[1.5, -0.23, 0.1]} center><span className="study-scene-label study-scene-label--warm">Buried smoldering peat</span></Html>
-    {view !== 'top' && <>
-      <Line points={[[-2.85, 0, 0.13], [-2.85, -2.44, 0.13]]} color="#dbe7df" lineWidth={1} transparent opacity={0.6} />
-      <Line points={[[-3, 0, 0.13], [-2.7, 0, 0.13]]} color="#dbe7df" lineWidth={1} />
-      <Line points={[[-3, -2.44, 0.13], [-2.7, -2.44, 0.13]]} color="#dbe7df" lineWidth={1} />
-      <Html position={[-3.25, -1.2, 0.3]} center><span className="study-scene-label">2.44 m<br /><small>Borehole depth</small></span></Html>
-    </>}
+    <Line points={[[-2.85, 0, 0.13], [-2.85, -2.44, 0.13]]} color="#dbe7df" lineWidth={1} transparent opacity={0.6} />
+    <Line points={[[-3, 0, 0.13], [-2.7, 0, 0.13]]} color="#dbe7df" lineWidth={1} />
+    <Line points={[[-3, -2.44, 0.13], [-2.7, -2.44, 0.13]]} color="#dbe7df" lineWidth={1} />
   </>
 }
 
@@ -263,12 +284,14 @@ function CameraRig({ view, resetToken }: Pick<StudySceneProps, 'view' | 'resetTo
     minPolarAngle={0.01} maxPolarAngle={Math.PI * 0.58} onStart={() => { transition.current = null }} />
 }
 
-function LoadingModel() {
-  return <Html center><div className="study-scene-status" role="status">Loading the peat study…</div></Html>
+function ModelReady({ onReady }: { onReady: () => void }) {
+  useEffect(onReady, [onReady])
+  return null
 }
-class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void }, { failed: boolean }> {
+class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void; onError: () => void }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() { return { failed: true } }
+  componentDidCatch() { this.props.onError() }
   render() {
     if (this.state.failed) return <div className="study-scene-status" role="alert">
       <strong>The 3D study could not load.</strong><p>Check the connection and try again.</p>
@@ -280,9 +303,15 @@ class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void
 
 export function StudyScene({ view, time, labels, resetToken = 0 }: StudySceneProps) {
   const [retry, setRetry] = useState(0)
+  const [ready, setReady] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const labelElements = useRef(new Map<string, HTMLDivElement>())
+  const descriptors = useMemo(() => labels && ready ? studyLabels(view, time) : [], [labels, ready, view, time])
+  const onReady = useCallback(() => setReady(true), [])
+  const onError = useCallback(() => { setFailed(true); setReady(false) }, [])
   return <div className="study-scene" style={{ width: '100%', height: '100%', position: 'relative', minHeight: 300 }}>
-    <SceneBoundary key={retry} onRetry={() => { useGLTF.clear(MODEL_URL); setRetry(value => value + 1) }}>
-      <Canvas orthographic frameloop="demand" dpr={[1, 1.65]} shadows camera={{ position: [6.2, 4.4, 13.5], near: 0.1, far: 100, zoom: 58 }}
+    <SceneBoundary key={retry} onError={onError} onRetry={() => { useGLTF.clear(MODEL_URL); setReady(false); setFailed(false); setRetry(value => value + 1) }}>
+      <Canvas orthographic frameloop="demand" dpr={[1, 1.65]} shadows={{ type: THREE.PCFShadowMap }} camera={{ position: [6.2, 4.4, 13.5], near: 0.1, far: 100, zoom: 58 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}>
         <color attach="background" args={['#152329']} />
         <fog attach="fog" args={['#152329', 27, 60]} />
@@ -291,17 +320,26 @@ export function StudyScene({ view, time, labels, resetToken = 0 }: StudyScenePro
         <directionalLight position={[-4, 10, 7]} intensity={3.2} color="#fff0d7" castShadow shadow-mapSize={[1024, 1024]}
           shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-normalBias={0.03} shadow-bias={-0.0001} />
         <directionalLight position={[6, 3, -6]} intensity={1.4} color="#9bd6ed" />
-        <Suspense fallback={<LoadingModel />}>
+        <Suspense fallback={null}>
           <StudyModel view={view} time={time} />
           <TransportTracer time={time} />
           <WarmEmbers time={time} />
-          {labels && <SceneLabels view={view} time={time} />}
+          {labels && view !== 'top' && view !== 'root' && <DepthGuide />}
+          <ModelReady onReady={onReady} />
         </Suspense>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.215, 0]} receiveShadow>
           <planeGeometry args={[200, 200]} /><meshStandardMaterial color="#18282d" roughness={1} />
         </mesh>
         <CameraRig view={view} resetToken={resetToken} />
+        <ProjectLabels labels={descriptors} elements={labelElements} />
       </Canvas>
     </SceneBoundary>
+    {!ready && !failed && <div className="study-scene-status" role="status">Loading the peat study…</div>}
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 3 }}>
+      {descriptors.map(label => <div key={label.id} ref={element => { if (element) labelElements.current.set(label.id, element); else labelElements.current.delete(label.id) }}
+        style={{ position: 'absolute', left: 0, top: 0, transform: 'translate(-10000px,-10000px)' }}>
+        <span className={`study-scene-label${label.tone ? ` study-scene-label--${label.tone}` : ''}`}>{label.text}</span>
+      </div>)}
+    </div>
   </div>
 }

@@ -1,5 +1,15 @@
 # Verification and validation status
 
+## Final Mac package and workspace transitions (2026-09-25)
+
+Final source passes typecheck, lint, all **65/65 tests in ten files**, and production build. The version 0.3.0 macOS archive was rebuilt with 105 production dependency notices and verified with `codesign --verify --deep --strict` before archiving and again after extraction. Archive SHA-256: `740a32f51de5a0bec4214ea98b10fdd7f44ccc372946ff16d87f419dfa7b2323`. It is generated beside the repository and intentionally excluded from Git.
+
+Production inspection uncovered failures that the development server did not expose: embedded image-bitmap textures needed local `blob:` fetch permission, and default GLTF decoder setup initialized unused WebAssembly under a strict script policy. The final loader disables unused Draco/Meshopt decoders; the local server allows in-memory blob fetches while retaining `script-src 'self'`, isolated/sandboxed rendering, and same-origin network access. No external texture or decoder host is required. Native inspection of the rebuilt archive confirmed the bark/soil textures and thermal overlay.
+
+The native console also exposed a label cleanup exception on switching out of the original scientific viewer. Both viewers now keep labels in React-owned DOM outside the canvases and project their world positions into those labels; the separate HTML roots and imperative node-removal path were removed. The final package completed a studio → numerical workspace → studio round trip and DevTools resize without console errors. The only console messages were the existing Three.js Clock deprecation warnings. Studio playback, view switches, labels, reset camera, and end-of-sequence pause were exercised; the final app was left paused at 14 s in cutaway view.
+
+This is a functional native smoke check. Sustained frame rate, every window size, and experimental validation remain outside the measured scope. The numerical-equivalence evidence and study limitations below still apply.
+
 ## Scene studio integration (2026-09-25)
 
 The final GLB is 25,161,996 bytes, SHA-256 `7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305`. Exporting at Blender frame 66 initially exposed an exporter default that sampled the animated source at frame zero. Explicit `export_current_frame=True` corrected it. Tests now verify the source center `(-1.4, -2.19, 0)` m, 0.500 m diameter, embedded buffers/images, asset hash, triangle preservation, bounds within 1e-5 m, and safe disposal/remount of private render resources. All 1,194 primitive meshes become 23 material/role batches with all 187,582 triangles retained. The Stage 2 source SHA-256 remains `2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5`.

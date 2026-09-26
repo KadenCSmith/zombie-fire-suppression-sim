@@ -1,8 +1,7 @@
 import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber'
-import { Html } from '@react-three/drei/web/Html.js'
 import { Line } from '@react-three/drei/core/Line.js'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as THREE from 'three'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
 import type { MechanicsFrame } from '../mechanics/model'
@@ -100,8 +99,7 @@ function CameraRig({ view, depth, lockCamera }: { view: View; depth: number; loc
   return <OrbitControls ref={controls} makeDefault enabled={!lockCamera} enableDamping dampingFactor={0.1} minZoom={45} maxZoom={220} minPolarAngle={0.04} maxPolarAngle={Math.PI - 0.04} />
 }
 
-function SoilBlock({ scenario, depth, illustration }: { scenario: any; depth: number; illustration: number }) {
-  const half = W / 2
+function soilLayers(scenario: any, depth: number) {
   const sourceLayers = Array.isArray(scenario?.soilLayers) && scenario.soilLayers.length ? scenario.soilLayers : [{ id: 'soil', thicknessM: depth }]
   let cursor = 0
   const layers: { from: number; to: number; color: string; label: string }[] = sourceLayers.map((layer: any, index: number) => {
@@ -109,6 +107,12 @@ function SoilBlock({ scenario, depth, illustration }: { scenario: any; depth: nu
     cursor += Number(layer.thicknessM ?? 0)
     return { from, to: Math.min(depth, cursor), color: ['#69543f', '#574c3c', '#4b453a', '#45453b'][index % 4], label: String(layer.id ?? `layer-${index + 1}`) }
   }).filter((layer: any) => layer.to - layer.from > 0.01)
+  return layers
+}
+
+function SoilBlock({ scenario, depth, illustration }: { scenario: any; depth: number; illustration: number }) {
+  const half = W / 2
+  const layers = soilLayers(scenario, depth)
   return <group>
     {layers.map((layer, i) => {
       const h = layer.to - layer.from
@@ -123,7 +127,6 @@ function SoilBlock({ scenario, depth, illustration }: { scenario: any; depth: nu
           <meshStandardMaterial color={layer.color} roughness={1} transparent opacity={0.88} side={THREE.DoubleSide} />
         </mesh>
         <Line points={[[-half, -layer.to, half], [half, -layer.to, half]]} color="#b9ad91" opacity={0.35} transparent lineWidth={1} />
-        <Html position={[-half, y, half]} distanceFactor={10}><span className="scale-scene-label">{layer.label} · {layer.from.toFixed(1)}–{layer.to.toFixed(1)} m</span></Html>
       </group>
     })}
     <mesh position={[0, -depth - 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -405,7 +408,6 @@ function Probe({ position }: { position?: ProbeLocation | null }) {
   return <group position={[position.xM - W / 2, -position.depthM, position.yM - W / 2]}>
     <mesh><sphereGeometry args={[0.07, 16, 12]} /><meshBasicMaterial color="#eaf9e5" /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.11, 0.13, 24]} /><meshBasicMaterial color="#eaf9e5" side={THREE.DoubleSide} /></mesh>
-    <Html position={[0, 0.18, 0]} center distanceFactor={8}><span className="probe-scene-label">SENSOR 01</span></Html>
   </group>
 }
 
@@ -520,11 +522,8 @@ function Plumes({ sources, smoke, steam, quality }: { sources: PlumeSource[]; sm
   })))}</group>
 }
 
-function ScaleLabels({ depth }: { depth: number }) {
+function ScaleLabels() {
   return <group>
-    <Html position={[-W / 2, 0.18, W / 2]} distanceFactor={9}><span className="scale-scene-label">0 m</span></Html>
-    <Html position={[W / 2, 0.18, W / 2]} distanceFactor={9}><span className="scale-scene-label">6.096 m · 20 ft</span></Html>
-    <Html position={[W / 2 + 0.1, -depth, W / 2]} distanceFactor={9}><span className="scale-scene-label">−{depth.toFixed(1)} m</span></Html>
     <Line points={[[-W / 2, -0.08, W / 2 + 0.18], [W / 2, -0.08, W / 2 + 0.18]]} color="#d5d4bd" lineWidth={1.5} />
   </group>
 }
@@ -550,15 +549,60 @@ function World(props: SceneProps) {
     {props.continuum && <ContinuumElements scenario={props.scenario} result={props.continuum} />}
     <SoilMotion amount={props.fastEvent ? 0 : props.illustration} />
     {!!props.plumes?.length && <Plumes sources={props.plumes} smoke={props.showSmoke ?? true} steam={props.showSteam ?? true} quality={props.plumeQuality ?? 3} />}
-    <ScaleLabels depth={depth} />
+    <ScaleLabels />
   </>
 }
 
+type ScientificLabel = { id: string; position: [number, number, number]; text: string; sensor?: boolean }
+
+function scientificLabels(props: SceneProps): ScientificLabel[] {
+  const depth = Number(props.scenario?.domain?.depthM ?? 3)
+  const labels: ScientificLabel[] = soilLayers(props.scenario, depth).map((layer, i) => ({
+    id: `layer-${i}`, position: [-W / 2, -(layer.from + layer.to) / 2, W / 2],
+    text: `${layer.label} · ${layer.from.toFixed(1)}–${layer.to.toFixed(1)} m`,
+  }))
+  labels.push(
+    { id: 'origin', position: [-W / 2, 0.18, W / 2], text: '0 m' },
+    { id: 'width', position: [W / 2, 0.18, W / 2], text: '6.096 m · 20 ft' },
+    { id: 'depth', position: [W / 2 + 0.1, -depth, W / 2], text: `−${depth.toFixed(1)} m` },
+  )
+  if (props.probe) labels.push({
+    id: 'sensor', position: [props.probe.xM - W / 2, 0.18 - props.probe.depthM, props.probe.yM - W / 2],
+    text: 'SENSOR 01', sensor: true,
+  })
+  return labels
+}
+
+/** Only projection is imperative; React owns insertion/removal of every DOM label. */
+function ProjectScientificLabels({ labels, elements }: { labels: ScientificLabel[]; elements: RefObject<Map<string, HTMLDivElement>> }) {
+  const point = useMemo(() => new THREE.Vector3(), [])
+  useFrame(({ camera, size }) => {
+    camera.updateMatrixWorld()
+    labels.forEach(label => {
+      const element = elements.current.get(label.id)
+      if (!element) return
+      point.set(...label.position).project(camera)
+      element.style.visibility = point.z < -1 || point.z > 1 ? 'hidden' : 'visible'
+      element.style.transform = `translate3d(${(point.x + 1) * size.width / 2}px,${(1 - point.y) * size.height / 2}px,0)${label.sensor ? ' translate(-50%,-50%)' : ''}`
+    })
+  })
+  return null
+}
+
 export function Scene(props: SceneProps) {
+  const labelElements = useRef(new Map<string, HTMLDivElement>())
+  const labels = scientificLabels(props)
   return <div className={`scene-canvas ${props.className ?? ''}`}>
     <Canvas orthographic camera={{ position: [8.2, 5.6, 8.5], zoom: 84, near: 0.1, far: 100 }} gl={{ antialias: true, preserveDrawingBuffer: true }} dpr={[1, 1.6]}>
       <World {...props} />
+      <ProjectScientificLabels labels={labels} elements={labelElements} />
     </Canvas>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+      {labels.map(label => <div key={label.id} ref={element => { if (element) labelElements.current.set(label.id, element); else labelElements.current.delete(label.id) }}
+        style={{ position: 'absolute', left: 0, top: 0, transform: 'translate(-10000px,-10000px)' }}>
+        <span className={label.sensor ? 'probe-scene-label' : 'scale-scene-label'}>{label.text}</span>
+      </div>)}
+    </div>
     <div className="scene-corner scene-corner-left">X / Y 6.096 × 6.096 m <span>·</span> Z ↓ {Number(props.scenario?.domain?.depthM ?? 3).toFixed(1)} m</div>
     <div className="scene-corner scene-corner-right">GRID {props.snapshot?.grid.nx ?? '–'} × {props.snapshot?.grid.ny ?? '–'} × {props.snapshot?.grid.nz ?? '–'}</div>
   </div>
