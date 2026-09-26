@@ -1,0 +1,22 @@
+[
+  {
+    "asset": "bark_brown_01",
+    "source": "https://polyhaven.com/a/bark_brown_01",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/bark_brown_01/bark_brown_01_diff_2k.jpg",
+      "Bump": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/bark_brown_01/bark_brown_01_bump_2k.jpg",
+      "Rough": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/bark_brown_01/bark_brown_01_rough_2k.jpg"
+    }
+  },
+  {
+    "asset": "forrest_ground_03",
+    "source": "https://polyhaven.com/a/forrest_ground_03",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forrest_ground_03/forrest_ground_03_diff_2k.jpg",
+      "Bump": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forrest_ground_03/forrest_ground_03_bump_2k.jpg",
+      "Rough": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forrest_ground_03/forrest_ground_03_rough_2k.jpg"
+    }
+  }
+]

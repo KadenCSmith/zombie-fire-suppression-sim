@@ -2,20 +2,22 @@
 
 ## Current gate
 
-**Stage 1 is ready for review; user approval is pending.** The review candidate is
-[Static_Model_Stage_1.blend](review/static-model/Static_Model_Stage_1.blend).
-It is an editable copy of the stage 07 scene from the private
-[dry-ice-peat-study v1.0.0 release](https://github.com/KadenCSmith/dry-ice-peat-study/releases/tag/v1.0.0).
-The original scene and release are preserved.
+**Stage 1 was approved by the user. Stage 2 is ready for material and UV approval.**
+The user requested both distinct soil strata and a thermal overlay. The editable
+[Materials_Thermal_Stage_2.blend](review/material-stage2/Materials_Thermal_Stage_2.blend)
+contains three selectable scenes: natural materials, illustrative thermal zones,
+and a root/trunk UV checker. See [the Stage 2 review](MATERIAL_THERMAL_REVIEW.md)
+for images, mapping measurements, asset credits and limitations.
 
-The user's six-stage workflow governs further Blender work. Existing materials
-and animation remain in the candidate as inherited work; they have not been
-approved under the new workflow. The previews use diagnostic object colors.
+The [approved Stage 1 candidate](review/static-model/Static_Model_Stage_1.blend)
+and original stage 07 scene from the private
+[dry-ice-peat-study v1.0.0 release](https://github.com/KadenCSmith/dry-ice-peat-study/releases/tag/v1.0.0)
+are preserved. The user's six-stage workflow governs further Blender work.
 
 | Stage | Review deliverable | Acceptance decision | Status |
 | --- | --- | --- | --- |
-| 1 Static model approval | Section, top and root-junction previews; measured dimensions; editable scene | Approve geometry, scale, buried peat placement and root connection | Awaiting user |
-| 2 Material and UV approval | Soil, peat, dry ice, bark, char and foliage material closeups; UV/stretch inspection | Approve surface appearance and mapping | Pending Stage 1 |
+| 1 Static model approval | Section, top and root-junction previews; measured dimensions; editable scene | Approve geometry, scale, buried peat placement and root connection | Approved by user |
+| 2 Material and UV approval | Soil strata and thermal overlay; surface closeups; UV/stretch inspection | Approve surface appearance and mapping | Awaiting user |
 | 3 Rig and deformation test | Transform and deformation tests; object ownership and root/trunk continuity checks | Approve motion controls and deformation behavior | Pending Stage 2 |
 | 4 Basic motion blocking | Low-cost preview of fall, release, transport and partial suppression | Approve sequence and broad motion | Pending Stage 3 |
 | 5 Camera move and timing | Section/top shot plan, camera paths and timed preview | Approve framing, moves and event timing | Pending Stage 4 |

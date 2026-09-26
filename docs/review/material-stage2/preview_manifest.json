@@ -1,0 +1,42 @@
+{
+  "stage": 2,
+  "status": "Awaiting user material and UV approval",
+  "frame": 66,
+  "renderer": "CPU Cycles",
+  "samples": 24,
+  "dimensions": [
+    1600,
+    1200
+  ],
+  "scientific_status": "Thermal overlay is static, dimensionless and illustrative; no temperature data",
+  "candidate_sha256": "2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5",
+  "preview_render_candidate_sha256": "a5bd18f9bb6621ad9e2ebf333a22898d1fa6cf15fa02cfde0e859a8c606c781c",
+  "post_preview_change": "Workspace opening view only",
+  "images": [
+    {
+      "file": "01_material_section.png",
+      "sha256": "5334123783410bf4fef9baaf538e29a88a89d5ca559ad7242d01f3e1516cc536",
+      "inspected": true
+    },
+    {
+      "file": "02_thermal_layers.png",
+      "sha256": "6e7117ab580d45e22a4f2ae45006b2a74fb4df6b3f4f1aa4d1c9031093fa4e1c",
+      "inspected": true
+    },
+    {
+      "file": "03_uv_checker.png",
+      "sha256": "04a18e32cf29462973db5f834708b1c8b17e248f4df9efe8fb6474250200e606",
+      "inspected": true
+    },
+    {
+      "file": "04_bark_char_closeup.png",
+      "sha256": "6d28eb2b8156671a424a2cf9f5b4a15d0f7ed499cd31e4c1df03409d8680bc34",
+      "inspected": true
+    },
+    {
+      "file": "05_frost_soil_closeup.png",
+      "sha256": "1466135f9ba3857ddea8d22a64a613478f98315c430321ac0c983a74ff95d1aa",
+      "inspected": true
+    }
+  ]
+}

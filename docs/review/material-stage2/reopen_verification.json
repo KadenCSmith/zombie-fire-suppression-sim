@@ -1,0 +1,78 @@
+{
+  "checks": {
+    "opens_on_material_scene_with_camera_view": true,
+    "approved_mesh_geometry_and_transforms_preserved": true,
+    "original_animation_keyframes_and_handles_preserved": true,
+    "sphere_motion_and_dimensions_match_at_13_frames": true,
+    "six_external_texture_maps_packed_after_reopen": true,
+    "diffuse_maps_srgb": true,
+    "bump_and_roughness_maps_noncolor": true,
+    "three_separate_review_scenes": true,
+    "thermal_scene_labels_illustrative": true,
+    "thermal_scene_has_static_frame_range": true,
+    "approved_scene_file_unchanged": true,
+    "candidate_file_unchanged_by_verification": true,
+    "reopened_uv_maps_finite_without_collapsed_valid_faces": true
+  },
+  "approved_sha256": "44479114176d3aac17e414da0a59344c6f4e294b926c36b8242770f04992cd3a",
+  "candidate_sha256": "2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5",
+  "original_meshes_checked": 885,
+  "original_actions_checked": 104,
+  "comparison_view_layer": "temporary VERIFY_ALL_OBJECTS in both files",
+  "geometry_differences": {},
+  "sphere_sample_frames": [
+    1,
+    35,
+    43,
+    51,
+    58,
+    59,
+    66,
+    75,
+    96,
+    126,
+    160,
+    240,
+    300
+  ],
+  "uv_after_reopen": [
+    {
+      "object": "Root \u2022 \u00d8 0.20 m nominal | partially charred, continuous to t",
+      "uv_map": "Bark_1m",
+      "triangles": 284,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.107500858132687,
+      "stretch_ratio_p95": 1.8172281077108698,
+      "stretch_ratio_max": 2.319519824994703,
+      "median_uv_units_per_meter": 0.999995601644144,
+      "finite_coordinates": true
+    },
+    {
+      "object": "Small tree \u2022 surviving trunk and crown",
+      "uv_map": "Bark_1m",
+      "triangles": 276,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.1411556748162917,
+      "stretch_ratio_p95": 1.4340009355338006,
+      "stretch_ratio_max": 1.6808318696360578,
+      "median_uv_units_per_meter": 0.9999982772128378,
+      "finite_coordinates": true
+    },
+    {
+      "object": "Living crown \u2022 varied curved leaves",
+      "uv_map": "Leaf",
+      "triangles": 22032,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0446450601904331,
+      "stretch_ratio_p95": 2.0200886975944923,
+      "stretch_ratio_max": 2.4068438934116143,
+      "median_uv_units_per_meter": 5.906370601517823,
+      "finite_coordinates": true
+    }
+  ],
+  "source_geometry_status": "Stage 1 approved; no vertex, topology or transform changes in Stage 2",
+  "scope": "Numerical/file verification, not experimental thermal validation or final render approval"
+}

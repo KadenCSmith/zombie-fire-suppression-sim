@@ -1,0 +1,190 @@
+{
+  "stage": 2,
+  "approval": "pending",
+  "stage_1_approval": "Approved by user, with thermal layers requested",
+  "source_sha256": "44479114176d3aac17e414da0a59344c6f4e294b926c36b8242770f04992cd3a",
+  "source_file": "Static_Model_Stage_1.blend",
+  "geometry_unchanged": true,
+  "uv": [
+    {
+      "object": "Root \u2022 \u00d8 0.20 m nominal | partially charred, continuous to t",
+      "uv_map": "Bark_1m",
+      "triangles": 284,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.107500858132687,
+      "stretch_ratio_p95": 1.8172281077108698,
+      "stretch_ratio_max": 2.319519824994703,
+      "median_uv_units_per_meter": 0.999995601644144,
+      "finite_coordinates": true
+    },
+    {
+      "object": "Small tree \u2022 surviving trunk and crown",
+      "uv_map": "Bark_1m",
+      "triangles": 276,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.1411556748162917,
+      "stretch_ratio_p95": 1.4340009355338006,
+      "stretch_ratio_max": 1.6808318696360578,
+      "median_uv_units_per_meter": 0.9999982772128378,
+      "finite_coordinates": true
+    },
+    {
+      "object": "01 \u2022 O \u2022 fibrous humus | section",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0017191008890027,
+      "stretch_ratio_p95": 1.007941068036045,
+      "stretch_ratio_max": 1.0189437124133958,
+      "median_uv_units_per_meter": 0.4995707829153979,
+      "finite_coordinates": true
+    },
+    {
+      "object": "02 \u2022 A \u2022 organic loam | section",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0041117184942014,
+      "stretch_ratio_p95": 1.025904968539239,
+      "stretch_ratio_max": 1.051170792179802,
+      "median_uv_units_per_meter": 0.49897523131668675,
+      "finite_coordinates": true
+    },
+    {
+      "object": "03 \u2022 B \u2022 iron-stained subsoil | section",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0080759960993348,
+      "stretch_ratio_p95": 1.034537324364846,
+      "stretch_ratio_max": 1.0563323796726465,
+      "median_uv_units_per_meter": 0.49799313282974944,
+      "finite_coordinates": true
+    },
+    {
+      "object": "04 \u2022 C \u2022 sandy parent material | section",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.000000153051257,
+      "stretch_ratio_p95": 1.0290267278302636,
+      "stretch_ratio_max": 1.0559503326616022,
+      "median_uv_units_per_meter": 0.4999999787902865,
+      "finite_coordinates": true
+    },
+    {
+      "object": "01 \u2022 O \u2022 fibrous humus | removable front",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0016590002871735,
+      "stretch_ratio_p95": 1.0075636966863686,
+      "stretch_ratio_max": 1.0189142937316356,
+      "median_uv_units_per_meter": 0.4995857590391738,
+      "finite_coordinates": true
+    },
+    {
+      "object": "02 \u2022 A \u2022 organic loam | removable front",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0040550727204465,
+      "stretch_ratio_p95": 1.0251531974772012,
+      "stretch_ratio_max": 1.0505265854788142,
+      "median_uv_units_per_meter": 0.4989893126104469,
+      "finite_coordinates": true
+    },
+    {
+      "object": "03 \u2022 B \u2022 iron-stained subsoil | removable front",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0078702584543136,
+      "stretch_ratio_p95": 1.0328967335615105,
+      "stretch_ratio_max": 1.055610296639147,
+      "median_uv_units_per_meter": 0.49804397500133896,
+      "finite_coordinates": true
+    },
+    {
+      "object": "04 \u2022 C \u2022 sandy parent material | removable front",
+      "uv_map": "Soil_2m",
+      "triangles": 13280,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.000000153051257,
+      "stretch_ratio_p95": 1.0283083423636914,
+      "stretch_ratio_max": 1.0559047976597293,
+      "median_uv_units_per_meter": 0.4999999787902865,
+      "finite_coordinates": true
+    },
+    {
+      "object": "Living crown \u2022 varied curved leaves",
+      "uv_map": "Leaf",
+      "triangles": 22032,
+      "degenerate_geometry_triangles": 0,
+      "collapsed_uv_triangles_on_valid_geometry": 0,
+      "stretch_ratio_median": 1.0446450601904331,
+      "stretch_ratio_p95": 2.0200886975944923,
+      "stretch_ratio_max": 2.4068438934116143,
+      "median_uv_units_per_meter": 5.906370601517823,
+      "finite_coordinates": true
+    }
+  ],
+  "branch_objects_unwrapped": 79,
+  "soil_objects_mapped": 8,
+  "thermal_basis": "Dimensionless static illustrative field, independently selectable; no solver temperature data",
+  "asset_scales_m": {
+    "bark_brown_01": 1,
+    "forrest_ground_03": 2
+  },
+  "packed_images": [
+    {
+      "name": "bark_brown_01_bump_2k.jpg",
+      "bytes": 2022061,
+      "sha256": "867c902591bbf0f14a60c402b89575329844c1c95f6b4f516c84fdc53a455168",
+      "color_space": "Non-Color"
+    },
+    {
+      "name": "bark_brown_01_diff_2k.jpg",
+      "bytes": 2667267,
+      "sha256": "0cdd066f34d357fdbf7eb99159e668a6dc346bb7fd093a9e27058eb827d09b9a",
+      "color_space": "sRGB"
+    },
+    {
+      "name": "bark_brown_01_rough_2k.jpg",
+      "bytes": 812553,
+      "sha256": "8ce13f1be85940fcb9a3dc78afd1529755c6aec6b52e683656bffa92820887d8",
+      "color_space": "Non-Color"
+    },
+    {
+      "name": "forrest_ground_03_bump_2k.jpg",
+      "bytes": 3064182,
+      "sha256": "8ab783cb6644bba8766713465d2f29c623a5b1fcef068e53da9025d46ef54b78",
+      "color_space": "Non-Color"
+    },
+    {
+      "name": "forrest_ground_03_diff_2k.jpg",
+      "bytes": 3522953,
+      "sha256": "187a8e33773473939c0e85b5e10ae94eb9e8d91463ab8b74e122d833d2d84dc6",
+      "color_space": "sRGB"
+    },
+    {
+      "name": "forrest_ground_03_rough_2k.jpg",
+      "bytes": 1877319,
+      "sha256": "b3b04dddd8ed6f441dc0271c3e6e4ac4d6ba882ab9c1028d13b08ddd39f091fa",
+      "color_space": "Non-Color"
+    }
+  ],
+  "candidate_sha256": "2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5",
+  "candidate_sha256_before_workspace_save": "a5bd18f9bb6621ad9e2ebf333a22898d1fa6cf15fa02cfde0e859a8c606c781c",
+  "workspace_update": "Native Blender camera view saved after preview rendering; no model or material edits"
+}

@@ -235,3 +235,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Blender review textures — CC0
+
+The Stage 2 Blender review packs the diffuse, bump and roughness maps for
+[Bark Brown 01](https://polyhaven.com/a/bark_brown_01) and
+[Forrest Ground 03](https://polyhaven.com/a/forrest_ground_03), by Rob Tuytel
+via Poly Haven. Poly Haven makes its assets available under
+[CC0](https://polyhaven.com/license). Source URLs are recorded in
+`docs/review/material-stage2/asset_sources.json` and in the Blender file's
+ASSET CREDITS text block. These assets provide visual surface detail; they are
+not scientific measurements or peer-reviewed evidence for thermal parameters.
