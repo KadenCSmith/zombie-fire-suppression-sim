@@ -234,6 +234,30 @@ describe('reduced coupled fields', () => {
     expect(after.arrays.oxygen[cell]).toBeLessThan(total0);
     expect(Math.abs(sim.diagnostics.gasBalanceResidualMol)).toBeLessThan(1e-9);
   });
+  it('uses restored conductivity in the next heat-conduction step', () => {
+    const s = quietClosedScenario();
+    s.soil.moistureSaturation = 0;
+    s.model.maxStepS = 600;
+    const initial = createSimulation(s).serialize();
+    const cell = 21;
+    const originalTemperature = initial.arrays.temperature[cell];
+    initial.arrays.temperature[cell] += 20;
+    for (const species of ['oxygen', 'co2', 'background', 'vapor']) {
+      initial.arrays[species][cell] *= originalTemperature / initial.arrays.temperature[cell];
+    }
+    initial.arrays.__ledger[0] = ['oxygen', 'co2', 'background', 'vapor']
+      .reduce((sum, species) => sum + initial.arrays[species].reduce((a, b) => a + b, 0), 0);
+    for (const [index, species] of ['oxygen', 'co2', 'background', 'vapor'].entries()) {
+      initial.arrays.__speciesLedger[index] = initial.arrays[species].reduce((a, b) => a + b, 0);
+    }
+    const moreConductive = structuredClone(initial);
+    moreConductive.arrays.thermalConductivity = initial.arrays.thermalConductivity.map(value => value * 20);
+    const standard = Simulation.restore(initial).advance(600);
+    const fasterHeat = Simulation.restore(moreConductive).advance(600);
+    expect(standard.diagnostics.status).toBe('running');
+    expect(fasterHeat.diagnostics.status).toBe('running');
+    expect(standard.fields.temperatureK[cell] - fasterHeat.fields.temperatureK[cell]).toBeGreaterThan(0.01);
+  });
   it('closes the reduced oxidation stoichiometry across fuel, oxygen, CO₂, and vapor', () => {
     const s = smallScenario();
     s.source.initialMassKg = 0; s.source.enabled = false;
