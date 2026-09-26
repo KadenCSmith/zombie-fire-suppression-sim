@@ -1,5 +1,12 @@
 # Verification and validation status
 
+## Timed release and cage illustration (2026-09-26, version 0.6.0)
+
+Scene studio now lands the dry ice at 4 s, waits exactly five playback seconds, and hides the solid instantaneously at 9 s while gas tracers expand and 88 soil/rock fragments move outward and settle. The inverted cage defaults to 10 cm high and 95 cm wide, with an open underside, editable dimensions and a visibility switch. Height was the stated assumption for the unspecified 10 cm measurement. It is lowered after landing. All four views use the shared timeline. These effects are prescribed illustration; gas pressure, molecular dynamics, cage collisions/containment and new fracture physics are not calculated.
+
+Two new tests verify the exact conversion boundary and reproducible fragment poses under reverse seeking. Typecheck, lint, 93 tests and production build passed during integration. Native development inspection confirmed disappearance, the expanding particle field, moving/settled fragments and the 10 cm cage. A particle-uniform update issue found during visual review was corrected by updating the actual shader material each rendered frame. The independently modified Stage 2 Blender file is preserved and excluded. Release verification follows when completed.
+
+
 ## Desktop release 0.5.0 (2026-09-26)
 
 The release packages are built from `65b5c71beebb7af2951bd487a532d98ce46a504e`. Later commits add the CI desktop harness and verification documentation; they do not change the packaged application. All remote feature branches are ancestors of `main` after a fresh fetch. The independent local Stage 2 Blender edit is preserved and excluded.

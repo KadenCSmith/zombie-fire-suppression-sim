@@ -6,10 +6,10 @@ import { useGLTF } from '@react-three/drei/core/Gltf.js'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import * as THREE from 'three'
-import { STUDY_PEAT, STUDY_SOURCE, studyAnimation, studyObjectRole, studyTime, type StudyView } from './studyModel'
+import { DEFAULT_STUDY_CAGE, STUDY_FRAGMENTS, STUDY_LANDING_TIME, STUDY_PEAT, STUDY_RELEASE_TIME, STUDY_SOURCE, smoothPhase, studyAnimation, studyCageBars, studyFragmentPose, studyObjectRole, studyTime, type StudyCage, type StudyView } from './studyModel'
 
 export type { StudyView } from './studyModel'
-export type StudySceneProps = { view: StudyView; time: number; labels: boolean; resetToken?: number }
+export type StudySceneProps = { view: StudyView; time: number; labels: boolean; cage?: StudyCage; resetToken?: number }
 const MODEL_URL = `${import.meta.env.BASE_URL}models/peat-study.glb`
 type Role = ReturnType<typeof studyObjectRole>
 type Batch = { geometry: THREE.BufferGeometry; material: THREE.MeshStandardMaterial; role: Role; name: string }
@@ -125,13 +125,14 @@ function StudyModel({ view, time }: Pick<StudySceneProps, 'view' | 'time'>) {
     uniforms.warmth.value = phase.warmth
     uniforms.sourceY.value = phase.sourceOffsetY
     invalidate()
-  }, [view, phase.cold, phase.warmth, phase.sourceOffsetY, uniforms, invalidate])
+  }, [view, time, phase.cold, phase.warmth, phase.sourceOffsetY, uniforms, invalidate])
   useEffect(() => () => {
     batches.forEach(batch => { batch.geometry.dispose(); batch.material.dispose() })
   }, [batches])
   return <group dispose={null}>
     {batches.map((batch, index) => <mesh key={index} geometry={batch.geometry} material={batch.material}
       position-y={batch.role === 'source' ? phase.sourceOffsetY : 0}
+      visible={batch.role !== 'source' || phase.sourceVisible}
       castShadow={batch.role !== 'soil'} receiveShadow />)}
   </group>
 }
@@ -143,7 +144,7 @@ uniform float uTransport;
 attribute vec4 seed;
 varying float vAlpha;
 void main() {
-  float phase = fract(seed.x + max(0.0, uTime - 4.0) * 0.13);
+  float phase = fract(seed.x + max(0.0, uTime - ${STUDY_RELEASE_TIME.toFixed(1)}) * 0.13);
   float reach = uTransport * phase;
   vec3 p = mix(vec3(-1.4, -2.05, 0.22), vec3(1.5, -0.62, 0.22), reach);
   float spread = 0.1 + 0.28 * phase;
@@ -163,7 +164,14 @@ void main() {
   #include <colorspace_fragment>
 }`
 function TransportTracer({ time }: { time: number }) {
-  const phase = studyAnimation(time)
+  const material = useRef<THREE.ShaderMaterial>(null)
+  useFrame(() => {
+    if (!material.current) return
+    const phase = studyAnimation(time), target = material.current.uniforms
+    target.uTime.value = studyTime(time)
+    target.uCold.value = phase.sourceVisible ? 0 : phase.cold * (1 - smoothPhase(time, 12, 17))
+    target.uTransport.value = phase.transport
+  })
   const geometry = useMemo(() => {
     const result = new THREE.BufferGeometry()
     const count = 180
@@ -176,15 +184,103 @@ function TransportTracer({ time }: { time: number }) {
     return result
   }, [])
   const uniforms = useMemo(() => ({ uTime: { value: 0 }, uCold: { value: 0 }, uTransport: { value: 0 } }), [])
-  useLayoutEffect(() => {
-    uniforms.uTime.value = studyTime(time)
-    uniforms.uCold.value = phase.cold
-    uniforms.uTransport.value = phase.transport
-  }, [time, phase.cold, phase.transport, uniforms])
   useEffect(() => () => geometry.dispose(), [geometry])
   return <points geometry={geometry} frustumCulled={false} renderOrder={2}>
-    <shaderMaterial uniforms={uniforms} vertexShader={tracerVertex} fragmentShader={tracerFragment} transparent depthWrite={false} />
+    <shaderMaterial ref={material} uniforms={uniforms} vertexShader={tracerVertex} fragmentShader={tracerFragment} transparent depthWrite={false} />
   </points>
+}
+
+const expansionVertex = `
+uniform float uAge;
+attribute vec4 seed;
+varying float vAlpha;
+void main() {
+  float angle = seed.x * 6.283185;
+  float vertical = seed.y * 2.0 - 1.0;
+  float planar = sqrt(max(0.0, 1.0 - vertical * vertical));
+  float radius = (0.25 + 1.5 * (1.0 - exp(-5.0 * uAge))) * (0.5 + 0.5 * seed.w);
+  vec3 p = vec3(-1.4, -2.19, 0.15);
+  p += vec3(cos(angle) * planar * radius, vertical * radius, abs(sin(angle)) * planar * radius * 0.32);
+  // A rising branch makes venting legible from the surface view as well.
+  if (seed.z > 0.65) {
+    float rise = min(3.6, uAge * 3.0) * (0.75 + 0.25 * seed.w);
+    float width = 0.2 + max(0.0, rise - 2.1) * 0.5;
+    p = vec3(-1.4 + cos(angle) * width, -2.19 + rise, sin(angle) * width);
+  }
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * mv;
+  gl_PointSize = 12.0 + 21.0 * seed.w;
+  vAlpha = 0.40 * exp(-0.75 * max(0.0, uAge - 0.7)) * (0.6 + 0.4 * seed.y);
+}`
+
+function GasExpansion({ time }: { time: number }) {
+  const material = useRef<THREE.ShaderMaterial>(null)
+  useFrame(() => { if (material.current) material.current.uniforms.uAge.value = studyAnimation(time).releaseAge })
+  const { sourceVisible } = studyAnimation(time)
+  const geometry = useMemo(() => {
+    const result = new THREE.BufferGeometry(), seed = new Float32Array(420 * 4)
+    let rng = 71237
+    for (let i = 0; i < seed.length; i++) { rng = (Math.imul(rng, 1664525) + 1013904223) >>> 0; seed[i] = rng / 4294967296 }
+    result.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(420 * 3), 3))
+    result.setAttribute('seed', new THREE.Float32BufferAttribute(seed, 4))
+    return result
+  }, [])
+  const uniforms = useMemo(() => ({ uAge: { value: 0 } }), [])
+  useEffect(() => () => geometry.dispose(), [geometry])
+  return <points geometry={geometry} visible={!sourceVisible} frustumCulled={false} renderOrder={3}>
+    <shaderMaterial ref={material} uniforms={uniforms} vertexShader={expansionVertex} fragmentShader={tracerFragment} transparent depthWrite={false} />
+  </points>
+}
+
+function MovingFragments({ time }: { time: number }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const object = useMemo(() => new THREE.Object3D(), [])
+  useLayoutEffect(() => {
+    if (!mesh.current) return
+    STUDY_FRAGMENTS.forEach((seed, i) => {
+      const pose = studyFragmentPose(i, time)
+      object.position.set(...pose.position)
+      object.rotation.set(...pose.rotation)
+      const size = seed.surface || time >= STUDY_RELEASE_TIME ? seed.size : 0
+      object.scale.set(size, size * 0.7, size * 0.85)
+      object.updateMatrix()
+      mesh.current!.setMatrixAt(i, object.matrix)
+    })
+    mesh.current.instanceMatrix.needsUpdate = true
+  }, [time, object])
+  useLayoutEffect(() => {
+    if (!mesh.current) return
+    STUDY_FRAGMENTS.forEach((seed, i) => mesh.current!.setColorAt(i, new THREE.Color(seed.surface ? '#837a64' : i % 3 ? '#796249' : '#ab9f82')))
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
+  }, [])
+  return <instancedMesh ref={mesh} args={[undefined, undefined, STUDY_FRAGMENTS.length]} frustumCulled={false} castShadow receiveShadow>
+    <icosahedronGeometry args={[1, 0]} /><meshStandardMaterial roughness={0.98} />
+  </instancedMesh>
+}
+
+function CraterCage({ time, cage }: { time: number; cage: StudyCage }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const bars = useMemo(() => studyCageBars(cage.heightM, cage.widthM), [cage.heightM, cage.widthM])
+  useLayoutEffect(() => {
+    if (!mesh.current) return
+    const object = new THREE.Object3D(), start = new THREE.Vector3(), end = new THREE.Vector3(), direction = new THREE.Vector3()
+    const up = new THREE.Vector3(0, 1, 0)
+    bars.forEach((bar, i) => {
+      start.set(...bar.start); end.set(...bar.end)
+      object.position.copy(start).add(end).multiplyScalar(0.5)
+      direction.copy(end).sub(start)
+      object.scale.set(0.006, direction.length(), 0.006)
+      object.quaternion.setFromUnitVectors(up, direction.normalize())
+      object.updateMatrix(); mesh.current!.setMatrixAt(i, object.matrix)
+    })
+    mesh.current.instanceMatrix.needsUpdate = true
+  }, [bars])
+  const drop = 0.8 * (1 - smoothPhase(time, STUDY_LANDING_TIME, STUDY_LANDING_TIME + 0.8))
+  return <group position={[STUDY_SOURCE[0], 0.035 + drop, STUDY_SOURCE[2]]} visible={cage.enabled && time >= STUDY_LANDING_TIME}>
+    <instancedMesh key={bars.length} ref={mesh} args={[undefined, undefined, bars.length]} frustumCulled={false} castShadow receiveShadow>
+      <cylinderGeometry args={[1, 1, 1, 8]} /><meshStandardMaterial color="#bbc6c8" metalness={0.72} roughness={0.35} />
+    </instancedMesh>
+  </group>
 }
 
 function WarmEmbers({ time }: { time: number }) {
@@ -209,15 +305,16 @@ function WarmEmbers({ time }: { time: number }) {
 }
 
 type LabelDescriptor = { id: string; position: [number, number, number]; text: ReactNode; tone?: 'warm' | 'cool' }
-function studyLabels(view: StudyView, time: number): LabelDescriptor[] {
+function studyLabels(view: StudyView, time: number, cage: StudyCage): LabelDescriptor[] {
   if (view === 'root') return [
     { id: 'root', position: [1.2, 0.45, -0.4], text: 'Living trunk & roots' },
     { id: 'char', position: [0.6, -0.9, 0.35], text: 'Charred peat interface', tone: 'warm' },
   ]
   const result: LabelDescriptor[] = [
-    { id: 'source', position: [-1.4, STUDY_SOURCE[1] + studyAnimation(time).sourceOffsetY - 0.39, 0.6], text: 'Dry ice · Ø 0.50 m', tone: 'cool' },
+    { id: 'source', position: [-1.4, STUDY_SOURCE[1] + studyAnimation(time).sourceOffsetY - 0.39, 0.6], text: studyAnimation(time).sourceVisible ? 'Dry ice · Ø 0.50 m' : 'CO₂ expansion · visual tracers', tone: 'cool' },
     { id: 'peat', position: [1.5, -0.23, 0.1], text: 'Buried smoldering peat', tone: 'warm' },
   ]
+  if (cage.enabled && time >= STUDY_LANDING_TIME) result.push({ id: 'cage', position: [-1.4, cage.heightM + 0.5, -0.15], text: `Inverted cage · ${Math.round(cage.heightM * 100)} cm high` })
   if (view !== 'top') result.push({ id: 'depth', position: [-3.25, -1.2, 0.3], text: <>2.44 m<br /><small>Borehole depth</small></> })
   return result
 }
@@ -301,12 +398,12 @@ class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void
   }
 }
 
-export function StudyScene({ view, time, labels, resetToken = 0 }: StudySceneProps) {
+export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, resetToken = 0 }: StudySceneProps) {
   const [retry, setRetry] = useState(0)
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const labelElements = useRef(new Map<string, HTMLDivElement>())
-  const descriptors = useMemo(() => labels && ready ? studyLabels(view, time) : [], [labels, ready, view, time])
+  const descriptors = useMemo(() => labels && ready ? studyLabels(view, time, cage) : [], [labels, ready, view, time, cage])
   const onReady = useCallback(() => setReady(true), [])
   const onError = useCallback(() => { setFailed(true); setReady(false) }, [])
   return <div className="study-scene" style={{ width: '100%', height: '100%', position: 'relative', minHeight: 300 }}>
@@ -322,6 +419,9 @@ export function StudyScene({ view, time, labels, resetToken = 0 }: StudyScenePro
         <directionalLight position={[6, 3, -6]} intensity={1.4} color="#9bd6ed" />
         <Suspense fallback={null}>
           <StudyModel view={view} time={time} />
+          <GasExpansion time={time} />
+          <MovingFragments time={time} />
+          <CraterCage time={time} cage={cage} />
           <TransportTracer time={time} />
           <WarmEmbers time={time} />
           {labels && view !== 'top' && view !== 'root' && <DepthGuide />}

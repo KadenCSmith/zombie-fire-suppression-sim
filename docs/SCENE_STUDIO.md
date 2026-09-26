@@ -20,11 +20,17 @@ The sequence starts paused. **Play** starts it; **Pause** holds the current time
 | Sequence time | Displayed action | Interpretation |
 | --- | --- | --- |
 | 0–4 s | Source placement | Prescribed descent into the borehole; not a calculated drop or impact. |
-| 4–8 s | Cold-source zone | A cool-colored region develops near the source. |
-| 8–14 s | Transport illustration | Moving tracers show an assumed route through the soil. CO₂ itself is colorless; the tracers are visual markers. |
-| 14–20 s | Partial cooling | Part of the peat changes color while a warm region remains. This is not a suppression result. |
+| 4–9 s | Five-second hold | The source rests. The inverted cage is lowered onto the opening during 4–4.8 s. |
+| 9–12 s | Instant gas release | The solid is hidden exactly at 9 s; gas tracers rapidly spread and 88 soil/rock fragments move. These are prescribed display trajectories. |
+| 12–20 s | Fragments settle | The grains and rocks settle and gas tracers disperse; a warm peat region remains. |
 
 These seconds belong to the illustration's playback clock. They are not a conversion from the scientific solver's multiday time or the separate radial gas event's short clock.
+
+## Inverted cage
+
+The default cage is **10 cm high and 95 cm wide**, centered over the 75 cm opening. The 10 cm measurement was interpreted as height because its intended dimension was unspecified; both height and width are editable in the scene sidebar. A checkbox hides it. Its top and four sides have bars; its underside has a perimeter frame with no base grid. It is placed after landing so the falling sphere does not pass through the lid. Bar spacing is at most 10 cm. Dimensions use meters internally.
+
+The cage, gas tracers and moving fragments are illustration geometry, not new physical constraints. No bar collisions, pressure-rated containment, fracture or molecular dynamics are calculated. CO₂ is colorless; visible particles are markers, not a claim about its appearance. Timings and trajectories are deterministic functions of playback time, so reverse seeking and looping restore the same state. The scientific solver and the original Blender/GLB asset are unchanged by this feature.
 
 ## Open the scientific workspace
 

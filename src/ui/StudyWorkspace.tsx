@@ -16,11 +16,12 @@ import Tags from 'lucide-react/dist/esm/icons/tags.mjs'
 import Thermometer from 'lucide-react/dist/esm/icons/thermometer.mjs'
 import { StudyScene } from './StudyScene'
 import './study.css'
+import { DEFAULT_STUDY_CAGE, STUDY_DURATION, STUDY_PHASES, STUDY_RELEASE_TIME } from './studyModel'
 
 type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
 type PlaybackSpeed = 0.5 | 1 | 2
 
-const DURATION = 20
+const DURATION = STUDY_DURATION
 const VIEWS = [
   { id: 'cutaway', number: '01', title: 'Soil cutaway', subtitle: 'Beneath the surface', icon: Layers3 },
   { id: 'thermal', number: '02', title: 'Thermal layers', subtitle: 'Follow the cooling zone', icon: Thermometer },
@@ -28,18 +29,13 @@ const VIEWS = [
   { id: 'root', number: '04', title: 'Roots & peat', subtitle: 'A closer look underground', icon: Leaf },
 ] as const
 
-const PHASES = [
-  { start: 0, end: 4, title: 'Source placement', short: 'Place', description: 'A dry-ice sphere descends into the borehole.' },
-  { start: 4, end: 8, title: 'Cold-source zone', short: 'Cool', description: 'A cool-colored zone appears around the source.' },
-  { start: 8, end: 14, title: 'Transport illustration', short: 'Transport', description: 'Moving tracers reveal an assumed route through the soil.' },
-  { start: 14, end: 20, title: 'Partial cooling', short: 'Observe', description: 'Part of the peat changes color while a warm region remains.' },
-] as const
+const PHASES = STUDY_PHASES
 
 const VIEW_NOTES: Record<StudyView, { title: string; description: string; observation: string }> = {
   cutaway: {
     title: 'A window underground',
     description: 'Four soil strata frame a borehole, buried peat and the roots of a living tree.',
-    observation: 'Follow the source from the surface to the base of the borehole, then watch the transport illustration unfold.',
+    observation: 'Follow the source from the surface to the base of the borehole, wait five seconds, then watch the release move soil and rock fragments.',
   },
   thermal: {
     title: 'See the temperature story',
@@ -78,6 +74,7 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
   const [labels, setLabels] = useState(true)
   const [resetToken, setResetToken] = useState(0)
   const timeRef = useRef(0)
+  const [cage, setCage] = useState({ ...DEFAULT_STUDY_CAGE })
 
   const seek = useCallback((next: number) => {
     const bounded = Math.max(0, Math.min(DURATION, next))
@@ -169,7 +166,7 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
             <button type="button" className="study-tool-button study-tool-icon" onClick={() => setResetToken((current) => current + 1)} aria-label="Reset camera to the selected view" title="Reset camera"><Focus size={17} /></button>
           </div>
         </div>
-        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} resetToken={resetToken} /></div>
+        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} /></div>
         <div className="study-viewport-footer">
           <span><MoveUpRight size={12} /> Drag to orbit <span className="study-hint-divider">/</span> Scroll to zoom</span>
           <span className="study-frame-state">{playing ? 'Playing' : time >= DURATION ? 'Sequence complete' : 'Paused'}<i aria-hidden="true" /></span>
@@ -198,15 +195,23 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
           <dl><div><dt>Soil footprint</dt><dd>8 × 8 <span>m</span></dd></div><div><dt>Borehole width</dt><dd>0.75 <span>m</span></dd></div><div><dt>Borehole depth</dt><dd>2.44 <span>m</span></dd></div><div><dt>Dry-ice diameter</dt><dd>0.50 <span>m</span></dd></div></dl>
         </section>
 
+        <section className="study-cage-controls" aria-label="Cage illustration settings">
+          <h3>Inverted cage</h3>
+          <label className="study-cage-toggle"><input type="checkbox" checked={cage.enabled} onChange={event => setCage(old => ({ ...old, enabled: event.target.checked }))} />Cover the crater opening</label>
+          <div><label htmlFor="study-cage-height">Height</label><input id="study-cage-height" type="number" min="1" max="100" step="1" value={Math.round(cage.heightM * 100)} onChange={event => { const value = Number(event.target.value); if (value >= 1 && value <= 100) setCage(old => ({ ...old, heightM: value / 100 })) }} /><span>cm</span></div>
+          <div><label htmlFor="study-cage-width">Width</label><input id="study-cage-width" type="number" min="10" max="200" step="5" value={Math.round(cage.widthM * 100)} onChange={event => { const value = Number(event.target.value); if (value >= 10 && value <= 200) setCage(old => ({ ...old, widthM: value / 100 })) }} /><span>cm</span></div>
+          <p>Open underneath. Placed after landing. Dimensions describe the illustration; containment and bar collisions are not calculated.</p>
+        </section>
+
         <div className="study-observation"><span className="study-observation-icon"><Focus size={16} /></span><p>{notes.observation}</p></div>
-        <p className="study-disclaimer">Illustrative motion and colors. This playback does not report calculated temperatures or treatment success.</p>
+        <p className="study-disclaimer">Staged instant conversion and fragment motion. CO₂ is invisible; colored gas tracers show the effect. This sequence does not predict pressure, fracture or treatment success.</p>
       </aside>
     </main>
 
     <section className="study-playback" aria-label="Illustrative sequence playback">
       <div className="study-playback-topline">
         <div className="study-current-phase" aria-live="polite" aria-atomic="true"><span className="study-phase-index">0{phaseIndex + 1}</span><div><strong>{phase.title}</strong><p>{phase.description}</p></div></div>
-        <span className="study-playback-badge">20-second illustrative sequence</span>
+        <span className="study-playback-badge">Release at {STUDY_RELEASE_TIME} s · 5 s after landing</span>
       </div>
       <div className="study-transport">
         <div className="study-play-buttons">
@@ -218,7 +223,7 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
           <input id="study-playhead" className="study-playhead" type="range" min="0" max={DURATION} step="0.01" value={time} style={progressStyle}
             aria-valuetext={`${time.toFixed(1)} of ${DURATION} seconds, ${phase.title}`}
             onPointerDown={() => setPlaying(false)} onChange={(event) => { setPlaying(false); seek(Number(event.target.value)) }} />
-          <div className="study-phase-markers" aria-hidden="true"><span style={{ left: '20%' }} /><span style={{ left: '40%' }} /><span style={{ left: '70%' }} /></div>
+          <div className="study-phase-markers" aria-hidden="true">{PHASES.slice(1).map(item => <span key={item.start} style={{ left: `${item.start / DURATION * 100}%` }} />)}</div>
           <div className="study-timeline-labels"><span>00:00</span><span>00:20</span></div>
         </div>
         <output className="study-time" aria-label="Current playback time">{formatTime(time)}<span> / 00:20</span></output>

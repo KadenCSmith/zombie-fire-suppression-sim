@@ -53,6 +53,12 @@ app.on('browser-window-created', (_event, win) => {
         const canvas = document.querySelector('canvas');
         const gl = canvas?.getContext('webgl2');
         if (!gl || gl.isContextLost()) throw new Error('WebGL2 unavailable');
+        document.querySelectorAll('.study-chapter')[2].click();
+        await waitFor(() => document.body.textContent.includes('CO₂ expansion · visual tracers'), 'instant conversion at 9 seconds');
+        if (Number(document.querySelector('#study-playhead').value) !== 9) throw new Error('Incorrect release time');
+        if (!document.body.textContent.includes('Inverted cage · 10 cm high')) throw new Error('Default cage missing');
+        document.querySelectorAll('.study-chapter')[1].click();
+        await waitFor(() => document.body.textContent.includes('Dry ice · Ø 0.50 m'), 'restored solid before conversion');
         window.dispatchEvent(new CustomEvent('workspace-request', {detail: 'simulation'}));
         await waitFor(() => document.body.textContent.includes('0d 00h 02m'), 'preserved numerical run');
         return 'ok';
