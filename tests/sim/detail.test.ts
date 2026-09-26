@@ -39,7 +39,8 @@ describe('10 cm material-aware finite volumes', () => {
     console.log('DETAILED_GRID_BENCHMARK', JSON.stringify({
       grid: [sim.nx, sim.ny, sim.nz], cellSizeM: [sim.dx, sim.dy, sim.dz],
       cells: sim.cellCount, snapshotMiB: snapshotBytes / (1024 * 1024),
-      initializedMs, oneStepMs: stepMs, processRssMiB: process.memoryUsage().rss / (1024 * 1024),
+      initializedMs, oneStepMs: stepMs, pressureIterations: after.diagnostics.pressureIterations,
+      processRssMiB: process.memoryUsage().rss / (1024 * 1024),
     }))
   }, 120000)
 

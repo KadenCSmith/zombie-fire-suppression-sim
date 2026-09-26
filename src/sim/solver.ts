@@ -31,6 +31,7 @@ interface Face {
   distance: number;
   g: number; // mol s^-1 Pa^-1 for Darcy pressure solve
   d: number; // mol s^-1 per mole-fraction difference
+  thermalConductance: number; // W K^-1; fixed material property
   boundary: boolean;
 }
 
@@ -124,6 +125,16 @@ export class Simulation {
   private vy: Float64Array;
   private vz: Float64Array;
   private faces: Face[] = [];
+  private readonly stepArrays: Float64Array[];
+  private readonly stepBackup: Float64Array[];
+  private readonly work: {
+    heatJ: Float64Array; initialCapacity: Float64Array; pre: Float64Array;
+    capacity: Float64Array; diagonal: Float64Array; gauge: Float64Array;
+    rhs: Float64Array; residualVector: Float64Array; preconditioned: Float64Array;
+    direction: Float64Array; product: Float64Array; outgoing: Float64Array;
+    conductanceX: Float64Array; conductanceY: Float64Array; conductanceZ: Float64Array;
+    deltas: Record<Species, Float64Array>;
+  };
   private sourceCells: Array<{ i: number; weight: number }> = [];
   private initialGasMol = 0;
   private cumulativeGasSourceMol = 0;
@@ -157,6 +168,17 @@ export class Simulation {
     this.porosity = array(); this.intrinsicH = array(); this.intrinsicV = array();
     this.effectiveH = array(); this.effectiveV = array(); this.effectiveDiffusivity = array();
     this.peatMask = array(); this.pressure = array(); this.vx = array(); this.vy = array(); this.vz = array();
+    this.stepArrays = [this.temperature, this.oxygen, this.co2, this.background,
+      this.vapor, this.fuel, this.rootFuel, this.reactionRate, this.water,
+      this.pressure, this.vx, this.vy, this.vz];
+    this.stepBackup = this.stepArrays.map(() => array());
+    this.work = {
+      heatJ: array(), initialCapacity: array(), pre: array(), capacity: array(),
+      diagonal: array(), gauge: array(), rhs: array(), residualVector: array(),
+      preconditioned: array(), direction: array(), product: array(), outgoing: array(),
+      conductanceX: array(), conductanceY: array(), conductanceZ: array(),
+      deltas: { oxygen: array(), co2: array(), background: array(), vapor: array() },
+    };
     this.dryIceMassKg = scenario.source.initialMassKg;
     this.dryIceTemperatureK = scenario.source.initialTemperatureK;
     this.heaterEnabled = scenario.source.enabled;
@@ -321,7 +343,9 @@ export class Simulation {
 
   private buildFaces(): void {
     const add = (a: number, b: number, axis: 0 | 1 | 2, area: number, distance: number, boundary = false) => {
-      this.faces.push({ a, b, axis, area, distance, g: 0, d: 0, boundary });
+      const thermalConductance = b >= 0
+        ? harmonic(this.thermalConductivity[a], this.thermalConductivity[b]) * area / distance : 0;
+      this.faces.push({ a, b, axis, area, distance, g: 0, d: 0, thermalConductance, boundary });
     };
     for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
       const i = this.idx(x, y, z);
@@ -524,13 +548,7 @@ export class Simulation {
   private performStep(dt: number): void {
     const n = this.cellCount;
     // Transactional step: a validity/numerical failure returns to the last fully valid state.
-    const backupArrays = {
-      temperature: this.temperature.slice(), oxygen: this.oxygen.slice(), co2: this.co2.slice(),
-      background: this.background.slice(), vapor: this.vapor.slice(), fuel: this.fuel.slice(),
-      rootFuel: this.rootFuel.slice(), reactionRate: this.reactionRate.slice(),
-      water: this.water.slice(), pressure: this.pressure.slice(),
-      vx: this.vx.slice(), vy: this.vy.slice(), vz: this.vz.slice(),
-    };
+    for (let j = 0; j < this.stepArrays.length; j++) this.stepBackup[j].set(this.stepArrays[j]);
     const backupScalars = [this.dryIceMassKg, this.dryIceTemperatureK, this.heaterEnergyJ,
       this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
       this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
@@ -543,11 +561,7 @@ export class Simulation {
     const rollback = () => {
       const failureStatus = this.diagnostics.status;
       const failureWarnings = this.diagnostics.warnings.filter(w => !backupDiagnostics.warnings.includes(w));
-      this.temperature.set(backupArrays.temperature); this.oxygen.set(backupArrays.oxygen);
-      this.co2.set(backupArrays.co2); this.background.set(backupArrays.background);
-      this.vapor.set(backupArrays.vapor); this.fuel.set(backupArrays.fuel); this.water.set(backupArrays.water);
-      this.rootFuel.set(backupArrays.rootFuel); this.reactionRate.set(backupArrays.reactionRate);
-      this.pressure.set(backupArrays.pressure); this.vx.set(backupArrays.vx); this.vy.set(backupArrays.vy); this.vz.set(backupArrays.vz);
+      for (let j = 0; j < this.stepArrays.length; j++) this.stepArrays[j].set(this.stepBackup[j]);
       [this.dryIceMassKg, this.dryIceTemperatureK, this.heaterEnergyJ,
         this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
         this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
@@ -559,8 +573,8 @@ export class Simulation {
       this.updateEffectiveProperties();
       this.updateDiagnostics();
     };
-    const heatJ = new Float64Array(n);
-    const initialCapacity = new Float64Array(n);
+    const { heatJ, initialCapacity } = this.work;
+    heatJ.fill(0);
     for (let i = 0; i < n; i++) initialCapacity[i] = this.cellCapacity(i);
     this.applyHeatConduction(dt, heatJ);
     this.applySource(dt, heatJ);
@@ -598,8 +612,7 @@ export class Simulation {
     const deepT = celsiusToKelvin(this.scenario.atmosphere.deepTemperatureC);
     for (const f of this.faces) {
       if (f.b < 0) continue;
-      const conductance = harmonic(this.thermalConductivity[f.a], this.thermalConductivity[f.b]) * f.area / f.distance;
-      const energy = conductance * (this.temperature[f.b] - this.temperature[f.a]) * dt;
+      const energy = f.thermalConductance * (this.temperature[f.b] - this.temperature[f.a]) * dt;
       heatJ[f.a] += energy; heatJ[f.b] -= energy;
     }
     const a = this.scenario.atmosphere;
@@ -722,8 +735,8 @@ export class Simulation {
     const n = this.cellCount;
     const atm = this.scenario.atmosphere;
     const atmT = celsiusToKelvin(atm.temperatureC);
-    const pre = new Float64Array(n);
-    const capacity = new Float64Array(n);
+    const { pre, capacity, diagonal, gauge, rhs, residualVector, preconditioned, direction, product,
+      conductanceX, conductanceY, conductanceZ } = this.work;
     for (let i = 0; i < n; i++) {
       pre[i] = this.totalGasAt(i);
       capacity[i] = this.gasVolume(i) / (R * this.temperature[i]);
@@ -742,26 +755,52 @@ export class Simulation {
     // The implicit gas-storage equation is symmetric positive definite:
     // C_i (p_i - p*_i) + dt sum_f g_f (p_i - p_neighbor) = 0.
     // Atmospheric boundary pressures are fixed. Solve for gauge pressure with
-    // Jacobi-preconditioned conjugate gradients; local Gauss-Seidel converges
-    // prohibitively slowly on the default high-conductance 3-D grid.
-    const diagonal = capacity.slice();
+    // conjugate gradients and a symmetric Gauss-Seidel preconditioner.
+    // This changes only the linear solver, not the storage or Darcy equation.
+    diagonal.set(capacity);
     for (const f of this.faces) {
       const conductance = dt * f.g;
       diagonal[f.a] += conductance;
-      if (f.b >= 0) diagonal[f.b] += conductance;
+      if (f.b >= 0) {
+        diagonal[f.b] += conductance;
+        if (f.axis === 0) conductanceX[f.a] = conductance;
+        else if (f.axis === 1) conductanceY[f.a] = conductance;
+        else conductanceZ[f.a] = conductance;
+      }
     }
-    const gauge = new Float64Array(n);
-    const rhs = new Float64Array(n);
-    const residualVector = new Float64Array(n);
-    const preconditioned = new Float64Array(n);
-    const direction = new Float64Array(n);
-    const product = new Float64Array(n);
     const applyMatrix = (input: Float64Array, output: Float64Array): void => {
-      for (let i = 0; i < n; i++) output[i] = capacity[i] * input[i];
-      for (const f of this.faces) {
-        const flux = dt * f.g * (input[f.a] - (f.b >= 0 ? input[f.b] : 0));
-        output[f.a] += flux;
-        if (f.b >= 0) output[f.b] -= flux;
+      const layerSize = this.nx * this.ny;
+      for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = diagonal[i] * input[i];
+        if (x > 0) value -= conductanceX[i - 1] * input[i - 1];
+        if (x + 1 < this.nx) value -= conductanceX[i] * input[i + 1];
+        if (y > 0) value -= conductanceY[i - this.nx] * input[i - this.nx];
+        if (y + 1 < this.ny) value -= conductanceY[i] * input[i + this.nx];
+        if (z > 0) value -= conductanceZ[i - layerSize] * input[i - layerSize];
+        if (z + 1 < this.nz) value -= conductanceZ[i] * input[i + layerSize];
+        output[i] = value;
+      }
+    };
+    // M = (D + L) D^-1 (D + U) is symmetric positive definite for this
+    // positive diagonal. The two ordered sweeps apply M^-1 to a residual.
+    const precondition = (input: Float64Array, output: Float64Array): void => {
+      const layerSize = this.nx * this.ny;
+      for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = input[i];
+        if (x > 0) value += conductanceX[i - 1] * output[i - 1];
+        if (y > 0) value += conductanceY[i - this.nx] * output[i - this.nx];
+        if (z > 0) value += conductanceZ[i - layerSize] * output[i - layerSize];
+        output[i] = value / diagonal[i];
+      }
+      for (let z = this.nz - 1; z >= 0; z--) for (let y = this.ny - 1; y >= 0; y--) for (let x = this.nx - 1; x >= 0; x--) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = 0;
+        if (x + 1 < this.nx) value += conductanceX[i] * output[i + 1];
+        if (y + 1 < this.ny) value += conductanceY[i] * output[i + this.nx];
+        if (z + 1 < this.nz) value += conductanceZ[i] * output[i + layerSize];
+        output[i] += value / diagonal[i];
       }
     };
     for (let i = 0; i < n; i++) {
@@ -773,10 +812,12 @@ export class Simulation {
     let rz = 0;
     for (let i = 0; i < n; i++) {
       residualVector[i] = rhs[i] - product[i];
-      preconditioned[i] = residualVector[i] / diagonal[i];
+      residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
+    }
+    precondition(residualVector, preconditioned);
+    for (let i = 0; i < n; i++) {
       direction[i] = preconditioned[i];
       rz += residualVector[i] * preconditioned[i];
-      residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
     }
     let iterations = 0;
     const tolerancePa = 1e-5;
@@ -794,10 +835,10 @@ export class Simulation {
       residual = 0;
       let nextRz = 0;
       for (let i = 0; i < n; i++) {
-        preconditioned[i] = residualVector[i] / diagonal[i];
-        nextRz += residualVector[i] * preconditioned[i];
         residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
       }
+      precondition(residualVector, preconditioned);
+      for (let i = 0; i < n; i++) nextRz += residualVector[i] * preconditioned[i];
       iterations++;
       if (residual <= tolerancePa) break;
       const beta = nextRz / rz;
@@ -848,7 +889,8 @@ export class Simulation {
     const atm = this.scenario.atmosphere;
     // A static pressure field is valid only for this step; subcycle fractions for positivity.
     let maxTurnover = 0;
-    const outgoing = new Float64Array(n);
+    const outgoing = this.work.outgoing;
+    outgoing.fill(0);
     for (const f of this.faces) {
       const pb = f.b >= 0 ? this.pressure[f.b] : atm.pressurePa;
       const flux = f.g * (this.pressure[f.a] - pb);
@@ -862,9 +904,7 @@ export class Simulation {
       return;
     }
     const subDt = dt / substeps;
-    const deltas: Record<Species, Float64Array> = {
-      oxygen: new Float64Array(n), co2: new Float64Array(n), background: new Float64Array(n), vapor: new Float64Array(n),
-    };
+    const deltas = this.work.deltas;
     for (let sub = 0; sub < substeps; sub++) {
       for (const species of SPECIES) deltas[species].fill(0);
       for (const f of this.faces) {

@@ -69,11 +69,11 @@ export const OVERLAY_INFO: Record<Overlay, { label: string; unit: string; min: n
   mobility: { label: 'Effective gas diffusivity', unit: 'log₁₀(m²/s)', min: -9, max: -4, field: 'effectiveGasDiffusivityM2S', log: true },
 }
 
-function colorAt(t: number) {
+function colorAt(t: number, target = new THREE.Color()) {
   const v = THREE.MathUtils.clamp(t, 0, 1)
-  if (v < 0.38) return palette.cool.clone().lerp(palette.mid, v / 0.38)
-  if (v < 0.72) return palette.mid.clone().lerp(palette.warm, (v - 0.38) / 0.34)
-  return palette.warm.clone().lerp(palette.hot, (v - 0.72) / 0.28)
+  if (v < 0.38) return target.copy(palette.cool).lerp(palette.mid, v / 0.38)
+  if (v < 0.72) return target.copy(palette.mid).lerp(palette.warm, (v - 0.38) / 0.34)
+  return target.copy(palette.warm).lerp(palette.hot, (v - 0.72) / 0.28)
 }
 
 function valueFor(frame: Frame, overlay: Overlay, index: number, ambientPa = 101325) {
@@ -282,6 +282,9 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
   const ny = grid?.ny ?? 0
   const nz = grid?.nz ?? 0
   const n = horizontal ? nx * ny : sectionY ? ny * nz : nx * nz
+  const dxM = grid?.dxM ?? 0
+  const dyM = grid?.dyM ?? 0
+  const dzM = grid?.dzM ?? 0
   const selected = horizontal ? Math.min(nz - 1, Math.max(0, Math.round((1 - slice) * (nz - 1) / 2))) : sectionY ? Math.min(nx - 1, Math.max(0, Math.round((slice + 1) * (nx - 1) / 2))) : Math.min(ny - 1, Math.max(0, Math.round((slice + 1) * (ny - 1) / 2)))
   const info = OVERLAY_INFO[overlay]
   const extent = useMemo(() => {
@@ -296,16 +299,14 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
     return Number.isFinite(lo) && hi > lo ? [lo, hi] : [info.min, info.max]
   }, [snapshot, fixedScale, info, overlay, scenario?.atmosphere?.pressurePa])
   useEffect(() => {
-    if (!ref.current || !snapshot || !grid || !n) return
+    if (!ref.current || !n) return
     const matrix = new THREE.Object3D()
-    const { dxM, dyM, dzM } = grid
     const half = W / 2
     for (let q = 0; q < n; q++) {
       let i: number; let j: number; let k: number
       if (horizontal) { i = q % nx; j = Math.floor(q / nx); k = selected }
       else if (sectionY) { j = q % ny; k = Math.floor(q / ny); i = selected }
       else { i = q % nx; k = Math.floor(q / nx); j = selected }
-      const index = (k * ny + j) * nx + i
       const x = -half + (i + 0.5) * dxM
       const z = -half + (j + 0.5) * dyM
       const y = -(k + 0.5) * dzM
@@ -314,13 +315,25 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
       matrix.scale.set(horizontal ? dxM * 0.96 : sectionY ? 0.032 : dxM * 0.96, horizontal ? 0.032 : dzM * 0.96, horizontal ? dyM * 0.96 : sectionY ? dyM * 0.96 : 0.032)
       matrix.updateMatrix()
       ref.current.setMatrixAt(q, matrix.matrix)
-      const value = valueFor(snapshot, overlay, index, Number(scenario?.atmosphere?.pressurePa ?? 101325))
-      const t = (value - extent[0]) / Math.max(1e-12, extent[1] - extent[0])
-      ref.current.setColorAt(q, colorAt(t))
     }
     ref.current.instanceMatrix.needsUpdate = true
+  }, [n, horizontal, sectionY, nx, ny, nz, selected, dxM, dyM, dzM])
+  useEffect(() => {
+    if (!ref.current || !snapshot || !n) return
+    const color = new THREE.Color()
+    const ambientPa = Number(scenario?.atmosphere?.pressurePa ?? 101325)
+    for (let q = 0; q < n; q++) {
+      let i: number; let j: number; let k: number
+      if (horizontal) { i = q % nx; j = Math.floor(q / nx); k = selected }
+      else if (sectionY) { j = q % ny; k = Math.floor(q / ny); i = selected }
+      else { i = q % nx; k = Math.floor(q / nx); j = selected }
+      const index = (k * ny + j) * nx + i
+      const value = valueFor(snapshot, overlay, index, ambientPa)
+      const t = (value - extent[0]) / Math.max(1e-12, extent[1] - extent[0])
+      ref.current.setColorAt(q, colorAt(t, color))
+    }
     if (ref.current.instanceColor) ref.current.instanceColor.needsUpdate = true
-  }, [snapshot, grid, n, horizontal, sectionY, nx, ny, nz, selected, overlay, extent, scenario?.atmosphere?.pressurePa])
+  }, [snapshot, n, horizontal, sectionY, nx, ny, selected, overlay, extent, scenario?.atmosphere?.pressurePa])
   if (!snapshot || !grid || !n) return null
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     if (event.instanceId === undefined) return
