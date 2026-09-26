@@ -1,5 +1,13 @@
 # Build status and handoff
 
+## Desktop release 0.5.0 (2026-09-26)
+
+Built from `65b5c71beebb7af2951bd487a532d98ce46a504e`: universal Mac DMG/ZIP, Windows x64/ARM64 ZIPs and Linux x64/ARM64 tarballs. The manifest and checksum file accompany [the private GitHub release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.5.0); local copies are in `~/Downloads/Zombie Fire Sim/v0.5.0/`. [Install and launch](INSTALL.md).
+
+The Mac app is installed and tested on the user's M3 Pro, including direct workspace launch, a numerical step, current-inventory event mechanics and animated thermal layers. Archive and application integrity checks passed. Mac signing is ad-hoc, not notarized; Windows/Linux are portable archives. All 91 tests, typecheck, lint and production builds pass on all three OS runners. Later commits add desktop smoke checks and documentation without changing the packaged app. [Exact verification and platform limitations](VALIDATION_STATUS.md).
+
+All fetched remote feature branches remain included in main. The independently modified Stage 2 Blender file is preserved and excluded. Model assumptions and experimental-validation gaps remain explicit; the interface and numerical improvements do not establish field-predictive physics.
+
 ## Physics consistency review (2026-09-26, version 0.5.0)
 
 New scenarios use consistent molecular masses for the cellulose oxidation surrogate (`numericalRevision: 2`). Historical imports without this field retain their previous reaction yields. The explicit thermal timestep now includes surface/bottom heat exchange and dry-ice contact conductances. Actual pressure is checked again after species transport, with rollback if it leaves the configured range.
