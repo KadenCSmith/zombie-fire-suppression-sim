@@ -4,7 +4,7 @@ import { runFastEvent } from '../fastEvent'
 import { SoilMechanics, type MechanicsResolution } from '../mechanics/model'
 import { ContinuumMechanics } from '../mechanics/continuum'
 import type { FastEventRun } from '../fastEvent'
-import type { Snapshot } from '../sim/types'
+import type { Snapshot, MechanicsMassGrid } from '../sim/types'
 import type { SolverCommand, SolverResponse } from './protocol'
 
 const scope = self as unknown as {
@@ -24,6 +24,7 @@ let runActive = false
 let pacedUntilTimeSeconds = 0
 let lastPaceWallMs = 0
 let gasEvent: FastEventRun | null = null
+let eventMass: MechanicsMassGrid | null = null
 let mechanics: SoilMechanics | null = null
 let continuum: ContinuumMechanics | null = null
 let mechanicsGeneration = 0
@@ -31,9 +32,9 @@ let mechanicsFrameIndex = 0
 let mechanicsStartWallMs = 0
 
 function beginMechanics(resolution: MechanicsResolution) {
-  if (!simulation || !gasEvent) throw new Error('Compute a gas event before starting mechanics.')
+  if (!simulation || !gasEvent || !eventMass) throw new Error('Compute a gas event before starting mechanics.')
   mechanicsGeneration++
-  mechanics = new SoilMechanics(simulation.scenario, gasEvent, resolution)
+  mechanics = new SoilMechanics(simulation.scenario, gasEvent, resolution, eventMass)
   mechanicsFrameIndex = 0
   mechanicsStartWallMs = performance.now()
   runMechanicsChunk(mechanicsGeneration)
@@ -151,7 +152,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
   try {
     if (command.type === 'init') {
       runGeneration++
-      mechanicsGeneration++; gasEvent = null; mechanics = null
+      mechanicsGeneration++; gasEvent = null; eventMass = null; mechanics = null
       continuum = null
       runActive = false
       simulation = new Simulation(command.scenario)
@@ -159,7 +160,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
       emitSnapshot(simulation.snapshot())
     } else if (command.type === 'dispose') {
       runGeneration++
-      mechanicsGeneration++; gasEvent = null; mechanics = null
+      mechanicsGeneration++; gasEvent = null; eventMass = null; mechanics = null
       continuum = null
       runActive = false
       simulation = null
@@ -193,6 +194,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
         if (command.convertRemainingDryIce && simulation.dryIceMassKg > 0) {
           emitSnapshot(simulation.convertRemainingDryIce())
         }
+        eventMass = simulation.mechanicsMassState()
         gasEvent = runFastEvent(simulation.scenario, simulation.snapshot(), command.options)
         scope.postMessage({ type: 'fastEvent', run: gasEvent })
         if (gasEvent.status === 'complete') beginMechanics(4)

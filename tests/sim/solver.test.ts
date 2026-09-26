@@ -276,9 +276,9 @@ describe('reduced coupled fields', () => {
     const co2ProducedKg = (sum(after.arrays.co2) - sum(before.arrays.co2)) * 0.0440095;
     const vaporProducedKg = (sum(after.arrays.vapor) - sum(before.arrays.vapor)) * 0.01801528;
     expect(fuelConsumed).toBeGreaterThan(0);
-    expect(oxygenConsumedKg).toBeCloseTo(fuelConsumed * 192 / 162, 7);
-    expect(co2ProducedKg).toBeCloseTo(fuelConsumed * 264 / 162, 7);
-    expect(vaporProducedKg).toBeCloseTo(fuelConsumed * 90 / 162, 7);
+    expect(oxygenConsumedKg).toBeCloseTo(fuelConsumed * 6 * 0.031998 / (6 * 0.0440095 + 5 * 0.01801528 - 6 * 0.031998), 7);
+    expect(co2ProducedKg).toBeCloseTo(fuelConsumed * 6 * 0.0440095 / (6 * 0.0440095 + 5 * 0.01801528 - 6 * 0.031998), 7);
+    expect(vaporProducedKg).toBeCloseTo(fuelConsumed * 5 * 0.01801528 / (6 * 0.0440095 + 5 * 0.01801528 - 6 * 0.031998), 7);
     expect(oxygenConsumedKg + fuelConsumed).toBeCloseTo(co2ProducedKg + vaporProducedKg, 7);
     expect(Math.abs(sim.diagnostics.cumulativeReactionHeatJ - fuelConsumed * s.model.heatOfCombustionJkg)
       / sim.diagnostics.cumulativeReactionHeatJ).toBeLessThan(1e-9);

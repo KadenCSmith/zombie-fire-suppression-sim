@@ -1,5 +1,14 @@
 # Verification and validation status
 
+## Physics consistency review (2026-09-26, version 0.5.0)
+
+New scenarios use consistent molecular masses for the cellulose oxidation surrogate (`numericalRevision: 2`). Historical imports without this field retain their previous reaction yields. The explicit thermal timestep now includes surface/bottom heat exchange and dry-ice contact conductances. Actual pressure is checked again after species transport, with rollback if it leaves the configured range.
+
+Short-event vertical mechanics now receives the current finite-volume solid and liquid inventories at the event time. Exact box-overlap integration conserves mass across nonaligned meshes and respects the already resolved peat geometry, remaining fuel, water and supplemental roots. This replaces independent geometry classification and initial-density loading. Mechanics remains one-way, with assumed stiffness and nearest-shell pressure loading.
+
+The six added tests cover strong Robin cooling, reaction stoichiometry and checkpoint continuation, conservative mesh transfer, current inventories, and rejected invalid mass. Typecheck, lint and all **91 tests in 13 files** passed. These are numerical checks, not experimental validation. Packaging and native release checks are recorded separately below when completed.
+
+
 ## Research materials and Developer tools (2026-09-26, version 0.4.0)
 
 Added three research menus with 12 composition profiles, a separate Developer tab with 94 editable numeric properties in the default scenario, and an applied-value/source export. New scenarios use the reviewed heat-storage/sublimation inputs and mass-fraction peat-density mixing; legacy material coefficients remain available for older schema-1 scenarios. Slow transport, radial gas, reduced vertical mechanics and FEM read the configured properties. Wet mechanics mass and its stable timestep were corrected; FEM now rejects a non-finite Poisson ratio. Scope and limitations are recorded in [Material evidence and ASCE citations](MATERIAL_EVIDENCE_ASCE.md) and [Research profiles](RESEARCH_PROFILES.md).

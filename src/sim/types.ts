@@ -152,6 +152,8 @@ export interface PathwayConfig {
 }
 
 export interface Scenario {
+  /** Revision 2 uses internally consistent molar reaction yields; absent = historical yields. */
+  numericalRevision?: 1 | 2;
   researchSelection?: ResearchSelection;
   /** Optional for legacy imports; recorded in every new scenario and checkpoint. */
   materialProperties?: Partial<MaterialProperties>;
@@ -331,4 +333,12 @@ export interface SerializedSimulation {
   events: OperationalEvent[];
   diagnostics: Diagnostics;
   arrays: Record<string, number[]>;
+}
+
+/** Double-precision current solid + liquid inventory for one-way mechanics loading. */
+export interface MechanicsMassGrid {
+  timeSeconds: number;
+  nx: number; ny: number; nz: number;
+  widthM: number; lengthM: number; depthM: number;
+  massKg: Float64Array;
 }

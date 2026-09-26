@@ -1,15 +1,14 @@
 import { resolveMaterials, peatPorosity, type MaterialProperties } from './materials';
 import { celsiusToKelvin, diameterFromMass, validateScenario } from './scenario';
-import type { Diagnostics, OperationalEvent, ProbeSample, Scenario, SerializedSimulation, Snapshot, SnapshotFields } from './types';
+import type { Diagnostics, OperationalEvent, ProbeSample, Scenario, SerializedSimulation, Snapshot, SnapshotFields, MechanicsMassGrid } from './types';
 
 // Reduced-model constants. Values and validity limits are documented in docs/PHYSICS_MODEL.md.
 const R = 8.314462618; // J mol^-1 K^-1
 const CO2_MOLAR_MASS = 0.0440095; // kg mol^-1
 const O2_MOLAR_MASS = 0.031998; // kg mol^-1
 const H2O_MOLAR_MASS = 0.01801528; // kg mol^-1
-const O2_PER_FUEL_KG = 192 / 162; // C6H10O5 + 6 O2 -> 6 CO2 + 5 H2O
-const CO2_PER_FUEL_KG = 264 / 162;
-const H2O_PER_FUEL_KG = 90 / 162;
+// C6H10O5 + 6 O2 -> 6 CO2 + 5 H2O. Use the same molar masses as the inventories.
+const FUEL_MOLAR_MASS = 6 * CO2_MOLAR_MASS + 5 * H2O_MOLAR_MASS - 6 * O2_MOLAR_MASS;
 
 type Species = 'oxygen' | 'co2' | 'background' | 'vapor';
 const SPECIES: Species[] = ['oxygen', 'co2', 'background', 'vapor'];
@@ -106,6 +105,8 @@ export class Simulation {
   private dryDensity: Float64Array;
   private solidHeatCapacity: Float64Array;
   private thermalConductivity: Float64Array;
+  private thermalLoss: Float64Array;
+  private readonly reactionYields: { oxygen: number; co2: number; vapor: number };
   private porosity: Float64Array;
   private intrinsicH: Float64Array;
   private intrinsicV: Float64Array;
@@ -148,6 +149,9 @@ export class Simulation {
     if (!result.valid) throw new Error(`Invalid scenario: ${result.errors.join(' ')}`);
     this.scenario = JSON.parse(JSON.stringify(scenario)) as Scenario;
     this.materials = resolveMaterials(this.scenario);
+    this.reactionYields = this.scenario.numericalRevision === 2
+      ? { oxygen: 6 * O2_MOLAR_MASS / FUEL_MOLAR_MASS, co2: 6 * CO2_MOLAR_MASS / FUEL_MOLAR_MASS, vapor: 5 * H2O_MOLAR_MASS / FUEL_MOLAR_MASS }
+      : { oxygen: 192 / 162, co2: 264 / 162, vapor: 90 / 162 };
     const d = this.scenario.domain;
     this.nx = d.nx; this.ny = d.ny; this.nz = d.nz;
     this.dx = d.widthM / d.nx; this.dy = d.lengthM / d.ny; this.dz = d.depthM / d.nz;
@@ -158,7 +162,7 @@ export class Simulation {
     this.background = array(); this.vapor = array(); this.fuel = array(); this.water = array();
     this.mineral = array(); this.rootFuel = array(); this.reactionRate = array();
     this.materialClass = new Uint8Array(this.cellCount);
-    this.dryDensity = array(); this.solidHeatCapacity = array(); this.thermalConductivity = array();
+    this.dryDensity = array(); this.solidHeatCapacity = array(); this.thermalConductivity = array(); this.thermalLoss = array();
     this.porosity = array(); this.intrinsicH = array(); this.intrinsicV = array();
     this.effectiveH = array(); this.effectiveV = array(); this.effectiveDiffusivity = array();
     this.peatMask = array(); this.pressure = array(); this.vx = array(); this.vy = array(); this.vz = array();
@@ -182,6 +186,7 @@ export class Simulation {
       throw new Error('Initial liquid water is below 273.15 K; freezing and thawing are not modeled.');
     }
     this.buildFaces();
+    this.refreshThermalConductances();
     this.sourceCells = this.makeSourceWeights();
     this.initialGasMol = this.totalGasMol();
     for (const species of SPECIES) {
@@ -354,11 +359,19 @@ export class Simulation {
   }
 
   private refreshThermalConductances(): void {
+    this.thermalLoss.fill(0);
     for (const face of this.faces) {
       if (face.b >= 0) {
         face.thermalConductance = harmonic(this.thermalConductivity[face.a], this.thermalConductivity[face.b])
           * face.area / face.distance;
+        this.thermalLoss[face.a] += face.thermalConductance;
+        this.thermalLoss[face.b] += face.thermalConductance;
       }
+    }
+    const a = this.scenario.atmosphere, area = this.dx * this.dy;
+    for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+      this.thermalLoss[this.idx(x, y, 0)] += a.surfaceHeatTransferWm2K * area;
+      this.thermalLoss[this.idx(x, y, this.nz - 1)] += a.bottomHeatTransferWm2K * area;
     }
   }
 
@@ -498,6 +511,8 @@ export class Simulation {
     for (let i = 0; i < this.cellCount; i++) {
       maxAlpha = Math.max(maxAlpha, this.thermalConductivity[i] * this.cellVolume / this.cellCapacity(i));
       maxDiff = Math.max(maxDiff, this.effectiveDiffusivity[i]);
+      // The Fourier bound alone omits Robin boundary losses and heterogeneous face sums.
+      if (this.thermalLoss[i] > 0) dt = Math.min(dt, 0.8 * this.cellCapacity(i) / this.thermalLoss[i]);
     }
     const inverseSquaredSum = 1 / this.dx ** 2 + 1 / this.dy ** 2 + 1 / this.dz ** 2;
     // Explicit 3D diffusion stability requires dt <= 1/(2 alpha sum(1/dx²)).
@@ -505,6 +520,12 @@ export class Simulation {
     if (this.dryIceMassKg > 0) {
       const radius = diameterFromMass(this.dryIceMassKg, source.densityKgM3) / 2;
       const area = 4 * Math.PI * radius * radius;
+      const contact = source.contactConductanceWm2K * area;
+      for (const { i, weight } of this.sourceCells) {
+        if (contact > 0) dt = Math.min(dt, 0.8 * this.cellCapacity(i) / (this.thermalLoss[i] + contact * weight));
+      }
+      if (contact > 0 && this.dryIceTemperatureK < this.materials.co2SublimationK - 1e-8)
+        dt = Math.min(dt, 0.8 * this.dryIceMassKg * this.materials.co2SolidHeatCapacityJKgK / contact);
       let weightedSoilTemperature = 0;
       for (const { i, weight } of this.sourceCells) weightedSoilTemperature += weight * this.temperature[i];
       const incomingPower = this.heaterPowerW + source.contactConductanceWm2K * area
@@ -695,25 +716,25 @@ export class Simulation {
         const arrhenius = Math.exp(-model.activationEnergyJMol / R * (1 / temp - 1 / model.referenceTemperatureK));
         // The bounded per-step conversion removes explicit reaction stiffness.
         const kineticFuelKg = this.fuel[i] * (1 - Math.exp(-Math.min(50, model.smolderRateS * arrhenius * oxygenFactor * dt)));
-        const oxygenLimitedFuelKg = this.oxygen[i] * O2_MOLAR_MASS / O2_PER_FUEL_KG;
+        const oxygenLimitedFuelKg = this.oxygen[i] * O2_MOLAR_MASS / this.reactionYields.oxygen;
         const reactedKg = Math.min(this.fuel[i], kineticFuelKg, oxygenLimitedFuelKg);
         if (reactedKg > 0) reactingCellCount++;
         const rootReactedKg = reactedKg * this.rootFuel[i] / this.fuel[i];
         this.rootFuel[i] -= rootReactedKg;
         this.reactionRate[i] = reactedKg / dt;
         this.fuel[i] -= reactedKg;
-        this.oxygen[i] -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
-        this.co2[i] += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
-        this.vapor[i] += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
-        this.cumulativeSpeciesSourceMol.oxygen -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
-        this.cumulativeSpeciesSourceMol.co2 += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
-        this.cumulativeSpeciesSourceMol.vapor += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
+        this.oxygen[i] -= reactedKg * this.reactionYields.oxygen / O2_MOLAR_MASS;
+        this.co2[i] += reactedKg * this.reactionYields.co2 / CO2_MOLAR_MASS;
+        this.vapor[i] += reactedKg * this.reactionYields.vapor / H2O_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.oxygen -= reactedKg * this.reactionYields.oxygen / O2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.co2 += reactedKg * this.reactionYields.co2 / CO2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.vapor += reactedKg * this.reactionYields.vapor / H2O_MOLAR_MASS;
         const heatReleasedJ = reactedKg * model.heatOfCombustionJkg;
         heatJ[i] += heatReleasedJ;
         reactionHeatJ += heatReleasedJ;
         this.diagnostics.cumulativeFuelConsumedKg += reactedKg;
         this.diagnostics.cumulativeRootFuelConsumedKg += rootReactedKg;
-        this.cumulativeGasSourceMol += reactedKg * (-O2_PER_FUEL_KG / O2_MOLAR_MASS + CO2_PER_FUEL_KG / CO2_MOLAR_MASS + H2O_PER_FUEL_KG / H2O_MOLAR_MASS);
+        this.cumulativeGasSourceMol += reactedKg * (-this.reactionYields.oxygen / O2_MOLAR_MASS + this.reactionYields.co2 / CO2_MOLAR_MASS + this.reactionYields.vapor / H2O_MOLAR_MASS);
       }
       if (temp > model.evaporationOnsetTemperatureK && this.water[i] > 0 && model.evaporationRateS > 0) {
         const ramp = clamp((temp - model.evaporationOnsetTemperatureK) / (model.boilingTemperatureK - model.evaporationOnsetTemperatureK), 0, 1);
@@ -883,7 +904,11 @@ export class Simulation {
       }
     }
     this.transportSpecies(dt);
-    for (let i = 0; i < n; i++) this.pressure[i] = this.totalGasAt(i) / capacity[i];
+    for (let i = 0; i < n; i++) {
+      this.pressure[i] = this.totalGasAt(i) / capacity[i];
+      if (!Number.isFinite(this.pressure[i]) || this.pressure[i] < this.scenario.model.minPressurePa || this.pressure[i] > this.scenario.model.maxPressurePa)
+        this.pause('validity-paused', 'Transported gas inventory left the supported pore-pressure range.');
+    }
   }
 
   private transportSpecies(dt: number): void {
@@ -986,6 +1011,12 @@ export class Simulation {
       this.pause('numerical-paused', 'A conservation residual became non-finite.');
       this.diagnostics.sourcePressureLoadStatus = 'outside-validity';
     }
+  }
+
+  mechanicsMassState(): MechanicsMassGrid {
+    const massKg = new Float64Array(this.cellCount);
+    for (let i = 0; i < this.cellCount; i++) massKg[i] = this.mineral[i] + this.fuel[i] + this.water[i];
+    return { ...this.scenario.domain, timeSeconds: this.timeSeconds, massKg };
   }
 
   snapshot(): Snapshot {

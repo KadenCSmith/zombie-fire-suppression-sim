@@ -43,3 +43,7 @@ Plume spheres are a visual approximation. Their horizontal drift uses the local 
 ## Measurements needed for field validation
 
 Required site data include stratigraphy, in-situ dry and wet density, porosity and saturation, overburden and pore pressure before release, elastic and shear moduli versus strain, tensile and shear strengths, damping, permeability as deformation develops, pressure histories near the source, surface/subsurface displacement histories, reaction and water-loss rates, plume humidity and aerosol yield, and boundary geometry. Field comparison must also establish whether the radial gas event remains within its stated validity bounds.
+
+## Current inventory loading (version 0.5)
+
+The short-event vertical model now uses the event-time finite-volume mineral, remaining fuel (including roots) and liquid-water mass. Exact box-overlap weights transfer that inventory to the mechanics mesh and conserve its total. This supersedes older descriptions of mechanics mass reconstructed independently from initial density or axis-aligned peat boxes. The residual compares mapped mass to the source-grid inventory. Event time and domain must match. Pressure remains nearest-shell mapped and the stiffness/yield laws remain assumed; mass conservation does not validate displacements. See [physics model](PHYSICS_MODEL.md).

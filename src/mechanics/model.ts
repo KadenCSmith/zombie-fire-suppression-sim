@@ -1,6 +1,8 @@
-import { resolveMaterials, peatPorosity, type MaterialProperties } from '../sim/materials'
+import { resolveMaterials, type MaterialProperties } from '../sim/materials'
 import { validateScenario } from '../sim/scenario'
-import type { Scenario } from '../sim/types'
+import { Simulation } from '../sim/solver'
+import { transferMass } from './massTransfer'
+import type { Scenario, MechanicsMassGrid } from '../sim/types'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
 
 /** Vertical, lumped low-order elements. One material point at each prism centre. */
@@ -86,7 +88,7 @@ export class SoilMechanics {
 
   get timeSeconds() { return this.time }
 
-  constructor(scenario: Scenario, run: FastEventRun, resolution: MechanicsResolution) {
+  constructor(scenario: Scenario, run: FastEventRun, resolution: MechanicsResolution, massGrid?: MechanicsMassGrid) {
     const validation = validateScenario(scenario)
     if (!validation.valid) throw new Error(validation.errors.join(' '))
     this.materials = resolveMaterials(scenario)
@@ -99,10 +101,15 @@ export class SoilMechanics {
     const dy = scenario.domain.lengthM / resolution
     this.dz = scenario.domain.depthM / resolution
     this.area = dx * dy
-    const volume = this.area * this.dz
     this.springK = this.materials.verticalYoungsPa * this.area / this.dz
     this.shearK = this.materials.verticalShearPa * this.dz * Math.min(dx, dy) / Math.max(dx, dy)
-    this.mass = new Float64Array(count)
+    const currentMass = massGrid ?? new Simulation(scenario).mechanicsMassState()
+    if (Math.abs(currentMass.timeSeconds - run.startSolverTimeS) > 1e-8
+      || currentMass.widthM !== scenario.domain.widthM || currentMass.lengthM !== scenario.domain.lengthM || currentMass.depthM !== scenario.domain.depthM)
+      throw new Error('Mechanics mass must match the gas event time and domain.')
+    const transferred = transferMass(currentMass, resolution)
+    this.mass = transferred.mass
+    if (this.mass.some(v => v <= 0)) throw new Error('An empty mechanics element requires a different material model.')
     this.displacement = new Float64Array(count)
     this.velocity = new Float64Array(count)
     this.yielded = new Uint8Array(count)
@@ -113,20 +120,7 @@ export class SoilMechanics {
     for (let k = 0; k < resolution; k++) for (let j = 0; j < resolution; j++) for (let i = 0; i < resolution; i++) {
       const q = index(i, j, k, resolution)
       const depth = (k + 0.5) * this.dz
-      let layerDepth = 0; let densityMultiplier = 1; let saturationOffset = 0; let porosityOffset = 0
-      for (const layer of scenario.soilLayers) {
-        layerDepth += layer.thicknessM
-        if (depth <= layerDepth + 1e-9) { densityMultiplier = layer.dryDensityMultiplier; saturationOffset = layer.moistureSaturationOffset; porosityOffset = layer.porosityOffset; break }
-      }
       const x = (i + 0.5) * dx; const y = (j + 0.5) * dy
-      const peat = scenario.peatRegions.find(region =>
-        Math.abs(x - region.centerXM) <= region.sizeXM / 2 && Math.abs(y - region.centerYM) <= region.sizeYM / 2
-        && Math.abs(depth - region.centerDepthM) <= region.thicknessM / 2)
-      const dryDensity = peat?.bulkDensityKgM3 ?? scenario.soil.bulkDensityKgM3 * densityMultiplier
-      const saturation = peat?.moistureSaturation ?? Math.max(0, Math.min(1, scenario.soil.moistureSaturation + saturationOffset))
-      const porosity = peat ? peatPorosity(dryDensity, peat.organicFraction, this.materials, !scenario.materialProperties) : scenario.soil.porosity + porosityOffset
-      const bulkDensity = dryDensity + this.materials.waterDensityKgM3 * porosity * saturation
-      this.mass[q] = bulkDensity * volume
       sumMass += this.mass[q]
       const radius = Math.hypot(x - scenario.source.centerXM, y - scenario.source.centerYM, depth - scenario.source.centerDepthM)
       let nearest = 0; let distance = Infinity
@@ -160,7 +154,7 @@ export class SoilMechanics {
     this.checks = { ...this.sizing, initialMassKg: sumMass,
       initialOverburdenPa: this.overburden[index(0, 0, resolution - 1, resolution)],
       initialEffectiveStressPa: this.overburden[index(0, 0, resolution - 1, resolution)] - this.materials.verticalBiot * Math.max(0, run.frames[0].shellPressurePa[this.shellIndex[index(0, 0, resolution - 1, resolution)]] - scenario.atmosphere.pressurePa),
-      massResidualKg: sumMass - this.mass.reduce((a, b) => a + b, 0), maxMomentumResidualN: 0,
+      massResidualKg: transferred.residualKg, maxMomentumResidualN: 0,
       pressureMapMinimumPa: 0, pressureMapMaximumPa: 0, pressureWorkJ: 0, kineticEnergyJ: 0, warnings: [] }
   }
 

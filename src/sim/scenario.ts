@@ -44,6 +44,7 @@ function cloneScenario(scenario: Scenario): Scenario {
 }
 
 const DEFAULT: Scenario = {
+  numericalRevision: 2,
   materialProperties: { ...DEFAULT_MATERIALS },
   schemaVersion: SCHEMA_VERSION,
   modelId: MODEL_ID,
@@ -167,6 +168,7 @@ export function validateScenario(raw: unknown): ValidationResult {
   if (!raw || typeof raw !== 'object') return { valid: false, errors: ['Scenario must be an object.'], warnings };
   const s = raw as Partial<Scenario>;
   errors.push(...validateMaterials(s.materialProperties));
+  if (s.numericalRevision !== undefined && s.numericalRevision !== 1 && s.numericalRevision !== 2) errors.push('Unsupported numerical revision.');
   if (s.researchSelection !== undefined) {
     const selection = s.researchSelection;
     if (!selection || typeof selection !== 'object' || typeof selection.id !== 'string'
