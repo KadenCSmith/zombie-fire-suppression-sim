@@ -1,0 +1,771 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-09-26T06:08:32.576Z",
+  "baselineCommit": "371a68af76a3c83f94173b0a4a36fddf464a481b",
+  "before": {
+    "path": "work/continuum-before.ts",
+    "sha256": "6b97de412b7cbef68966e1f883892cb0f123e35c6cad3b2fd7e653bad6fd6d69"
+  },
+  "after": {
+    "path": "src/mechanics/continuum.ts",
+    "sha256": "b9153b3013b7c0d1137d0bc411ec4a1bed4bddf0c8b41873f153e36827730ada"
+  },
+  "benchmarkScriptSha256": "dacee29e997789aad37b1a12616f2816d08ecfbe503a5242be65af28c3abc809",
+  "environment": {
+    "node": "v26.8.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "osRelease": "27.0.0",
+    "cpuModel": "Apple M3 Pro",
+    "logicalCpus": 12
+  },
+  "method": {
+    "warmupsPerImplementationPerCase": 1,
+    "measuredRepetitionsPerImplementationPerCase": 3,
+    "ordering": "Alternating paired before/after runs",
+    "setup": "Fresh constructor only. Restart construction separately reported for plastic case.",
+    "solve": "Sum of solveTopTraction calls; plastic case includes load, unload, and restored unload. Checkpoint serialization/comparison excluded.",
+    "exactEquality": "Object.is for every finite numeric scalar/array entry, including signed zero; shapes and nonnumeric metadata match. Full result and checkpoint at every stage.",
+    "normalizedDifference": "|after-before| / max(1, |before|, |after|)",
+    "limitations": "Single machine and Node runtime; three repeats with other app work potentially active. No browser-wide speedup, transport timing, measured heap peak, or experimental physics validation. Payload estimates exclude JS overhead, state/history, and frame storage. No performance threshold is a test gate."
+  },
+  "totals": {
+    "numericValuesCompared": 120381,
+    "unequalNumericValues": 0,
+    "maxAbsoluteDifference": 0,
+    "maxNormalizedDifference": 0
+  },
+  "cases": [
+    {
+      "name": "uniform-4-cubed",
+      "grid": [
+        4,
+        4,
+        4
+      ],
+      "dimensionsM": [
+        6.096,
+        6.096,
+        3
+      ],
+      "material": {
+        "youngsPa": 1000000,
+        "poisson": 0.3,
+        "cohesionPa": 8000,
+        "frictionSlope": 0.35,
+        "dilationSlope": 0.05,
+        "hardeningPa": 20000
+      },
+      "bulkDensityKgM3": 1200,
+      "tractionPa": 1000,
+      "elementCount": 64,
+      "nodeCount": 125,
+      "timing": {
+        "beforeSetupMs": {
+          "median": 69.32012500000002,
+          "minimum": 23.08533399999999,
+          "maximum": 83.013375
+        },
+        "afterSetupMs": {
+          "median": 0.8334579999999505,
+          "minimum": 0.7886670000000322,
+          "maximum": 1.4887919999999895
+        },
+        "beforeSolveMs": {
+          "median": 48.668375000000026,
+          "minimum": 46.77612499999998,
+          "maximum": 49.404042000000004
+        },
+        "afterSolveMs": {
+          "median": 40.383291999999926,
+          "minimum": 39.814750000000004,
+          "maximum": 42.36933299999998
+        },
+        "setupMedianRatioBeforeOverAfter": 83.17170751256108,
+        "solveMedianRatioBeforeOverAfter": 1.205161159223971
+      },
+      "operatorPayloadEstimateBytes": {
+        "before": 884736,
+        "afterIncludingDofCache": 19968
+      },
+      "measurements": [
+        {
+          "repetition": 1,
+          "order": "before-after",
+          "before": {
+            "setupMs": 69.32012500000002,
+            "solveMs": 48.668375000000026,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "after": {
+            "setupMs": 1.4887919999999895,
+            "solveMs": 40.383291999999926,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 8764,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 2,
+          "order": "after-before",
+          "before": {
+            "setupMs": 83.013375,
+            "solveMs": 49.404042000000004,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "after": {
+            "setupMs": 0.8334579999999505,
+            "solveMs": 42.36933299999998,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 8764,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 3,
+          "order": "before-after",
+          "before": {
+            "setupMs": 23.08533399999999,
+            "solveMs": 46.77612499999998,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "after": {
+            "setupMs": 0.7886670000000322,
+            "solveMs": 39.814750000000004,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "2c09147685916288daed20a2ff448823060504682a6f258a2623161453a691b9",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              0.000001362700965628981
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 8764,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "uniform-6-cubed",
+      "grid": [
+        6,
+        6,
+        6
+      ],
+      "dimensionsM": [
+        6.096,
+        6.096,
+        3
+      ],
+      "material": {
+        "youngsPa": 1000000,
+        "poisson": 0.3,
+        "cohesionPa": 8000,
+        "frictionSlope": 0.35,
+        "dilationSlope": 0.05,
+        "hardeningPa": 20000
+      },
+      "bulkDensityKgM3": 1200,
+      "tractionPa": 1000,
+      "elementCount": 216,
+      "nodeCount": 343,
+      "timing": {
+        "beforeSetupMs": {
+          "median": 53.34154200000012,
+          "minimum": 40.823666,
+          "maximum": 54.01375000000007
+        },
+        "afterSetupMs": {
+          "median": 2.760791000000154,
+          "minimum": 2.5821249999999054,
+          "maximum": 6.963541999999961
+        },
+        "beforeSolveMs": {
+          "median": 83.74779199999989,
+          "minimum": 83.61325000000011,
+          "maximum": 84.38037500000019
+        },
+        "afterSolveMs": {
+          "median": 68.72266600000012,
+          "minimum": 67.97783400000003,
+          "maximum": 69.14691700000003
+        },
+        "setupMedianRatioBeforeOverAfter": 19.321108334530628,
+        "solveMedianRatioBeforeOverAfter": 1.2186342130557006
+      },
+      "operatorPayloadEstimateBytes": {
+        "before": 2985984,
+        "afterIncludingDofCache": 34560
+      },
+      "measurements": [
+        {
+          "repetition": 1,
+          "order": "before-after",
+          "before": {
+            "setupMs": 53.34154200000012,
+            "solveMs": 83.61325000000011,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "after": {
+            "setupMs": 2.760791000000154,
+            "solveMs": 68.72266600000012,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 29072,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 2,
+          "order": "after-before",
+          "before": {
+            "setupMs": 54.01375000000007,
+            "solveMs": 84.38037500000019,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "after": {
+            "setupMs": 6.963541999999961,
+            "solveMs": 69.14691700000003,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 29072,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 3,
+          "order": "before-after",
+          "before": {
+            "setupMs": 40.823666,
+            "solveMs": 83.74779199999989,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "after": {
+            "setupMs": 2.5821249999999054,
+            "solveMs": 67.97783400000003,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "656dd4a24c3281f6033d4352cba7ad2b294c8af9bd7fc506a5d8fa8241f8de47",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              1
+            ],
+            "forceResidualsN": [
+              7.069545515835933e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 29072,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "non-cubic-distinct-material",
+      "grid": [
+        2,
+        3,
+        2
+      ],
+      "dimensionsM": [
+        1.4,
+        2.7,
+        0.8
+      ],
+      "material": {
+        "youngsPa": 2500000,
+        "poisson": 0.22,
+        "cohesionPa": 10000000,
+        "frictionSlope": 0.35,
+        "dilationSlope": 0.05,
+        "hardeningPa": 20000
+      },
+      "bulkDensityKgM3": 950,
+      "tractionPa": 1400,
+      "elementCount": 12,
+      "nodeCount": 36,
+      "timing": {
+        "beforeSetupMs": {
+          "median": 2.2816660000000866,
+          "minimum": 2.142166999999972,
+          "maximum": 2.342875000000049
+        },
+        "afterSetupMs": {
+          "median": 0.36808300000006966,
+          "minimum": 0.34674999999992906,
+          "maximum": 0.38066700000013043
+        },
+        "beforeSolveMs": {
+          "median": 5.238458999999921,
+          "minimum": 5.14691700000003,
+          "maximum": 5.382333000000017
+        },
+        "afterSolveMs": {
+          "median": 4.488791999999876,
+          "minimum": 4.371708000000126,
+          "maximum": 4.543624999999793
+        },
+        "setupMedianRatioBeforeOverAfter": 6.1987812531403375,
+        "solveMedianRatioBeforeOverAfter": 1.1670086294932056
+      },
+      "operatorPayloadEstimateBytes": {
+        "before": 165888,
+        "afterIncludingDofCache": 14976
+      },
+      "measurements": [
+        {
+          "repetition": 1,
+          "order": "before-after",
+          "before": {
+            "setupMs": 2.2816660000000866,
+            "solveMs": 5.238458999999921,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "after": {
+            "setupMs": 0.36808300000006966,
+            "solveMs": 4.543624999999793,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 1730,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 2,
+          "order": "after-before",
+          "before": {
+            "setupMs": 2.342875000000049,
+            "solveMs": 5.382333000000017,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "after": {
+            "setupMs": 0.34674999999992906,
+            "solveMs": 4.371708000000126,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 1730,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 3,
+          "order": "before-after",
+          "before": {
+            "setupMs": 2.142166999999972,
+            "solveMs": 5.14691700000003,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "after": {
+            "setupMs": 0.38066700000013043,
+            "solveMs": 4.488791999999876,
+            "restartSetupMs": 0,
+            "restartRestoreMs": 0,
+            "fullOutputSha256": "8c769022aaec6536c7d57429388467ddd7a040e8d841cd753d132d27413469c8",
+            "restartDifference": null,
+            "nonlinearIterations": [
+              3
+            ],
+            "forceResidualsN": [
+              2.423295200060238e-7
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 1730,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "plastic-load-unload-restart",
+      "grid": [
+        1,
+        1,
+        1
+      ],
+      "dimensionsM": [
+        1,
+        1,
+        1
+      ],
+      "material": {
+        "youngsPa": 1000000,
+        "poisson": 0.3,
+        "cohesionPa": 8000,
+        "frictionSlope": 0.35,
+        "dilationSlope": 0.05,
+        "hardeningPa": 20000
+      },
+      "bulkDensityKgM3": 1200,
+      "tractionPa": 18000,
+      "unloadAndRestart": true,
+      "elementCount": 1,
+      "nodeCount": 8,
+      "timing": {
+        "beforeSetupMs": {
+          "median": 0.19770900000003166,
+          "minimum": 0.17729099999996834,
+          "maximum": 0.209416999999803
+        },
+        "afterSetupMs": {
+          "median": 0.3508750000000873,
+          "minimum": 0.32950000000005275,
+          "maximum": 1.8803330000000642
+        },
+        "beforeSolveMs": {
+          "median": 11.829124999999976,
+          "minimum": 10.966624000000365,
+          "maximum": 12.116165999999794
+        },
+        "afterSolveMs": {
+          "median": 11.770373999999947,
+          "minimum": 9.914417000000185,
+          "maximum": 11.894416999999976
+        },
+        "setupMedianRatioBeforeOverAfter": 0.5634741717135232,
+        "solveMedianRatioBeforeOverAfter": 1.0049914301788567
+      },
+      "operatorPayloadEstimateBytes": {
+        "before": 13824,
+        "afterIncludingDofCache": 13920
+      },
+      "measurements": [
+        {
+          "repetition": 1,
+          "order": "before-after",
+          "before": {
+            "setupMs": 0.19770900000003166,
+            "solveMs": 12.116165999999794,
+            "restartSetupMs": 0.20691600000009203,
+            "restartRestoreMs": 0.049250000000029104,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "after": {
+            "setupMs": 0.3508750000000873,
+            "solveMs": 11.894416999999976,
+            "restartSetupMs": 0.21345799999994597,
+            "restartRestoreMs": 0.020584000000098968,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 561,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 2,
+          "order": "after-before",
+          "before": {
+            "setupMs": 0.209416999999803,
+            "solveMs": 11.829124999999976,
+            "restartSetupMs": 0.18091700000013589,
+            "restartRestoreMs": 0.014167000000043117,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "after": {
+            "setupMs": 1.8803330000000642,
+            "solveMs": 11.770373999999947,
+            "restartSetupMs": 0.8875839999998334,
+            "restartRestoreMs": 0.019166999999924883,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 561,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        },
+        {
+          "repetition": 3,
+          "order": "before-after",
+          "before": {
+            "setupMs": 0.17729099999996834,
+            "solveMs": 10.966624000000365,
+            "restartSetupMs": 0.21450000000004366,
+            "restartRestoreMs": 0.0062499999999090505,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "after": {
+            "setupMs": 0.32950000000005275,
+            "solveMs": 9.914417000000185,
+            "restartSetupMs": 0.3708329999999478,
+            "restartRestoreMs": 0.00870800000006966,
+            "fullOutputSha256": "460e5dd3ca332fbfafe88e07a72e7bcfddb732e6f0a42cf3299516d37148a8eb",
+            "restartDifference": {
+              "numericValuesCompared": 187,
+              "unequalNumericValues": 0,
+              "maxAbsoluteDifference": 0,
+              "maxNormalizedDifference": 0
+            },
+            "nonlinearIterations": [
+              159,
+              3,
+              3
+            ],
+            "forceResidualsN": [
+              0.020639762271457585,
+              7.620525250325721e-12,
+              7.620525250325721e-12
+            ]
+          },
+          "difference": {
+            "numericValuesCompared": 561,
+            "unequalNumericValues": 0,
+            "maxAbsoluteDifference": 0,
+            "maxNormalizedDifference": 0
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@ const contentTypes = {
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
   '.wasm': 'application/wasm',
+  '.glb': 'model/gltf-binary',
 };
 
 let server;

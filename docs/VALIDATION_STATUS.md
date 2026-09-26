@@ -1,5 +1,21 @@
 # Verification and validation status
 
+## Scene studio integration (2026-09-25)
+
+The final GLB is 25,161,996 bytes, SHA-256 `7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305`. Exporting at Blender frame 66 initially exposed an exporter default that sampled the animated source at frame zero. Explicit `export_current_frame=True` corrected it. Tests now verify the source center `(-1.4, -2.19, 0)` m, 0.500 m diameter, embedded buffers/images, asset hash, triangle preservation, bounds within 1e-5 m, and safe disposal/remount of private render resources. All 1,194 primitive meshes become 23 material/role batches with all 187,582 triangles retained. The Stage 2 source SHA-256 remains `2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5`.
+
+Native Electron development inspection on this Mac displayed all four views with the correct borehole/source position, thermal overlay, surface framing and root/peat close-up. View switching preserved the chosen 14.0 s sequence position. Play/pause, chapter seeking, restart, 2× speed selection, loop enable, and label toggling responded. The numerical workspace started at zero after illustrative playback; one physical step advanced it to two minutes. A round trip through Scene studio preserved that two-minute state and its readouts. The studio remounted successfully. These observations verify the UI path, not sustained frame rate or every screen size.
+
+The animation clock and qualitative thermal shader have no connection to scientific worker inputs. Authored motion, transport tracers, and colors do not report calculated temperatures, freezing, or treatment efficacy. Web PBR materials simplify the Blender shader network. The UI completion does not approve the pending Blender rig/deformation or final-render stages.
+
+## Shared FEM operator verification (2026-09-25)
+
+The optimized continuum solver was compared with baseline `371a68af76a3c83f94173b0a4a36fddf464a481b` for 4³ and 6³ elastic bricks, a non-cubic 2 × 3 × 2 mesh with a different material, and a one-brick plastic load/unload/checkpoint sequence. All 120,381 numeric values matched exactly (maximum absolute difference zero). A permanent elastic patch test checks non-cubic cells and isolation between separately constructed material instances. Quadrature, physical laws, solve order, convergence tolerances, and plastic state remain unchanged.
+
+After one warm-up and three measured repetitions on this Mac, median setup/solve times in ms were: 4³, 69.320/48.668 → 0.833/40.383; 6³, 53.342/83.748 → 2.761/68.723; non-cubic, 2.282/5.238 → 0.368/4.489; plastic one-brick, 0.198/11.829 → 0.351/11.770. These are local case timings, not a whole-app or sustained-throughput guarantee. The reproducible script and raw output are linked from [Solver optimization review](SOLVER_OPTIMIZATION_REVIEW.md).
+
+The integrated source passed typecheck, lint, all 65 tests across ten files, and production build. Five new scene/timeline/asset tests and one new continuum regression supplement the prior 59. The build retains existing Lucide directive and large-chunk warnings; tests emit a Three.js CommonJS deprecation warning. Numerical equivalence is not experimental peat-fire validation. The [research review](RESEARCH_REVIEW_ASCE.md) documents the remaining calibration and coupled-physics work.
+
 ## Stage 2 materials, UVs and illustrative thermal layers (2026-09-25)
 
 The saved candidate reopens successfully in Blender 4.2.3. Verification compares 885 original mesh coordinate/topology/transform fingerprints and 104 animation-action fingerprints against the approved Stage 1 file. All match, as do the sphere's position and dimensions at 13 frames across the inherited timeline. All six diffuse, bump and roughness images remain packed after reopening, with sRGB diffuse maps and Non-Color data maps. The original scene and approved Stage 1 file hashes are unchanged. See [reopen_verification.json](review/material-stage2/reopen_verification.json).

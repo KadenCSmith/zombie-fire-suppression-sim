@@ -1,14 +1,16 @@
 # Zombie Fire Suppression Sim
 
-**Exploratory animation — reduced, unvalidated physics.**
+**Interactive scene studio and a separate, unvalidated scientific model.**
 
-A local macOS application for exploring a buried dry-ice source, finite heater input, peat smoldering, and slow gas/heat transport under a 20 ft × 20 ft (6.096 m × 6.096 m) grass surface. A separate bounded radial gas event drives a reduced vertical soil mechanics calculation. These reduced calculations compare assumptions and numerical behavior; they do not establish whether a field treatment would suppress a fire, fracture soil, or be safe.
+A local macOS application that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration; its colors and motion are prescribed and are not solver results.
+
+Choose **Open simulation** for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
 
 ## Run locally
 
-Extract **Zombie Fire Suppression Sim.app.zip** from the task's `outputs` folder into `~/Applications`, then open **Zombie Fire Suppression Sim.app** there. It opens its own window, needs no browser or separate Node.js installation, and works without an API key or cloud service. The app bundles the built interface and serves it to its own window through a random `127.0.0.1` port; closing the app stops that local server. The signed archive is a generated deliverable beside this source repository, not a file committed to Git. It is locally signed for this Mac and is not Apple notarized for general distribution.
+After packaging, extract **Zombie Fire Suppression Sim.app.zip** from the directory directly beside this repository into `~/Applications`, then open **Zombie Fire Suppression Sim.app** there. It opens its own window, needs no browser or separate Node.js installation, and works without an API key or cloud service. The app bundles the built interface and serves it to its own window through a random `127.0.0.1` port; closing the app stops that local server. The archive is a generated deliverable outside the source repository, not a file committed to Git. The packaging script signs it locally for this Mac; it is not Apple notarized for general distribution. See [build status](docs/BUILD_STATUS.md) for the latest recorded packaging result.
 
 The repository's [run-mac.command](run-mac.command), or `npm run mac`, opens the installed app in `~/Applications`. To rebuild the Mac app from source, install Node.js 22.12+ and npm, then run:
 
@@ -17,7 +19,7 @@ npm ci
 npm run package:mac
 ```
 
-The build places `Zombie Fire Suppression Sim.app.zip` beside this repository in `outputs`. Run this extraction command from the repository folder to keep macOS File Provider metadata out of the app bundle:
+The build places `Zombie Fire Suppression Sim.app.zip` directly in this repository's parent directory (`../Zombie Fire Suppression Sim.app.zip`). Run this extraction command from the repository folder to keep macOS File Provider metadata out of the app bundle:
 
 ```sh
 mkdir -p "$HOME/Applications"
@@ -67,6 +69,10 @@ The linked JSON files can be selected through **Import**. They carry the schema 
 
 ## Controls
 
+- **Scene studio:** select one of four views, drag to orbit, scroll to zoom, toggle labels or reset the camera. Play/pause, restart, scrub, select a chapter, set 0.5×/1×/2× speed or loop the 20-second illustration. Changing views preserves its current time. Scrubbing pauses playback; backgrounding the app pauses it. **Open simulation** enters the scientific workspace; its **Scene studio** button returns to the illustration and pauses the scientific run while retaining its current in-memory scenario and history. Studio motion does not modify the solver.
+
+The following controls belong to the **scientific workspace**:
+
 - **Setup:** choose a demonstration scenario, then use **Edit part of scenario** to show one group at a time: Dry ice and heater, Soil and peat, Smoldering and pathways, Air and boundaries, or Advanced model. Diameter and density set the initial dry-ice mass; there is no separate mass entry. Scenario edits restart the physical run after a short debounce, while heater on/off is recorded as a live operational event. **Reset settings to defaults** restores the demonstration scenario and interface settings, then starts a fresh physical run.
 - **Scene:** choose 3D orbit, top, X section, or Y section; drag to orbit and scroll to zoom. The 3D orbit shows geometry without a full-height field sheet. Top and X/Y section views show quantitative colored cells; move their slice with the clipping slider, select a field, and choose fixed or adaptive color scaling. Toggle modeled flow arrows and visible roots. Click a colored cell to place the virtual sensor.
 - **Simulation:** play/pause, take one physical solver step, reset the current run, fast-forward, or run to a chosen hour. One-, three-, and seven-day windows are available. The solver pace defaults to **30 simulated seconds per real second** and can request 120, 600, or 3600; the worker reports achieved throughput. The physical **Reset** restarts the currently selected settings, distinct from Setup's **Reset settings to defaults**. Scrub recorded checkpoints or choose a separate playback pace to inspect saved states without advancing the solver. Solver-derived smoldering power, consumed fuel, cumulative heat, and reacting cell count are shown alongside peak temperature and other readouts.
@@ -79,6 +85,7 @@ The Results panel shows remaining source mass, heater input, peak temperature, r
 
 ## What the displays mean
 
+- **Scene studio** shows the authored 8 m × 8 m Blender geometry with simplified web materials. Thermal colors, source placement, transport tracers and partial cooling are an illustrative story, with no calculated temperature scale or treatment outcome. White tracers mark an assumed route; they are not visible CO₂. The dimensions differ from the default scientific domain. The points below describe the scientific workspace.
 - The 3D soil and grass scene shows geometry; top and X/Y section views show colored values on a coarse grid beneath the surface. Their colors are display choices; CO₂ itself is not colored.
 - The buried source is shown as a volume-equivalent sphere. Its shrinking display does not resolve cavities, contact resistance, or a spherical solid interface.
 - An initial hot region sets temperature and available fuel; it is not held hot afterward. Local oxygen-dependent fuel oxidation adds modeled heat to the energy balance, while conduction, gas cooling, evaporation, and boundaries can still cool the peat. The on-screen glow follows modeled temperature and is not a separate heat source.
@@ -89,6 +96,7 @@ The Results panel shows remaining source mass, heater input, peak temperature, r
 
 ## Model limits and documents
 
+- [Scene studio](docs/SCENE_STUDIO.md): four views, animation controls, asset provenance and the boundary between illustration and calculated fields.
 - [Blender staged approval](docs/STAGED_REVIEW.md): Stage 1 approved; Stage 2 materials, soil strata, illustrative thermal overlay, and the six approval gates.
 
 The combustible fuel is represented by an uncalibrated, cellulose-like complete-oxidation surrogate. Char and ash are not modeled inventories in this release. Peat-specific kinetics, heterogeneous moisture/flow measurements, source-scale phase behavior, and experimental validation remain open work. The model stops if a configured low-speed gas or thermodynamic validity check fails; it must not be interpreted as a blast or geomechanics calculation.
@@ -98,6 +106,8 @@ The combustible fuel is represented by an uncalibrated, cellulose-like complete-
 - [Mechanics model](docs/MECHANICS_MODEL.md) and [method decision](docs/SOIL_MECHANICS_DECISION.md): vertical force balance, pressure mapping, yield, plumes, assumptions, and limits.
 - [Parameter reference](docs/PARAMETER_REFERENCE.md): bases, default values, ranges, and provenance.
 - [Sources](docs/SOURCES.md): primary references and reuse choices.
+- [Research review with ASCE citations](docs/RESEARCH_REVIEW_ASCE.md): why each source is needed, parameter decisions and unresolved evidence.
+- [Solver optimization review](docs/SOLVER_OPTIMIZATION_REVIEW.md): FEM submatrices, the finite-volume stencil and measured optimization evidence.
 - [Validation status](docs/VALIDATION_STATUS.md): what was checked and what remains unvalidated.
 - [Build status](docs/BUILD_STATUS.md): requirement-by-requirement delivery and next tasks.
 - [Physics roadmap](docs/PHYSICS_ROADMAP.md): experiments and model work needed before engineering use.

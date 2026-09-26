@@ -59,4 +59,35 @@ describe('three-dimensional brick mechanics', () => {
     expect(unloaded.accumulatedPlasticStrain.some(v => v > 0)).toBe(true)
     expect(Math.max(...Array.from(unloaded.displacementM, Math.abs))).toBeGreaterThan(0)
   })
+
+  it('keeps non-cubic geometry and distinct material instances consistent with the elastic patch solution', () => {
+    const soft = { ...DEFAULT_CONTINUUM_MATERIAL, youngsPa: 800_000, poisson: 0.22, cohesionPa: 1e8 }
+    const stiff = { ...DEFAULT_CONTINUUM_MATERIAL, youngsPa: 2_500_000, poisson: 0.37, cohesionPa: 1e9 }
+    // Construct both before solving: shared operators must never leak across instances.
+    const models = [
+      new ContinuumMechanics(2, 3, 2, 1.4, 2.7, 0.8, soft, 950),
+      new ContinuumMechanics(3, 2, 2, 2.1, 0.8, 1.6, stiff, 1450),
+    ]
+    const untouched = models[1].checkpoint()
+    for (const [index, model] of models.entries()) {
+      const traction = 1400
+      const result = model.solveTopTraction(traction)
+      const expectedVertical = -traction / model.material.youngsPa
+      const expectedHorizontal = model.material.poisson * traction / model.material.youngsPa
+      for (let element = 0; element < model.elementCount; element++) {
+        const offset = element * 6
+        expect(result.strain[offset]).toBeCloseTo(expectedHorizontal, 9)
+        expect(result.strain[offset + 1]).toBeCloseTo(expectedHorizontal, 9)
+        expect(result.strain[offset + 2]).toBeCloseTo(expectedVertical, 9)
+        expect(result.stressPa[offset + 2]).toBeCloseTo(-traction, 4)
+        for (let shear = 3; shear < 6; shear++) expect(Math.abs(result.strain[offset + shear])).toBeLessThan(1e-9)
+      }
+      expect(result.residualN).toBeLessThan(0.05)
+      expect(result.reactionN[2]).toBeCloseTo(-traction * model.widthM * model.lengthM, 3)
+      expect(result.geostaticResidualN).toBeLessThan(1e-8)
+      expect(result.geostaticBaseReactionN).toBeCloseTo(-model.bulkDensityKgM3 * 9.80665 * model.widthM * model.lengthM * model.depthM, 5)
+      expect(result.accumulatedPlasticStrain.every(value => value === 0)).toBe(true)
+      if (index === 0) expect(models[1].checkpoint()).toEqual(untouched)
+    }
+  })
 })

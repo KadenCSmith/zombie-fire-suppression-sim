@@ -1,0 +1,15 @@
+{
+  "source": "docs/review/material-stage2/Materials_Thermal_Stage_2.blend",
+  "source_sha256": "2272d17ee6d27edfebcd8a6775d266963d12f53cdf71aa1cf6876c10ea844ae5",
+  "asset": "public/models/peat-study.glb",
+  "asset_sha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+  "bytes": 25161996,
+  "selected_objects": 1179,
+  "materials": 21,
+  "source_object": "DRY ICE \u2022 \u00d8 0.500 m | vertical ballistic drop",
+  "peat_object": "Peat lens \u2022 exposed planar geological section",
+  "frame": 66,
+  "coordinate_mapping": "Blender (x,y,z) -> glTF (x,z,-y), meters",
+  "scope": "Approved geometry with simplified web PBR materials; no source edits or exported animation",
+  "texture_license": "CC0; Poly Haven Bark Brown 01 and Forrest Ground 03; see THIRD_PARTY_NOTICES.md"
+}

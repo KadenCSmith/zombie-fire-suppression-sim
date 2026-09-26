@@ -236,7 +236,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Blender review textures — CC0
+## Blender review and Scene studio textures — CC0
 
 The Stage 2 Blender review packs the diffuse, bump and roughness maps for
 [Bark Brown 01](https://polyhaven.com/a/bark_brown_01) and
@@ -246,3 +246,11 @@ via Poly Haven. Poly Haven makes its assets available under
 `docs/review/material-stage2/asset_sources.json` and in the Blender file's
 ASSET CREDITS text block. These assets provide visual surface detail; they are
 not scientific measurements or peer-reviewed evidence for thermal parameters.
+
+The app's `public/models/peat-study.glb` also embeds texture data derived from
+these assets for Scene studio. The export retains diffuse and roughness inputs
+in simplified glTF PBR materials; Blender procedural shading and bump networks
+are not reproduced in full. This use is covered by the same CC0 asset terms.
+The export source and hashes are recorded in
+`public/models/peat-study.manifest.json`. The credit does not license this
+project's original code or authored geometry; their licensing status is unchanged.

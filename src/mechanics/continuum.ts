@@ -35,7 +35,7 @@ const NODE = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0],
   [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]] as const
 const GAUSS = [-1 / Math.sqrt(3), 1 / Math.sqrt(3)]
 type Point = { B: Float64Array; weight: number; depthM: number }
-type Element = { nodes: number[]; points: Point[]; stiffness: Float64Array }
+type Element = { nodes: number[]; dofs: Int32Array; points: Point[]; stiffness: Float64Array }
 
 function elasticMatrix(m: ContinuumMaterial): Float64Array {
   const D = new Float64Array(36)
@@ -125,32 +125,38 @@ export class ContinuumMechanics {
       if (i === 0 && j === 0 && k === nz) { this.fixed[node * 3] = 1; this.fixed[node * 3 + 1] = 1 }
       if (i === nx && j === 0 && k === nz) this.fixed[node * 3 + 1] = 1
     }
+    // This instance has identical regular bricks and one elastic material. Share
+    // only their immutable operators; depth and plastic history stay per element.
+    // A heterogeneous or deformed mesh would need distinct operators.
+    const referencePoints: Array<{ B: Float64Array; weight: number; zeta: number }> = []
+    const stiffness = new Float64Array(24 * 24)
+    for (const zeta of GAUSS) for (const eta of GAUSS) for (const xi of GAUSS) {
+      const B = new Float64Array(6 * 24)
+      for (let a = 0; a < 8; a++) {
+        const sx = NODE[a][0] ? 1 : -1, sy = NODE[a][1] ? 1 : -1, sz = NODE[a][2] ? 1 : -1
+        const gx = sx * (1 + sy * eta) * (1 + sz * zeta) / (4 * dx)
+        const gy = sy * (1 + sx * xi) * (1 + sz * zeta) / (4 * dy)
+        const gz = sz * (1 + sx * xi) * (1 + sy * eta) / (4 * dz)
+        const c = a * 3
+        B[c] = gx; B[24 + c + 1] = gy; B[48 + c + 2] = gz
+        B[72 + c] = gy; B[72 + c + 1] = gx
+        B[96 + c + 1] = gz; B[96 + c + 2] = gy
+        B[120 + c] = gz; B[120 + c + 2] = gx
+      }
+      const weight = dx * dy * dz / 8
+      referencePoints.push({ B, weight, zeta })
+      for (let a = 0; a < 24; a++) for (let b = 0; b < 24; b++) {
+        let kab = 0
+        for (let r = 0; r < 6; r++) for (let s = 0; s < 6; s++) kab += B[r * 24 + a] * this.D[r * 6 + s] * B[s * 24 + b]
+        stiffness[a * 24 + b] += weight * kab
+      }
+    }
     for (let k = 0; k < nz; k++) for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
       const nodes = NODE.map(([a, b, c]) => this.node(i + a, j + b, k + c))
-      const points: Point[] = []
-      const stiffness = new Float64Array(24 * 24)
-      for (const zeta of GAUSS) for (const eta of GAUSS) for (const xi of GAUSS) {
-        const B = new Float64Array(6 * 24)
-        for (let a = 0; a < 8; a++) {
-          const sx = NODE[a][0] ? 1 : -1, sy = NODE[a][1] ? 1 : -1, sz = NODE[a][2] ? 1 : -1
-          const gx = sx * (1 + sy * eta) * (1 + sz * zeta) / (4 * dx)
-          const gy = sy * (1 + sx * xi) * (1 + sz * zeta) / (4 * dy)
-          const gz = sz * (1 + sx * xi) * (1 + sy * eta) / (4 * dz)
-          const c = a * 3
-          B[c] = gx; B[24 + c + 1] = gy; B[48 + c + 2] = gz
-          B[72 + c] = gy; B[72 + c + 1] = gx
-          B[96 + c + 1] = gz; B[96 + c + 2] = gy
-          B[120 + c] = gz; B[120 + c + 2] = gx
-        }
-        const weight = dx * dy * dz / 8
-        points.push({ B, weight, depthM: k * dz + (1 + zeta) * dz / 2 })
-        for (let a = 0; a < 24; a++) for (let b = 0; b < 24; b++) {
-          let kab = 0
-          for (let r = 0; r < 6; r++) for (let s = 0; s < 6; s++) kab += B[r * 24 + a] * this.D[r * 6 + s] * B[s * 24 + b]
-          stiffness[a * 24 + b] += weight * kab
-        }
-      }
-      this.elements.push({ nodes, points, stiffness })
+      const dofs = new Int32Array(24)
+      for (let a = 0; a < 24; a++) dofs[a] = nodes[Math.floor(a / 3)] * 3 + a % 3
+      const points = referencePoints.map(({ B, weight, zeta }) => ({ B, weight, depthM: k * dz + (1 + zeta) * dz / 2 }))
+      this.elements.push({ nodes, dofs, points, stiffness })
     }
     const gravity = new Float64Array(this.displacement.length)
     const referenceInternal = new Float64Array(this.displacement.length)
@@ -172,7 +178,7 @@ export class ContinuumMechanics {
   }
 
   private node(i: number, j: number, k: number) { return (k * (this.ny + 1) + j) * (this.nx + 1) + i }
-  private dof(element: Element, a: number) { return element.nodes[Math.floor(a / 3)] * 3 + a % 3 }
+  private dof(element: Element, a: number) { return element.dofs[a] }
 
   private multiply(x: Float64Array): Float64Array {
     const y = new Float64Array(x.length)

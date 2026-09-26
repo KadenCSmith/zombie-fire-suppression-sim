@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Activity from 'lucide-react/dist/esm/icons/activity.mjs'
 import ArrowDownToLine from 'lucide-react/dist/esm/icons/arrow-down-to-line.mjs'
 import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.mjs'
@@ -37,6 +37,7 @@ type Tab = 'setup' | 'simulation' | 'results' | 'event'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway' | 'hypothetical'
 type SimClient = ReturnType<typeof createSimulationClient>
+const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
 
 const DAY = 86400
 const OVERLAYS: Overlay[] = ['temperature', 'activity', 'material', 'oxygen', 'co2', 'pressure', 'moisture', 'fuel', 'porosity', 'permeability', 'effective-permeability', 'mobility']
@@ -189,6 +190,7 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 }
 
 function App() {
+  const [workspace, setWorkspace] = useState<'study' | 'simulation'>('study')
   const initial = useMemo(() => createDefaultScenario(), [])
   const [scenario, setScenario] = useState<Scenario>(initial)
   const [preset, setPreset] = useState<ScenarioPreset>('heated')
@@ -632,11 +634,24 @@ function App() {
   const removeLayer = (index: number) => { if (scenario.soilLayers.length <= 1) return; setPreset('custom'); setScenario((old) => { const layers = old.soilLayers.map((l) => ({ ...l })); const removed = layers.splice(index, 1)[0]; layers[Math.min(index, layers.length - 1)].thicknessM += removed.thicknessM; return { ...old, soilLayers: layers } }); setSelectedLayer(0) }
   const layer = scenario.soilLayers[selectedLayer]
 
+  const openStudy = () => {
+    pause()
+    comparisonClientRef.current?.pause()
+    setPlayback(false)
+    setFastPlaying(false)
+    setMotionPlaying(false)
+    setWorkspace('study')
+  }
+
+  if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
+    <StudyWorkspace onOpenSimulation={() => setWorkspace('simulation')} />
+  </Suspense>
+
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.2</span></small></div></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.3</span></small></div></div>
       <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
-      <div className="topbar-actions"><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
+      <div className="topbar-actions"><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>
 
     <nav className="workflow-tabs" role="tablist" aria-label="App sections">
@@ -862,7 +877,7 @@ function App() {
     </div>
 
     {(tab === 'simulation' || tab === 'results') && <footer className="timeline"><div className="transport"><button className="play-btn" type="button" onClick={playing ? pause : start} disabled={!validation.valid} aria-label={playing ? 'Pause solver' : 'Run solver'}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><IconButton title="One physical solver step" onClick={() => clientRef.current?.step()} disabled={!validation.valid || playing}><StepForward size={17} /></IconButton><IconButton title="Reset physical run" onClick={reset}><RotateCcw size={17} /></IconButton><IconButton title="Fast forward at up to 3600 simulated seconds per real second; physical solver steps remain stable" onClick={() => { setPlayback(false); setComputeRate(3600); clientRef.current?.setComputeRate(3600); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }} disabled={!validation.valid}><SkipForward size={17} /></IconButton></div><div className="timeline-main"><div className="timeline-head"><span>PHYSICAL SOLVER TIME <strong>{formatClock(time)}</strong></span><span>{progress.toFixed(0)}% of {durationDays}-day window</span></div><input className="timeline-range" type="range" min={0} max={Math.max(1, history.length - 1)} step={1} value={playback ? playbackIndex : Math.max(0, history.length - 1)} onChange={(e) => { pause(); setPlayback(true); setPlaybackIndex(Number(e.target.value)) }} aria-label="Recorded run playback scrubber" /><div className="timeline-ticks"><span>0</span><span>1d</span><span>{durationDays}d</span></div></div><div className="timeline-options"><div className="compute-rate"><label>SOLVER PACE</label><select aria-label="Target simulated seconds per wall second" value={computeRate} onChange={(e) => setComputeRate(Number(e.target.value))} title="Requested pace; actual throughput may be lower"><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div><div className="duration-pills">{[1, 3, 7].map((d) => <button key={d} type="button" className={durationDays === d ? 'active' : ''} onClick={() => setDurationDays(d)}>{d}d</button>)}</div><div className="run-to"><label>RUN TO</label><input type="number" min={0} max={durationDays * 24} step={1} value={runToHour} onChange={(e) => setRunToHour(Number(e.target.value))} /><span>h</span><button type="button" onClick={() => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(Math.min(durationDays * DAY, runToHour * 3600)) }} disabled={!validation.valid}>Go</button></div><div className="throughput">{throughput > 0 ? `${throughput.toFixed(0)} sim s / wall s` : 'Throughput measured during run'}</div></div><div className="playback-controls"><span>RECORDED PLAYBACK</span><button type="button" onClick={() => { pause(); setPlayback((v) => !v) }} disabled={history.length < 2}>{playback ? 'Pause' : 'Play'}</button><select aria-label="Recorded playback speed" value={playbackSpeed} onChange={(e) => setPlaybackSpeed(Number(e.target.value))}><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div></footer>}
-    {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.2</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manual soil-piece motion and radial shell damage; event displacement is calculated separately.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture surfaces, horizontal geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
+    {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.3</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manual soil-piece motion and radial shell damage; event displacement is calculated separately.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture surfaces, horizontal geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
   </div>
 }
 

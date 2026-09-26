@@ -1,10 +1,22 @@
 # Build status and handoff
 
+## Scene studio integration — version 0.3 (2026-09-25)
+
+The app now opens a four-view scene studio based on the Stage 2 Blender asset: soil cutaway, illustrative thermal layers, surface, and roots/peat. A shared 20-second sequence offers play/pause, timeline seeking, chapters, restart, speed, and loop controls. Camera changes are animated. The separate numerical workspace remains accessible through Open simulation and preserves its run when returning from the studio. The user expressly requested this app animation; the separate Blender Stage 3–6 review gates remain open.
+
+The portable asset retains 187,582 triangles and combines 1,194 primitive meshes into 23 render batches. No source Blender file changed. Native development checks confirmed all four views, playback, label control, and a numerical step followed by a workspace round trip. Typecheck, lint, 65 tests, and production build pass. Standalone version 0.3 package verification is the final delivery check. See [Scene studio](SCENE_STUDIO.md) and [verification details](VALIDATION_STATUS.md).
+
+## FEM operator reuse and research review (2026-09-25)
+
+Regular-brick FEM instances now share their identical elastic stiffness and strain operators and cache element degrees of freedom. The existing element submatrix method and matrix-free FV pressure stencil are retained. All 120,381 compared numeric values match the baseline exactly, including plastic unloading and checkpoint continuation. In the recorded local 4³/6³ cases, median solve times fell 17–18%; the one-brick case did not improve meaningfully. See [the implementation and measurements](SOLVER_OPTIMIZATION_REVIEW.md) and [benchmark artifact](../examples/continuumOptimizationBenchmark.json).
+
+The separate [research review with ASCE citations](RESEARCH_REVIEW_ASCE.md) explains why seven peer-reviewed studies are needed and maps their evidence to actual variables and model limits. It does not substitute unmatched laboratory coefficients into the demonstration model. Both remote feature branches were already integrated into main; no redundant merge was required.
+
 ## Staged continuation (2026-09-25)
 
 [Stage 1 geometry is approved](STAGED_REVIEW.md). [Stage 2 materials and UVs](MATERIAL_THERMAL_REVIEW.md) are ready for the user's approval, with distinct O/A/B/C strata and a separate illustrative thermal scene. The portable Blender candidate packs all six external texture maps. Geometry, original animation actions and sampled sphere motion are preserved. Five review previews were rendered and inspected. Stage 3 rig/deformation work is the next approval-gated step. The remaining final four-frame review is reserved for Stage 6.
 
-The simulator still passes all 59 tests, typecheck, lint and build. Both remote feature branches are already ancestors of main. Further solver optimization and the separate peer-reviewed-source report with ASCE citations remain pending; Stage 2 introduces no physical-model or solver changes.
+The simulator still passes all 59 tests, typecheck, lint and build. Both remote feature branches are already ancestors of main. At that stage, solver optimization and the source report were pending; they are now delivered above. Stage 2 itself introduced no physical-model or solver changes.
 
 Performance follow-up (2026-09-25): the fine-grid pressure calculation uses direct-neighbor matrix application, symmetric Gauss-Seidel preconditioning, and reusable buffers; the slice view avoids rebuilding its instance transforms on each new field snapshot. Checkpoint restoration refreshes the cached heat conductances from saved material fields. The 61 × 61 × 30 benchmark step improved from 849 ms to 569–593 ms in three individual runs; a later busy-host run took 698 ms. All 59 tests, typecheck, lint, and the production build passed on final source. Matched baseline/optimized snapshot fields agreed within 7.71 × 10⁻⁸ normalized difference in the three comparison cases. The Mac was locked during native-window inspection, so native interaction and frame rate are still open; see `VALIDATION_STATUS.md` for the measured scope and limits.
 
@@ -52,7 +64,7 @@ Status reviewed against source on 2026-09-25. “Implemented” means code exist
 | Standalone Mac app outside Git | Version 0.2 signed archive rebuilt and verified | The canonical output is `Zombie Fire Suppression Sim.app.zip`. The app has a dedicated window, custom icon, loopback-only server, isolated renderer, and embedded redistribution notices. The packaging script verified strict code signing before and after archive extraction. It is locally ad-hoc signed, not Apple notarized. The final version 0.2 native-window visual check is pending because the Mac locked; earlier source-development window checks passed. |
 | Unit/conservation/restart/numerical tests | Implemented and passed locally | Current full suite passes 41/41 in four files: 25 slow-solver, 8 short-event, 7 mechanics/plume, and 1 refinement/benchmark check. The original slow/event gates and new gravity, pressure, yield, settling, momentum, replay, plume, and resolution checks are described in `VALIDATION_STATUS.md`. |
 | Performance target near 30 fps and Apple-silicon M3 verification | Medium mechanics benchmark measured; UI FPS open | One 6³ mechanics run took 4.89 ms in a test process on the M3 Pro with 2.14 MiB process RSS growth; sustained native-window frame rate remains unmeasured. |
-| Private GitHub repository | Created at [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim) | Publish the final native packaging, UI, solver, examples, and documentation changes after native smoke. |
+| Private GitHub repository | Created at [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim) | Main contains the earlier feature branches; version 0.3 integrates the scene studio, FEM operator reuse, and research documentation. |
 
 ## Next agent task
 
