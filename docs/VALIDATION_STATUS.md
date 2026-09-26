@@ -1,5 +1,11 @@
 # Verification and validation status
 
+## Staged Blender review baseline (2026-09-25)
+
+Main `0e77f015` was checked again before new solver work: typecheck, lint and production build exited 0; 59/59 tests passed across eight files. The detailed-grid test recorded 683.63 ms for one 120 s step and 128 pressure iterations. No solver improvement is claimed by this baseline. The build retained existing Lucide directive and bundle-size warnings.
+
+The separate stage 07 Blender illustration was inspected through evaluated meshes. A strict sphere-floor check exposed a 0.180 mm mesh offset; a separate candidate centers the mesh without changing animation keys. All nine static geometry checks pass on reopening that candidate. The original scene SHA-256 is unchanged. Root/trunk and root/peat surfaces overlap; they are separate meshes, and deformation remains untested. The diagnostic script initially crashed while mutating a live collection iterator; it now snapshots the object list before mutation. Workbench export stalled in Metal, including individual-view retries. CPU Cycles then exported all three flat-color geometry previews successfully (12 samples, frame 66), and all images were inspected. These diagnostic previews do not use or approve final materials or lighting; the remaining four-frame final review is still pending. See [the approval plan and evidence](STAGED_REVIEW.md). User approval is pending at Stage 1.
+
 ## Solver and field-view performance (2026-09-25)
 
 The 3D finite-volume model retains its heat conduction, finite dry-ice source, oxidation/evaporation, ideal-gas storage, Darcy flow, four-species transport, validity guards, rollback, and conservation ledgers. The pressure solve now applies the same matrix through direct grid neighbors with a symmetric Gauss-Seidel preconditioner. Fixed material heat conductances and step work buffers are reused. The field view updates instance transforms only when grid geometry or slice changes, and reuses a color object during snapshot recoloring. These are computational changes; no material law, source term, boundary condition, or physical step limit was removed.

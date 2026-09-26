@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Staged continuation (2026-09-25)
+
+[Stage 1 static model review](STAGED_REVIEW.md) contains the editable Blender candidate, measured geometry and previews. The user requested six sequential approval stages; material, deformation, motion, camera and final-render work remain gated. The simulator baseline passes all 59 tests, typecheck, lint and build. Both remote feature branches are already ancestors of main. Further solver optimization and the peer-reviewed-source report with ASCE citations remain pending; this checkpoint introduces no physical-model changes.
+
 Performance follow-up (2026-09-25): the fine-grid pressure calculation uses direct-neighbor matrix application, symmetric Gauss-Seidel preconditioning, and reusable buffers; the slice view avoids rebuilding its instance transforms on each new field snapshot. Checkpoint restoration refreshes the cached heat conductances from saved material fields. The 61 × 61 × 30 benchmark step improved from 849 ms to 569–593 ms in three individual runs; a later busy-host run took 698 ms. All 59 tests, typecheck, lint, and the production build passed on final source. Matched baseline/optimized snapshot fields agreed within 7.71 × 10⁻⁸ normalized difference in the three comparison cases. The Mac was locked during native-window inspection, so native interaction and frame rate are still open; see `VALIDATION_STATUS.md` for the measured scope and limits.
 
 Detailed-grid follow-up: the Setup screen offers ≤10 cm volumes for the default domain (61 × 61 × 30), a material overlay, and sensor readouts of each volume's resolved properties. The fine-grid numerical test and runtime measurement are in `VALIDATION_STATUS.md`; the fast default remains available for longer exploratory runs. This preset refines the finite-volume heat/gas/fire solver, not the separate 4³ FEM mechanics benchmark.

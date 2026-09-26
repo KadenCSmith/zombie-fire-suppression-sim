@@ -1,0 +1,13 @@
+{
+  "stage": 1,
+  "approval": "pending",
+  "engine": "Cycles CPU",
+  "samples": 12,
+  "frame": 66,
+  "appearance": "Temporary flat-color geometry visualization; original materials preserved in candidate",
+  "files": {
+    "01_section.png": "507b2b2f6f920bbc4c5a85a9925a12e022af385d8c55f66dd48dbf23a81d4890",
+    "02_top.png": "7a002c3f662f20134d4eca5120d3e43262edfaf77207df2e524e47580f118f95",
+    "03_root_junction.png": "73622c5fa326c865e8f35f5a9a9cbac769c31ea3c4247ea4f77eb643158ccc41"
+  }
+}

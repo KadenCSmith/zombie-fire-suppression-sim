@@ -1,0 +1,114 @@
+{
+  "stage": "1 Static model approval",
+  "approval": "pending user review",
+  "source_file": "Dry_Ice_Peat_Study.blend",
+  "source_sha256": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+  "candidate_file": "Static_Model_Stage_1.blend",
+  "candidate_sha256": "44479114176d3aac17e414da0a59344c6f4e294b926c36b8242770f04992cd3a",
+  "sphere_local_mesh_translation_m": [
+    3.4689903259277344e-05,
+    0.001187145709991455,
+    0.0007197260856628418
+  ],
+  "blender_version": "4.2.3 LTS",
+  "frame": 66,
+  "checks": {
+    "sphere_diameter_0_50_m": true,
+    "borehole_diameter_0_75_m": true,
+    "borehole_floor_minus_2_44_m": true,
+    "sphere_floor_contact": true,
+    "positive_radial_clearance": true,
+    "peat_mesh_below_nominal_ground": true,
+    "root_trunk_surface_intersection": true,
+    "root_peat_surface_intersection": true,
+    "middle_root_rings_nominal_0_20_m": true
+  },
+  "sphere_bounds": {
+    "minimum_m": [
+      -1.649999976158142,
+      -0.2499999850988388,
+      -2.440000057220459
+    ],
+    "maximum_m": [
+      -1.149999976158142,
+      0.2499999850988388,
+      -1.940000057220459
+    ],
+    "extent_m": [
+      0.5,
+      0.4999999701976776,
+      0.5
+    ]
+  },
+  "cutter_bounds": {
+    "minimum_m": [
+      -1.774999976158142,
+      -0.375,
+      -2.440000057220459
+    ],
+    "maximum_m": [
+      -1.024999976158142,
+      0.375,
+      0.3999999761581421
+    ],
+    "extent_m": [
+      0.75,
+      0.75,
+      2.840000033378601
+    ]
+  },
+  "terrain_bounds": {
+    "minimum_m": [
+      -4.0,
+      -4.0,
+      -3.200000047683716
+    ],
+    "maximum_m": [
+      4.0,
+      4.0,
+      0.049241866916418076
+    ],
+    "extent_m": [
+      8.0,
+      8.0,
+      3.249241914600134
+    ]
+  },
+  "peat_bounds": {
+    "minimum_m": [
+      -0.31801700592041016,
+      0.0,
+      -1.2550827264785767
+    ],
+    "maximum_m": [
+      3.0960140228271484,
+      2.580709934234619,
+      -0.10859626531600952
+    ],
+    "extent_m": [
+      3.4140310287475586,
+      2.580709934234619,
+      1.1464864611625671
+    ]
+  },
+  "peat_vertices_below_nominal_ground_fraction": 1.0,
+  "radial_clearance_m": 0.125,
+  "sphere_floor_gap_m": 0.0,
+  "root_ring_mean_diameters_m": [
+    0.17030119031742755,
+    0.20036418098091222,
+    0.20009837689819687,
+    0.19975835052857036,
+    0.20958138130933726,
+    0.2596696839680101
+  ],
+  "root_trunk_intersecting_triangle_pairs": 26,
+  "root_peat_intersecting_triangle_pairs": 30,
+  "limits": [
+    "Nominal ground is z=0; this is not a local cover-depth or volume-fraction calculation.",
+    "Intersecting separate root and trunk meshes establish overlap, not a welded deformation-ready mesh.",
+    "The cutter extends above ground; its total height is not the subsurface borehole depth.",
+    "Preview colors identify geometry only; materials, UVs, motion, lighting and physics are not approved.",
+    "These are static geometry previews, not the remaining four-frame final render/review attempt."
+  ]
+}

@@ -89,6 +89,8 @@ The Results panel shows remaining source mass, heater input, peak temperature, r
 
 ## Model limits and documents
 
+- [Blender staged approval](docs/STAGED_REVIEW.md): Stage 1 geometry review, editable candidate, and the six approval gates.
+
 The combustible fuel is represented by an uncalibrated, cellulose-like complete-oxidation surrogate. Char and ash are not modeled inventories in this release. Peat-specific kinetics, heterogeneous moisture/flow measurements, source-scale phase behavior, and experimental validation remain open work. The model stops if a configured low-speed gas or thermodynamic validity check fails; it must not be interpreted as a blast or geomechanics calculation.
 
 - [Physics model](docs/PHYSICS_MODEL.md): equations, units, boundaries, numerical treatment, and diagnostics.
