@@ -23,7 +23,7 @@ import Upload from 'lucide-react/dist/esm/icons/upload.mjs'
 import Waves from 'lucide-react/dist/esm/icons/waves.mjs'
 import Zap from 'lucide-react/dist/esm/icons/zap.mjs'
 import { Scene, OVERLAY_INFO, type FastOverlay, type Overlay, type ProbeLocation, type View } from './ui/Scene'
-import { createDefaultScenario, diameterFromMass, massFromDiameter, validateScenario } from './sim'
+import { createDefaultScenario, diameterFromMass, massFromDiameter, validateScenario, SCENARIOS } from './sim'
 import { PARAMETER_REGISTRY, SOIL_PRESETS, applySoilPreset as applyPresetToScenario } from './sim/parameters'
 import type { Scenario, Snapshot, ProbeSample } from './sim/types'
 import type { FastEventRun } from './fastEvent'
@@ -35,7 +35,7 @@ import { derivePlumeSources, type PlumeSource } from './plumes/model'
 type Checkpoint = { snapshot: Snapshot; probe: ProbeSample | null }
 type Tab = 'setup' | 'simulation' | 'results' | 'event'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
-type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway' | 'hypothetical'
+type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
 
@@ -63,26 +63,9 @@ function setPath(object: any, path: string, value: unknown) {
 
 function getPath(object: any, path: string): any { return path.split('.').reduce((v, p) => v?.[p], object) }
 
-function makePreset(key: ScenarioPreset, base: Scenario): Scenario {
-  const s = clone(base)
-  s.seed = 240925
-  s.name = {
-    custom: 'Custom scenario', untreated: 'Untreated smoldering', cold: 'Dry ice · heater off',
-    heated: 'Dry ice · heater on', wet: 'Wet, low permeability', pathway: 'Preferential pathway',
-    hypothetical: 'Hypothetical altered geometry',
-  }[key]
-  s.description = 'Demonstration assumption; not calibrated against field measurements.'
-  s.illustrativeEvent = { triggeredAtS: null, intensity: 0 }
-  if (key === 'untreated') { s.source.initialMassKg = 0; s.source.enabled = false }
-  if (key === 'cold') s.source.enabled = false
-  if (key === 'heated') s.source.enabled = true
-  if (key === 'wet') { s.soil.moistureSaturation = 0.72; s.soil.intrinsicPermeabilityHorizontalM2 = 2e-13; s.soil.intrinsicPermeabilityVerticalM2 = 4e-14; s.source.enabled = true }
-  if (key === 'pathway' || key === 'hypothetical') {
-    s.pathways = [{ id: 'assumed-path-1', centerXM: 3.65, centerYM: 3.05, centerDepthM: 1.4, sizeXM: 0.28, sizeYM: 0.28, thicknessM: 2.1, rotationDeg: 0, permeabilityMultiplier: 20 }]
-  }
-  if (key === 'hypothetical') s.description = 'Assumed post-rearrangement pathway geometry. This is a separate hypothesis, not a prediction from dry ice or the illustrative motion.'
-  return s
-}
+// Use the same canonical scenarios as exports, tests and documentation.
+const PRESET_KEYS = { untreated: 'untreated', cold: 'dryIceOnly', heated: 'heatedDryIce',
+  wet: 'wetLowPermeability', pathway: 'hypotheticalPathway' } as const
 
 function asSceneFrame(snapshot: Snapshot | null) {
   if (!snapshot) return null
@@ -459,7 +442,7 @@ function App() {
 
   const selectTab = (next: Tab) => { setTab(next); setFastMode(next === 'event' && Boolean(fastRun)); if (next === 'event') setComparison(false); else setFastPlaying(false) }
 
-  const loadPreset = (key: ScenarioPreset) => { if (key === 'custom') return; setPreset(key); setScenario(makePreset(key, initial)); setOperationalEvents([]) }
+  const loadPreset = (key: ScenarioPreset) => { if (key === 'custom') return; setPreset(key); setScenario(clone(SCENARIOS[PRESET_KEYS[key]])); setOperationalEvents([]) }
   const start = () => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }
   const pause = () => { clientRef.current?.pause(); setPlaying(false) }
   const reset = () => { pause(); setError(''); clientRef.current?.init(scenario); setSnapshot(null); setHistory([]); setPlayback(false); setOperationalEvents([]); setHeaterEnabled(scenario.source.enabled); setHeaterGeneration(scenario.source.heatGenerationWm3); setBoundaryOxygenInput(scenario.atmosphere.oxygenMoleFraction); setFastRun(null); setContinuumResult(null); setFastMode(false); setFastPlaying(false); lastRecordTime.current = -Infinity }
@@ -661,7 +644,7 @@ function App() {
     <div className="workspace">
       <aside className="sidebar left-sidebar">
         <div className="panel-heading"><div><small>{tab === 'setup' ? 'MODEL INPUTS' : tab === 'simulation' ? 'RUN CONTROLS' : tab === 'results' ? 'ANALYSIS' : 'SHORT-TIME MODEL'}</small><h2>{tab === 'setup' ? 'Scenario setup' : tab === 'simulation' ? 'Explore the run' : tab === 'results' ? 'Recorded results' : 'Gas and soil event'}</h2></div><Settings2 size={18} /></div>
-        {tab === 'setup' && <><div className="scenario-select"><label htmlFor="scenario-preset">DEMONSTRATION SCENARIO</label><select id="scenario-preset" value={preset} onChange={(e) => loadPreset(e.target.value as ScenarioPreset)}><option value="custom">Custom scenario</option><option value="untreated">Untreated smoldering</option><option value="cold">Dry ice · heater off</option><option value="heated">Dry ice · heater on</option><option value="wet">Wet, low permeability</option><option value="pathway">Preferential pathway</option><option value="hypothetical">Hypothetical altered geometry</option></select><p>{scenario.description}</p></div><div className="setup-category"><label htmlFor="setup-category">EDIT PART OF SCENARIO</label><select id="setup-category" value={setupSection} onChange={(e) => setSetupSection(e.target.value as SetupSection)}><option value="source">Dry ice and heater</option><option value="ground">Soil and peat</option><option value="fire">Smoldering and pathways</option><option value="boundary">Air and boundaries</option><option value="advanced">Advanced model</option></select></div></>}
+        {tab === 'setup' && <><div className="scenario-select"><label htmlFor="scenario-preset">DEMONSTRATION SCENARIO</label><select id="scenario-preset" value={preset} onChange={(e) => loadPreset(e.target.value as ScenarioPreset)}><option value="custom">Custom scenario</option><option value="untreated">Untreated smoldering</option><option value="cold">Dry ice · heater off</option><option value="heated">Dry ice · heater on</option><option value="wet">Wet, low permeability</option><option value="pathway">Hypothetical pathway</option></select><p>{scenario.description}</p></div><div className="setup-category"><label htmlFor="setup-category">EDIT PART OF SCENARIO</label><select id="setup-category" value={setupSection} onChange={(e) => setSetupSection(e.target.value as SetupSection)}><option value="source">Dry ice and heater</option><option value="ground">Soil and peat</option><option value="fire">Smoldering and pathways</option><option value="boundary">Air and boundaries</option><option value="advanced">Advanced model</option></select></div></>}
         <div className="controls-scroll" ref={controlsScrollRef}>
           {tab === 'setup' && setupSection === 'source' && <>
             <div className="tab-intro"><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><p>Dry ice sublimates from finite stored mass. Heat is applied over a fixed numerical support volume.</p></div>

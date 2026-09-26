@@ -1,5 +1,12 @@
 # Verification and validation status
 
+## Consolidation verification (2026-09-25)
+
+After fetching all remote branches, `main` contains both `feature/soil-mechanics-plumes` (`a83d59f`) and `performance/solver-and-rendering` (`0d7654e`); no remote branch remains unmerged. Historical branches are retained as references. Removed the unused Recharts dependency and 38 installed packages. The UI now uses the canonical scenario definitions used by tests and exported examples; removed duplicate wet/pathway definitions and the redundant pathway option. The slow finite-volume, radial gas, vertical mechanics and 3D FEM modules are distinct models, not duplicate code.
+
+Typecheck, lint, 65 tests in ten files, and production build passed after cleanup. Production dependency audit reports no known vulnerabilities. Existing Three.js deprecation and Vite bundle-size warnings remain. Material evidence and Developer tools are the next integration.
+
+
 ## Final Mac package and workspace transitions (2026-09-25)
 
 Final source passes typecheck, lint, all **65/65 tests in ten files**, and production build. The version 0.3.0 macOS archive was rebuilt with 105 production dependency notices and verified with `codesign --verify --deep --strict` before archiving and again after extraction. Archive SHA-256: `740a32f51de5a0bec4214ea98b10fdd7f44ccc372946ff16d87f419dfa7b2323`. It is generated beside the repository and intentionally excluded from Git.

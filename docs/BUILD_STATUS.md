@@ -1,5 +1,12 @@
 # Build status and handoff
 
+## Branch consolidation and cleanup (2026-09-25)
+
+After fetching all remote branches, `main` contains both `feature/soil-mechanics-plumes` (`a83d59f`) and `performance/solver-and-rendering` (`0d7654e`); no remote branch remains unmerged. Historical branches are retained as references. Removed the unused Recharts dependency and 38 installed packages. The UI now uses the canonical scenario definitions used by tests and exported examples; removed duplicate wet/pathway definitions and the redundant pathway option. The slow finite-volume, radial gas, vertical mechanics and 3D FEM modules are distinct models, not duplicate code.
+
+Typecheck, lint, 65 tests in ten files, and production build passed after cleanup. Production dependency audit reports no known vulnerabilities. Existing Three.js deprecation and Vite bundle-size warnings remain. Material evidence and Developer tools are the next integration.
+
+
 ## Scene studio integration — version 0.3 (2026-09-25)
 
 The app now opens a four-view scene studio based on the Stage 2 Blender asset: soil cutaway, illustrative thermal layers, surface, and roots/peat. A shared 20-second sequence offers play/pause, timeline seeking, chapters, restart, speed, and loop controls. Camera changes are animated. The separate numerical workspace remains accessible through Open simulation and preserves its run when returning from the studio. The user expressly requested this app animation; the separate Blender Stage 3–6 review gates remain open.
