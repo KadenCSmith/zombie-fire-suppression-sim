@@ -10,8 +10,16 @@ Typecheck and lint passed; **85 tests in 11 files** passed after the material/pr
 
 Native development observations: all three family menus are available; the peat–sand family exposes ten compositions. A 20% peat / 80% sand base-soil profile staged density 870 kg/m³, organic fraction 0.159, conductivity 0.108 W/(m·K) and heat capacity 887.3563 J/(kg·K). Setting porosity to 0.99 disabled Apply and reported layer porosity violations. Correcting it to 0.63 enabled Apply, restarted the calculation and labeled porosity as edited. The native Save dialog exported the applied scenario and all 16 sources; the saved JSON was inspected in the project’s ignored verification folder and retained the selected profile and edited porosity. These observations verify software behavior, not physical realism or agreement with the experiments.
 
-The final integration passed typecheck, lint, 85/85 tests (11 files, 3.31 s), and the production build (405 modules, 2.22 s). Existing Three.js deprecation, ignored Lucide client directives and bundle-size warnings remain nonfatal. The previous package observations below are historical; package verification for 0.4 is recorded separately when complete.
+The final integration passed typecheck, lint, 85/85 tests (11 files, 3.31 s), and the production build (405 modules, 2.22 s). Existing Three.js deprecation, ignored Lucide client directives and bundle-size warnings remain nonfatal. The package observations for 0.4 follow; older package entries are historical.
 
+
+## Packaged release verification (2026-09-26)
+
+Release code is committed and pushed as `1655a24`. Version 0.4.0 was packaged with 67 production dependency notices. Strict deep signature verification passed before archiving, in the packager’s clean extraction, in a clean project preview extraction, and after updating `~/Applications/Zombie Fire Suppression Sim.app`. The prior installed version 0.1.0 was moved into the ignored `work/installed-backup-0.1` folder for recovery. No source Blender file was included in this update. Archive SHA-256: `4e4540b28550b662f37e721fa58dc44cbe219fdf4347bb5dca8e7cddead3999e`.
+
+The first preview extraction over an older bundle retained obsolete dependency license files, causing its signature check to fail. Removing that generated preview bundle and extracting the verified archive into a clean location resolved it. Install instructions must replace the old bundle, not merge its contents. The generated archive is outside Git; it is a local ad-hoc signed build, not Apple-notarized distribution.
+
+Native production checks: the authored landscape loaded; the Developer tab and organic field-soil menu rendered correctly; the Andean profile staged and applied. One physical solver step reached 120 s, Ready/paused, with 12 reacting cells, 5523.3 W last-step modeled reaction heat, 0.044 kg consumed fuel, 270.3 °C peak temperature and 3.99 kg remaining dry ice. Returning to Developer retained the applied research comparison; all ten peat–sand profiles were visible with cleaned numeric formatting. These are UI and reduced-solver observations, not measured peat-fire results. The app is left paused with Research profiles open. Native export and invalid-input checks are documented above.
 
 ## Consolidation verification (2026-09-25)
 

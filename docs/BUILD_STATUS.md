@@ -6,6 +6,8 @@ Added three research menus with 12 composition profiles, a separate Developer ta
 
 The supplied working document was reviewed without modifying or publishing it. Measured density, estimated composition/thermal properties, converted moisture, and unreported assumptions are distinguished. No source confirms all default properties together. Experimental validation, freezing, full multiphase CO₂/water behavior and calibrated fracture remain absent.
 
+Version 0.4.0 is tested, pushed (`1655a24`), packaged, and installed. The native release applied a research profile and completed a 120 s numerical step. All 85 tests, typecheck, lint and production build pass; the archive and installed app pass strict signature checks. See [release verification](VALIDATION_STATUS.md).
+
 The cleanup integration was tested and pushed as `31c95c6`. Both remote feature branches remain integrated; no redundant merge is needed. An independently modified local Stage 2 Blender file is preserved and excluded from this material/UI integration.
 
 ## Branch consolidation and cleanup (2026-09-25)
