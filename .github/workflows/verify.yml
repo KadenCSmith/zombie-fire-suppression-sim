@@ -25,3 +25,11 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - name: Desktop startup and worker smoke (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-desktop.cjs
+      - name: Desktop startup and worker smoke (Linux CI display)
+        if: runner.os == 'Linux'
+        # GitHub's ephemeral Linux runner restricts the Chromium namespace sandbox.
+        # This flag is confined to the CI process; shipped launchers keep it enabled.
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-desktop.cjs
