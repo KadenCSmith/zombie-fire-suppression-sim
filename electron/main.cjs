@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, shell } = require('electron');
 const { createServer } = require('node:http');
 const { readFile, stat } = require('node:fs/promises');
 const path = require('node:path');
@@ -97,7 +97,18 @@ async function createWindow() {
     },
   });
 
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // Research references only; never pass arbitrary protocols to the OS.
+    try {
+      const reference = new URL(url);
+      if (reference.protocol === 'https:' && reference.hostname === 'doi.org'
+        && !reference.username && !reference.password && !reference.port
+        && /^\/10\.\d{4,9}\/.+/.test(reference.pathname)) {
+        shell.openExternal(reference.href).catch(error => console.error('Unable to open DOI:', error));
+      }
+    } catch { /* malformed destinations remain denied */ }
+    return { action: 'deny' };
+  });
   mainWindow.webContents.on('will-navigate', (event, destination) => {
     try {
       if (new URL(destination).origin === appOrigin) return;

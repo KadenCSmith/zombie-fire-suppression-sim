@@ -1,3 +1,5 @@
+import type { ResearchSelection } from './researchProfiles'
+import type { MaterialProperties } from './materials'
 /** All distances are metres. x/y lie along the surface; depth is positive downward. */
 export type PeatShape = 'ellipsoid' | 'slab' | 'irregular';
 
@@ -150,6 +152,9 @@ export interface PathwayConfig {
 }
 
 export interface Scenario {
+  researchSelection?: ResearchSelection;
+  /** Optional for legacy imports; recorded in every new scenario and checkpoint. */
+  materialProperties?: Partial<MaterialProperties>;
   schemaVersion: 1;
   modelId: 'zombie-reduced-porous-v0.1';
   unitMetadata: {

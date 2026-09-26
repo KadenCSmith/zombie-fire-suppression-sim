@@ -8,6 +8,12 @@ Choose **Open simulation** for the separate scientific workspace. Its default do
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
 
+## Research materials and Developer tools
+
+Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an Andean organic-soil comparison, and ten lowland peat–sand mixtures. Open **Simulation → Developer → Research profiles**. Choose a target, stage a profile, review its measured/estimated inputs, and apply it to restart the calculation. The Developer tab also exposes thermal, gas, reaction, mechanics and numerical constraints with source notes, input validation and an evidence export.
+
+[Profile guide](docs/RESEARCH_PROFILES.md) · [Material audit and ASCE citations](docs/MATERIAL_EVIDENCE_ASCE.md). The user-supplied working document was included in the review. Unsupported settings remain labeled assumptions; selecting a paper does not experimentally validate the simulation.
+
 ## Run locally
 
 After packaging, extract **Zombie Fire Suppression Sim.app.zip** from the directory directly beside this repository into `~/Applications`, then open **Zombie Fire Suppression Sim.app** there. It opens its own window, needs no browser or separate Node.js installation, and works without an API key or cloud service. The app bundles the built interface and serves it to its own window through a random `127.0.0.1` port; closing the app stops that local server. The archive is a generated deliverable outside the source repository, not a file committed to Git. The packaging script signs it locally for this Mac; it is not Apple notarized for general distribution. See [build status](docs/BUILD_STATUS.md) for the latest recorded packaging result.

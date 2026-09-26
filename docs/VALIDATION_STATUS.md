@@ -1,5 +1,18 @@
 # Verification and validation status
 
+## Research materials and Developer tools (2026-09-26, version 0.4.0)
+
+Added three research menus with 12 composition profiles, a separate Developer tab with 94 editable numeric properties in the default scenario, and an applied-value/source export. New scenarios use the reviewed heat-storage/sublimation inputs and mass-fraction peat-density mixing; legacy material coefficients remain available for older schema-1 scenarios. Slow transport, radial gas, reduced vertical mechanics and FEM read the configured properties. Wet mechanics mass and its stable timestep were corrected; FEM now rejects a non-finite Poisson ratio. Scope and limitations are recorded in [Material evidence and ASCE citations](MATERIAL_EVIDENCE_ASCE.md) and [Research profiles](RESEARCH_PROFILES.md).
+
+The supplied working document was reviewed without modifying or publishing it. Measured density, estimated composition/thermal properties, converted moisture, and unreported assumptions are distinguished. No source confirms all default properties together. Experimental validation, freezing, full multiphase CO₂/water behavior and calibrated fracture remain absent.
+
+Typecheck and lint passed; **85 tests in 11 files** passed after the material/profile integration. Added checks cover all 12 profiles on both targets, finite fields, correct moisture conversion, mass-fraction mixing, rejected invalid inputs/metadata, immutable staged edits, original-versus-edited evidence, exact custom latent-heat accounting, legacy/custom checkpoint continuation, custom FEM stiffness response, and a tightened short-event pressure ceiling.
+
+Native development observations: all three family menus are available; the peat–sand family exposes ten compositions. A 20% peat / 80% sand base-soil profile staged density 870 kg/m³, organic fraction 0.159, conductivity 0.108 W/(m·K) and heat capacity 887.3563 J/(kg·K). Setting porosity to 0.99 disabled Apply and reported layer porosity violations. Correcting it to 0.63 enabled Apply, restarted the calculation and labeled porosity as edited. The native Save dialog exported the applied scenario and all 16 sources; the saved JSON was inspected in the project’s ignored verification folder and retained the selected profile and edited porosity. These observations verify software behavior, not physical realism or agreement with the experiments.
+
+The final integration passed typecheck, lint, 85/85 tests (11 files, 3.31 s), and the production build (405 modules, 2.22 s). Existing Three.js deprecation, ignored Lucide client directives and bundle-size warnings remain nonfatal. The previous package observations below are historical; package verification for 0.4 is recorded separately when complete.
+
+
 ## Consolidation verification (2026-09-25)
 
 After fetching all remote branches, `main` contains both `feature/soil-mechanics-plumes` (`a83d59f`) and `performance/solver-and-rendering` (`0d7654e`); no remote branch remains unmerged. Historical branches are retained as references. Removed the unused Recharts dependency and 38 installed packages. The UI now uses the canonical scenario definitions used by tests and exported examples; removed duplicate wet/pathway definitions and the redundant pathway option. The slow finite-volume, radial gas, vertical mechanics and 3D FEM modules are distinct models, not duplicate code.

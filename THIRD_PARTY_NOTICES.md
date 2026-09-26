@@ -254,3 +254,20 @@ are not reproduced in full. This use is covered by the same CC0 asset terms.
 The export source and hashes are recorded in
 `public/models/peat-study.manifest.json`. The credit does not license this
 project's original code or authored geometry; their licensing status is unchanged.
+
+## Research composition data — CC BY 4.0
+
+The ten peat–sand profiles adapt Table 4 from Decharme, B. (2025), “A process-based
+modeling of soil organic matter physical properties for land surface models –
+Part 1: Soil mixture theory,” *Geoscientific Model Development*, 18, 9349–9384,
+https://doi.org/10.5194/gmd-18-9349-2025, licensed under
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
+Original measurements are attributed there to Arkhangelskaya and Telyatnikova
+(2023), https://doi.org/10.1134/S1064229322602463.
+
+Adaptations: percentages converted to fractions; estimated volumetric heat
+capacity divided by measured dry density for specific heat; a zero-water dry
+reference assumed for menu initialization. Observations and estimates remain
+separately identified. No full paper, illustration or original proprietary
+article text is bundled. This notice does not change the license status of the
+project’s original code.

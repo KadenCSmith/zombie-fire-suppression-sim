@@ -1,3 +1,4 @@
+import { DEFAULT_MATERIALS, resolveMaterials, validateMaterials, peatPorosity } from './materials';
 import type { Scenario, ValidationResult } from './types';
 
 export const SCHEMA_VERSION = 1 as const;
@@ -43,6 +44,7 @@ function cloneScenario(scenario: Scenario): Scenario {
 }
 
 const DEFAULT: Scenario = {
+  materialProperties: { ...DEFAULT_MATERIALS },
   schemaVersion: SCHEMA_VERSION,
   modelId: MODEL_ID,
   unitMetadata: {
@@ -164,6 +166,18 @@ export function validateScenario(raw: unknown): ValidationResult {
   const warnings: string[] = [];
   if (!raw || typeof raw !== 'object') return { valid: false, errors: ['Scenario must be an object.'], warnings };
   const s = raw as Partial<Scenario>;
+  errors.push(...validateMaterials(s.materialProperties));
+  if (s.researchSelection !== undefined) {
+    const selection = s.researchSelection;
+    if (!selection || typeof selection !== 'object' || typeof selection.id !== 'string'
+      || typeof selection.target !== 'string' || !/^(soil|peat:\d+)$/.test(selection.target)
+      || !Array.isArray(selection.sourceIds) || !selection.sourceIds.every(id => typeof id === 'string')
+      || !selection.appliedValues || typeof selection.appliedValues !== 'object' || Array.isArray(selection.appliedValues)
+      || !Object.values(selection.appliedValues).every(v => typeof v === 'number' && Number.isFinite(v))
+      || (selection.propertyNotes !== undefined && (!selection.propertyNotes || typeof selection.propertyNotes !== 'object'
+        || Array.isArray(selection.propertyNotes) || !Object.values(selection.propertyNotes).every(v => typeof v === 'string'))))
+      errors.push('Invalid research profile metadata.');
+  }
   if (s.schemaVersion !== 1) errors.push('Unsupported schemaVersion; expected 1.');
   if (s.modelId !== MODEL_ID) errors.push(`Unsupported modelId; expected ${MODEL_ID}.`);
   if (!s.unitMetadata || s.unitMetadata.system !== 'SI' || s.unitMetadata.coordinates !== 'x-y-horizontal-depth-positive-down'
@@ -202,6 +216,7 @@ export function validateScenario(raw: unknown): ValidationResult {
   let totalLayerThickness = 0;
   const layerIds = new Set<string>();
   for (const layer of s.soilLayers) {
+    if (!layer || typeof layer !== 'object') { errors.push('soilLayers items must be objects.'); continue; }
     if (typeof layer.id !== 'string' || !layer.id || layerIds.has(layer.id)) errors.push('Soil layer ids must be unique nonempty text.');
     layerIds.add(layer.id);
     check(`${layer.id}.thicknessM`, layer.thicknessM, 0.05, d.depthM);
@@ -221,7 +236,7 @@ export function validateScenario(raw: unknown): ValidationResult {
   check('source.heatGenerationWm3', source.heatGenerationWm3, 0, 1e6);
   check('source.startTimeS', source.startTimeS, 0, 1e8);
   check('source.durationS', source.durationS, 0, 1e8);
-  check('source.initialTemperatureK', source.initialTemperatureK, 150, 194.65);
+  check('source.initialTemperatureK', source.initialTemperatureK, 150, resolveMaterials(s as Scenario).co2SublimationK);
   check('source.contactConductanceWm2K', source.contactConductanceWm2K, 0, 100);
   if (typeof source.enabled !== 'boolean') errors.push('source.enabled must be boolean.');
   for (const [label, value, limit] of [
@@ -270,6 +285,9 @@ export function validateScenario(raw: unknown): ValidationResult {
     inside('Dry-ice sphere', source.centerXM, source.centerYM, source.centerDepthM, r, r, r);
   }
   for (const region of s.peatRegions) {
+    if (!region || typeof region !== 'object') { errors.push('Peat region must be an object.'); continue; }
+    const phi = peatPorosity(region.bulkDensityKgM3, region.organicFraction, resolveMaterials(s as Scenario), !s.materialProperties);
+    if (!Number.isFinite(phi) || phi <= 0.05 || phi >= 0.95) errors.push(`${region.id}: density and composition must yield porosity within (0.05, 0.95).`);
     if (typeof region.id !== 'string' || !region.id) errors.push('Peat region id is required.');
     check(`${region.id}.organicFraction`, region.organicFraction, 0, 1);
     check(`${region.id}.bulkDensityKgM3`, region.bulkDensityKgM3, 50, 2500);
@@ -283,6 +301,7 @@ export function validateScenario(raw: unknown): ValidationResult {
     inside(`Peat region ${region.id}`, region.centerXM, region.centerYM, region.centerDepthM, Math.max(region.sizeXM, region.sizeYM) / 2, Math.max(region.sizeXM, region.sizeYM) / 2, region.thicknessM / 2);
   }
   for (const hot of s.hotRegions) {
+    if (!hot || typeof hot !== 'object') { errors.push('hotRegions items must be objects.'); continue; }
     if (typeof hot.id !== 'string' || !hot.id) errors.push('Hot region id is required.');
     check(`${hot.id}.fuelFraction`, hot.fuelFraction, 0, 1);
     check(`${hot.id}.temperatureC`, hot.temperatureC, -20, 900);
@@ -293,6 +312,7 @@ export function validateScenario(raw: unknown): ValidationResult {
     inside(`Hot region ${hot.id}`, hot.centerXM, hot.centerYM, hot.centerDepthM, Math.max(hot.sizeXM, hot.sizeYM) / 2, Math.max(hot.sizeXM, hot.sizeYM) / 2, hot.thicknessM / 2);
   }
   for (const path of s.pathways) {
+    if (!path || typeof path !== 'object') { errors.push('pathways items must be objects.'); continue; }
     if (typeof path.id !== 'string' || !path.id) errors.push('Pathway id is required.');
     check(`${path.id}.permeabilityMultiplier`, path.permeabilityMultiplier, 0.01, 1e5);
     check(`${path.id}.sizeXM`, path.sizeXM, 0.05, d.widthM);

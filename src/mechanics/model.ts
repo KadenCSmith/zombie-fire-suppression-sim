@@ -1,18 +1,12 @@
+import { resolveMaterials, peatPorosity, type MaterialProperties } from '../sim/materials'
+import { validateScenario } from '../sim/scenario'
 import type { Scenario } from '../sim/types'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
 
 /** Vertical, lumped low-order elements. One material point at each prism centre. */
 export type MechanicsResolution = 4 | 6 | 8
 export const MECHANICS_RESOLUTIONS: MechanicsResolution[] = [4, 6, 8]
-export const MECHANICS_ASSUMPTIONS = {
-  gravityMS2: 9.80665,
-  youngsModulusPa: 1_000_000,
-  shearModulusPa: 350_000,
-  biotCoefficient: 0.8,
-  tensileStrengthPa: 20_000,
-  dampingRatio: 0.12,
-  yieldedStiffnessFraction: 0.25,
-} as const
+
 
 export interface MechanicsFrame {
   eventTimeS: number
@@ -53,7 +47,8 @@ export function mechanicsSizing(resolution: MechanicsResolution, durationS = 2, 
   const dz = (scenario?.domain.depthM ?? 3) / resolution
   const rho = scenario?.soil.bulkDensityKgM3 ?? 1200
   const mass = rho * dx * dy * dz
-  const stiffness = MECHANICS_ASSUMPTIONS.youngsModulusPa * dx * dy / dz
+  const m = resolveMaterials(scenario)
+  const stiffness = m.verticalYoungsPa * dx * dy / dz + 2 * m.verticalShearPa * dz
   const stableStepS = Math.min(0.01, 0.2 * Math.sqrt(mass / (2 * stiffness)))
   return { elements, materialPoints: elements, estimatedMemoryBytes: elements * 112,
     expectedSteps: Math.ceil(durationS / stableStepS), stableStepS }
@@ -76,6 +71,7 @@ export class SoilMechanics {
   readonly yielded: Uint8Array
   readonly overburden: Float64Array
   readonly pressure: Float64Array
+  readonly materials: MaterialProperties
   private readonly scenario: Scenario
   private readonly run: FastEventRun
   private readonly area: number
@@ -91,6 +87,9 @@ export class SoilMechanics {
   get timeSeconds() { return this.time }
 
   constructor(scenario: Scenario, run: FastEventRun, resolution: MechanicsResolution) {
+    const validation = validateScenario(scenario)
+    if (!validation.valid) throw new Error(validation.errors.join(' '))
+    this.materials = resolveMaterials(scenario)
     if (!MECHANICS_RESOLUTIONS.includes(resolution)) throw new Error('Unsupported mechanics resolution.')
     if (!run.frames.length) throw new Error('Mechanics needs gas pressure frames.')
     this.scenario = scenario; this.run = run; this.n = resolution
@@ -101,8 +100,8 @@ export class SoilMechanics {
     this.dz = scenario.domain.depthM / resolution
     this.area = dx * dy
     const volume = this.area * this.dz
-    this.springK = MECHANICS_ASSUMPTIONS.youngsModulusPa * this.area / this.dz
-    this.shearK = MECHANICS_ASSUMPTIONS.shearModulusPa * this.dz * Math.min(dx, dy) / Math.max(dx, dy)
+    this.springK = this.materials.verticalYoungsPa * this.area / this.dz
+    this.shearK = this.materials.verticalShearPa * this.dz * Math.min(dx, dy) / Math.max(dx, dy)
     this.mass = new Float64Array(count)
     this.displacement = new Float64Array(count)
     this.velocity = new Float64Array(count)
@@ -114,10 +113,10 @@ export class SoilMechanics {
     for (let k = 0; k < resolution; k++) for (let j = 0; j < resolution; j++) for (let i = 0; i < resolution; i++) {
       const q = index(i, j, k, resolution)
       const depth = (k + 0.5) * this.dz
-      let layerDepth = 0; let densityMultiplier = 1; let saturationOffset = 0
+      let layerDepth = 0; let densityMultiplier = 1; let saturationOffset = 0; let porosityOffset = 0
       for (const layer of scenario.soilLayers) {
         layerDepth += layer.thicknessM
-        if (depth <= layerDepth + 1e-9) { densityMultiplier = layer.dryDensityMultiplier; saturationOffset = layer.moistureSaturationOffset; break }
+        if (depth <= layerDepth + 1e-9) { densityMultiplier = layer.dryDensityMultiplier; saturationOffset = layer.moistureSaturationOffset; porosityOffset = layer.porosityOffset; break }
       }
       const x = (i + 0.5) * dx; const y = (j + 0.5) * dy
       const peat = scenario.peatRegions.find(region =>
@@ -125,7 +124,8 @@ export class SoilMechanics {
         && Math.abs(depth - region.centerDepthM) <= region.thicknessM / 2)
       const dryDensity = peat?.bulkDensityKgM3 ?? scenario.soil.bulkDensityKgM3 * densityMultiplier
       const saturation = peat?.moistureSaturation ?? Math.max(0, Math.min(1, scenario.soil.moistureSaturation + saturationOffset))
-      const bulkDensity = dryDensity + 1000 * scenario.soil.porosity * saturation
+      const porosity = peat ? peatPorosity(dryDensity, peat.organicFraction, this.materials, !scenario.materialProperties) : scenario.soil.porosity + porosityOffset
+      const bulkDensity = dryDensity + this.materials.waterDensityKgM3 * porosity * saturation
       this.mass[q] = bulkDensity * volume
       sumMass += this.mass[q]
       const radius = Math.hypot(x - scenario.source.centerXM, y - scenario.source.centerYM, depth - scenario.source.centerDepthM)
@@ -145,14 +145,21 @@ export class SoilMechanics {
       let above = 0
       for (let k = 0; k < resolution; k++) {
         const q = index(i, j, k, resolution)
-        this.overburden[q] = (above + this.mass[q] / 2) * MECHANICS_ASSUMPTIONS.gravityMS2 / this.area
+        this.overburden[q] = (above + this.mass[q] / 2) * 9.80665 / this.area
         above += this.mass[q]
       }
     }
-    this.damping = 2 * MECHANICS_ASSUMPTIONS.dampingRatio * Math.sqrt(this.springK * sumMass / count)
+    this.damping = 2 * this.materials.verticalDampingRatio * Math.sqrt(this.springK * sumMass / count)
+    // Bound the explicit step using the lightest element, all coupled springs,
+    // and damping. Developer edits must not bypass the stability estimate.
+    const minMass = this.mass.reduce((a, b) => Math.min(a, b), Infinity)
+    this.sizing.stableStepS = Math.min(0.01,
+      0.2 * Math.sqrt(minMass / (2 * this.springK + 4 * this.shearK)),
+      this.damping > 0 ? 0.2 * minMass / this.damping : Infinity)
+    this.sizing.expectedSteps = Math.ceil(run.durationS / this.sizing.stableStepS)
     this.checks = { ...this.sizing, initialMassKg: sumMass,
       initialOverburdenPa: this.overburden[index(0, 0, resolution - 1, resolution)],
-      initialEffectiveStressPa: this.overburden[index(0, 0, resolution - 1, resolution)] - MECHANICS_ASSUMPTIONS.biotCoefficient * Math.max(0, run.frames[0].shellPressurePa[this.shellIndex[index(0, 0, resolution - 1, resolution)]] - scenario.atmosphere.pressurePa),
+      initialEffectiveStressPa: this.overburden[index(0, 0, resolution - 1, resolution)] - this.materials.verticalBiot * Math.max(0, run.frames[0].shellPressurePa[this.shellIndex[index(0, 0, resolution - 1, resolution)]] - scenario.atmosphere.pressurePa),
       massResidualKg: sumMass - this.mass.reduce((a, b) => a + b, 0), maxMomentumResidualN: 0,
       pressureMapMinimumPa: 0, pressureMapMaximumPa: 0, pressureWorkJ: 0, kineticEnergyJ: 0, warnings: [] }
   }
@@ -176,28 +183,28 @@ export class SoilMechanics {
     const prior = Float64Array.from(this.displacement)
     const priorMomentum = this.velocity.reduce((sum, v, q) => sum + this.mass[q] * v, 0)
     let external = 0
-    for (let q = 0; q < count; q++) { force[q] = -this.mass[q] * MECHANICS_ASSUMPTIONS.gravityMS2 - this.damping * this.velocity[q]; external += force[q] }
+    for (let q = 0; q < count; q++) { force[q] = -this.mass[q] * 9.80665 - this.damping * this.velocity[q]; external += force[q] }
     for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
       for (let k = 0; k < n; k++) {
         const q = index(i, j, k, n)
         const below = k === n - 1 ? -1 : index(i, j, k + 1, n)
-        const weightAbove = this.overburden[q] * this.area + this.mass[q] * MECHANICS_ASSUMPTIONS.gravityMS2 / 2
+        const weightAbove = this.overburden[q] * this.area + this.mass[q] * 9.80665 / 2
         const relative = this.displacement[q] - (below < 0 ? 0 : this.displacement[below])
-        const stiffness = this.springK * (this.yielded[q] ? MECHANICS_ASSUMPTIONS.yieldedStiffnessFraction : 1)
+        const stiffness = this.springK * (this.yielded[q] ? this.materials.verticalYieldedFraction : 1)
         const trial = weightAbove - stiffness * relative
         const facePressure = this.pressure[q] - atm
-        if (trial / this.area - MECHANICS_ASSUMPTIONS.biotCoefficient * facePressure < -MECHANICS_ASSUMPTIONS.tensileStrengthPa) this.yielded[q] = 1
+        if (trial / this.area - this.materials.verticalBiot * facePressure < -this.materials.verticalTensilePa) this.yielded[q] = 1
         // Failed tensile link opens. Compression/contact remains and supports settling.
-        const linkForce = this.yielded[q] ? Math.max(0, weightAbove - this.springK * MECHANICS_ASSUMPTIONS.yieldedStiffnessFraction * relative) : trial
+        const linkForce = this.yielded[q] ? Math.max(0, weightAbove - this.springK * this.materials.verticalYieldedFraction * relative) : trial
         force[q] += linkForce
         if (below >= 0) force[below] -= linkForce
         else external += linkForce // supported bottom reaction
         const aboveP = k === 0 ? atm : (this.pressure[index(i, j, k - 1, n)] + this.pressure[q]) / 2
         const belowP = k === n - 1 ? atm : (this.pressure[below] + this.pressure[q]) / 2
-        const pressureForce = MECHANICS_ASSUMPTIONS.biotCoefficient * this.area * (belowP - aboveP)
+        const pressureForce = this.materials.verticalBiot * this.area * (belowP - aboveP)
         force[q] += pressureForce
-        if (k === 0) external -= MECHANICS_ASSUMPTIONS.biotCoefficient * this.area * (aboveP - atm)
-        if (k === n - 1) external += MECHANICS_ASSUMPTIONS.biotCoefficient * this.area * (belowP - atm)
+        if (k === 0) external -= this.materials.verticalBiot * this.area * (aboveP - atm)
+        if (k === n - 1) external += this.materials.verticalBiot * this.area * (belowP - atm)
         const side = (i === 0 ? 1 : 0) + (i === n - 1 ? 1 : 0) + (j === 0 ? 1 : 0) + (j === n - 1 ? 1 : 0)
         if (side) { const boundaryForce = -side * this.shearK * this.displacement[q]; force[q] += boundaryForce; external += boundaryForce }
       }
@@ -223,7 +230,7 @@ export class SoilMechanics {
       const k = Math.floor(q / (n * n)), i = q % n, j = Math.floor(q / n) % n
       const aboveP = k === 0 ? atm : (this.pressure[index(i, j, k - 1, n)] + this.pressure[q]) / 2
       const belowP = k === n - 1 ? atm : (this.pressure[index(i, j, k + 1, n)] + this.pressure[q]) / 2
-      this.workJ += MECHANICS_ASSUMPTIONS.biotCoefficient * this.area * (belowP - aboveP) * (this.displacement[q] - prior[q])
+      this.workJ += this.materials.verticalBiot * this.area * (belowP - aboveP) * (this.displacement[q] - prior[q])
     }
     this.maxMomentumResidualN = Math.max(this.maxMomentumResidualN, Math.abs((updatedMomentum - priorMomentum) / dt - external))
   }
@@ -244,11 +251,11 @@ export class SoilMechanics {
     for (let q = 0; q < this.mass.length; q++) {
       const k = Math.floor(q / (this.n * this.n))
       const below = k === this.n - 1 ? -1 : q + this.n * this.n
-      const preload = this.overburden[q] * this.area + this.mass[q] * MECHANICS_ASSUMPTIONS.gravityMS2 / 2
-      const stiffness = this.springK * (this.yielded[q] ? MECHANICS_ASSUMPTIONS.yieldedStiffnessFraction : 1)
+      const preload = this.overburden[q] * this.area + this.mass[q] * 9.80665 / 2
+      const stiffness = this.springK * (this.yielded[q] ? this.materials.verticalYieldedFraction : 1)
       const contactForce = preload - stiffness * (this.displacement[q] - (below < 0 ? 0 : this.displacement[below]))
       effective[q] = (this.yielded[q] ? Math.max(0, contactForce) : contactForce) / this.area
-        - MECHANICS_ASSUMPTIONS.biotCoefficient * Math.max(0, this.pressure[q] - this.scenario.atmosphere.pressurePa)
+        - this.materials.verticalBiot * Math.max(0, this.pressure[q] - this.scenario.atmosphere.pressurePa)
       maxDisplacement = Math.max(maxDisplacement, Math.abs(this.displacement[q]))
       yieldedElements += this.yielded[q]
     }

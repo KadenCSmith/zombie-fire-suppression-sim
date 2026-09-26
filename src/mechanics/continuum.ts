@@ -105,7 +105,7 @@ export class ContinuumMechanics {
 
   constructor(nx: number, ny: number, nz: number, widthM: number, lengthM: number, depthM: number, material: ContinuumMaterial = DEFAULT_CONTINUUM_MATERIAL, bulkDensityKgM3 = 1200) {
     if (![nx, ny, nz].every(v => Number.isInteger(v) && v >= 1 && v <= 16)) throw new Error('Mechanics requires 1–16 elements on every axis.')
-    if (![widthM, lengthM, depthM, material.youngsPa].every(v => Number.isFinite(v) && v > 0) || material.poisson <= -0.9 || material.poisson >= 0.49) throw new Error('Invalid mechanics dimensions or elastic material.')
+    if (![widthM, lengthM, depthM, material.youngsPa].every(v => Number.isFinite(v) && v > 0) || !Number.isFinite(material.poisson) || material.poisson <= -0.9 || material.poisson >= 0.49) throw new Error('Invalid mechanics dimensions or elastic material.')
     if ([material.cohesionPa, material.frictionSlope, material.dilationSlope, material.hardeningPa].some(v => !Number.isFinite(v) || v < 0)) throw new Error('Invalid plastic material.')
     if (!Number.isFinite(bulkDensityKgM3) || bulkDensityKgM3 <= 0) throw new Error('Invalid soil bulk density.')
     this.nx = nx; this.ny = ny; this.nz = nz; this.widthM = widthM; this.lengthM = lengthM; this.depthM = depthM; this.material = { ...material }

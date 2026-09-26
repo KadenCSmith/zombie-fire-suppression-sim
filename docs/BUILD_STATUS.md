@@ -1,5 +1,13 @@
 # Build status and handoff
 
+## Research materials and Developer tools (2026-09-26, version 0.4.0)
+
+Added three research menus with 12 composition profiles, a separate Developer tab with 94 editable numeric properties in the default scenario, and an applied-value/source export. New scenarios use the reviewed heat-storage/sublimation inputs and mass-fraction peat-density mixing; legacy material coefficients remain available for older schema-1 scenarios. Slow transport, radial gas, reduced vertical mechanics and FEM read the configured properties. Wet mechanics mass and its stable timestep were corrected; FEM now rejects a non-finite Poisson ratio. Scope and limitations are recorded in [Material evidence and ASCE citations](MATERIAL_EVIDENCE_ASCE.md) and [Research profiles](RESEARCH_PROFILES.md).
+
+The supplied working document was reviewed without modifying or publishing it. Measured density, estimated composition/thermal properties, converted moisture, and unreported assumptions are distinguished. No source confirms all default properties together. Experimental validation, freezing, full multiphase CO₂/water behavior and calibrated fracture remain absent.
+
+The cleanup integration was tested and pushed as `31c95c6`. Both remote feature branches remain integrated; no redundant merge is needed. An independently modified local Stage 2 Blender file is preserved and excluded from this material/UI integration.
+
 ## Branch consolidation and cleanup (2026-09-25)
 
 After fetching all remote branches, `main` contains both `feature/soil-mechanics-plumes` (`a83d59f`) and `performance/solver-and-rendering` (`0d7654e`); no remote branch remains unmerged. Historical branches are retained as references. Removed the unused Recharts dependency and 38 installed packages. The UI now uses the canonical scenario definitions used by tests and exported examples; removed duplicate wet/pathway definitions and the redundant pathway option. The slow finite-volume, radial gas, vertical mechanics and 3D FEM modules are distinct models, not duplicate code.

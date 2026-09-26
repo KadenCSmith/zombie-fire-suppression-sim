@@ -1,3 +1,4 @@
+import { continuumMaterial } from '../sim/materials'
 import { Simulation } from '../sim/index'
 import { runFastEvent } from '../fastEvent'
 import { SoilMechanics, type MechanicsResolution } from '../mechanics/model'
@@ -204,7 +205,7 @@ scope.onmessage = (event: MessageEvent<SolverCommand>) => {
       if (!continuum) {
         const domain = simulation.scenario.domain
         continuum = new ContinuumMechanics(4, 4, 4, domain.widthM, domain.lengthM, domain.depthM,
-          undefined, simulation.scenario.soil.bulkDensityKgM3)
+          continuumMaterial(simulation.scenario), simulation.scenario.soil.bulkDensityKgM3)
       }
       const result = continuum.solveTopTraction(command.tractionPa)
       scope.postMessage({ type: 'continuumResult', result, tractionPa: command.tractionPa, resolution: 4 },

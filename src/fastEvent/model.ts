@@ -1,20 +1,14 @@
+import { resolveMaterials } from '../sim/materials';
 import { validateScenario } from '../sim/scenario';
 import type { Scenario, Snapshot } from '../sim/types';
 import type { FastEventAssumptions, FastEventDiagnostics, FastEventFrame, FastEventOptions, FastEventRun } from './types';
 
 const R = 8.314462618; // J/(mol K)
-const MU = 1.8e-5; // Pa s, fixed gas-mixture approximation
 const G = 9.80665; // m/s²
 const MAX_DURATION_S = 2;
 const MAX_FRAMES = 100;
 const INTERNAL_STEP_S = 0.001;
 const ATMOSPHERIC_SOUND_SCALE_MS = 250; // only sets flux relaxation time; no shock solver
-const MAX_FAST_PRESSURE_PA = 5e6; // reduced-event numerical validity ceiling, unvalidated
-const MAX_FACE_GAS_SPEED_MS = 50; // reduced-event numerical validity ceiling
-const ASSUMED_COHESION_PA = 20000;
-const ASSUMED_BIOT = 0.8;
-const ASSUMED_DAMAGE_RATE_S = 3;
-const ASSUMED_DAMAGE_K_MULTIPLIER = 10;
 
 interface Shell {
   radiusM: number;
@@ -178,6 +172,7 @@ function totalCO2(shells: Shell[]): number { return shells.reduce((sum, shell) =
  */
 export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, options: FastEventOptions = {}): FastEventRun {
   const { durationS, frameCount } = validateInput(scenario, initialSnapshot, options);
+  const materials = resolveMaterials(scenario);
   const shells = aggregateShells(scenario, initialSnapshot);
   const faces = makeFaces(shells, scenario);
   const atmospherePa = scenario.atmosphere.pressurePa;
@@ -191,11 +186,11 @@ export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, opti
       ? scenario.atmosphere.sideGasBoundary === 'atmospheric' ? 'top-and-sides-open' : 'top-surface-open-only'
       : scenario.atmosphere.sideGasBoundary === 'atmospheric' ? 'sides-open-only' : 'closed-gas-boundaries',
     overburdenPa: scenario.soil.bulkDensityKgM3 * G * scenario.source.centerDepthM,
-    cohesionPa: ASSUMED_COHESION_PA, biotCoefficient: ASSUMED_BIOT,
-    damageRateS: ASSUMED_DAMAGE_RATE_S,
-    maxDamagePermeabilityMultiplier: ASSUMED_DAMAGE_K_MULTIPLIER,
-    maxSupportedPressurePa: MAX_FAST_PRESSURE_PA,
-    maxSupportedFaceGasSpeedMS: MAX_FACE_GAS_SPEED_MS,
+    cohesionPa: materials.fastCohesionPa, biotCoefficient: materials.fastBiot,
+    damageRateS: materials.fastDamageRateS,
+    maxDamagePermeabilityMultiplier: materials.fastDamagePermeabilityFactor,
+    maxSupportedPressurePa: materials.fastMaxPressurePa,
+    maxSupportedFaceGasSpeedMS: materials.fastMaxSpeedMS,
   };
   const diagnostics: FastEventDiagnostics = {
     initialTotalGasMol: totalGas(shells), remainingTotalGasMol: totalGas(shells),
@@ -231,7 +226,7 @@ export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, opti
   let initialMaxCellPressure = 0;
   for (const pressure of initialSnapshot.fields.pressurePa) initialMaxCellPressure = Math.max(initialMaxCellPressure, pressure);
   diagnostics.maxPressurePa = initialMaxCellPressure;
-  if (initialMaxCellPressure > MAX_FAST_PRESSURE_PA || shells.some(s => shellPressure(s) > MAX_FAST_PRESSURE_PA)) {
+  if (initialMaxCellPressure > materials.fastMaxPressurePa || shells.some(s => shellPressure(s) > materials.fastMaxPressurePa)) {
     status = 'validity-paused';
     diagnostics.warnings.push('Initial pressure exceeds the bounded radial event model. No fast transient calculated.');
     capture('validity-paused');
@@ -243,10 +238,10 @@ export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, opti
         const dt = Math.min(INTERNAL_STEP_S, frameTargetS - eventTimeS);
         const pressures = shells.map(shellPressure);
         const nextDamage = shells.map((shell, i) => {
-          const effectiveStressDeficitPa = ASSUMED_BIOT * Math.max(0, pressures[i] - atmospherePa)
-            - assumptions.overburdenPa - ASSUMED_COHESION_PA;
-          shell.yieldIndex = Math.max(0, effectiveStressDeficitPa / ASSUMED_COHESION_PA);
-          return 1 - (1 - shell.damage) * Math.exp(-ASSUMED_DAMAGE_RATE_S * shell.yieldIndex * dt);
+          const effectiveStressDeficitPa = materials.fastBiot * Math.max(0, pressures[i] - atmospherePa)
+            - assumptions.overburdenPa - materials.fastCohesionPa;
+          shell.yieldIndex = Math.max(0, effectiveStressDeficitPa / materials.fastCohesionPa);
+          return 1 - (1 - shell.damage) * Math.exp(-materials.fastDamageRateS * shell.yieldIndex * dt);
         });
         const nextFluxes: number[] = [];
         for (const face of faces) {
@@ -254,16 +249,16 @@ export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, opti
           const right = face.right >= 0 ? shells[face.right] : null;
           const rightPressure = right ? pressures[face.right] : atmospherePa;
           const rightTemperature = right ? right.temperatureK : scenario.atmosphere.temperatureC + 273.15;
-          const leftK = left.basePermeabilityM2 * (1 + (ASSUMED_DAMAGE_K_MULTIPLIER - 1) * nextDamage[face.left]);
-          const rightK = right ? right.basePermeabilityM2 * (1 + (ASSUMED_DAMAGE_K_MULTIPLIER - 1) * nextDamage[face.right]) : leftK;
+          const leftK = left.basePermeabilityM2 * (1 + (materials.fastDamagePermeabilityFactor - 1) * nextDamage[face.left]);
+          const rightK = right ? right.basePermeabilityM2 * (1 + (materials.fastDamagePermeabilityFactor - 1) * nextDamage[face.right]) : leftK;
           const k = 2 * leftK * rightK / (leftK + rightK);
           const referenceConcentration = (pressures[face.left] + rightPressure) / (R * (left.temperatureK + rightTemperature));
-          const conductance = k / MU * face.areaM2 / face.distanceM * referenceConcentration;
+          const conductance = k / materials.gasViscosityPaS * face.areaM2 / face.distanceM * referenceConcentration;
           const equilibriumFlux = conductance * (pressures[face.left] - rightPressure);
           const flux = face.molarFluxMolS + (1 - Math.exp(-dt / face.relaxationS)) * (equilibriumFlux - face.molarFluxMolS);
           const speed = Math.abs(flux) / Math.max(1e-12, referenceConcentration * face.areaM2);
           diagnostics.maxFaceGasSpeedMS = Math.max(diagnostics.maxFaceGasSpeedMS, speed);
-          if (!Number.isFinite(flux) || speed > MAX_FACE_GAS_SPEED_MS) {
+          if (!Number.isFinite(flux) || speed > materials.fastMaxSpeedMS) {
             status = 'validity-paused';
             diagnostics.warnings.push('Fast-event face speed exceeded the bounded reduced model; transient paused without a shock extrapolation.');
             break;
@@ -298,7 +293,7 @@ export function runFastEvent(scenario: Scenario, initialSnapshot: Snapshot, opti
         eventTimeS += dt;
         diagnostics.steps++;
         if (shells.some(s => s.co2Mol < -1e-9 || s.otherMol < -1e-9 || !Number.isFinite(shellPressure(s)))
-          || shells.some(s => shellPressure(s) > MAX_FAST_PRESSURE_PA)
+          || shells.some(s => shellPressure(s) > materials.fastMaxPressurePa)
           || Math.abs(diagnostics.initialTotalGasMol - diagnostics.cumulativeBoundaryOutMol - totalGas(shells)) > 1e-7 * Math.max(1, diagnostics.initialTotalGasMol)) {
           status = 'validity-paused';
           diagnostics.warnings.push('Fast-event pressure or gas inventory left the bounded reduced model; transient paused.');

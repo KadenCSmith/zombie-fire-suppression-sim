@@ -1,8 +1,12 @@
-# Reduced physics model, version 0.1
+# Reduced physics model — material extension in version 0.4
 
 **Status:** exploratory, unvalidated. This document describes the implemented reduced model and its intended validity boundary; `VALIDATION_STATUS.md` distinguishes numerical checks from experimental validation. References are indexed in `SOURCES.md`.
 
 The app opens in a separate [Scene studio](SCENE_STUDIO.md). Its authored 8 m × 8 m Blender landscape, prescribed thermal palette and 20-second motion sequence are illustrative. They do not use the scientific state described here, report calculated temperatures or change the numerical trajectory. **Open simulation** enters this document's scientific workspace, whose default domain is 6.096 m × 6.096 m.
+
+## Material configuration (version 0.4)
+
+The optional `materialProperties` extension contains 34 independently validated coefficients. New scenarios include it; older schema-1 files retain their original material values and arithmetic/clamped peat-density mixing. New peat porosity uses additive specific volumes for dry organic/mineral mass fractions. Thermal storage, sublimation, gas viscosity, radial event limits and both mechanics models read the resolved scenario values. Changes restart all associated results. See [the evidence audit](MATERIAL_EVIDENCE_ASCE.md) and [composition profiles](RESEARCH_PROFILES.md) for values, bases, assumptions and scope. The equations below describe the same reduced model; quoted legacy coefficients are superseded by configured values when the extension is present.
 
 ## Domain and inventories
 
@@ -56,7 +60,7 @@ It consumes finite dry fuel and oxygen, produces CO₂ and water vapor, and adds
 
 The solver reports cumulative reaction heat `Σ(m_reacted × heatOfCombustionJkg)` in joules, last accepted-step reaction power `Q_step/Δt` in watts, and the count of cells with positive oxidation in that accepted step. These quantities are restored with checkpoints and rolled back when a step fails. The broader, drier default hot peat region makes reaction heat visible in this demonstration, yet the finite hot spot can still cool when heat losses exceed reaction heat. This is not a calibrated claim of sustained peat combustion.
 
-Liquid water increases the local heat capacity by approximately 4180 J/kg/K, consumes approximately 2.26 MJ/kg when evaporated, adds water vapor to gas storage, and reduces connected gas-pore transport through the `fg` rules above. Evaporation uses a first-order rate ramped from an onset temperature to a boiling-temperature setting and capped by available sensible energy; it is not a vapor-liquid equilibrium calculation. The model does not solve liquid-water flow, capillary redistribution, condensation, freezing/thawing, or swelling. It rejects an initially frozen wet scenario and rolls back and pauses a step that would cool liquid-bearing soil below 273.15 K; dry cells may remain colder. This is a validity guard, not a latent-freezing calculation. A single moisture setting cannot be interpreted as a universal reduction in peat-fire spread: S6 observed the opposite trend for downward spread in a particular 30 cm peat-column experiment as dry density and oxygen supply changed.
+Liquid water increases the local heat capacity by 4186 J/kg/K by default (4180 in legacy files), consumes approximately 2.26 MJ/kg when evaporated, adds water vapor to gas storage, and reduces connected gas-pore transport through the `fg` rules above. Evaporation uses a first-order rate ramped from an onset temperature to a boiling-temperature setting and capped by available sensible energy; it is not a vapor-liquid equilibrium calculation. The model does not solve liquid-water flow, capillary redistribution, condensation, freezing/thawing, or swelling. It rejects an initially frozen wet scenario and rolls back and pauses a step that would cool liquid-bearing soil below 273.15 K; dry cells may remain colder. This is a validity guard, not a latent-freezing calculation. A single moisture setting cannot be interpreted as a universal reduction in peat-fire spread: S6 observed the opposite trend for downward spread in a particular 30 cm peat-column experiment as dry density and oxygen supply changed.
 
 ## Gas and heat transport
 

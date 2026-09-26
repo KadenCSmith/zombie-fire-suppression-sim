@@ -108,7 +108,7 @@ export const PARAMETER_REGISTRY: ParameterEntry[] = [
     ['source.centerDepthM', 'Dry-ice center depth', 'zs', 'm', 'Positive below surface; top cover derived from mass/density', 'within block'],
     ['source.densityKgM3', 'Dry-ice density', 'rho_CO2,s', 'kg/m³', 'Assumed homogeneous solid density; linked mass/diameter', [500, 2000]],
     ['source.initialMassKg', 'Initial dry-ice mass', 'm_CO2,0', 'kg', 'Solid inventory; diameter derived', [0, 1000], ['source.densityKgM3']],
-    ['source.initialTemperatureK', 'Initial dry-ice temperature', 'Ts,0', 'K', 'Lumped source at/below fixed near-atmospheric sublimation temperature', [150, 194.65]],
+    ['source.initialTemperatureK', 'Initial dry-ice temperature', 'Ts,0', 'K', 'Lumped source at/below fixed near-atmospheric sublimation temperature', [150, 195]],
     ['source.supportRadiusM', 'Fixed heater support radius', 'rh', 'm', 'Numerical support sphere; unchanged as dry ice shrinks', [0.02, 1]],
     ['source.heatGenerationWm3', 'Volumetric heater generation', "q'''", 'W/m³', 'Fixed heater support volume; total power derived', [0, 1e6], ['source.supportRadiusM']],
     ['source.startTimeS', 'Heater start', 'th,start', 's', 'Physical solver clock', [0, 1e8]],

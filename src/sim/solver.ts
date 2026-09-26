@@ -1,3 +1,4 @@
+import { resolveMaterials, peatPorosity, type MaterialProperties } from './materials';
 import { celsiusToKelvin, diameterFromMass, validateScenario } from './scenario';
 import type { Diagnostics, OperationalEvent, ProbeSample, Scenario, SerializedSimulation, Snapshot, SnapshotFields } from './types';
 
@@ -6,15 +7,6 @@ const R = 8.314462618; // J mol^-1 K^-1
 const CO2_MOLAR_MASS = 0.0440095; // kg mol^-1
 const O2_MOLAR_MASS = 0.031998; // kg mol^-1
 const H2O_MOLAR_MASS = 0.01801528; // kg mol^-1
-const LIQUID_WATER_DENSITY = 1000; // kg m^-3
-const WATER_HEAT_CAPACITY = 4180; // J kg^-1 K^-1
-const GAS_HEAT_CAPACITY = 29; // J mol^-1 K^-1, reduced mixture approximation
-const CO2_HEAT_CAPACITY = 28.5; // J mol^-1 K^-1, sensible heating of source gas
-const CO2_SOLID_HEAT_CAPACITY = 850; // J kg^-1 K^-1, demonstration assumption
-const CO2_SUBLIMATION_K = 194.65; // K at near atmospheric pressure
-const CO2_SUBLIMATION_JKG = 571000; // J kg^-1, NIST phase-change value rounded
-const WATER_EVAPORATION_JKG = 2.26e6; // J kg^-1, approximate near boiling
-const GAS_VISCOSITY = 1.8e-5; // Pa s, fixed mixture approximation
 const O2_PER_FUEL_KG = 192 / 162; // C6H10O5 + 6 O2 -> 6 CO2 + 5 H2O
 const CO2_PER_FUEL_KG = 264 / 162;
 const H2O_PER_FUEL_KG = 90 / 162;
@@ -81,6 +73,7 @@ function freshDiagnostics(): Diagnostics {
 /** An independent, deterministic 3D finite-volume realization of one scenario. */
 export class Simulation {
   readonly scenario: Scenario;
+  readonly materials: MaterialProperties;
   readonly nx: number;
   readonly ny: number;
   readonly nz: number;
@@ -154,6 +147,7 @@ export class Simulation {
     const result = validateScenario(scenario);
     if (!result.valid) throw new Error(`Invalid scenario: ${result.errors.join(' ')}`);
     this.scenario = JSON.parse(JSON.stringify(scenario)) as Scenario;
+    this.materials = resolveMaterials(this.scenario);
     const d = this.scenario.domain;
     this.nx = d.nx; this.ny = d.ny; this.nz = d.nz;
     this.dx = d.widthM / d.nx; this.dy = d.lengthM / d.ny; this.dz = d.depthM / d.nz;
@@ -210,7 +204,7 @@ export class Simulation {
   }
   private gasVolume(i: number): number {
     // Liquid fills pore space, leaving an evolving gas-accessible volume.
-    return Math.max(1e-12, this.porosity[i] * this.cellVolume - this.water[i] / LIQUID_WATER_DENSITY);
+    return Math.max(1e-12, this.porosity[i] * this.cellVolume - this.water[i] / this.materials.waterDensityKgM3);
   }
   private totalGasAt(i: number): number { return this.oxygen[i] + this.co2[i] + this.background[i] + this.vapor[i]; }
   private totalGasMol(): number {
@@ -282,10 +276,9 @@ export class Simulation {
           bulkDensity = peat.bulkDensityKgM3;
           organic = peat.organicFraction;
           saturation = peat.moistureSaturation;
-          const particleDensity = organic * 1400 + (1 - organic) * 2650;
-          porosity = clamp(1 - bulkDensity / particleDensity, 0.1, 0.9);
-          kThermal = 0.16 + 0.6 * saturation; // uncalibrated peat heat-conduction mixture
-          kH *= 4; kV *= 2; // demonstration peat pathway assumption
+          porosity = peatPorosity(bulkDensity, organic, this.materials, !s.materialProperties);
+          kThermal = this.materials.peatDryConductivityWmK + this.materials.peatSaturationConductivityWmK * saturation; // uncalibrated peat heat-conduction mixture
+          kH *= this.materials.peatHorizontalPermeabilityFactor; kV *= this.materials.peatVerticalPermeabilityFactor; // demonstration peat pathway assumption
           this.peatMask[i] = 1;
           materialClass = 2;
         }
@@ -306,9 +299,9 @@ export class Simulation {
       this.rootFuel[i] = rootFuelKg;
       this.mineral[i] = bulkDensity * (1 - organic) * this.cellVolume;
       this.materialClass[i] = materialClass;
-      this.water[i] = porosity * this.cellVolume * saturation * LIQUID_WATER_DENSITY;
+      this.water[i] = porosity * this.cellVolume * saturation * this.materials.waterDensityKgM3;
       this.dryDensity[i] = bulkDensity;
-      this.solidHeatCapacity[i] = soil.solidHeatCapacityJKgK;
+      this.solidHeatCapacity[i] = materialClass === 2 ? this.materials.peatHeatCapacityJKgK : soil.solidHeatCapacityJKgK;
       this.thermalConductivity[i] = kThermal;
       this.porosity[i] = porosity;
       this.intrinsicH[i] = kH;
@@ -389,7 +382,7 @@ export class Simulation {
 
   private cellCapacity(i: number): number {
     return this.dryDensity[i] * this.cellVolume * this.solidHeatCapacity[i]
-      + this.water[i] * WATER_HEAT_CAPACITY + this.totalGasAt(i) * GAS_HEAT_CAPACITY;
+      + this.water[i] * this.materials.waterHeatCapacityJKgK + this.totalGasAt(i) * this.materials.gasHeatCapacityJMolK;
   }
 
   private heaterActiveAt(time: number): boolean {
@@ -460,17 +453,17 @@ export class Simulation {
     if (this.diagnostics.status !== 'running') throw new Error('Cannot convert dry ice after the reduced solver has paused outside its valid regime.');
     const convertedMassKg = this.dryIceMassKg;
     const injectedMol = convertedMassKg / CO2_MOLAR_MASS;
-    const solidSensibleJ = convertedMassKg * CO2_SOLID_HEAT_CAPACITY * Math.max(0, CO2_SUBLIMATION_K - this.dryIceTemperatureK);
-    const latentJ = convertedMassKg * CO2_SUBLIMATION_JKG;
+    const solidSensibleJ = convertedMassKg * this.materials.co2SolidHeatCapacityJKgK * Math.max(0, this.materials.co2SublimationK - this.dryIceTemperatureK);
+    const latentJ = convertedMassKg * this.materials.co2SublimationJkg;
     let gasSensibleJ = 0;
     for (const { i, weight } of this.sourceCells) {
       const mol = injectedMol * weight;
       this.co2[i] += mol;
-      gasSensibleJ += mol * CO2_HEAT_CAPACITY * (this.temperature[i] - CO2_SUBLIMATION_K);
+      gasSensibleJ += mol * this.materials.co2GasHeatCapacityJMolK * (this.temperature[i] - this.materials.co2SublimationK);
     }
     const interventionEnergyJ = solidSensibleJ + latentJ + gasSensibleJ;
     this.dryIceMassKg = 0;
-    this.dryIceTemperatureK = CO2_SUBLIMATION_K;
+    this.dryIceTemperatureK = this.materials.co2SublimationK;
     this.cumulativeSourceSensibleJ += solidSensibleJ;
     this.cumulativeSourceLatentJ += latentJ;
     this.cumulativeGasSourceMol += injectedMol;
@@ -516,7 +509,7 @@ export class Simulation {
       for (const { i, weight } of this.sourceCells) weightedSoilTemperature += weight * this.temperature[i];
       const incomingPower = this.heaterPowerW + source.contactConductanceWm2K * area
         * Math.max(0, weightedSoilTemperature - this.dryIceTemperatureK);
-      if (incomingPower > 0) dt = Math.min(dt, Math.max(0.01, 0.5 * this.dryIceMassKg * CO2_SUBLIMATION_JKG / incomingPower));
+      if (incomingPower > 0) dt = Math.min(dt, Math.max(0.01, 0.5 * this.dryIceMassKg * this.materials.co2SublimationJkg / incomingPower));
     }
     return dt;
   }
@@ -654,21 +647,21 @@ export class Simulation {
     }
     this.cumulativeSourceSoilJ += soilEnergyJ;
     let availableJ = heaterJ + soilEnergyJ;
-    if (availableJ >= 0 && this.dryIceTemperatureK < CO2_SUBLIMATION_K) {
-      const sensible = Math.min(availableJ, this.dryIceMassKg * CO2_SOLID_HEAT_CAPACITY * (CO2_SUBLIMATION_K - this.dryIceTemperatureK));
-      this.dryIceTemperatureK += sensible / (this.dryIceMassKg * CO2_SOLID_HEAT_CAPACITY);
+    if (availableJ >= 0 && this.dryIceTemperatureK < this.materials.co2SublimationK) {
+      const sensible = Math.min(availableJ, this.dryIceMassKg * this.materials.co2SolidHeatCapacityJKgK * (this.materials.co2SublimationK - this.dryIceTemperatureK));
+      this.dryIceTemperatureK += sensible / (this.dryIceMassKg * this.materials.co2SolidHeatCapacityJKgK);
       availableJ -= sensible;
       this.cumulativeSourceSensibleJ += sensible;
     }
     if (availableJ < 0) {
-      this.dryIceTemperatureK += availableJ / (this.dryIceMassKg * CO2_SOLID_HEAT_CAPACITY);
+      this.dryIceTemperatureK += availableJ / (this.dryIceMassKg * this.materials.co2SolidHeatCapacityJKgK);
       this.cumulativeSourceSensibleJ += availableJ;
       availableJ = 0;
     }
-    if (availableJ <= 0 || this.dryIceTemperatureK < CO2_SUBLIMATION_K - 1e-8) return;
-    const sublimatedKg = Math.min(this.dryIceMassKg, availableJ / CO2_SUBLIMATION_JKG);
+    if (availableJ <= 0 || this.dryIceTemperatureK < this.materials.co2SublimationK - 1e-8) return;
+    const sublimatedKg = Math.min(this.dryIceMassKg, availableJ / this.materials.co2SublimationJkg);
     this.dryIceMassKg -= sublimatedKg;
-    const latentJ = sublimatedKg * CO2_SUBLIMATION_JKG;
+    const latentJ = sublimatedKg * this.materials.co2SublimationJkg;
     this.cumulativeSourceLatentJ += latentJ;
     const unusedJ = availableJ - latentJ;
     if (unusedJ > 0) {
@@ -684,7 +677,7 @@ export class Simulation {
       const mol = addedMol * weight;
       this.co2[i] += mol;
       // Cold gas sensible heating by the cell is separate from sublimation latent energy.
-      heatJ[i] -= mol * CO2_HEAT_CAPACITY * Math.max(0, this.temperature[i] - this.dryIceTemperatureK);
+      heatJ[i] -= mol * this.materials.co2GasHeatCapacityJMolK * Math.max(0, this.temperature[i] - this.dryIceTemperatureK);
     }
   }
 
@@ -726,11 +719,11 @@ export class Simulation {
         const ramp = clamp((temp - model.evaporationOnsetTemperatureK) / (model.boilingTemperatureK - model.evaporationOnsetTemperatureK), 0, 1);
         const kineticKg = this.water[i] * (1 - Math.exp(-model.evaporationRateS * ramp * dt));
         const availableSensibleJ = Math.max(0, (temp - 273.15) * this.cellCapacity(i));
-        const evapKg = Math.min(this.water[i], kineticKg, availableSensibleJ / WATER_EVAPORATION_JKG);
+        const evapKg = Math.min(this.water[i], kineticKg, availableSensibleJ / this.materials.waterEvaporationJkg);
         this.water[i] -= evapKg;
         this.vapor[i] += evapKg / H2O_MOLAR_MASS;
         this.cumulativeSpeciesSourceMol.vapor += evapKg / H2O_MOLAR_MASS;
-        heatJ[i] -= evapKg * WATER_EVAPORATION_JKG;
+        heatJ[i] -= evapKg * this.materials.waterEvaporationJkg;
         this.cumulativeGasSourceMol += evapKg / H2O_MOLAR_MASS;
         this.diagnostics.cumulativeWaterEvaporatedKg += evapKg;
       }
@@ -757,7 +750,7 @@ export class Simulation {
       const k = b >= 0 ? harmonic(kA, f.axis === 2 ? this.effectiveV[b] : this.effectiveH[b]) : kA;
       const temp = b >= 0 ? (this.temperature[a] + this.temperature[b]) / 2 : (this.temperature[a] + atmT) / 2;
       const molarDensity = atm.pressurePa / (R * temp);
-      f.g = k / GAS_VISCOSITY * f.area / f.distance * molarDensity;
+      f.g = k / this.materials.gasViscosityPaS * f.area / f.distance * molarDensity;
       const diffusivity = b >= 0 ? harmonic(this.effectiveDiffusivity[a], this.effectiveDiffusivity[b]) : atm.exchangeVelocityMS * f.distance;
       f.d = diffusivity * f.area / f.distance * molarDensity;
     }
@@ -1025,7 +1018,7 @@ export class Simulation {
       fields.rootFuelKg[i] = this.rootFuel[i];
       fields.reactionRateKgS[i] = this.reactionRate[i];
       fields.reactionPowerWm3[i] = this.reactionRate[i] * this.scenario.model.heatOfCombustionJkg / this.cellVolume;
-      fields.moisture[i] = this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume);
+      fields.moisture[i] = this.water[i] / (this.materials.waterDensityKgM3 * this.porosity[i] * this.cellVolume);
       fields.pressurePa[i] = this.pressure[i];
       fields.porosity[i] = this.porosity[i];
       fields.intrinsicPermeability[i] = Math.sqrt(this.intrinsicH[i] * this.intrinsicV[i]);
@@ -1063,7 +1056,7 @@ export class Simulation {
       rootFuelKg: this.rootFuel[i], temperatureK: this.temperature[i], oxygenMoleFraction: o2,
       co2MoleFraction: totalGas > 0 ? this.co2[i] / totalGas : 0,
       oxygenPartialPressurePa: o2 * this.pressure[i], pressurePa: this.pressure[i],
-      moistureSaturation: this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume),
+      moistureSaturation: this.water[i] / (this.materials.waterDensityKgM3 * this.porosity[i] * this.cellVolume),
       fuelKg: this.fuel[i], darcyVelocityMS: [this.vx[i], this.vy[i], this.vz[i]] };
   }
 
@@ -1098,7 +1091,7 @@ export class Simulation {
     if (!Number.isFinite(data.timeSeconds) || data.timeSeconds < 0 || !Number.isFinite(data.dryIceMassKg) || data.dryIceMassKg < 0 || data.dryIceMassKg > data.scenario.source.initialMassKg) {
       throw new Error('Invalid checkpoint scalar state.');
     }
-    if (!Number.isFinite(data.dryIceTemperatureK) || data.dryIceTemperatureK < 150 || data.dryIceTemperatureK > 194.65
+    if (!Number.isFinite(data.dryIceTemperatureK) || data.dryIceTemperatureK < 150 || data.dryIceTemperatureK > sim.materials.co2SublimationK
       || !Number.isFinite(data.heaterEnergyJ) || data.heaterEnergyJ < 0
       || !Number.isFinite(data.heaterGenerationWm3) || data.heaterGenerationWm3 < 0 || data.heaterGenerationWm3 > 1e6) {
       throw new Error('Invalid checkpoint source/heater state.');
