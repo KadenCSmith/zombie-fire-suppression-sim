@@ -360,6 +360,15 @@ export class Simulation {
     }
   }
 
+  private refreshThermalConductances(): void {
+    for (const face of this.faces) {
+      if (face.b >= 0) {
+        face.thermalConductance = harmonic(this.thermalConductivity[face.a], this.thermalConductivity[face.b])
+          * face.area / face.distance;
+      }
+    }
+  }
+
   private makeSourceWeights(): Array<{ i: number; weight: number }> {
     const source = this.scenario.source;
     const fx = source.centerXM / this.dx - 0.5;
@@ -1115,6 +1124,9 @@ export class Simulation {
       if (!Array.isArray(values) || values.length !== sim.cellCount || values.some(v => !Number.isFinite(v))) throw new Error(`Invalid checkpoint array ${name}.`);
       array.set(values);
     }
+    // Checkpoints carry material fields, so a restored conductivity must also
+    // refresh the otherwise static face coefficients used by heat conduction.
+    sim.refreshThermalConductances();
     for (const name of ['oxygen', 'co2', 'background', 'vapor', 'fuel', 'rootFuel', 'mineral', 'reactionRate', 'water']) {
       if (Array.from(assignments[name]).some(value => value < 0)) throw new Error(`Negative inventory in checkpoint array ${name}.`);
     }
