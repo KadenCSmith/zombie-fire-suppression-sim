@@ -22,7 +22,8 @@ async function electronCache(platform, arch) {
   const sums = await readFile(path.join(directory, 'SHASUMS256.txt'), 'utf8');
   for (const cpu of arch === 'universal' ? ['x64', 'arm64'] : [arch]) {
     const filename = `electron-v${electronVersion}-${platform}-${cpu}.zip`;
-    const expected = sums.split(/\r?\n/).find(line => line.trim().endsWith(` ${filename}`))?.split(/\s+/)[0];
+    const expected = sums.split(/\r?\n/).map(line => line.match(/^([a-f0-9]{64})\s+\*?(.+)$/))
+      .find(parts => parts?.[2] === filename)?.[1];
     const actual = createHash('sha256').update(await readFile(path.join(directory, filename))).digest('hex');
     if (!expected || expected !== actual) throw new Error(`Official Electron checksum mismatch: ${filename}`);
   }
