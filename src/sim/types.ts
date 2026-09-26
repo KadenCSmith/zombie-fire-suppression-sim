@@ -205,6 +205,8 @@ export interface Diagnostics {
   correctedFuelKg: number;
   /** Integrated gas balance: initial + sources - boundary outflow - current, mol. */
   gasBalanceResidualMol: number;
+  /** Per-species initial + sources - signed boundary outflow + numerical correction - current, mol. */
+  speciesBalanceResidualMol: Record<'oxygen' | 'co2' | 'background' | 'vapor', number>;
   /** Integrated dry-ice heater + soil energy - sensible - latent, J. */
   sourceEnergyResidualJ: number;
   /** Diagnostic limited to resolved heat terms; excludes gas enthalpy at boundaries. */
@@ -216,7 +218,10 @@ export interface Diagnostics {
   cumulativeInterventionGasSensibleJ: number;
   cumulativeCO2OutflowKg: number;
   cumulativeOxygenBoundaryInKg: number;
+  /** Signed prescribed benchmark oxygen change; background changes oppositely, mol. */
+  cumulativeOxygenInterventionMol: number;
   cumulativeFuelConsumedKg: number;
+  cumulativeRootFuelConsumedKg: number;
   /** Integrated heat released by the reduced dry-fuel oxidation reaction, J. */
   cumulativeReactionHeatJ: number;
   /** Reaction heat generated during the last accepted step divided by that step's duration, W. */
@@ -234,6 +239,19 @@ export interface SnapshotFields {
   backgroundGas: Float32Array;
   waterVapor: Float32Array;
   fuel: Float32Array;
+  /** Nonreacting mineral mass per bulk cell, kg. */
+  mineralKg: Float32Array;
+  /** 0 mineral, 1 mixed mineral/organic soil, 2 peat; roots and paths modify this matrix. */
+  materialClass: Float32Array;
+  /** Resolved dry bulk density and thermal conductivity for the chosen cell material. */
+  dryDensityKgM3: Float32Array;
+  thermalConductivityWmK: Float32Array;
+  /** Remaining supplemental root fuel, a subset of fuel, kg. */
+  rootFuelKg: Float32Array;
+  /** Accepted-step dry-fuel oxidation rate, kg/s per cell. */
+  reactionRateKgS: Float32Array;
+  /** Accepted-step reaction heat source per bulk cell volume, W/m³. */
+  reactionPowerWm3: Float32Array;
   moisture: Float32Array;
   pressurePa: Float32Array;
   porosity: Float32Array;
@@ -270,6 +288,13 @@ export interface ProbeSample {
   xM: number;
   yM: number;
   depthM: number;
+  /** 0 mineral, 1 mixed mineral/organic soil, 2 peat matrix. */
+  materialClass: number;
+  dryDensityKgM3: number;
+  thermalConductivityWmK: number;
+  porosity: number;
+  intrinsicPermeabilityM2: number;
+  rootFuelKg: number;
   temperatureK: number;
   oxygenMoleFraction: number;
   co2MoleFraction: number;
@@ -282,9 +307,11 @@ export interface ProbeSample {
 
 export interface OperationalEvent {
   timeSeconds: number;
-  type: 'heater-enabled' | 'heater-generation' | 'dry-ice-convert-all';
+  type: 'heater-enabled' | 'heater-generation' | 'dry-ice-convert-all' | 'atmospheric-oxygen' | 'oxygen-inventory-benchmark';
   value: boolean | number;
   externalEnergyJ?: number;
+  externalOxygenMol?: number;
+  externalBackgroundMol?: number;
 }
 
 export interface SerializedSimulation {

@@ -21,6 +21,7 @@ const H2O_PER_FUEL_KG = 90 / 162;
 
 type Species = 'oxygen' | 'co2' | 'background' | 'vapor';
 const SPECIES: Species[] = ['oxygen', 'co2', 'background', 'vapor'];
+function zeroSpecies(): Record<Species, number> { return { oxygen: 0, co2: 0, background: 0, vapor: 0 }; }
 
 interface Face {
   a: number;
@@ -30,6 +31,7 @@ interface Face {
   distance: number;
   g: number; // mol s^-1 Pa^-1 for Darcy pressure solve
   d: number; // mol s^-1 per mole-fraction difference
+  thermalConductance: number; // W K^-1; fixed material property
   boundary: boolean;
 }
 
@@ -64,10 +66,13 @@ function freshDiagnostics(): Diagnostics {
     sourceExcessPressurePa: 0, sourceProjectedAreaM2: 0, sourcePressureLoadN: 0,
     sourcePressureLoadStatus: 'within-reduced-model',
     correctedMoles: 0, correctedWaterKg: 0, correctedFuelKg: 0,
-    gasBalanceResidualMol: 0, sourceEnergyResidualJ: 0, resolvedHeatResidualJ: 0,
+    gasBalanceResidualMol: 0, speciesBalanceResidualMol: zeroSpecies(),
+    sourceEnergyResidualJ: 0, resolvedHeatResidualJ: 0,
     cumulativeCO2InputKg: 0, cumulativeCO2OutflowKg: 0,
     cumulativeInterventionEnergyJ: 0, cumulativeInterventionGasSensibleJ: 0,
     cumulativeOxygenBoundaryInKg: 0, cumulativeFuelConsumedKg: 0,
+    cumulativeOxygenInterventionMol: 0,
+    cumulativeRootFuelConsumedKg: 0,
     cumulativeReactionHeatJ: 0, lastReactionPowerW: 0, reactingCellCount: 0,
     cumulativeWaterEvaporatedKg: 0, cumulativeGasBoundaryOutMol: 0,
   };
@@ -100,6 +105,10 @@ export class Simulation {
   private background: Float64Array;
   private vapor: Float64Array;
   private fuel: Float64Array;
+  private mineral: Float64Array;
+  private materialClass: Uint8Array;
+  private rootFuel: Float64Array;
+  private reactionRate: Float64Array;
   private water: Float64Array;
   private dryDensity: Float64Array;
   private solidHeatCapacity: Float64Array;
@@ -116,9 +125,23 @@ export class Simulation {
   private vy: Float64Array;
   private vz: Float64Array;
   private faces: Face[] = [];
+  private readonly stepArrays: Float64Array[];
+  private readonly stepBackup: Float64Array[];
+  private readonly work: {
+    heatJ: Float64Array; initialCapacity: Float64Array; pre: Float64Array;
+    capacity: Float64Array; diagonal: Float64Array; gauge: Float64Array;
+    rhs: Float64Array; residualVector: Float64Array; preconditioned: Float64Array;
+    direction: Float64Array; product: Float64Array; outgoing: Float64Array;
+    conductanceX: Float64Array; conductanceY: Float64Array; conductanceZ: Float64Array;
+    deltas: Record<Species, Float64Array>;
+  };
   private sourceCells: Array<{ i: number; weight: number }> = [];
   private initialGasMol = 0;
   private cumulativeGasSourceMol = 0;
+  private initialSpeciesMol = zeroSpecies();
+  private cumulativeSpeciesSourceMol = zeroSpecies();
+  private cumulativeSpeciesBoundaryOutMol = zeroSpecies();
+  private cumulativeSpeciesCorrectionMol = zeroSpecies();
   private cumulativeSourceHeaterJ = 0;
   private cumulativeSourceSoilJ = 0;
   private cumulativeSourceSensibleJ = 0;
@@ -139,18 +162,38 @@ export class Simulation {
     const array = () => new Float64Array(this.cellCount);
     this.temperature = array(); this.oxygen = array(); this.co2 = array();
     this.background = array(); this.vapor = array(); this.fuel = array(); this.water = array();
+    this.mineral = array(); this.rootFuel = array(); this.reactionRate = array();
+    this.materialClass = new Uint8Array(this.cellCount);
     this.dryDensity = array(); this.solidHeatCapacity = array(); this.thermalConductivity = array();
     this.porosity = array(); this.intrinsicH = array(); this.intrinsicV = array();
     this.effectiveH = array(); this.effectiveV = array(); this.effectiveDiffusivity = array();
     this.peatMask = array(); this.pressure = array(); this.vx = array(); this.vy = array(); this.vz = array();
+    this.stepArrays = [this.temperature, this.oxygen, this.co2, this.background,
+      this.vapor, this.fuel, this.rootFuel, this.reactionRate, this.water,
+      this.pressure, this.vx, this.vy, this.vz];
+    this.stepBackup = this.stepArrays.map(() => array());
+    this.work = {
+      heatJ: array(), initialCapacity: array(), pre: array(), capacity: array(),
+      diagonal: array(), gauge: array(), rhs: array(), residualVector: array(),
+      preconditioned: array(), direction: array(), product: array(), outgoing: array(),
+      conductanceX: array(), conductanceY: array(), conductanceZ: array(),
+      deltas: { oxygen: array(), co2: array(), background: array(), vapor: array() },
+    };
     this.dryIceMassKg = scenario.source.initialMassKg;
     this.dryIceTemperatureK = scenario.source.initialTemperatureK;
     this.heaterEnabled = scenario.source.enabled;
     this.heaterGenerationWm3 = scenario.source.heatGenerationWm3;
     this.initializeCells();
+    if (this.hasUnsupportedFrozenWater()) {
+      throw new Error('Initial liquid water is below 273.15 K; freezing and thawing are not modeled.');
+    }
     this.buildFaces();
     this.sourceCells = this.makeSourceWeights();
     this.initialGasMol = this.totalGasMol();
+    for (const species of SPECIES) {
+      const array = this.gasArray(species);
+      for (let i = 0; i < this.cellCount; i++) this.initialSpeciesMol[species] += array[i];
+    }
     this.updateDiagnostics();
   }
 
@@ -183,6 +226,12 @@ export class Simulation {
       case 'vapor': return this.vapor;
     }
   }
+  private hasUnsupportedFrozenWater(): boolean {
+    for (let i = 0; i < this.cellCount; i++) {
+      if (this.water[i] > 0 && this.temperature[i] < 273.15 - 1e-9) return true;
+    }
+    return false;
+  }
   private atmosphereFraction(species: Species): number {
     const a = this.scenario.atmosphere;
     switch (species) {
@@ -214,6 +263,7 @@ export class Simulation {
       }
       let bulkDensity = soil.bulkDensityKgM3;
       let organic = soil.organicFraction;
+      let materialClass = organic > 0 ? 1 : 0;
       let saturation = soil.moistureSaturation;
       let porosity = soil.porosity;
       let kThermal = soil.thermalConductivityWmK;
@@ -237,6 +287,7 @@ export class Simulation {
           kThermal = 0.16 + 0.6 * saturation; // uncalibrated peat heat-conduction mixture
           kH *= 4; kV *= 2; // demonstration peat pathway assumption
           this.peatMask[i] = 1;
+          materialClass = 2;
         }
       }
       for (const path of s.pathways) {
@@ -252,6 +303,9 @@ export class Simulation {
       // Roots are added once to the base organic dry mass; never included in its fraction.
       const mineralOrganicFuelKg = bulkDensity * organic * this.cellVolume;
       this.fuel[i] = mineralOrganicFuelKg + rootFuelKg;
+      this.rootFuel[i] = rootFuelKg;
+      this.mineral[i] = bulkDensity * (1 - organic) * this.cellVolume;
+      this.materialClass[i] = materialClass;
       this.water[i] = porosity * this.cellVolume * saturation * LIQUID_WATER_DENSITY;
       this.dryDensity[i] = bulkDensity;
       this.solidHeatCapacity[i] = soil.solidHeatCapacityJKgK;
@@ -265,6 +319,7 @@ export class Simulation {
           hot.sizeXM, hot.sizeYM, hot.thicknessM, 0, 0.5)) {
           this.temperature[i] = Math.max(this.temperature[i], celsiusToKelvin(hot.temperatureC));
           this.fuel[i] *= hot.fuelFraction;
+          this.rootFuel[i] *= hot.fuelFraction;
         }
       }
       const n = s.atmosphere.pressurePa * this.gasVolume(i) / (R * this.temperature[i]);
@@ -288,7 +343,9 @@ export class Simulation {
 
   private buildFaces(): void {
     const add = (a: number, b: number, axis: 0 | 1 | 2, area: number, distance: number, boundary = false) => {
-      this.faces.push({ a, b, axis, area, distance, g: 0, d: 0, boundary });
+      const thermalConductance = b >= 0
+        ? harmonic(this.thermalConductivity[a], this.thermalConductivity[b]) * area / distance : 0;
+      this.faces.push({ a, b, axis, area, distance, g: 0, d: 0, thermalConductance, boundary });
     };
     for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
       const i = this.idx(x, y, z);
@@ -349,6 +406,39 @@ export class Simulation {
     this.events.push({ timeSeconds: this.timeSeconds, type: 'heater-generation', value: heatGenerationWm3 });
   }
 
+  /** Prescribed atmospheric boundary composition for a reduced oxygen-interruption benchmark. */
+  setAtmosphericOxygen(moleFraction: number): void {
+    const atmosphere = this.scenario.atmosphere;
+    const maximum = 1 - atmosphere.co2MoleFraction - atmosphere.waterVaporMoleFraction;
+    if (!Number.isFinite(moleFraction) || moleFraction < 0 || moleFraction > maximum) throw new Error('Atmospheric oxygen mole fraction is outside the mixture range.');
+    if (atmosphere.oxygenMoleFraction === moleFraction) return;
+    atmosphere.oxygenMoleFraction = moleFraction;
+    this.events.push({ timeSeconds: this.timeSeconds, type: 'atmospheric-oxygen', value: moleFraction });
+  }
+
+  /** Benchmark-only, prescribed inventory exchange at fixed total gas moles and temperature. */
+  setUniformOxygenFraction(moleFraction: number): void {
+    if (!Number.isFinite(moleFraction) || moleFraction < 0 || moleFraction > 1) throw new Error('Invalid benchmark oxygen fraction.');
+    const changes = new Float64Array(this.cellCount);
+    for (let i = 0; i < this.cellCount; i++) {
+      const target = this.totalGasAt(i) * moleFraction;
+      changes[i] = target - this.oxygen[i];
+      if (this.background[i] + 1e-12 < changes[i]) throw new Error('Insufficient background gas for prescribed oxygen exchange.');
+    }
+    let deltaOxygenMol = 0;
+    for (let i = 0; i < this.cellCount; i++) {
+      this.oxygen[i] += changes[i];
+      this.background[i] -= changes[i];
+      deltaOxygenMol += changes[i];
+    }
+    this.diagnostics.cumulativeOxygenInterventionMol += deltaOxygenMol;
+    this.cumulativeSpeciesSourceMol.oxygen += deltaOxygenMol;
+    this.cumulativeSpeciesSourceMol.background -= deltaOxygenMol;
+    this.events.push({ timeSeconds: this.timeSeconds, type: 'oxygen-inventory-benchmark', value: moleFraction,
+      externalOxygenMol: deltaOxygenMol, externalBackgroundMol: -deltaOxygenMol, externalEnergyJ: 0 });
+    this.updateDiagnostics();
+  }
+
   /**
    * One numerical intervention: transform all remaining solid inventory into CO₂ gas at
    * the source support cells. The required phase-change and gas-equilibration energy is
@@ -375,6 +465,7 @@ export class Simulation {
     this.cumulativeSourceSensibleJ += solidSensibleJ;
     this.cumulativeSourceLatentJ += latentJ;
     this.cumulativeGasSourceMol += injectedMol;
+    this.cumulativeSpeciesSourceMol.co2 += injectedMol;
     this.diagnostics.cumulativeCO2InputKg += convertedMassKg;
     this.diagnostics.cumulativeInterventionEnergyJ += interventionEnergyJ;
     this.diagnostics.cumulativeInterventionGasSensibleJ += gasSensibleJ;
@@ -436,8 +527,14 @@ export class Simulation {
 
   /** Advance to an absolute physical time; maxSteps permits responsive worker chunking. */
   advanceTo(targetTimeSeconds: number, maxSteps = Number.POSITIVE_INFINITY): Snapshot {
+    this.advanceUntil(targetTimeSeconds, maxSteps);
+    return this.snapshot();
+  }
+
+  /** Advance without allocating a full display snapshot; used by fine-grid worker chunks. */
+  advanceUntil(targetTimeSeconds: number, maxSteps = Number.POSITIVE_INFINITY): void {
     if (!Number.isFinite(targetTimeSeconds) || targetTimeSeconds < this.timeSeconds - 1e-9) throw new Error('Target time must be finite and not earlier than current solver time.');
-    if (maxSteps <= 0) return this.snapshot();
+    if (maxSteps <= 0) return;
     let steps = 0;
     while (this.timeSeconds + 1e-9 < targetTimeSeconds && this.diagnostics.status === 'running' && steps < maxSteps) {
       const dt = this.nextStepLimit(targetTimeSeconds - this.timeSeconds);
@@ -446,40 +543,38 @@ export class Simulation {
       steps++;
     }
     if (Math.abs(this.timeSeconds - targetTimeSeconds) <= 1e-8) this.timeSeconds = targetTimeSeconds;
-    return this.snapshot();
   }
 
   private performStep(dt: number): void {
     const n = this.cellCount;
     // Transactional step: a validity/numerical failure returns to the last fully valid state.
-    const backupArrays = {
-      temperature: this.temperature.slice(), oxygen: this.oxygen.slice(), co2: this.co2.slice(),
-      background: this.background.slice(), vapor: this.vapor.slice(), fuel: this.fuel.slice(),
-      water: this.water.slice(), pressure: this.pressure.slice(),
-      vx: this.vx.slice(), vy: this.vy.slice(), vz: this.vz.slice(),
-    };
+    for (let j = 0; j < this.stepArrays.length; j++) this.stepBackup[j].set(this.stepArrays[j]);
     const backupScalars = [this.dryIceMassKg, this.dryIceTemperatureK, this.heaterEnergyJ,
       this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
       this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
       this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ];
-    const backupDiagnostics: Diagnostics = { ...this.diagnostics, warnings: [...this.diagnostics.warnings] };
+    const backupSpeciesSource = { ...this.cumulativeSpeciesSourceMol };
+    const backupSpeciesBoundary = { ...this.cumulativeSpeciesBoundaryOutMol };
+    const backupSpeciesCorrection = { ...this.cumulativeSpeciesCorrectionMol };
+    const backupDiagnostics: Diagnostics = { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+      speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } };
     const rollback = () => {
       const failureStatus = this.diagnostics.status;
       const failureWarnings = this.diagnostics.warnings.filter(w => !backupDiagnostics.warnings.includes(w));
-      this.temperature.set(backupArrays.temperature); this.oxygen.set(backupArrays.oxygen);
-      this.co2.set(backupArrays.co2); this.background.set(backupArrays.background);
-      this.vapor.set(backupArrays.vapor); this.fuel.set(backupArrays.fuel); this.water.set(backupArrays.water);
-      this.pressure.set(backupArrays.pressure); this.vx.set(backupArrays.vx); this.vy.set(backupArrays.vy); this.vz.set(backupArrays.vz);
+      for (let j = 0; j < this.stepArrays.length; j++) this.stepArrays[j].set(this.stepBackup[j]);
       [this.dryIceMassKg, this.dryIceTemperatureK, this.heaterEnergyJ,
         this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ, this.cumulativeSourceSoilJ,
         this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ, this.cumulativeSourceReturnJ,
         this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ] = backupScalars;
+      this.cumulativeSpeciesSourceMol = backupSpeciesSource;
+      this.cumulativeSpeciesBoundaryOutMol = backupSpeciesBoundary;
+      this.cumulativeSpeciesCorrectionMol = backupSpeciesCorrection;
       this.diagnostics = { ...backupDiagnostics, status: failureStatus, warnings: [...backupDiagnostics.warnings, ...failureWarnings] };
       this.updateEffectiveProperties();
       this.updateDiagnostics();
     };
-    const heatJ = new Float64Array(n);
-    const initialCapacity = new Float64Array(n);
+    const { heatJ, initialCapacity } = this.work;
+    heatJ.fill(0);
     for (let i = 0; i < n; i++) initialCapacity[i] = this.cellCapacity(i);
     this.applyHeatConduction(dt, heatJ);
     this.applySource(dt, heatJ);
@@ -495,6 +590,11 @@ export class Simulation {
         rollback();
         return;
       }
+    }
+    if (this.hasUnsupportedFrozenWater()) {
+      this.pause('validity-paused', 'Wet soil reached the freezing point; the model has no ice or thawing state.');
+      rollback();
+      return;
     }
     this.cumulativeResolvedHeatExpectedJ += expectedHeatJ;
     this.cumulativeResolvedHeatActualJ += actualHeatJ;
@@ -512,8 +612,7 @@ export class Simulation {
     const deepT = celsiusToKelvin(this.scenario.atmosphere.deepTemperatureC);
     for (const f of this.faces) {
       if (f.b < 0) continue;
-      const conductance = harmonic(this.thermalConductivity[f.a], this.thermalConductivity[f.b]) * f.area / f.distance;
-      const energy = conductance * (this.temperature[f.b] - this.temperature[f.a]) * dt;
+      const energy = f.thermalConductance * (this.temperature[f.b] - this.temperature[f.a]) * dt;
       heatJ[f.a] += energy; heatJ[f.b] -= energy;
     }
     const a = this.scenario.atmosphere;
@@ -570,6 +669,7 @@ export class Simulation {
     }
     const addedMol = sublimatedKg / CO2_MOLAR_MASS;
     this.cumulativeGasSourceMol += addedMol;
+    this.cumulativeSpeciesSourceMol.co2 += addedMol;
     this.diagnostics.cumulativeCO2InputKg += sublimatedKg;
     for (const { i, weight } of this.sourceCells) {
       const mol = addedMol * weight;
@@ -584,6 +684,7 @@ export class Simulation {
     let reactionHeatJ = 0;
     let reactingCellCount = 0;
     for (let i = 0; i < this.cellCount; i++) {
+      this.reactionRate[i] = 0;
       const temp = this.temperature[i];
       if (temp > model.minimumReactionTemperatureK && this.fuel[i] > 0 && this.oxygen[i] > 0) {
         const gas = this.totalGasAt(i);
@@ -595,14 +696,21 @@ export class Simulation {
         const oxygenLimitedFuelKg = this.oxygen[i] * O2_MOLAR_MASS / O2_PER_FUEL_KG;
         const reactedKg = Math.min(this.fuel[i], kineticFuelKg, oxygenLimitedFuelKg);
         if (reactedKg > 0) reactingCellCount++;
+        const rootReactedKg = reactedKg * this.rootFuel[i] / this.fuel[i];
+        this.rootFuel[i] -= rootReactedKg;
+        this.reactionRate[i] = reactedKg / dt;
         this.fuel[i] -= reactedKg;
         this.oxygen[i] -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
         this.co2[i] += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
         this.vapor[i] += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.oxygen -= reactedKg * O2_PER_FUEL_KG / O2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.co2 += reactedKg * CO2_PER_FUEL_KG / CO2_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.vapor += reactedKg * H2O_PER_FUEL_KG / H2O_MOLAR_MASS;
         const heatReleasedJ = reactedKg * model.heatOfCombustionJkg;
         heatJ[i] += heatReleasedJ;
         reactionHeatJ += heatReleasedJ;
         this.diagnostics.cumulativeFuelConsumedKg += reactedKg;
+        this.diagnostics.cumulativeRootFuelConsumedKg += rootReactedKg;
         this.cumulativeGasSourceMol += reactedKg * (-O2_PER_FUEL_KG / O2_MOLAR_MASS + CO2_PER_FUEL_KG / CO2_MOLAR_MASS + H2O_PER_FUEL_KG / H2O_MOLAR_MASS);
       }
       if (temp > model.evaporationOnsetTemperatureK && this.water[i] > 0 && model.evaporationRateS > 0) {
@@ -612,6 +720,7 @@ export class Simulation {
         const evapKg = Math.min(this.water[i], kineticKg, availableSensibleJ / WATER_EVAPORATION_JKG);
         this.water[i] -= evapKg;
         this.vapor[i] += evapKg / H2O_MOLAR_MASS;
+        this.cumulativeSpeciesSourceMol.vapor += evapKg / H2O_MOLAR_MASS;
         heatJ[i] -= evapKg * WATER_EVAPORATION_JKG;
         this.cumulativeGasSourceMol += evapKg / H2O_MOLAR_MASS;
         this.diagnostics.cumulativeWaterEvaporatedKg += evapKg;
@@ -626,8 +735,8 @@ export class Simulation {
     const n = this.cellCount;
     const atm = this.scenario.atmosphere;
     const atmT = celsiusToKelvin(atm.temperatureC);
-    const pre = new Float64Array(n);
-    const capacity = new Float64Array(n);
+    const { pre, capacity, diagonal, gauge, rhs, residualVector, preconditioned, direction, product,
+      conductanceX, conductanceY, conductanceZ } = this.work;
     for (let i = 0; i < n; i++) {
       pre[i] = this.totalGasAt(i);
       capacity[i] = this.gasVolume(i) / (R * this.temperature[i]);
@@ -646,26 +755,52 @@ export class Simulation {
     // The implicit gas-storage equation is symmetric positive definite:
     // C_i (p_i - p*_i) + dt sum_f g_f (p_i - p_neighbor) = 0.
     // Atmospheric boundary pressures are fixed. Solve for gauge pressure with
-    // Jacobi-preconditioned conjugate gradients; local Gauss-Seidel converges
-    // prohibitively slowly on the default high-conductance 3-D grid.
-    const diagonal = capacity.slice();
+    // conjugate gradients and a symmetric Gauss-Seidel preconditioner.
+    // This changes only the linear solver, not the storage or Darcy equation.
+    diagonal.set(capacity);
     for (const f of this.faces) {
       const conductance = dt * f.g;
       diagonal[f.a] += conductance;
-      if (f.b >= 0) diagonal[f.b] += conductance;
+      if (f.b >= 0) {
+        diagonal[f.b] += conductance;
+        if (f.axis === 0) conductanceX[f.a] = conductance;
+        else if (f.axis === 1) conductanceY[f.a] = conductance;
+        else conductanceZ[f.a] = conductance;
+      }
     }
-    const gauge = new Float64Array(n);
-    const rhs = new Float64Array(n);
-    const residualVector = new Float64Array(n);
-    const preconditioned = new Float64Array(n);
-    const direction = new Float64Array(n);
-    const product = new Float64Array(n);
     const applyMatrix = (input: Float64Array, output: Float64Array): void => {
-      for (let i = 0; i < n; i++) output[i] = capacity[i] * input[i];
-      for (const f of this.faces) {
-        const flux = dt * f.g * (input[f.a] - (f.b >= 0 ? input[f.b] : 0));
-        output[f.a] += flux;
-        if (f.b >= 0) output[f.b] -= flux;
+      const layerSize = this.nx * this.ny;
+      for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = diagonal[i] * input[i];
+        if (x > 0) value -= conductanceX[i - 1] * input[i - 1];
+        if (x + 1 < this.nx) value -= conductanceX[i] * input[i + 1];
+        if (y > 0) value -= conductanceY[i - this.nx] * input[i - this.nx];
+        if (y + 1 < this.ny) value -= conductanceY[i] * input[i + this.nx];
+        if (z > 0) value -= conductanceZ[i - layerSize] * input[i - layerSize];
+        if (z + 1 < this.nz) value -= conductanceZ[i] * input[i + layerSize];
+        output[i] = value;
+      }
+    };
+    // M = (D + L) D^-1 (D + U) is symmetric positive definite for this
+    // positive diagonal. The two ordered sweeps apply M^-1 to a residual.
+    const precondition = (input: Float64Array, output: Float64Array): void => {
+      const layerSize = this.nx * this.ny;
+      for (let z = 0; z < this.nz; z++) for (let y = 0; y < this.ny; y++) for (let x = 0; x < this.nx; x++) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = input[i];
+        if (x > 0) value += conductanceX[i - 1] * output[i - 1];
+        if (y > 0) value += conductanceY[i - this.nx] * output[i - this.nx];
+        if (z > 0) value += conductanceZ[i - layerSize] * output[i - layerSize];
+        output[i] = value / diagonal[i];
+      }
+      for (let z = this.nz - 1; z >= 0; z--) for (let y = this.ny - 1; y >= 0; y--) for (let x = this.nx - 1; x >= 0; x--) {
+        const i = (z * this.ny + y) * this.nx + x;
+        let value = 0;
+        if (x + 1 < this.nx) value += conductanceX[i] * output[i + 1];
+        if (y + 1 < this.ny) value += conductanceY[i] * output[i + this.nx];
+        if (z + 1 < this.nz) value += conductanceZ[i] * output[i + layerSize];
+        output[i] += value / diagonal[i];
       }
     };
     for (let i = 0; i < n; i++) {
@@ -677,10 +812,12 @@ export class Simulation {
     let rz = 0;
     for (let i = 0; i < n; i++) {
       residualVector[i] = rhs[i] - product[i];
-      preconditioned[i] = residualVector[i] / diagonal[i];
+      residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
+    }
+    precondition(residualVector, preconditioned);
+    for (let i = 0; i < n; i++) {
       direction[i] = preconditioned[i];
       rz += residualVector[i] * preconditioned[i];
-      residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
     }
     let iterations = 0;
     const tolerancePa = 1e-5;
@@ -698,10 +835,10 @@ export class Simulation {
       residual = 0;
       let nextRz = 0;
       for (let i = 0; i < n; i++) {
-        preconditioned[i] = residualVector[i] / diagonal[i];
-        nextRz += residualVector[i] * preconditioned[i];
         residual = Math.max(residual, Math.abs(residualVector[i]) / diagonal[i]);
       }
+      precondition(residualVector, preconditioned);
+      for (let i = 0; i < n; i++) nextRz += residualVector[i] * preconditioned[i];
       iterations++;
       if (residual <= tolerancePa) break;
       const beta = nextRz / rz;
@@ -752,7 +889,8 @@ export class Simulation {
     const atm = this.scenario.atmosphere;
     // A static pressure field is valid only for this step; subcycle fractions for positivity.
     let maxTurnover = 0;
-    const outgoing = new Float64Array(n);
+    const outgoing = this.work.outgoing;
+    outgoing.fill(0);
     for (const f of this.faces) {
       const pb = f.b >= 0 ? this.pressure[f.b] : atm.pressurePa;
       const flux = f.g * (this.pressure[f.a] - pb);
@@ -766,9 +904,7 @@ export class Simulation {
       return;
     }
     const subDt = dt / substeps;
-    const deltas: Record<Species, Float64Array> = {
-      oxygen: new Float64Array(n), co2: new Float64Array(n), background: new Float64Array(n), vapor: new Float64Array(n),
-    };
+    const deltas = this.work.deltas;
     for (let sub = 0; sub < substeps; sub++) {
       for (const species of SPECIES) deltas[species].fill(0);
       for (const f of this.faces) {
@@ -788,6 +924,7 @@ export class Simulation {
           if (b >= 0) deltas[species][b] += transfer;
           else {
             this.diagnostics.cumulativeGasBoundaryOutMol += transfer;
+            this.cumulativeSpeciesBoundaryOutMol[species] += transfer;
             if (species === 'co2') this.diagnostics.cumulativeCO2OutflowKg += transfer * CO2_MOLAR_MASS;
             if (species === 'oxygen') this.diagnostics.cumulativeOxygenBoundaryInKg -= transfer * O2_MOLAR_MASS;
           }
@@ -802,6 +939,7 @@ export class Simulation {
             // Small roundoff is corrected explicitly and recorded; material negativity pauses.
             if (array[i] < -1e-8) { this.pause('numerical-paused', `${species} became negative at cell ${i}.`); return; }
             this.diagnostics.correctedMoles += -array[i];
+            this.cumulativeSpeciesCorrectionMol[species] -= array[i];
             array[i] = 0;
           }
         }
@@ -827,13 +965,22 @@ export class Simulation {
       ? 'within-reduced-model' : 'outside-validity';
     this.diagnostics.gasBalanceResidualMol = this.initialGasMol + this.cumulativeGasSourceMol
       - this.diagnostics.cumulativeGasBoundaryOutMol + this.diagnostics.correctedMoles - this.totalGasMol();
+    for (const species of SPECIES) {
+      const array = this.gasArray(species);
+      let currentMol = 0;
+      for (let i = 0; i < this.cellCount; i++) currentMol += array[i];
+      this.diagnostics.speciesBalanceResidualMol[species] = this.initialSpeciesMol[species]
+        + this.cumulativeSpeciesSourceMol[species] - this.cumulativeSpeciesBoundaryOutMol[species]
+        + this.cumulativeSpeciesCorrectionMol[species] - currentMol;
+    }
     this.diagnostics.sourceEnergyResidualJ = this.cumulativeSourceHeaterJ + this.cumulativeSourceSoilJ
       + this.diagnostics.cumulativeInterventionEnergyJ - this.diagnostics.cumulativeInterventionGasSensibleJ
       - this.cumulativeSourceSensibleJ - this.cumulativeSourceLatentJ - this.cumulativeSourceReturnJ;
     this.diagnostics.resolvedHeatResidualJ = this.cumulativeResolvedHeatExpectedJ - this.cumulativeResolvedHeatActualJ;
     if (![this.diagnostics.gasBalanceResidualMol, this.diagnostics.sourceEnergyResidualJ, this.diagnostics.resolvedHeatResidualJ,
       this.diagnostics.sourceExcessPressurePa, this.diagnostics.sourcePressureLoadN,
-      this.diagnostics.cumulativeReactionHeatJ, this.diagnostics.lastReactionPowerW].every(Number.isFinite)) {
+      this.diagnostics.cumulativeReactionHeatJ, this.diagnostics.lastReactionPowerW,
+      ...SPECIES.map(species => this.diagnostics.speciesBalanceResidualMol[species])].every(Number.isFinite)) {
       this.pause('numerical-paused', 'A conservation residual became non-finite.');
       this.diagnostics.sourcePressureLoadStatus = 'outside-validity';
     }
@@ -844,6 +991,10 @@ export class Simulation {
     const fields: SnapshotFields = {
       temperatureK: new Float32Array(n), oxygen: new Float32Array(n), co2: new Float32Array(n),
       backgroundGas: new Float32Array(n), waterVapor: new Float32Array(n), fuel: new Float32Array(n),
+      mineralKg: new Float32Array(n), rootFuelKg: new Float32Array(n),
+      materialClass: new Float32Array(n), dryDensityKgM3: new Float32Array(n),
+      thermalConductivityWmK: new Float32Array(n),
+      reactionRateKgS: new Float32Array(n), reactionPowerWm3: new Float32Array(n),
       moisture: new Float32Array(n), pressurePa: new Float32Array(n), porosity: new Float32Array(n),
       intrinsicPermeability: new Float32Array(n), effectivePermeability: new Float32Array(n),
       effectiveGasDiffusivity: new Float32Array(n), peatMask: new Float32Array(n),
@@ -858,6 +1009,13 @@ export class Simulation {
       fields.backgroundGas[i] = totalGas > 0 ? this.background[i] / totalGas : 0;
       fields.waterVapor[i] = totalGas > 0 ? this.vapor[i] / totalGas : 0;
       fields.fuel[i] = this.fuel[i];
+      fields.mineralKg[i] = this.mineral[i];
+      fields.materialClass[i] = this.materialClass[i];
+      fields.dryDensityKgM3[i] = this.dryDensity[i];
+      fields.thermalConductivityWmK[i] = this.thermalConductivity[i];
+      fields.rootFuelKg[i] = this.rootFuel[i];
+      fields.reactionRateKgS[i] = this.reactionRate[i];
+      fields.reactionPowerWm3[i] = this.reactionRate[i] * this.scenario.model.heatOfCombustionJkg / this.cellVolume;
       fields.moisture[i] = this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume);
       fields.pressurePa[i] = this.pressure[i];
       fields.porosity[i] = this.porosity[i];
@@ -875,7 +1033,8 @@ export class Simulation {
       dryIceDiameterM: diameterFromMass(this.dryIceMassKg, this.scenario.source.densityKgM3),
       dryIceTemperatureK: this.dryIceTemperatureK, heaterPowerW: this.heaterPowerW,
       heaterEnergyJ: this.heaterEnergyJ, peakTemperatureK, totalFuelKg,
-      diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings] },
+      diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+        speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } },
     };
   }
 
@@ -889,7 +1048,10 @@ export class Simulation {
     const i = this.idx(x, y, z);
     const totalGas = this.totalGasAt(i);
     const o2 = totalGas > 0 ? this.oxygen[i] / totalGas : 0;
-    return { xM, yM, depthM, temperatureK: this.temperature[i], oxygenMoleFraction: o2,
+    return { xM, yM, depthM, materialClass: this.materialClass[i],
+      dryDensityKgM3: this.dryDensity[i], thermalConductivityWmK: this.thermalConductivity[i],
+      porosity: this.porosity[i], intrinsicPermeabilityM2: Math.sqrt(this.intrinsicH[i] * this.intrinsicV[i]),
+      rootFuelKg: this.rootFuel[i], temperatureK: this.temperature[i], oxygenMoleFraction: o2,
       co2MoleFraction: totalGas > 0 ? this.co2[i] / totalGas : 0,
       oxygenPartialPressurePa: o2 * this.pressure[i], pressurePa: this.pressure[i],
       moistureSaturation: this.water[i] / (LIQUID_WATER_DENSITY * this.porosity[i] * this.cellVolume),
@@ -900,7 +1062,8 @@ export class Simulation {
     const arrays: Record<string, number[]> = {};
     for (const [name, array] of Object.entries({
       temperature: this.temperature, oxygen: this.oxygen, co2: this.co2, background: this.background, vapor: this.vapor,
-      fuel: this.fuel, water: this.water, dryDensity: this.dryDensity, solidHeatCapacity: this.solidHeatCapacity,
+      fuel: this.fuel, rootFuel: this.rootFuel, mineral: this.mineral, reactionRate: this.reactionRate,
+      water: this.water, dryDensity: this.dryDensity, solidHeatCapacity: this.solidHeatCapacity,
       thermalConductivity: this.thermalConductivity, porosity: this.porosity, intrinsicH: this.intrinsicH,
       intrinsicV: this.intrinsicV, effectiveH: this.effectiveH, effectiveV: this.effectiveV,
       effectiveDiffusivity: this.effectiveDiffusivity, peatMask: this.peatMask, pressure: this.pressure,
@@ -909,11 +1072,15 @@ export class Simulation {
     arrays.__ledger = [this.initialGasMol, this.cumulativeGasSourceMol, this.cumulativeSourceHeaterJ,
       this.cumulativeSourceSoilJ, this.cumulativeSourceSensibleJ, this.cumulativeSourceLatentJ,
       this.cumulativeSourceReturnJ, this.cumulativeResolvedHeatExpectedJ, this.cumulativeResolvedHeatActualJ];
+    arrays.__speciesLedger = [this.initialSpeciesMol, this.cumulativeSpeciesSourceMol,
+      this.cumulativeSpeciesBoundaryOutMol, this.cumulativeSpeciesCorrectionMol]
+      .flatMap(totals => SPECIES.map(species => totals[species]));
     return { formatVersion: 1, scenario: JSON.parse(JSON.stringify(this.scenario)) as Scenario,
       timeSeconds: this.timeSeconds, dryIceMassKg: this.dryIceMassKg,
       dryIceTemperatureK: this.dryIceTemperatureK, heaterEnergyJ: this.heaterEnergyJ,
       heaterEnabled: this.heaterEnabled, heaterGenerationWm3: this.heaterGenerationWm3,
-      events: this.events.map(e => ({ ...e })), diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings] }, arrays };
+      events: this.events.map(e => ({ ...e })), diagnostics: { ...this.diagnostics, warnings: [...this.diagnostics.warnings],
+        speciesBalanceResidualMol: { ...this.diagnostics.speciesBalanceResidualMol } }, arrays };
   }
 
   static restore(data: SerializedSimulation): Simulation {
@@ -929,39 +1096,76 @@ export class Simulation {
     }
     const assignments: Record<string, Float64Array> = {
       temperature: sim.temperature, oxygen: sim.oxygen, co2: sim.co2, background: sim.background,
-      vapor: sim.vapor, fuel: sim.fuel, water: sim.water, dryDensity: sim.dryDensity,
+      vapor: sim.vapor, fuel: sim.fuel, rootFuel: sim.rootFuel, mineral: sim.mineral, reactionRate: sim.reactionRate,
+      water: sim.water, dryDensity: sim.dryDensity,
       solidHeatCapacity: sim.solidHeatCapacity, thermalConductivity: sim.thermalConductivity,
       porosity: sim.porosity, intrinsicH: sim.intrinsicH, intrinsicV: sim.intrinsicV,
       effectiveH: sim.effectiveH, effectiveV: sim.effectiveV,
       effectiveDiffusivity: sim.effectiveDiffusivity, peatMask: sim.peatMask, pressure: sim.pressure,
       vx: sim.vx, vy: sim.vy, vz: sim.vz,
     };
+    const initialRootFuel = Array.from(sim.rootFuel);
+    const initialFuel = Array.from(sim.fuel);
     for (const [name, array] of Object.entries(assignments)) {
-      const values = data.arrays[name];
+      let values = data.arrays[name];
+      if (values === undefined && name === 'mineral') values = Array.from(sim.mineral);
+      if (values === undefined && name === 'reactionRate') values = Array(sim.cellCount).fill(0);
+      if (values === undefined && name === 'rootFuel') values = initialRootFuel.map((initial, i) =>
+        initial * Math.min(1, data.arrays.fuel[i] / Math.max(1e-12, initialFuel[i])));
       if (!Array.isArray(values) || values.length !== sim.cellCount || values.some(v => !Number.isFinite(v))) throw new Error(`Invalid checkpoint array ${name}.`);
       array.set(values);
     }
-    for (const name of ['oxygen', 'co2', 'background', 'vapor', 'fuel', 'water']) {
-      if (data.arrays[name].some(value => value < 0)) throw new Error(`Negative inventory in checkpoint array ${name}.`);
+    for (const name of ['oxygen', 'co2', 'background', 'vapor', 'fuel', 'rootFuel', 'mineral', 'reactionRate', 'water']) {
+      if (Array.from(assignments[name]).some(value => value < 0)) throw new Error(`Negative inventory in checkpoint array ${name}.`);
     }
     if (data.arrays.temperature.some(value => value < 150 || value > 1200)
       || data.arrays.porosity.some(value => value <= 0 || value >= 1)
       || data.arrays.pressure.some(value => value <= 0)) throw new Error('Checkpoint temperature, porosity, or pressure is outside supported limits.');
+    if (sim.hasUnsupportedFrozenWater()) throw new Error('Checkpoint contains liquid water below 273.15 K without an ice state.');
     const ledger = data.arrays.__ledger;
     if (!Array.isArray(ledger) || ledger.length !== 9 || ledger.some(v => !Number.isFinite(v))) throw new Error('Invalid checkpoint ledger.');
-    if (![data.diagnostics.cumulativeReactionHeatJ, data.diagnostics.lastReactionPowerW,
+    const rootFuelConsumedKg = data.diagnostics.cumulativeRootFuelConsumedKg ??
+      sim.rootFuel.reduce((sum, value, i) => sum + Math.max(0, initialRootFuel[i] - value), 0);
+    if (![data.diagnostics.cumulativeReactionHeatJ, rootFuelConsumedKg, data.diagnostics.lastReactionPowerW,
       data.diagnostics.reactingCellCount].every(v => Number.isFinite(v) && v >= 0)
       || !Number.isInteger(data.diagnostics.reactingCellCount)) throw new Error('Invalid checkpoint reaction diagnostics.');
     [sim.initialGasMol, sim.cumulativeGasSourceMol, sim.cumulativeSourceHeaterJ,
       sim.cumulativeSourceSoilJ, sim.cumulativeSourceSensibleJ, sim.cumulativeSourceLatentJ,
       sim.cumulativeSourceReturnJ, sim.cumulativeResolvedHeatExpectedJ, sim.cumulativeResolvedHeatActualJ] = ledger;
+    const speciesLedger = data.arrays.__speciesLedger;
+    if (speciesLedger !== undefined) {
+      if (!Array.isArray(speciesLedger) || speciesLedger.length !== 16 || speciesLedger.some(v => !Number.isFinite(v))) {
+        throw new Error('Invalid checkpoint species ledger.');
+      }
+      [sim.initialSpeciesMol, sim.cumulativeSpeciesSourceMol, sim.cumulativeSpeciesBoundaryOutMol,
+        sim.cumulativeSpeciesCorrectionMol].forEach((totals, group) => {
+        SPECIES.forEach((species, index) => { totals[species] = speciesLedger[group * 4 + index]; });
+      });
+    } else {
+      // Legacy checkpoints did not retain component fluxes. Begin component accounting
+      // at the restored state; the original aggregate ledger still spans the full run.
+      for (const species of SPECIES) {
+        const array = sim.gasArray(species);
+        let currentMol = 0;
+        for (let i = 0; i < sim.cellCount; i++) currentMol += array[i];
+        sim.initialSpeciesMol[species] = currentMol;
+      }
+    }
     sim.timeSeconds = data.timeSeconds; sim.dryIceMassKg = data.dryIceMassKg;
     sim.dryIceTemperatureK = data.dryIceTemperatureK; sim.heaterEnergyJ = data.heaterEnergyJ;
     sim.heaterEnabled = data.heaterEnabled; sim.heaterGenerationWm3 = data.heaterGenerationWm3;
     sim.events = data.events.map(e => ({ ...e }));
-    sim.diagnostics = { ...data.diagnostics, warnings: [...data.diagnostics.warnings] };
+    sim.diagnostics = { ...data.diagnostics, cumulativeRootFuelConsumedKg: rootFuelConsumedKg,
+      cumulativeOxygenInterventionMol: data.diagnostics.cumulativeOxygenInterventionMol ?? 0,
+      speciesBalanceResidualMol: zeroSpecies(),
+      warnings: [...data.diagnostics.warnings] };
     sim.updateDiagnostics();
     if (Math.abs(sim.diagnostics.gasBalanceResidualMol) > 1e-6 * Math.max(1, sim.initialGasMol)) throw new Error('Checkpoint gas inventory does not match its conservation ledger.');
+    for (const species of SPECIES) {
+      if (Math.abs(sim.diagnostics.speciesBalanceResidualMol[species]) > 1e-6 * Math.max(1, sim.initialSpeciesMol[species])) {
+        throw new Error(`Checkpoint ${species} inventory does not match its conservation ledger.`);
+      }
+    }
     return sim;
   }
 

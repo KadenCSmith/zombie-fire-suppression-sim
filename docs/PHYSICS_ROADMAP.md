@@ -1,5 +1,23 @@
 # Physics roadmap
 
+## Source audit for the new branch
+
+| Subsystem | Code and method | Verified scope / gap | Next acceptance check |
+| --- | --- | --- | --- |
+| Soil movement | `mechanics/continuum.ts`: 3D eight-node small-strain FEM; `mechanics/model.ts`: separate vertical dynamic links | Elastic/plastic top-load benchmark calculated; link model remains one-way and spatially sensitive | Heterogeneous gravity, pressure loading, 3D plastic mesh study |
+| Pressure | `sim/solver.ts`: implicit finite-volume ideal-gas storage/Darcy solve | Basic conservation tests; fixed geometry and viscosity | Pressure/flow analytical benchmark and property-domain test |
+| Gas species | `sim/solver.ts`: finite-volume upwind advection/diffusion of O₂, CO₂, background, vapor | Mixture inventories tracked; no buoyancy or validated CO₂ dissolution | Independent transport benchmark and open-boundary closure |
+| Fire | `sim/solver.ts`: finite-fuel oxidation, oxygen limit, reaction heat | Calculated but uncalibrated; char/ash and independent smolder reference absent | Priority 2 reaction/inventory and reference comparison |
+| Heat | `sim/solver.ts`: finite-volume conduction/storage and boundary exchange | Analytical heat check exists; gas enthalpy closure incomplete | Reaction/source-inclusive energy closure |
+| Water | `sim/solver.ts`: liquid inventory, evaporation, vapor species | No liquid flow, condensation, ice | Moist/dry and evaporation energy checks; bound unsupported freezing |
+| Dry ice | `sim/solver.ts`: finite source, heater support, sublimation/soil heat | Source ledger tests; subgrid contact and pressure phase limits | Coarse/resolved deposition and phase-domain checks |
+| Property evolution | `sim/solver.ts`: initial spatial mixtures, moisture-dependent mobility | Organic burnout does not update stiffness/porosity | Sourced or explicitly assumed evolution law and balances |
+| Geometry mapping | `sim/solver.ts`, `mechanics/model.ts`, `ui/Scene.tsx` | Separate solver/view geometry; no conservative 3D deforming remap | Nonmatching-grid transfer and coupling verification |
+| Runtime/restart | `worker/solver.worker.ts`, `sim/solver.ts`, `mechanics/continuum.ts` | Worker separation and slow-solver restart; continuum checkpoint unit check | UI restart/export, run identity, event schedule replay |
+| Conservation | `sim/solver.ts` diagnostics and tests | Gas/source/fuel ledgers, incomplete total heat and coupled work | Global and local mass/energy/force residual suite |
+
+The 3D brick mode is FEA because it solves nodal vector displacement with element strain interpolation, constitutive integration at Gauss points, and equilibrium residuals. The old link solver is only a reduced vertical response. The transport grid and rendering triangles are not finite-element mechanics. The table records supported code and open verification work, not a claim of field validity.
+
 The current application is an exploratory animation. Engineering claims require a measured input set, numerical verification, and independent experimental validation. Priorities below identify what evidence is needed before increasing model fidelity.
 
 1. **Measure the domain and fuel.** Map peat geometry, stratigraphy, porosity, bulk density, organic/mineral fractions, root volume and dry fuel mass, moisture on a clearly stated basis, and intrinsic permeability in each direction. Measure thermal conductivity and heat capacity versus temperature and moisture. Record spatial uncertainty rather than treating a single preset as a site survey.

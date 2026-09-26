@@ -5,8 +5,11 @@ import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import type { FastEventFrame, FastEventRun } from '../fastEvent'
+import type { MechanicsFrame } from '../mechanics/model'
+import type { ContinuumResult } from '../mechanics/continuum'
+import type { PlumeSource } from '../plumes/model'
 
-export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
+export type Overlay = 'temperature' | 'oxygen' | 'co2' | 'pressure' | 'moisture' | 'fuel' | 'char' | 'activity' | 'material' | 'porosity' | 'permeability' | 'effective-permeability' | 'mobility'
 export type View = 'orbit' | 'top' | 'section-x' | 'section-y'
 export type ProbeLocation = { xM: number; yM: number; depthM: number }
 export type FastOverlay = 'pressure' | 'co2' | 'damage'
@@ -30,6 +33,13 @@ type SceneProps = {
   illustration: number
   lockCamera?: boolean
   fastEvent?: { run: FastEventRun; frame: FastEventFrame; overlay: FastOverlay } | null
+  mechanics?: MechanicsFrame | null
+  continuum?: ContinuumResult | null
+  mechanicsView?: 'displacement' | 'yield'
+  plumes?: PlumeSource[]
+  showSmoke?: boolean
+  showSteam?: boolean
+  plumeQuality?: number
   probe?: ProbeLocation | null
   onProbe?: (probe: ProbeLocation) => void
   className?: string
@@ -50,6 +60,8 @@ export const OVERLAY_INFO: Record<Overlay, { label: string; unit: string; min: n
   pressure: { label: 'Pressure above ambient', unit: 'Pa', min: -200, max: 200, field: 'pressurePa' },
   moisture: { label: 'Moisture saturation', unit: 'fraction', min: 0, max: 1, field: 'moistureSaturation' },
   fuel: { label: 'Remaining fuel', unit: 'kg/cell', min: 0, max: 1, field: 'fuelKg' },
+  activity: { label: 'Oxidation heat rate', unit: 'W/m³', min: 0, max: 10000, field: 'reactionPowerWm3' },
+  material: { label: 'Material class (0 mineral · 1 mixed · 2 peat)', unit: 'class', min: 0, max: 2, field: 'materialClass' },
   char: { label: 'Char', unit: 'kg/cell', min: 0, max: 0.2, field: 'charKg' },
   porosity: { label: 'Porosity', unit: 'fraction', min: 0, max: 0.7, field: 'porosity' },
   permeability: { label: 'Intrinsic permeability', unit: 'log₁₀(m²)', min: -15, max: -9, field: 'intrinsicPermeabilityM2', log: true },
@@ -57,11 +69,11 @@ export const OVERLAY_INFO: Record<Overlay, { label: string; unit: string; min: n
   mobility: { label: 'Effective gas diffusivity', unit: 'log₁₀(m²/s)', min: -9, max: -4, field: 'effectiveGasDiffusivityM2S', log: true },
 }
 
-function colorAt(t: number) {
+function colorAt(t: number, target = new THREE.Color()) {
   const v = THREE.MathUtils.clamp(t, 0, 1)
-  if (v < 0.38) return palette.cool.clone().lerp(palette.mid, v / 0.38)
-  if (v < 0.72) return palette.mid.clone().lerp(palette.warm, (v - 0.38) / 0.34)
-  return palette.warm.clone().lerp(palette.hot, (v - 0.72) / 0.28)
+  if (v < 0.38) return target.copy(palette.cool).lerp(palette.mid, v / 0.38)
+  if (v < 0.72) return target.copy(palette.mid).lerp(palette.warm, (v - 0.38) / 0.34)
+  return target.copy(palette.warm).lerp(palette.hot, (v - 0.72) / 0.28)
 }
 
 function valueFor(frame: Frame, overlay: Overlay, index: number, ambientPa = 101325) {
@@ -270,6 +282,9 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
   const ny = grid?.ny ?? 0
   const nz = grid?.nz ?? 0
   const n = horizontal ? nx * ny : sectionY ? ny * nz : nx * nz
+  const dxM = grid?.dxM ?? 0
+  const dyM = grid?.dyM ?? 0
+  const dzM = grid?.dzM ?? 0
   const selected = horizontal ? Math.min(nz - 1, Math.max(0, Math.round((1 - slice) * (nz - 1) / 2))) : sectionY ? Math.min(nx - 1, Math.max(0, Math.round((slice + 1) * (nx - 1) / 2))) : Math.min(ny - 1, Math.max(0, Math.round((slice + 1) * (ny - 1) / 2)))
   const info = OVERLAY_INFO[overlay]
   const extent = useMemo(() => {
@@ -284,16 +299,14 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
     return Number.isFinite(lo) && hi > lo ? [lo, hi] : [info.min, info.max]
   }, [snapshot, fixedScale, info, overlay, scenario?.atmosphere?.pressurePa])
   useEffect(() => {
-    if (!ref.current || !snapshot || !grid || !n) return
+    if (!ref.current || !n) return
     const matrix = new THREE.Object3D()
-    const { dxM, dyM, dzM } = grid
     const half = W / 2
     for (let q = 0; q < n; q++) {
       let i: number; let j: number; let k: number
       if (horizontal) { i = q % nx; j = Math.floor(q / nx); k = selected }
       else if (sectionY) { j = q % ny; k = Math.floor(q / ny); i = selected }
       else { i = q % nx; k = Math.floor(q / nx); j = selected }
-      const index = (k * ny + j) * nx + i
       const x = -half + (i + 0.5) * dxM
       const z = -half + (j + 0.5) * dyM
       const y = -(k + 0.5) * dzM
@@ -302,13 +315,25 @@ function FieldSlice({ scenario, snapshot, overlay, view, slice, fixedScale, onPr
       matrix.scale.set(horizontal ? dxM * 0.96 : sectionY ? 0.032 : dxM * 0.96, horizontal ? 0.032 : dzM * 0.96, horizontal ? dyM * 0.96 : sectionY ? dyM * 0.96 : 0.032)
       matrix.updateMatrix()
       ref.current.setMatrixAt(q, matrix.matrix)
-      const value = valueFor(snapshot, overlay, index, Number(scenario?.atmosphere?.pressurePa ?? 101325))
-      const t = (value - extent[0]) / Math.max(1e-12, extent[1] - extent[0])
-      ref.current.setColorAt(q, colorAt(t))
     }
     ref.current.instanceMatrix.needsUpdate = true
+  }, [n, horizontal, sectionY, nx, ny, nz, selected, dxM, dyM, dzM])
+  useEffect(() => {
+    if (!ref.current || !snapshot || !n) return
+    const color = new THREE.Color()
+    const ambientPa = Number(scenario?.atmosphere?.pressurePa ?? 101325)
+    for (let q = 0; q < n; q++) {
+      let i: number; let j: number; let k: number
+      if (horizontal) { i = q % nx; j = Math.floor(q / nx); k = selected }
+      else if (sectionY) { j = q % ny; k = Math.floor(q / ny); i = selected }
+      else { i = q % nx; k = Math.floor(q / nx); j = selected }
+      const index = (k * ny + j) * nx + i
+      const value = valueFor(snapshot, overlay, index, ambientPa)
+      const t = (value - extent[0]) / Math.max(1e-12, extent[1] - extent[0])
+      ref.current.setColorAt(q, colorAt(t, color))
+    }
     if (ref.current.instanceColor) ref.current.instanceColor.needsUpdate = true
-  }, [snapshot, grid, n, horizontal, sectionY, nx, ny, nz, selected, overlay, extent, scenario?.atmosphere?.pressurePa])
+  }, [snapshot, n, horizontal, sectionY, nx, ny, selected, overlay, extent, scenario?.atmosphere?.pressurePa])
   if (!snapshot || !grid || !n) return null
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     if (event.instanceId === undefined) return
@@ -405,6 +430,96 @@ function SoilMotion({ amount }: { amount: number }) {
   })}</group>
 }
 
+function MechanicsElements({ scenario, frame, view }: { scenario: any; frame: MechanicsFrame; view: 'displacement' | 'yield' }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const n = frame.resolution
+  const count = n ** 3
+  const dx = Number(scenario.domain.widthM) / n
+  const dy = Number(scenario.domain.lengthM) / n
+  const dz = Number(scenario.domain.depthM) / n
+  useEffect(() => {
+    if (!mesh.current) return
+    const object = new THREE.Object3D()
+    const color = new THREE.Color()
+    const scale = Math.max(0.01, frame.maxDisplacementM)
+    for (let q = 0; q < count; q++) {
+      const i = q % n; const j = Math.floor(q / n) % n; const k = Math.floor(q / (n * n))
+      object.position.set(-W / 2 + (i + 0.5) * dx, -(k + 0.5) * dz + frame.displacementM[q], -W / 2 + (j + 0.5) * dy)
+      object.scale.set(dx * 0.91, dz * 0.88, dy * 0.91)
+      object.updateMatrix()
+      mesh.current.setMatrixAt(q, object.matrix)
+      if (view === 'yield') color.set(frame.yielded[q] ? '#ff654f' : '#456774')
+      else color.set('#357a91').lerp(new THREE.Color('#f4d481'), Math.min(1, Math.abs(frame.displacementM[q]) / scale))
+      mesh.current.setColorAt(q, color)
+    }
+    mesh.current.instanceMatrix.needsUpdate = true
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
+  }, [frame, count, dx, dy, dz, n, view])
+  return <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+    <boxGeometry args={[1, 1, 1]} />
+    <meshStandardMaterial transparent opacity={0.59} roughness={0.9} depthWrite={false} side={THREE.DoubleSide} />
+  </instancedMesh>
+}
+
+function ContinuumElements({ scenario, result }: { scenario: any; result: ContinuumResult }) {
+  const mesh = useRef<THREE.InstancedMesh>(null)
+  const n = 4, dx = Number(scenario.domain.widthM) / n, dy = Number(scenario.domain.lengthM) / n, dz = Number(scenario.domain.depthM) / n
+  useEffect(() => {
+    if (!mesh.current) return
+    const object = new THREE.Object3D(), color = new THREE.Color()
+    const disp = result.displacementM
+    let max = 0
+    for (const value of disp) max = Math.max(max, Math.abs(value))
+    const node = (i: number, j: number, k: number) => (k * (n + 1) + j) * (n + 1) + i
+    for (let k = 0; k < n; k++) for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const q = (k * n + j) * n + i
+      const center = [0, 0, 0]
+      for (let c = 0; c <= 1; c++) for (let b = 0; b <= 1; b++) for (let a = 0; a <= 1; a++) {
+        const p = node(i + a, j + b, k + c) * 3
+        for (let axis = 0; axis < 3; axis++) center[axis] += disp[p + axis] / 8
+      }
+      object.position.set(-W / 2 + (i + 0.5) * dx + center[0], -(k + 0.5) * dz - center[2], -W / 2 + (j + 0.5) * dy + center[1])
+      object.scale.set(dx * 0.9, dz * 0.9, dy * 0.9)
+      object.updateMatrix()
+      mesh.current.setMatrixAt(q, object.matrix)
+      color.set(result.yielded[q] ? '#ff654f' : '#357a91').lerp(new THREE.Color('#f4d481'), result.yielded[q] ? 0 : Math.min(1, Math.hypot(...center) / Math.max(1e-8, max)))
+      mesh.current.setColorAt(q, color)
+    }
+    mesh.current.instanceMatrix.needsUpdate = true
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true
+  }, [result, dx, dy, dz])
+  return <instancedMesh ref={mesh} args={[undefined, undefined, n ** 3]}><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial transparent opacity={0.6} roughness={0.9} depthWrite={false} /></instancedMesh>
+}
+
+function Plumes({ sources, smoke, steam, quality }: { sources: PlumeSource[]; smoke: boolean; steam: boolean; quality: number }) {
+  const group = useRef<THREE.Group>(null)
+  useFrame(({ clock }) => {
+    if (!group.current) return
+    const t = clock.getElapsedTime()
+    group.current.children.forEach((piece, index) => {
+      const source = sources[Math.floor(index / (quality * 2))]
+      if (!source) return
+      const kind = Math.floor(index / quality) % 2
+      const phase = index % quality / quality
+      const speed = Math.max(0.08, source.riseMS)
+      const flight = ((t * speed * 0.22 + phase) % 1)
+      piece.position.set(source.xM - W / 2 + source.vxMS * flight * 2 + Math.sin(index * 13.1) * flight * 0.08,
+        -source.depthM + flight * (source.depthM + 1.4),
+        source.yM - W / 2 + source.vyMS * flight * 2 + Math.cos(index * 8.7) * flight * 0.08)
+      const strength = kind === 0 ? source.smokeKgS : source.condensedSteamKgS
+      piece.visible = Boolean(kind === 0 ? smoke : steam) && strength > 0 && flight > Math.min(0.75, 0.12 / Math.max(speed, 0.08))
+      piece.scale.setScalar((kind === 0 ? 0.07 : 0.06) + flight * (kind === 0 ? 0.25 : 0.19))
+    })
+  })
+  return <group ref={group}>{sources.flatMap((source, s) => [0, 1].flatMap((kind) => Array.from({ length: quality }, (_, i) => {
+    const rate = kind === 0 ? source.smokeKgS : source.condensedSteamKgS
+    return <mesh key={`${s}-${kind}-${i}`} visible={rate > 0}>
+      <sphereGeometry args={[1, 8, 6]} />
+      <meshBasicMaterial color={kind === 0 ? '#4c514e' : '#d8e9e7'} transparent opacity={Math.min(0.42, 0.1 + Math.log1p(rate * 1000) * 0.12)} depthWrite={false} />
+    </mesh>
+  })))}</group>
+}
+
 function ScaleLabels({ depth }: { depth: number }) {
   return <group>
     <Html position={[-W / 2, 0.18, W / 2]} distanceFactor={9}><span className="scale-scene-label">0 m</span></Html>
@@ -431,7 +546,10 @@ function World(props: SceneProps) {
     {props.fastEvent ? <FastEventShells scenario={props.scenario} event={props.fastEvent} /> : props.view !== 'orbit' ? <FieldSlice {...props} /> : null}
     {!props.fastEvent && props.showFlow && <FlowArrows snapshot={props.snapshot} view={props.view} slice={props.slice} />}
     <Probe position={props.probe} />
-    <SoilMotion amount={props.fastEvent ? Math.max(props.illustration, Math.max(...Array.from(props.fastEvent.frame.shellDamage), 0) * 0.65) : props.illustration} />
+    {props.mechanics && <MechanicsElements scenario={props.scenario} frame={props.mechanics} view={props.mechanicsView ?? 'displacement'} />}
+    {props.continuum && <ContinuumElements scenario={props.scenario} result={props.continuum} />}
+    <SoilMotion amount={props.fastEvent ? 0 : props.illustration} />
+    {!!props.plumes?.length && <Plumes sources={props.plumes} smoke={props.showSmoke ?? true} steam={props.showSteam ?? true} quality={props.plumeQuality ?? 3} />}
     <ScaleLabels depth={depth} />
   </>
 }
