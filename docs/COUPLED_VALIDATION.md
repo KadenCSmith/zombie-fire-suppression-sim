@@ -41,7 +41,7 @@ Three measured repetitions of the same **10 simulated seconds**, including coupl
 
 The largest observed process RSS in these sequential Node studies was about 327 MB. This includes the harness and accumulated runtime state; it is not total desktop/GPU memory. History is bounded to at most 61 regular frames plus a terminal failure frame per model. Numerical steps are independent of snapshot/playback cadence.
 
-The native Electron 120 s Preview exercise measured **117–120 viewport fps**, cancel completion within **101 ms** using a 100 ms polling interval, and summed application working sets around **723 MB**. Shared pages may be counted twice; compressed memory and GPU/unified-memory allocations are not fully attributed. The default observations are comfortably below the 16 GiB design budget, but this is not a full Instruments allocation audit. Research has measured solver RSS, not a native 24 GiB stress certification. System memory pressure was low during checks.
+The native Electron 120 s Preview exercise measured **117–120 viewport fps**, cancel completion within **102 ms** using a 100 ms polling interval, and summed application working sets around **724 MB**. Shared pages may be counted twice; compressed memory and GPU/unified-memory allocations are not fully attributed. The default observations are comfortably below the 16 GiB design budget, but this is not a full Instruments allocation audit. Research has measured solver RSS, not a native 24 GiB stress certification. System memory pressure was low during checks.
 
 Preset errors are **case-dependent**. Preview's 1 m cells under-resolve the default fracture length, Engineering's 0.667 m cells also exceed ℓ/2, and Research's 0.5 m cells meet that minimum. Meeting spacing alone did not establish fracture convergence. Lens/hot-region initialization currently uses cell classification; different meshes represent different voxelized initial masses/heat, and the default reaction totals differ accordingly. There is no single certified field-error percentage for these presets. Use reported analytical/refinement cases and perform matched-scenario studies before interpreting predictions.
 
@@ -65,3 +65,7 @@ Preset errors are **case-dependent**. Preview's 1 m cells under-resolve the defa
 7. Native Intel Mac and Windows/Linux ARM device execution, notarization/Windows signing, complete unified-memory accounting, and a verified GPU/native acceleration backend.
 
 These gaps remain explicit in the UI, exports, release notes and model documentation. Working software and numerical convergence are not experimental validation.
+
+## Platform verification scope
+
+The new desktop harness computes 120 s on macOS and Linux. Windows CI uses software graphics and a 10 s calculation for the same worker, A/B, replay, export, invalidation and cancellation checks. Its attempted 120 s check reached 56 s after about 165 wall seconds and hit the harness deadline; this is not reported as a completed Windows long run or a physical convergence failure. A separate Linux fracture rollback test needed 5.31 s, so its test-only wall-clock allowance is now 30 s; numerical acceptance tolerances are unchanged. The harness also checks that selected-model throughput agrees with exported run metadata.
