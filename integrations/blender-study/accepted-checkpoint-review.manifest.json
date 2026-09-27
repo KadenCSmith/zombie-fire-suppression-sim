@@ -1,0 +1,14 @@
+{
+  "asset": "accepted-checkpoint-review.mp4",
+  "format": "H.264 MP4",
+  "fps": 2,
+  "seconds": 2.5,
+  "accepted_times_s": [
+    0,
+    0.5,
+    1,
+    1.5,
+    2
+  ],
+  "scope": "Labeled held accepted checkpoints in the natural presentation scene. Each checkpoint is held for 0.5 playback seconds; this is a review clip, not continuous physical-time integration. Decorative aggregates do not affect physics."
+}

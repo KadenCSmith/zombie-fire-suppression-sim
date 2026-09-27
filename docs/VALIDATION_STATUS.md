@@ -343,3 +343,7 @@ Compare temperature, oxygen, CO₂, moisture, pressure, emissions, fuel/char, an
 148 tests / 25 files passed; typecheck, lint and build passed. New tests check invariant extensive inventories and source support across mesh choices, film-source limits and timestep refinement, and matched elastic/coupled trajectories between reference and optional sparse operators. Initialization independently reviewed in three rounds (frozen); source independently reviewed in two rounds. See `docs/review/unified/initialization.md`, `docs/review/unified-source-review.md`, and `docs/CO2_SOURCE_MODEL.md`.
 
 Cold source-only is the new lab default. Prepared hot specimens explicitly disclose removed initial water and remain assumed cases. No experimental/field validation, resolved excavation or mobile liquid infiltration is claimed. Equal initial totals do not establish solution convergence. Final performance, natural-cutaway UI and Blender visual review are pending at this milestone.
+
+## Unified reference completion — 27 September 2026
+
+Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.

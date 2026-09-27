@@ -239,3 +239,7 @@ The immediate physics dependencies are measured peat/root material and source-co
 ## 2026-09-27 unified physics milestone
 
 A separate checkout preserves the user's original Blender edit. Adds exactly 10× mesh options, common conservative material/source initialization, a finite CO₂ heat/mass-transfer source and an opt-in float64 sparse elastic operator. Existing reference backend remains default during the comparison audit. Typecheck, lint, 148 tests in 25 files, and production build passed together on this integration. UI natural-cutaway polish and final Blender cache are still in progress; this entry is not a release-completion claim.
+
+## Unified reference completion — 27 September 2026
+
+Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.

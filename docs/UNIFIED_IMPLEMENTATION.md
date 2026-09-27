@@ -20,3 +20,11 @@ Conservation, mechanical residuals and comparison with an independent implementa
 ## Validation protocol
 
 Keep mass and energy totals constant across fidelity presets to 1e-12 relative in initialization tests. Require existing ledger gates and force residual ≤1e-4 N. Compare any optimized operator with the retained reference on identical inputs and tolerances; report setup and solve timings separately. Keep failed experiments visible. Independent review is recorded before accepted source publication.
+
+## Milestone 2: integrated natural and scientific presentation
+
+The natural cutaway follows the requested layered-soil/oak reference: 570 fixed-seed irregular aggregate instances, a detailed oak and roots, and peat shading derived from accepted material fractions. Anatomy and aggregate meshes are visual context; they do not fabricate additional mechanical contacts or inventories. Scientific fields retain cellwise values. Natural/scientific views share accepted node displacements, physical time and linked cameras. The original authored Blender animation is an explicitly distinct comparison with different geometry and normalized playback.
+
+The original Blender study is preserved with commit/file provenance. The new importer maps accepted grid topology, units, source mass and checkpoint times into an editable derivative; scientific and natural vertices agree exactly. A five-checkpoint 2,560-cell example, rendered previews and labeled review clip accompany six passing Python contract tests.
+
+A completed browser reference run reached 10 s at 2,560 cells. Replay, previous-result restore, cancellation, terrain changes and synchronized views were inspected. Rendering uploads exposed faces only, reuses geometry buffers and sleeps when idle; this does not reduce solver element count. Full tests: 148 in 25 files, plus six Python tests; typecheck, lint and production build pass. Native packaging is verified separately.
