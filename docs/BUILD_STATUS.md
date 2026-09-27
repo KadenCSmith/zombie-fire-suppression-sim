@@ -1,5 +1,18 @@
 # Build status and handoff
 
+## Model workbench (2026-09-26, version 0.10.0)
+
+The model selector now distinguishes the preserved terrain demonstration, existing porous gas/heat workspace and new soil-mechanics benchmark. The paired fixture runs explicit elasticity and frictional plasticity with identical inputs and load/unload stages. Calculated displacement, incremental stress, plastic strain, mesh inspection, shared orthographic camera/color scale, unit-bearing sliders, resets, worker cancellation, stored replay and JSON export are implemented. Physical edits invalidate prior results. See [audit, equations and implementation sequence](MODEL_WORKBENCH.md) and [separate parameter evidence](WORKBENCH_PARAMETER_EVIDENCE.md).
+
+The new analytical load/unload tests exposed an existing nonlinear-search oscillation during unloading. The search now requires sufficient residual reduction and expands only while improving. Historical constitutive defaults remain plastic; explicit elastic checkpoints cannot be restored as plastic or vice versa. The gravity reference balance is not included in plastic yielding, and this limit is explicit. No coupled fracture/peat validation is claimed for the homogeneous fixture.
+
+Local typecheck, lint, all **111 tests in 17 files**, production build and native Electron smoke passed. New checks cover the independent uniaxial plastic solution, elastic recovery, retained plastic strain, reaction balance, 1³/2³/4³ mesh agreement, 10/20 load-increment agreement, strain-limit rejection, law-safe restart and field/replay immutability. The desktop check exercises both worker models, computed-field availability, numeric reset, physical-input invalidation, cross-workspace retention, all five earlier scenes and the preserved 120 s transport run. Native screenshot review confirmed readable controls, shared-scale deformed bricks and instruments.
+
+The local [profile report](../examples/mechanicsComparisonBenchmark.json) records actual source hashes and three timed repetitions after warmup: 21-frame 2³ elastic/plastic solves had medians of 11.0/76.2 ms; 4³ medians were 201.5/1145.2 ms. Maximum sampled residual was below 5.58e-5 N; final vertical-strain analytical error below 7.7e-9. These measurements exclude rendering/transfer, and the convergence change is not bitwise-equivalent optimization. Experimental peat strength, fracture energy, creep, initial effective stress and coupled failure remain separate validation targets.
+
+The independent Blender file retains its recorded SHA-256 and is excluded; synced sources are unchanged. Release, hosted platform and installed-app checks are recorded below only when complete.
+
+
 ## Broad opening, irregular roots and surface fire (2026-09-26, version 0.9.0)
 
 The latest scene replaces the horizontal bond markers with irregular soil pieces opening under a broader assumed load and weaker soil coefficients. The oak root network uses reproducible irregular directions, curves, depths and branches. A peat bed spans most of the section, with an unburnt margin and a narrow staged path to a small surface fire. Version 0.8 is retained alongside 0.5–0.7. [Model changes, display approximations and two additional peer-reviewed fire studies with ASCE references](WIDE_RUPTURE_FIRE.md).

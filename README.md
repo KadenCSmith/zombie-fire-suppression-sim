@@ -2,11 +2,17 @@
 
 **Interactive scene studio and a separate, unvalidated scientific model.**
 
-A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration. Its latest version adds a separate reduced particle calculation under assumed loading; gas and thermal displays remain illustrative.
+A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal illustration**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration. Its latest version adds a separate reduced particle calculation under assumed loading; gas and thermal displays remain illustrative.
 
-Choose **Open simulation** for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
+Choose **Porous gas & heat** in the **Physics model** selector for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
+
+## Model selection and mechanics comparison — 0.10
+
+The **Physics model** selector opens the fast demonstration, existing porous gas/heat workspace, or new soil-deformation workbench. In the latter, compare identical load/unload stages through explicit linear elasticity and frictional plasticity, using shared cameras/scales and calculated displacement, incremental stress and plastic strain. Sliders have units, numeric entry and resets; changing physical inputs invalidates the previous trajectory. A new analytical benchmark exposed and repaired an unloading convergence defect. The homogeneous fixture is separate from the oak landscape and is not coupled fracture.
+
+[Workbench, audit and next stages](docs/MODEL_WORKBENCH.md) · [Parameter evidence](docs/WORKBENCH_PARAMETER_EVIDENCE.md). Open directly with `--mechanics`. Earlier scenes remain in ⋯.
 
 ## Broad ground opening and surface fire
 
@@ -30,7 +36,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.9.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.9.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download version 0.10.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.10.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
 [Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
 
@@ -55,7 +61,7 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.9.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.10.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 

@@ -3,6 +3,8 @@
  * The reference geostatic state is equilibrated before incremental loads are applied.
  */
 export interface ContinuumMaterial {
+  /** Omitted in historical scenarios: preserve the existing plastic law. */
+  constitutiveLaw?: 'elastic' | 'drucker-prager'
   youngsPa: number
   poisson: number
   cohesionPa: number
@@ -104,6 +106,7 @@ export class ContinuumMechanics {
   private readonly D: Float64Array
 
   constructor(nx: number, ny: number, nz: number, widthM: number, lengthM: number, depthM: number, material: ContinuumMaterial = DEFAULT_CONTINUUM_MATERIAL, bulkDensityKgM3 = 1200) {
+    if (material.constitutiveLaw !== undefined && material.constitutiveLaw !== 'elastic' && material.constitutiveLaw !== 'drucker-prager') throw new Error('Unknown constitutive law.')
     if (![nx, ny, nz].every(v => Number.isInteger(v) && v >= 1 && v <= 16)) throw new Error('Mechanics requires 1–16 elements on every axis.')
     if (![widthM, lengthM, depthM, material.youngsPa].every(v => Number.isFinite(v) && v > 0) || !Number.isFinite(material.poisson) || material.poisson <= -0.9 || material.poisson >= 0.49) throw new Error('Invalid mechanics dimensions or elastic material.')
     if ([material.cohesionPa, material.frictionSlope, material.dilationSlope, material.hardeningPa].some(v => !Number.isFinite(v) || v < 0)) throw new Error('Invalid plastic material.')
@@ -224,7 +227,9 @@ export class ContinuumMechanics {
         const eps = new Float64Array(6)
         for (let a = 0; a < 6; a++) for (let b = 0; b < 24; b++) eps[a] += B[a * 24 + b] * u[this.dof(e, b)]
         const offset = (eId * 8 + gp) * 6
-        const mapped = returnMap(eps, this.plastic.subarray(offset, offset + 6), this.hardening[eId * 8 + gp], this.material)
+        const mapped = this.material.constitutiveLaw === 'elastic'
+          ? { stress: stressFromStrain(this.D, eps), plastic: new Float64Array(6), hardening: 0, yielded: false }
+          : returnMap(eps, this.plastic.subarray(offset, offset + 6), this.hardening[eId * 8 + gp], this.material)
         if (commit) { this.plastic.set(mapped.plastic, offset); this.hardening[eId * 8 + gp] = mapped.hardening }
         if (mapped.yielded || this.hardening[eId * 8 + gp] > 0) yielded[eId] = 1
         ep += mapped.hardening
@@ -236,31 +241,47 @@ export class ContinuumMechanics {
   }
 
   /** Apply a prescribed uniform vertical traction on the free top, positive downward. */
-  solveTopTraction(tractionPa: number, toleranceN = 0.05): ContinuumResult {
+  solveTopTraction(tractionPa: number, toleranceN = 0.05, relativeTolerance = 1e-7): ContinuumResult {
     if (!Number.isFinite(tractionPa)) throw new Error('Invalid top traction.')
+    if (!Number.isFinite(toleranceN) || toleranceN <= 0 || !Number.isFinite(relativeTolerance) || relativeTolerance <= 0) throw new Error('Invalid mechanics tolerance.')
     const force = new Float64Array(this.displacement.length)
     const areaPerElement = this.widthM / this.nx * this.lengthM / this.ny
     for (let j = 0; j < this.ny; j++) for (let i = 0; i < this.nx; i++) for (const [a, b] of [[i, j], [i + 1, j], [i, j + 1], [i + 1, j + 1]]) {
       force[this.node(a, b, 0) * 3 + 2] += tractionPa * areaPerElement / 4
     }
     // Reference gravity stress is an initially equilibrated state; force is its perturbation.
-    let u = Float64Array.from(this.displacement), state = this.state(u, false), iterations = 0
+    let u: Float64Array = Float64Array.from(this.displacement), state = this.state(u, false), iterations = 0
     const scale = Math.max(1, Math.sqrt(dot(force, force)))
     for (; iterations < 200; iterations++) {
       const residual = Float64Array.from(force, (v, i) => this.fixed[i] ? 0 : v - state.internal[i])
       const norm = Math.sqrt(dot(residual, residual))
-      if (norm <= Math.max(toleranceN, 1e-7 * scale)) break
+      if (norm <= Math.max(toleranceN, relativeTolerance * scale)) break
       const correction = this.linearSolve(residual, Math.max(1e-8, norm * 1e-9))
-      let accepted = false
-      for (let factor = 16; factor >= 1 / 1024; factor /= 2) {
+      // Start at the elastic correction. The former first-decrease search
+      // started at 16 and could accept a factor-2 unloading oscillation due to
+      // roundoff. Require sufficient decrease and expand only while improving.
+      let bestNorm = norm
+      let best: { u: Float64Array; state: ReturnType<ContinuumMechanics['state']> } | null = null
+      const tryFactor = (factor: number) => {
         const candidate = Float64Array.from(u, (v, i) => v + factor * correction[i])
         try {
           const next = this.state(candidate, false)
           const nextResidual = Float64Array.from(force, (v, i) => this.fixed[i] ? 0 : v - next.internal[i])
-          if (Math.sqrt(dot(nextResidual, nextResidual)) < norm) { u = candidate; state = next; accepted = true; break }
-        } catch { /* Smaller step may remain in the supported cone branch. */ }
+          const nextNorm = Math.sqrt(dot(nextResidual, nextResidual))
+          if (nextNorm < bestNorm * (1 - 1e-4 * Math.min(1, factor))) {
+            bestNorm = nextNorm; best = { u: candidate, state: next }; return true
+          }
+        } catch { /* Trial state never commits plastic history. */ }
+        return false
       }
-      if (!accepted) throw new Error('Mechanics nonlinear solve did not reduce force residual.')
+      if (tryFactor(1)) {
+        for (let factor = 2; factor <= 64 && bestNorm > Math.max(toleranceN, relativeTolerance * scale); factor *= 2) if (!tryFactor(factor)) break
+      } else {
+        for (let factor = 0.5; factor >= 1 / 1024; factor /= 2) if (tryFactor(factor)) break
+      }
+      if (!best) throw new Error('Mechanics nonlinear solve did not reduce force residual.')
+      const accepted = best as { u: Float64Array; state: ReturnType<ContinuumMechanics['state']> }
+      u = accepted.u; state = accepted.state
     }
     if (iterations === 200) {
       const remainder = Float64Array.from(force, (v, i) => this.fixed[i] ? 0 : v - state.internal[i])
@@ -282,10 +303,11 @@ export class ContinuumMechanics {
       geostaticResidualN: this.geostaticResidualN, geostaticBaseReactionN: this.geostaticBaseReactionN }
   }
 
-  checkpoint() { return { schemaVersion: 1 as const, nx: this.nx, ny: this.ny, nz: this.nz,
+  checkpoint() { return { schemaVersion: 1 as const, constitutiveLaw: this.material.constitutiveLaw ?? 'drucker-prager', nx: this.nx, ny: this.ny, nz: this.nz,
     displacementM: Array.from(this.displacement), plasticStrain: Array.from(this.plastic), hardening: Array.from(this.hardening) } }
 
-  restore(data: ReturnType<ContinuumMechanics['checkpoint']>) {
+  restore(data: Omit<ReturnType<ContinuumMechanics['checkpoint']>, 'constitutiveLaw'> & { constitutiveLaw?: 'elastic' | 'drucker-prager' }) {
+    if ((data.constitutiveLaw ?? 'drucker-prager') !== (this.material.constitutiveLaw ?? 'drucker-prager')) throw new Error('Checkpoint constitutive law does not match.')
     if (data.schemaVersion !== 1 || data.nx !== this.nx || data.ny !== this.ny || data.nz !== this.nz ||
       data.displacementM.length !== this.displacement.length || data.plasticStrain.length !== this.plastic.length || data.hardening.length !== this.hardening.length ||
       [...data.displacementM, ...data.plasticStrain, ...data.hardening].some(v => !Number.isFinite(v))) throw new Error('Invalid mechanics checkpoint.')

@@ -1,9 +1,12 @@
+import { ModelSelector, type PhysicsWorkspace } from './ui/ModelSelector'
+import type { MechanicsSession } from './ui/MechanicsWorkspace'
+import type { CameraMemory } from './ui/MechanicsScene'
+import type { StudySession } from './ui/StudyWorkspace'
 import { StudyVersions } from './ui/StudyVersions'
 import type { StudyVersion } from './ui/studyModel'
 import DeveloperTools from './ui/DeveloperTools'
 import { resolveMaterials } from './sim/materials'
 import { ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Activity from 'lucide-react/dist/esm/icons/activity.mjs'
 import ArrowDownToLine from 'lucide-react/dist/esm/icons/arrow-down-to-line.mjs'
 import ArrowLeftRight from 'lucide-react/dist/esm/icons/arrow-left-right.mjs'
 import BookOpen from 'lucide-react/dist/esm/icons/book-open.mjs'
@@ -41,6 +44,7 @@ type Tab = 'setup' | 'simulation' | 'results' | 'event' | 'developer'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
+const MechanicsWorkspace = lazy(() => import('./ui/MechanicsWorkspace'))
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
 
 const DAY = 86400
@@ -178,7 +182,10 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 
 function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
-  const [workspace, setWorkspace] = useState<'study' | 'simulation'>(() => new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
+  const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => new URLSearchParams(window.location.search).get('workspace') === 'mechanics' ? 'mechanics' : new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
+  const mechanicsSession = useRef<MechanicsSession | undefined>(undefined)
+  const mechanicsCamera = useRef<CameraMemory | undefined>(undefined)
+  const studySession = useRef<StudySession | undefined>(undefined)
   const initial = useMemo(() => createDefaultScenario(), [])
   const [scenario, setScenario] = useState<Scenario>(initial)
   const [preset, setPreset] = useState<ScenarioPreset>('heated')
@@ -622,10 +629,12 @@ function App() {
   const removeLayer = (index: number) => { if (scenario.soilLayers.length <= 1) return; setPreset('custom'); setScenario((old) => { const layers = old.soilLayers.map((l) => ({ ...l })); const removed = layers.splice(index, 1)[0]; layers[Math.min(index, layers.length - 1)].thicknessM += removed.thicknessM; return { ...old, soilLayers: layers } }); setSelectedLayer(0) }
   const layer = scenario.soilLayers[selectedLayer]
 
+  const changeWorkspace = (next: PhysicsWorkspace) => {
+    pause(); comparisonClientRef.current?.pause(); clientRef.current?.pauseMechanics(); setMechanicsRunning(false); setFastPlaying(false); setMotionPlaying(false); setWorkspace(next)
+  }
   const openStudy = () => {
     pause()
     comparisonClientRef.current?.pause()
-    setPlayback(false)
     setFastPlaying(false)
     setMotionPlaying(false)
     setWorkspace('study')
@@ -634,7 +643,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'study' && target !== 'simulation') return
+      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -647,15 +656,17 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
+  if (workspace === 'mechanics') return <Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} /></Suspense>
+
   if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
-    <StudyWorkspace key={studyVersion} version={studyVersion} onVersionChange={setStudyVersion} onOpenSimulation={() => setWorkspace('simulation')} />
+    <StudyWorkspace key={studyVersion} version={studyVersion} onVersionChange={next => { studySession.current=undefined; setStudyVersion(next) }} onOpenSimulation={() => changeWorkspace('simulation')} onWorkspace={changeWorkspace} session={studySession} />
   </Suspense>
 
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.9</span></small></div></div>
-      <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
-      <div className="topbar-actions"><StudyVersions version={studyVersion} onSelect={next => { setStudyVersion(next); openStudy() }} /><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.10</span></small></div></div>
+      <div className="topbar-center"><ModelSelector value="simulation" onChange={changeWorkspace} /></div>
+      <div className="topbar-actions"><StudyVersions version={studyVersion} onSelect={next => { studySession.current=undefined; setStudyVersion(next); openStudy() }} /><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>
 
     <nav className="workflow-tabs" role="tablist" aria-label="App sections">

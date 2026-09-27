@@ -407,6 +407,8 @@ function DepthGuide() {
   </>
 }
 
+const savedStudyCameras = new Map<string, { position: THREE.Vector3; target: THREE.Vector3; zoom: number }>()
+
 function CameraRig({ view, resetToken, version }: Pick<StudySceneProps, 'view' | 'resetToken' | 'version'>) {
   const { camera, size, invalidate } = useThree()
   const controls = useRef<OrbitControlsImpl>(null)
@@ -418,7 +420,9 @@ function CameraRig({ view, resetToken, version }: Pick<StudySceneProps, 'view' |
     const height = view === 'root' ? 4.6 : view === 'top' ? 6.4 : 7.7
     const zoom = Math.min(size.height / height, size.width / (view === 'root' ? 5.8 : view === 'top' ? 10.4 : 11.8))
     if (!initialized.current) {
-      camera.position.copy(position); camera.zoom = zoom; camera.lookAt(focus); camera.updateProjectionMatrix()
+      const saved = savedStudyCameras.get(`${version}/${view}`)
+      if (saved) { position.copy(saved.position); focus.copy(saved.target) }
+      camera.position.copy(position); camera.zoom = saved?.zoom ?? zoom; camera.lookAt(focus); camera.updateProjectionMatrix()
       controls.current?.target.copy(focus); controls.current?.update(); initialized.current = true
     } else transition.current = {
       elapsed: 0, position: camera.position.clone(), target: controls.current?.target.clone() ?? focus.clone(), zoom: camera.zoom,
@@ -440,7 +444,7 @@ function CameraRig({ view, resetToken, version }: Pick<StudySceneProps, 'view' |
     else invalidate()
   })
   return <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={0.12} minZoom={18} maxZoom={240}
-    minPolarAngle={0.01} maxPolarAngle={Math.PI * 0.58} onStart={() => { transition.current = null }} />
+    minPolarAngle={0.01} maxPolarAngle={Math.PI * 0.58} onChange={() => { if (initialized.current && controls.current) savedStudyCameras.set(`${version}/${view}`, { position: camera.position.clone(), target: controls.current.target.clone(), zoom: camera.zoom }) }} onStart={() => { transition.current = null }} />
 }
 
 function ModelReady({ onReady }: { onReady: () => void }) {

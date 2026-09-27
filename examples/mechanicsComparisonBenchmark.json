@@ -1,0 +1,173 @@
+{
+  "createdAt": "2026-09-27T05:59:52.862Z",
+  "host": {
+    "cpu": "Apple M3 Pro",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v26.8.2"
+  },
+  "inputs": {
+    "tractionPa": 9200,
+    "material": {
+      "youngsPa": 1000000,
+      "poisson": 0.3,
+      "cohesionPa": 8000,
+      "frictionSlope": 0.35,
+      "dilationSlope": 0.05,
+      "hardeningPa": 20000
+    },
+    "resolution": 2,
+    "increments": 10
+  },
+  "sourceHashes": {
+    "src/mechanics/continuum.ts": "cd90a06e2614bccf73eec15c30418a69727b63d1ed95b255afb4d89ddaa2a02c",
+    "src/mechanics/comparison.ts": "61dc3c9e0e38d0e51552976074b401d204510a5a41e4997bf7121da7fa04c311"
+  },
+  "notes": "One warmup, three measured runs per case. Solver setup and solve only; excludes worker transfer/rendering. No optimization speedup claimed.",
+  "records": [
+    {
+      "resolution": 1,
+      "law": "elastic",
+      "samples": [
+        {
+          "setupMs": 0.787542000000002,
+          "solveMs": 1.489083000000008
+        },
+        {
+          "setupMs": 0.6813339999999926,
+          "solveMs": 1.2482909999999947
+        },
+        {
+          "setupMs": 0.8776670000000024,
+          "solveMs": 0.9929579999999874
+        }
+      ],
+      "medianSetupMs": 0.787542000000002,
+      "medianSolveMs": 1.2482909999999947,
+      "frames": 21,
+      "maxResidualN": 1.4551915228366852e-10,
+      "finalVerticalStrain": -9.16150835750251e-18,
+      "maxAnalyticalFinalStrainError": 9.16150835750251e-18
+    },
+    {
+      "resolution": 1,
+      "law": "drucker-prager",
+      "samples": [
+        {
+          "setupMs": 0.7142499999999927,
+          "solveMs": 4.134666999999979
+        },
+        {
+          "setupMs": 0.6305419999999913,
+          "solveMs": 3.9900419999999883
+        },
+        {
+          "setupMs": 0.6262079999999912,
+          "solveMs": 3.493249999999989
+        }
+      ],
+      "medianSetupMs": 0.6305419999999913,
+      "medianSolveMs": 3.9900419999999883,
+      "frames": 21,
+      "maxResidualN": 0.00004428124702826608,
+      "finalVerticalStrain": -0.00622777433274048,
+      "maxAnalyticalFinalStrainError": 3.4450372667430007e-9
+    },
+    {
+      "resolution": 2,
+      "law": "elastic",
+      "samples": [
+        {
+          "setupMs": 0.9333340000000021,
+          "solveMs": 11.010333000000003
+        },
+        {
+          "setupMs": 0.7656659999999818,
+          "solveMs": 11.208666999999991
+        },
+        {
+          "setupMs": 0.7410409999999956,
+          "solveMs": 10.942250000000001
+        }
+      ],
+      "medianSetupMs": 0.7656659999999818,
+      "medianSolveMs": 11.010333000000003,
+      "frames": 21,
+      "maxResidualN": 5.618153509340473e-7,
+      "finalVerticalStrain": -5.519531229639109e-13,
+      "maxAnalyticalFinalStrainError": 6.306682064603776e-13
+    },
+    {
+      "resolution": 2,
+      "law": "drucker-prager",
+      "samples": [
+        {
+          "setupMs": 0.7920419999999808,
+          "solveMs": 76.21116700000005
+        },
+        {
+          "setupMs": 0.4571250000000191,
+          "solveMs": 77.59199999999998
+        },
+        {
+          "setupMs": 0.21062499999999318,
+          "solveMs": 75.56183399999998
+        }
+      ],
+      "medianSetupMs": 0.4571250000000191,
+      "medianSolveMs": 76.21116700000005,
+      "frames": 21,
+      "maxResidualN": 0.000055753653214196675,
+      "finalVerticalStrain": -0.006227782174069382,
+      "maxAnalyticalFinalStrainError": 4.3963025338211725e-9
+    },
+    {
+      "resolution": 4,
+      "law": "elastic",
+      "samples": [
+        {
+          "setupMs": 1.3628330000000233,
+          "solveMs": 200.89220799999998
+        },
+        {
+          "setupMs": 0.1861660000000711,
+          "solveMs": 201.51545799999997
+        },
+        {
+          "setupMs": 0.20829100000014478,
+          "solveMs": 205.43558299999995
+        }
+      ],
+      "medianSetupMs": 0.20829100000014478,
+      "medianSolveMs": 201.51545799999997,
+      "frames": 21,
+      "maxResidualN": 1.4850690265981218e-7,
+      "finalVerticalStrain": -3.234679234534464e-13,
+      "maxAnalyticalFinalStrainError": 1.2675894405303478e-12
+    },
+    {
+      "resolution": 4,
+      "law": "drucker-prager",
+      "samples": [
+        {
+          "setupMs": 0.2045419999999467,
+          "solveMs": 1116.9884159999997
+        },
+        {
+          "setupMs": 0.2136249999998654,
+          "solveMs": 1145.1765
+        },
+        {
+          "setupMs": 0.2316659999996773,
+          "solveMs": 1152.2086659999995
+        }
+      ],
+      "medianSetupMs": 0.2136249999998654,
+      "medianSolveMs": 1145.1765,
+      "frames": 21,
+      "maxResidualN": 0.000024332493921974674,
+      "finalVerticalStrain": -0.006227785431026535,
+      "maxAnalyticalFinalStrainError": 7.65426981345907e-9
+    }
+  ]
+}

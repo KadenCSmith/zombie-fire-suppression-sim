@@ -1,5 +1,7 @@
+import { ModelSelector, type PhysicsWorkspace } from './ModelSelector'
+import { ParameterSlider } from './ParameterSlider'
+import type { MutableRefObject } from 'react'
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
-import ArrowUpRight from 'lucide-react/dist/esm/icons/arrow-up-right.mjs'
 import Check from 'lucide-react/dist/esm/icons/check.mjs'
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right.mjs'
 import Flame from 'lucide-react/dist/esm/icons/flame.mjs'
@@ -26,7 +28,7 @@ type PlaybackSpeed = 0.5 | 1 | 2
 const DURATION = STUDY_DURATION
 const VIEWS = [
   { id: 'cutaway', number: '01', title: 'Soil cutaway', subtitle: 'Beneath the surface', icon: Layers3 },
-  { id: 'thermal', number: '02', title: 'Thermal layers', subtitle: 'Follow the cooling zone', icon: Thermometer },
+  { id: 'thermal', number: '02', title: 'Thermal illustration', subtitle: 'Qualitative colors only', icon: Thermometer },
   { id: 'top', number: '03', title: 'Surface view', subtitle: 'See the whole site', icon: Scan },
   { id: 'root', number: '04', title: 'Roots & peat', subtitle: 'A closer look underground', icon: Leaf },
 ] as const
@@ -66,19 +68,24 @@ function formatTime(value: number) {
   return `00:${value.toFixed(1).padStart(4, '0')}`
 }
 
-export default function StudyWorkspace({ onOpenSimulation, version = 'rupture', onVersionChange }: { onOpenSimulation?: () => void; version?: StudyVersion; onVersionChange: (version: StudyVersion) => void }) {
+export interface StudySession { view: StudyView; time: number; speed: PlaybackSpeed; labels: boolean; loop: boolean; cage: typeof DEFAULT_STUDY_CAGE; launchSpeed: number; soilOptions: typeof SOIL_PARTICLE_DEFAULTS }
+
+export default function StudyWorkspace({ version = 'rupture', onVersionChange, onWorkspace, session }: { onOpenSimulation?: () => void; version?: StudyVersion; onVersionChange: (version: StudyVersion) => void; onWorkspace: (value: PhysicsWorkspace) => void; session: MutableRefObject<StudySession | undefined> }) {
+  const saved = session.current
   const PHASES = version === 'original' ? ORIGINAL_STUDY_PHASES : (version === 'fracture' || version === 'rupture') ? FRACTURE_STUDY_PHASES : STUDY_PHASES
-  const [launchSpeed, setLaunchSpeed] = useState(2.8)
-  const [soilOptions, setSoilOptions] = useState({ ...SOIL_PARTICLE_DEFAULTS })
-  const [view, setView] = useState<StudyView>('cutaway')
-  const [time, setTime] = useState(0)
+  const [launchSpeed, setLaunchSpeed] = useState(saved?.launchSpeed ?? 2.8)
+  const [soilOptions, setSoilOptions] = useState(saved?.soilOptions ?? { ...SOIL_PARTICLE_DEFAULTS })
+  const [view, setView] = useState<StudyView>(saved?.view ?? 'cutaway')
+  const [time, setTime] = useState(saved?.time ?? 0)
   const [playing, setPlaying] = useState(false)
-  const [speed, setSpeed] = useState<PlaybackSpeed>(1)
-  const [loop, setLoop] = useState(false)
-  const [labels, setLabels] = useState(true)
+  const [speed, setSpeed] = useState<PlaybackSpeed>(saved?.speed ?? 1)
+  const [loop, setLoop] = useState(saved?.loop ?? false)
+  const [labels, setLabels] = useState(saved?.labels ?? true)
   const [resetToken, setResetToken] = useState(0)
-  const timeRef = useRef(0)
-  const [cage, setCage] = useState({ ...DEFAULT_STUDY_CAGE })
+  const timeRef = useRef(saved?.time ?? 0)
+  const [cage, setCage] = useState(saved?.cage ?? { ...DEFAULT_STUDY_CAGE })
+
+  useEffect(() => { session.current = { view,time,speed,labels,loop,cage,launchSpeed,soilOptions } }, [view,time,speed,labels,loop,cage,launchSpeed,soilOptions,session])
 
   const seek = useCallback((next: number) => {
     const bounded = Math.max(0, Math.min(DURATION, next))
@@ -143,14 +150,14 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'rupture', 
       </div>
       <div className="study-header-actions">
         <span className="study-concept-badge"><span aria-hidden="true" />{STUDY_VERSIONS.find(item => item.id === version)?.title}</span>
-        {onOpenSimulation && <button className="study-simulation-link" onClick={onOpenSimulation} type="button">Open simulation <ArrowUpRight size={15} /></button>}
+        <ModelSelector value="study" onChange={onWorkspace} />
         <StudyVersions version={version} onSelect={selectVersion} />
       </div>
     </header>
 
     <section className="study-heading" aria-labelledby="study-title">
-      <div className="study-heading-copy"><p className="study-eyebrow">Explore the model</p><h1 id="study-title">One landscape. Four perspectives.</h1></div>
-      <p className="study-heading-note">Choose a view, then play the story beneath the surface.</p>
+      <div className="study-heading-copy"><p className="study-eyebrow">Rendering view / demonstration</p><h1 id="study-title">Terrain & subsurface operations.</h1></div>
+      <p className="study-heading-note">Fast demonstration · prescribed load and staged fire. Physical field calculations are in the model selector.</p>
     </section>
 
     <nav className="study-view-nav" aria-label="Study views">
@@ -213,7 +220,7 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'rupture', 
         {(version === 'fracture' || version === 'rupture') && <section className="study-cage-controls" aria-label="Bonded particle scenario">
           <h3>{version === 'rupture' ? 'Ground opening & broad peat fire' : 'Cap & bonded soil'}</h3>
           <p>{version === 'rupture' ? 'Irregular soil pieces separate and lift under a broader assumed load. A wide buried peat bed has an unburnt margin and a narrow staged fire path to the surface. The oak has uneven lateral and deep branching roots. Fire growth is illustrative; CO₂ does not ignite or feed the fire.' : <>A 70 cm concave cap falls onto the source. Its rim stays seated; the center flexes under an assumed load. The peat lens is centered 1.65 m deep with an unburnt surround. A young bur oak has spreading lateral roots and descending roots to 2.7 m; their dimensions are illustrative.</>}</p>
-          <div><label htmlFor="soil-load">Assumed load</label><input id="soil-load" type="number" min="0" max="30" step="1" value={soilOptions.pressurePa / 1000} onChange={event => { const value = Number(event.target.value); if (value >= 0 && value <= 30) { setPlaying(false); seek(0); setSoilOptions(old => ({ ...old, pressurePa: value * 1000 })) } }} /><span>kPa</span></div>
+          <ParameterSlider label="Assumed pressure load" value={soilOptions.pressurePa / 1000} min={0} max={30} step={1} unit="kPa" defaultValue={18} note="Prescribed footprint; edits restart playback" onChange={value => { setPlaying(false); seek(0); setSoilOptions(old => ({ ...old, pressurePa: value * 1000 })) }} />
           <p>Mineral bulk density: 1050 kg/m³ at the surface, increasing by 220 kg/m³ per meter. Peat: 300 kg/m³. These scenario assumptions do not establish a universal depth profile.</p>
           <p>{version === 'rupture' ? 'A weaker, more broadly loaded 2D soil scenario. Irregular display pieces expose gaps using the calculated motion and damage; their crack shapes are illustrative.' : 'Calculated spring-bond separation and surface uplift in a 2D section.'} The load spreads laterally and upward by prescription; gas flow and fracture direction are not predicted.</p>
         </section>}
