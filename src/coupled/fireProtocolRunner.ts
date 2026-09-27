@@ -1,7 +1,7 @@
 import { createFireProtocol, type FireProtocolFrame, type FireProtocolOptions } from './fireProtocol'
 
 export type FireProtocolStatus = 'completed' | 'time-budget-stopped' | 'physics-stopped'
-export type FireProtocolCachedFrame = FireProtocolFrame & { event?: 'dry-ice-insertion' }
+export type FireProtocolCachedFrame = FireProtocolFrame & { event?: 'ignition-cutoff' | 'dry-ice-insertion' }
 export interface FireProtocolProgress {
   type: 'progress'
   phase: 'ignition' | 'treatment'
@@ -57,7 +57,7 @@ export async function runFireProtocol(options: Partial<FireProtocolOptions> = {}
   const elapsedS = () => (performance.now() - start) / 1000
   const withinBudget = () => {
     if (elapsedS() <= wallLimitS) return true
-    status = 'time-budget-stopped'; stopReason = 'Offline calculation reached its wall-clock budget; accepted earlier states retained and remaining frames were not invented.'
+    status = 'time-budget-stopped'; stopReason = 'Calculation reached its wall-clock budget; accepted earlier states retained and remaining frames were not invented.'
     return false
   }
   const capture = (): FireProtocolCachedFrame => ({ ...run.capture(), ...(treatmentStartS === null ? {} : { phase: 'treatment' as const }) })
@@ -84,6 +84,10 @@ export async function runFireProtocol(options: Partial<FireProtocolOptions> = {}
       if (!withinBudget()) break
       conservativeStep(Math.min(config.maxStepS, config.durationS - sim.time, nextCaptureS - sim.time))
       if (sim.time >= nextCaptureS - 1e-8) { frames.push(capture()); nextCaptureS += config.captureEveryS }
+      // step() already clips at the heater schedule: record that accepted event
+      // without adding a timestep or moving the ordinary capture schedule.
+      if (Math.abs(sim.time - config.ignitionDurationS) < 1e-8 && frames.at(-1)!.timeS !== sim.time)
+        frames.push({ ...capture(), event: 'ignition-cutoff' })
       await progress()
     }
     saveFinal()

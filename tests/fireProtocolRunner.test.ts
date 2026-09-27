@@ -46,4 +46,13 @@ describe('shared fire experiment driver', () => {
     expect(cache.frames.every(frame => frame.dryIceKg === 0)).toBe(true)
     expect(cache.propagationResolved).toBe(false)
   })
+
+  it('captures ignition cutoff between regular snapshots without introducing extra steps', async () => {
+    const cache = await runFireProtocol({ ...short, durationS: 4, captureEveryS: 2 }, { treatmentDurationS: 0 })
+    expect(cache.frames.map(frame => frame.timeS)).toEqual([0, 1, 2, 4])
+    expect(cache.frames[1].event).toBe('ignition-cutoff')
+    expect(cache.frames[1].phase).toBe('unforced-reaction')
+    expect(cache.frames.at(-1)!.ledger.steps).toBe(3)
+    expect(cache.frames.at(-1)!.ledger.heaterJ).toBeCloseTo(100, 8)
+  })
 })
