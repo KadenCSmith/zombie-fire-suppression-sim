@@ -22,6 +22,7 @@ Reuse the existing TypeScript finite-volume and brick-FEM knowledge, but isolate
 
 - First tested/pushed integration: a3c3361, with phase-aware 3D FVM, initialized heterogeneous FEM, root bars, phase-field research, workers and native UI. Three-platform CI passed.
 - Second integration: buoyancy/energy, frozen initial states, explicit reduced cap shell/contact/anchors/venting, separate sensitivity studies, intact-operator optimization, and strict failed-fracture reporting. 133 tests pass. Detailed failed and passed gates are in COUPLED_VALIDATION.md.
-- Release work: build and verify archives, install 0.11 beside the running/preserved 0.10, publish source and downloads/checksums, inspect installed native window and record final source CI.
+- Release delivered: source/application commits and all 17 assets are published and hash-verified; 0.11 is installed beside preserved 0.10; final three-platform CI passes. See BUILD_STATUS.md for commit IDs, archive/native checks and exact scope.
+- Remaining installation action: the Mac was locked on two CUA attempts. After the user unlocks it, inspect the installed 0.11 window, calculate/replay the default scenario and record the observation. Do not call the already-passed development smoke an installed-window observation.
 
 Do not overwrite the independent Blender edit or sources. Do not claim the failed fracture mesh/energy gates passed. All remaining model/data gaps are listed individually in COUPLED_VALIDATION.md.

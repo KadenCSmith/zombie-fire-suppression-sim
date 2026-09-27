@@ -1,0 +1,114 @@
+{
+  "releaseId": 397562754,
+  "sourceCommit": "05d9c292476677068e9040f5843e70b8ec33ec32",
+  "verifiedAt": "2026-09-27T08:18:49.892011+00:00",
+  "assets": [
+    {
+      "filename": "COUPLED_MODEL.md",
+      "bytes": 17144,
+      "sha256": "7d02537e6fc48340f7608dacfd6df1f2f02c9c0c1468f0221aa352a7292d4797",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "COUPLED_VALIDATION.md",
+      "bytes": 10971,
+      "sha256": "bc8bb09bc5feff982f1edfe33825141ca3095d9738acd782c5366b96694dc235",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "INSTALL.md",
+      "bytes": 9111,
+      "sha256": "75b1115885f080bbc7034df7e5cf30ca4e258fcd87e597b78416a265d611dfb1",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Native-Application.png",
+      "bytes": 561162,
+      "sha256": "1f696dce69c28a44f2da55ec7c9a2647f64da2f834478e818457e30f8cf12b78",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "RELEASE-VERIFICATION.json",
+      "bytes": 2560,
+      "sha256": "16fac72b89ebc61ba8c660fc8f7ab21b40476a3273e3504975aa02268017e29a",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "SHA256SUMS.txt",
+      "bytes": 1541,
+      "sha256": "b0c18ea27b0efb080556657cf9466b410332ea7bdcaa72f6ec08064d27057587",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "SOURCE-MANIFEST.json",
+      "bytes": 30396,
+      "sha256": "3da81e0efb3c2902872557180052aa2faa021dea1fb602272b808a7e9147df15",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "START-HERE.md",
+      "bytes": 4410,
+      "sha256": "327d5441a24af9b171750e578131815e9f7e0aae7cb92642826c49dec3852281",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Linux-arm64.tar.gz",
+      "bytes": 141816439,
+      "sha256": "6c3c723153f2647d3233c1cbf7f06f405999bc1317a18d2aecfb85ae2f5a0c17",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Linux-x64.tar.gz",
+      "bytes": 140730822,
+      "sha256": "141a247cd766f56340a2cb3a9d72121d059c9bbf4f684027df2215ac588105ef",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Source.zip",
+      "bytes": 58733245,
+      "sha256": "3c8d71395655be10778492b83717eb450051c58a62e9116b97a7ff240ecaf05f",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Validation-Evidence.zip",
+      "bytes": 609786,
+      "sha256": "f3281f7ad16989255ddba6c4a1308fb5192929afd94ecdefcf6f6dac506d41f5",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Windows-arm64.zip",
+      "bytes": 174125830,
+      "sha256": "8debe08324423b4093cdc8c13d88740f16978c0cc52b7b462c6e7176a5e6e480",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-Windows-x64.zip",
+      "bytes": 176028202,
+      "sha256": "3fdaa15110d1a9d92f261d29bd1c9181ac3a0c8009c1d744eb92488aff59161c",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-macOS-universal.dmg",
+      "bytes": 271064715,
+      "sha256": "2b9f99db9b291954c75239cca219596008a0f77da5fa19e10fa9f956d0b5008c",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "Zombie-Fire-Sim-0.11.0-macOS-universal.zip",
+      "bytes": 247458673,
+      "sha256": "b2aa88941e7d468751f661440702a15754c650648f5959f81da2f9108291020f",
+      "githubDigestMatched": true
+    },
+    {
+      "filename": "release-manifest.json",
+      "bytes": 3791,
+      "sha256": "44f4a4978a1c47703bcfb729f8363014e063ade4ff93094f289e41d4177ca5fd",
+      "githubDigestMatched": true
+    }
+  ],
+  "releaseUrl": "https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0",
+  "published": true,
+  "sourceSnapshotCommit": "74c0ef55680a5decc0b75d956a6636575f44898f",
+  "platformCiUrl": "https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36305414929",
+  "installedWindowInspection": "Pending: Mac locked; two CUA attempts; user asked to unlock."
+}
