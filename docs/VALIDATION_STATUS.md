@@ -1,5 +1,13 @@
 # Verification and validation status
 
+## Seated cap, bonded soil and bur oak (2026-09-26, version 0.8.0)
+
+Added a concave cap that drops onto the ice, assumed rim restraint and one calculated flex mode, a deeper lower-density peat lens with unburnt surround, and a young bur oak with connected lateral and descending roots to approximately 2.7 m. Soil motion comes from a 2D unit-thickness spring lattice with irreversible tensile bond failure under an **assumed** lateral/upward pressure footprint. Surface uplift is shown at the calculated scale. The scientific workspace and older scene versions remain separate and available. [Model, source rationale and ASCE references](CAP_SOIL_PARTICLES.md).
+
+Typecheck, lint, all **103 tests in 15 files**, production build and local native Electron smoke passed. New numerical checks cover zero load, cap seating, input bounds, finite results at 30 kPa, irreversible damage, fixed supports and reverse seeking. The default model gives 225 failed bonds, about 1.04 cm peak surface uplift and 10.92 cm peak cap deflection. These are assumed-scenario outputs, not experimental validation. Native development inspection confirmed the oak crown, deep connected roots, deeper peat, seated cap, damage markers and Roots & peat camera. The previous shallow peat cavity is visually filled. The independent Stage 2 Blender edit is preserved and excluded.
+
+Cap support/strength, gas flow, root reinforcement, moisture-dependent fracture and field containment are not validated or fully solved. Increasing density alone does not establish fracture direction. The current root depth is illustrative, informed by bur-oak rooting literature. Release checks are recorded separately when complete.
+
 ## Scene dynamics and version history (2026-09-26, version 0.7.0)
 
 The top-right three-dot control in both workspaces replays 0.5 cooling, 0.6 rapid release and the latest 0.7 debris dynamics. Earlier behavior uses shared current assets/renderer fixes; it does not run archived binaries. The latest scene adds held-then-free-fall source placement, fixed-step particle gravity/drag, inelastic contacts, friction and rigid cage-bar contact. Assumed release speed is editable. Gas/thermal displays remain authored; no CFD, fracture, cage strength or experimental validation is claimed. The numerical scientific workspace is unchanged. [Equations, assumptions and ASCE sources](SCENE_DYNAMICS.md).

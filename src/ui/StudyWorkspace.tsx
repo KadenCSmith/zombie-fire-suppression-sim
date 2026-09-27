@@ -16,8 +16,9 @@ import Tags from 'lucide-react/dist/esm/icons/tags.mjs'
 import Thermometer from 'lucide-react/dist/esm/icons/thermometer.mjs'
 import { StudyScene } from './StudyScene'
 import './study.css'
+import { SOIL_PARTICLE_DEFAULTS } from './soilParticleModel'
 import { StudyVersions } from './StudyVersions'
-import { DEFAULT_STUDY_CAGE, STUDY_DURATION, STUDY_PHASES, STUDY_RELEASE_TIME, ORIGINAL_STUDY_PHASES, STUDY_VERSIONS, type StudyVersion } from './studyModel'
+import { DEFAULT_STUDY_CAGE, STUDY_DURATION, STUDY_PHASES, STUDY_RELEASE_TIME, ORIGINAL_STUDY_PHASES, FRACTURE_STUDY_PHASES, STUDY_VERSIONS, type StudyVersion } from './studyModel'
 
 type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
 type PlaybackSpeed = 0.5 | 1 | 2
@@ -65,9 +66,10 @@ function formatTime(value: number) {
   return `00:${value.toFixed(1).padStart(4, '0')}`
 }
 
-export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics', onVersionChange }: { onOpenSimulation?: () => void; version?: StudyVersion; onVersionChange: (version: StudyVersion) => void }) {
-  const PHASES = version === 'original' ? ORIGINAL_STUDY_PHASES : STUDY_PHASES
+export default function StudyWorkspace({ onOpenSimulation, version = 'fracture', onVersionChange }: { onOpenSimulation?: () => void; version?: StudyVersion; onVersionChange: (version: StudyVersion) => void }) {
+  const PHASES = version === 'original' ? ORIGINAL_STUDY_PHASES : version === 'fracture' ? FRACTURE_STUDY_PHASES : STUDY_PHASES
   const [launchSpeed, setLaunchSpeed] = useState(2.8)
+  const [soilOptions, setSoilOptions] = useState({ ...SOIL_PARTICLE_DEFAULTS })
   const [view, setView] = useState<StudyView>('cutaway')
   const [time, setTime] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -171,7 +173,7 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics',
             <button type="button" className="study-tool-button study-tool-icon" onClick={() => setResetToken((current) => current + 1)} aria-label="Reset camera to the selected view" title="Reset camera"><Focus size={17} /></button>
           </div>
         </div>
-        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} version={version} launchSpeed={launchSpeed} /></div>
+        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} version={version} launchSpeed={launchSpeed} soilOptions={soilOptions} /></div>
         <div className="study-viewport-footer">
           <span><MoveUpRight size={12} /> Drag to orbit <span className="study-hint-divider">/</span> Scroll to zoom</span>
           <span className="study-frame-state">{playing ? 'Playing' : time >= DURATION ? 'Sequence complete' : 'Paused'}<i aria-hidden="true" /></span>
@@ -200,7 +202,7 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics',
           <dl><div><dt>Soil footprint</dt><dd>8 × 8 <span>m</span></dd></div><div><dt>Borehole width</dt><dd>0.75 <span>m</span></dd></div><div><dt>Borehole depth</dt><dd>2.44 <span>m</span></dd></div><div><dt>Dry-ice diameter</dt><dd>0.50 <span>m</span></dd></div></dl>
         </section>
 
-        {version !== 'original' && <section className="study-cage-controls" aria-label="Cage illustration settings">
+        {version !== 'original' && version !== 'fracture' && <section className="study-cage-controls" aria-label="Cage illustration settings">
           <h3>Inverted cage</h3>
           <label className="study-cage-toggle"><input type="checkbox" checked={cage.enabled} onChange={event => setCage(old => ({ ...old, enabled: event.target.checked }))} />Cover the crater opening</label>
           <div><label htmlFor="study-cage-height">Height</label><input id="study-cage-height" type="number" min="1" max="100" step="1" value={Math.round(cage.heightM * 100)} onChange={event => { const value = Number(event.target.value); if (value >= 1 && value <= 100) setCage(old => ({ ...old, heightM: value / 100 })) }} /><span>cm</span></div>
@@ -208,6 +210,13 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics',
           <p>{version === 'dynamics' ? 'Open underneath. Simplified particle contacts with rigid bars; cage strength and deformation are not modeled.' : 'Open underneath. Placed after landing. Containment and bar collisions are not calculated.'}</p>
         </section>}
 
+        {version === 'fracture' && <section className="study-cage-controls" aria-label="Bonded particle scenario">
+          <h3>Cap &amp; bonded soil</h3>
+          <p>A 70 cm concave cap falls onto the source. Its rim stays seated; the center flexes under an assumed load. The peat lens is centered 1.65 m deep with an unburnt surround. A young bur oak has spreading lateral roots and descending roots to 2.7 m; their dimensions are illustrative.</p>
+          <div><label htmlFor="soil-load">Assumed load</label><input id="soil-load" type="number" min="0" max="30" step="1" value={soilOptions.pressurePa / 1000} onChange={event => { const value = Number(event.target.value); if (value >= 0 && value <= 30) { setPlaying(false); seek(0); setSoilOptions(old => ({ ...old, pressurePa: value * 1000 })) } }} /><span>kPa</span></div>
+          <p>Mineral bulk density: 1050 kg/m³ at the surface, increasing by 220 kg/m³ per meter. Peat: 300 kg/m³. These scenario assumptions do not establish a universal depth profile.</p>
+          <p>Calculated spring-bond separation and surface uplift in a 2D section. The load spreads laterally and upward by prescription; gas flow and fracture direction are not predicted.</p>
+        </section>}
         {version === 'dynamics' && <section className="study-cage-controls" aria-label="Debris dynamics assumptions">
           <h3>Calculated debris motion</h3>
           <p>Gravity · air resistance · bounce · friction · cage contacts</p>
@@ -215,7 +224,7 @@ export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics',
           <p>Gravity 9.80665 m/s². Assumed debris density 1800 kg/m³, drag coefficient 0.8, rebound 0.22 and friction 0.6. Exposed debris settles onto simplified ground planes. Gas pressure does not set the release speed.</p>
         </section>}
         <div className="study-observation"><span className="study-observation-icon"><Focus size={16} /></span><p>{version === 'original' ? 'Original cooling and transport study, preserved for comparison. The source remains visible.' : notes.observation}</p></div>
-        <p className="study-disclaimer">{version === 'dynamics' ? 'Calculated particle translation with assumed release. The source is held, then falls under gravity before landing at 4 s. Gas and thermal colors remain illustrative; no pressure, fracture or containment prediction.' : version === 'original' ? 'Earlier authored cooling and transport. No calculated temperature or treatment outcome.' : 'Earlier staged conversion and fragment motion. Gas tracers are illustrative; no pressure or fracture prediction.'}</p>
+        <p className="study-disclaimer">{version === 'fracture' ? 'Assumed restrained cap and lateral/upward pressure footprint. Particle bonds break under tension. No validated fracture, shell strength or gas containment prediction.' : version === 'dynamics' ? 'Calculated particle translation with assumed release. The source is held, then falls under gravity before landing at 4 s. Gas and thermal colors remain illustrative; no pressure, fracture or containment prediction.' : version === 'original' ? 'Earlier authored cooling and transport. No calculated temperature or treatment outcome.' : 'Earlier staged conversion and fragment motion. Gas tracers are illustrative; no pressure or fracture prediction.'}</p>
       </aside>
     </main>
 

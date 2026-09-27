@@ -1,6 +1,12 @@
 # Scene studio
 
-Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. The latest version calculates debris translation under gravity, drag and simplified contacts with an assumed release velocity. Gas and thermal displays remain authored. It is not connected to the scientific solver and does not calculate temperature, gas concentration, fracture or treatment success. The top-right ⋯ menu also replays the earlier 0.5 cooling and 0.6 rapid-release scenes. See [dynamics, evidence and limitations](SCENE_DYNAMICS.md).
+Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. Version 0.7 calculates debris translation under gravity, drag and simplified contacts with an assumed release velocity. Gas and thermal displays remain authored. It is not connected to the scientific solver and does not calculate temperature, gas concentration, fracture or treatment success. The top-right ⋯ menu replays versions 0.5–0.8. See [dynamics, evidence and limitations](SCENE_DYNAMICS.md).
+
+## Latest: 0.8 cap and bonded soil
+
+The cap falls onto the ice and seats underground before the 9 s release. An assumed lateral/upward pressure footprint drives a 2D spring-bond particle section and a single cap deformation mode. The soil shows slight uplift and persistent bond-damage markers. A deeper peat lens centered at 1.65 m contains a smoldering core and unburnt surround. A procedural bur oak replaces the old tree, with shallow laterals and descending roots to about 2.7 m. Roots move visually with the soil field but provide no calculated reinforcement. **Roots & peat** frames the deeper section.
+
+The gas field, dimensions, density gradient, cap support and mechanical coefficients are assumed. Fracture direction, shell containment, temperatures and treatment success are not predicted. [Detailed equations, parameters, ASCE references and evidence limits](CAP_SOIL_PARTICLES.md).
 
 ## Views
 

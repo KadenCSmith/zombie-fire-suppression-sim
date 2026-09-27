@@ -8,14 +8,17 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import * as THREE from 'three'
 import { DEFAULT_STUDY_CAGE, STUDY_FRAGMENTS, STUDY_LANDING_TIME, STUDY_PEAT, STUDY_RELEASE_TIME, STUDY_SOURCE, smoothPhase, studyAnimation, studyCageBars, studyFragmentPose, studyObjectRole, studyTime, type StudyCage, type StudyView, type StudyVersion } from './studyModel'
 
+import { BondedSoil, ConcaveCap, DeepPeat, createSoilTexture, updateSoilTexture, soilVertexFields } from './FractureStudy'
+import { OakTree } from './OakTree'
+import { BURIED_PEAT, buildSoilReplay, SOIL_PARTICLE_DEFAULTS, type SoilParticleOptions } from './soilParticleModel'
 import { buildDebrisReplay, debrisPose, type DebrisReplay } from './studyDynamics'
 
 export type { StudyView } from './studyModel'
-export type StudySceneProps = { view: StudyView; time: number; labels: boolean; cage?: StudyCage; resetToken?: number; version?: StudyVersion; launchSpeed?: number }
+export type StudySceneProps = { view: StudyView; time: number; labels: boolean; cage?: StudyCage; resetToken?: number; version?: StudyVersion; launchSpeed?: number; soilOptions?: SoilParticleOptions }
 const MODEL_URL = `${import.meta.env.BASE_URL}models/peat-study.glb`
 type Role = ReturnType<typeof studyObjectRole>
 type Batch = { geometry: THREE.BufferGeometry; material: THREE.MeshStandardMaterial; role: Role; name: string }
-type DisplayUniforms = { thermal: { value: number }; cold: { value: number }; warmth: { value: number }; sourceY: { value: number } }
+type DisplayUniforms = { thermal: { value: number }; cold: { value: number }; warmth: { value: number }; sourceY: { value: number }; soilTexture?: { value: THREE.DataTexture }; peatY?: { value: number } }
 
 /** Modify private material copies only; the loader cache and solver remain untouched. */
 function displayMaterial(original: THREE.Material, role: Role, uniforms: DisplayUniforms, name: string) {
@@ -25,15 +28,21 @@ function displayMaterial(original: THREE.Material, role: Role, uniforms: Display
   material.onBeforeCompile = shader => {
     Object.assign(shader.uniforms, {
       uStudyThermal: uniforms.thermal, uStudyCold: uniforms.cold,
-      uStudyWarmth: uniforms.warmth, uStudySourceY: uniforms.sourceY,
+      uStudyWarmth: uniforms.warmth, uStudySourceY: uniforms.sourceY, uPeatY: uniforms.peatY ?? { value: -0.68 },
     })
     shader.vertexShader = 'varying vec3 vStudyWorld;\n' + shader.vertexShader
+    if (uniforms.soilTexture && role === 'soil') {
+      shader.uniforms.uSoilField = uniforms.soilTexture
+      shader.vertexShader = soilVertexFields + shader.vertexShader
+      shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.xy += soilOffset(position);')
+    }
     shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\nvStudyWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;')
     shader.fragmentShader = `varying vec3 vStudyWorld;
 uniform float uStudyThermal;
 uniform float uStudyCold;
 uniform float uStudyWarmth;
 uniform float uStudySourceY;
+uniform float uPeatY;
 vec3 studyPalette(float v) {
   vec3 a = vec3(0.045, 0.23, 0.48);
   vec3 b = vec3(0.12, 0.56, 0.57);
@@ -45,7 +54,7 @@ vec3 studyPalette(float v) {
 }
 ` + shader.fragmentShader
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
-vec3 hotDelta = (vStudyWorld - vec3(1.4, -0.68, -0.72)) / vec3(1.7, 0.65, 1.4);
+vec3 hotDelta = (vStudyWorld - vec3(1.4, uPeatY, -0.72)) / vec3(1.7, 0.65, 1.4);
 vec3 coldDelta = (vStudyWorld - vec3(-1.4, -2.19 + uStudySourceY, 0.0)) / vec3(0.85, 0.9, 0.85);
 float hotZone = exp(-1.1 * dot(hotDelta, hotDelta));
 float coldZone = exp(-1.1 * dot(coldDelta, coldDelta));
@@ -53,7 +62,7 @@ float zone = ${base.toFixed(2)} + 0.98 * uStudyWarmth * hotZone - 0.33 * uStudyC
 diffuseColor.rgb = mix(diffuseColor.rgb, studyPalette(clamp(zone, 0.0, 1.0)), uStudyThermal * 0.93);
 `)
   }
-  material.customProgramCacheKey = () => `study-overlay-${role}-${base}`
+  material.customProgramCacheKey = () => `study-overlay-${role}-${base}-${!!uniforms.soilTexture}`
   return material
 }
 
@@ -68,13 +77,14 @@ function roleForObject(object: THREE.Object3D, root: THREE.Object3D): { role: Ro
 }
 
 /** Static geometry is transformed into world space and merged by material/role. */
-export function prepareStudyBatches(root: THREE.Object3D, uniforms: DisplayUniforms): Batch[] {
+export function prepareStudyBatches(root: THREE.Object3D, uniforms: DisplayUniforms, buried = false): Batch[] {
   const groups = new Map<string, { geometries: THREE.BufferGeometry[]; material: THREE.Material; role: Role; name: string }>()
   const transformed = root.clone(true)
   transformed.updateMatrixWorld(true)
   transformed.traverse(object => {
     if (!(object instanceof THREE.Mesh) || !object.visible) return
     const { role, name } = roleForObject(object, transformed)
+    if (buried && (role === 'peat' || /(peat|Charred[ _]organic)/i.test(object.name) || /^(Exposed root|Root[ •]|Small tree|Tree |Lower trunk|Natural bark|Living crown)/i.test(object.name.replaceAll('_', ' ')))) return
     const materials = Array.isArray(object.material) ? object.material : [object.material]
     const raw = object.geometry.index ? object.geometry.toNonIndexed() : object.geometry.clone()
     raw.applyMatrix4(object.matrixWorld)
@@ -115,11 +125,34 @@ export function prepareStudyBatches(root: THREE.Object3D, uniforms: DisplayUnifo
   })
 }
 
-function StudyModel({ view, time, version }: Pick<StudySceneProps, 'view' | 'time' | 'version'>) {
+/** Close the former shallow lens opening when the deeper scenario is selected. */
+function shallowSoilFill(uniforms: DisplayUniforms): Batch {
+  const geometry = new THREE.BufferGeometry()
+  // Subdivide radially so strata interpolate across the former lens footprint.
+  const positions: number[] = [], colors: number[] = [], indices: number[] = []
+  for (let ring = 0; ring <= 24; ring++) for (let segment = 0; segment <= 96; segment++) {
+    const r = ring / 24, a = segment / 96 * Math.PI * 2
+    const x = 1.4 + Math.cos(a) * r * 1.75, y = -0.68 + Math.sin(a) * r * 0.61
+    positions.push(x, y, 0.012)
+    const boundary = -0.82 + 0.055 * Math.sin(x * 1.7)
+    const f = THREE.MathUtils.smoothstep(y, boundary - 0.025, boundary + 0.025)
+    const color = new THREE.Color().setRGB(0.29, 0.21, 0.13).lerp(new THREE.Color().setRGB(0.18, 0.12, 0.058), f)
+    colors.push(color.r, color.g, color.b)
+    if (ring < 24 && segment < 96) { const i = ring * 97 + segment; indices.push(i, i + 97, i + 1, i + 1, i + 97, i + 98) }
+  }
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+  geometry.deleteAttribute('uv'); geometry.setIndex(indices); geometry.computeVertexNormals()
+  const original = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, side: THREE.DoubleSide })
+  const material = displayMaterial(original, 'soil', uniforms, '02 refill'); original.dispose()
+  return { geometry, material, role: 'soil', name: 'Former shallow opening · soil infill' }
+}
+
+function StudyModel({ view, time, version, soilTexture }: Pick<StudySceneProps, 'view' | 'time' | 'version'> & { soilTexture?: THREE.DataTexture }) {
   const { scene } = useGLTF(MODEL_URL, false, false)
   const invalidate = useThree(state => state.invalidate)
-  const uniforms = useMemo<DisplayUniforms>(() => ({ thermal: { value: 0 }, cold: { value: 0 }, warmth: { value: 1 }, sourceY: { value: 3.5 } }), [])
-  const batches = useMemo(() => prepareStudyBatches(scene, uniforms), [scene, uniforms])
+  const uniforms = useMemo<DisplayUniforms>(() => ({ thermal: { value: 0 }, cold: { value: 0 }, warmth: { value: 1 }, sourceY: { value: 3.5 }, peatY: { value: version === 'fracture' ? BURIED_PEAT.y : -0.68 }, ...(soilTexture ? { soilTexture: { value: soilTexture } } : {}) }), [soilTexture, version])
+  const batches = useMemo(() => { const result = prepareStudyBatches(scene, uniforms, version === 'fracture'); if (version === 'fracture') result.push(shallowSoilFill(uniforms)); return result }, [scene, uniforms, version])
   const phase = studyAnimation(time, version)
   useLayoutEffect(() => {
     uniforms.thermal.value = view === 'thermal' ? 1 : 0
@@ -196,6 +229,7 @@ function TransportTracer({ time, version }: { time: number; version: StudyVersio
 
 const expansionVertex = `
 uniform float uAge;
+uniform float uSeated;
 attribute vec4 seed;
 varying float vAlpha;
 void main() {
@@ -211,13 +245,19 @@ void main() {
     float width = 0.2 + max(0.0, rise - 2.1) * 0.5;
     p = vec3(-1.4 + cos(angle) * width, -2.19 + rise, sin(angle) * width);
   }
+  if (uSeated > 0.5) {
+    float sx = 0.35 + min(uAge,3.0) * 0.9;
+    float sy = 0.2 + min(uAge,4.0) * 0.25;
+    p = vec3(-1.4 + cos(angle)*sx*seed.w, -2.19 + min(uAge,4.0)*0.24 + sin(angle)*sy*seed.w, 0.11 + seed.y * 0.06);
+    if (abs(p.x + 1.4) < 0.4) p.y = min(p.y, -2.10);
+  }
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
   gl_PointSize = 12.0 + 21.0 * seed.w;
   vAlpha = 0.40 * exp(-0.75 * max(0.0, uAge - 0.7)) * (0.6 + 0.4 * seed.y);
 }`
 
-function GasExpansion({ time }: { time: number }) {
+function GasExpansion({ time, seated = false }: { time: number; seated?: boolean }) {
   const material = useRef<THREE.ShaderMaterial>(null)
   useFrame(() => { if (material.current) material.current.uniforms.uAge.value = studyAnimation(time).releaseAge })
   const { sourceVisible } = studyAnimation(time)
@@ -229,7 +269,7 @@ function GasExpansion({ time }: { time: number }) {
     result.setAttribute('seed', new THREE.Float32BufferAttribute(seed, 4))
     return result
   }, [])
-  const uniforms = useMemo(() => ({ uAge: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ uAge: { value: 0 }, uSeated: { value: seated ? 1 : 0 } }), [seated])
   useEffect(() => () => geometry.dispose(), [geometry])
   return <points geometry={geometry} visible={!sourceVisible} frustumCulled={false} renderOrder={3}>
     <shaderMaterial ref={material} uniforms={uniforms} vertexShader={expansionVertex} fragmentShader={tracerFragment} transparent depthWrite={false} />
@@ -310,6 +350,13 @@ function WarmEmbers({ time }: { time: number }) {
 
 type LabelDescriptor = { id: string; position: [number, number, number]; text: ReactNode; tone?: 'warm' | 'cool' }
 function studyLabels(view: StudyView, time: number, cage: StudyCage, version: StudyVersion): LabelDescriptor[] {
+  if (version === 'fracture') return [
+    { id: 'source', position: [-1.4, -2.6 + studyAnimation(time, version).sourceOffsetY, 0.25], text: time < 4 ? 'Dry ice · placement' : time < 9 ? 'Dry ice · below ground' : 'Assumed lateral gas load', tone: 'cool' },
+    { id: 'peat', position: [1.45, -2.35, 0.25], text: 'Smoldering core · unburnt peat surround', tone: 'warm' },
+    ...(time >= 4.35 ? [{ id: 'cap', position: [-1.4, -1.55, 0.3] as [number, number, number], text: 'Concave cap · restrained rim' }] : []),
+    { id: 'oak', position: [2.75, -0.7, 0.25], text: 'Bur oak · deep branching roots' },
+    { id: 'surface', position: [0.5, 0.3, 0.1], text: 'Surface uplift · bonded particles' },
+  ]
   if (view === 'root') return [
     { id: 'root', position: [1.2, 0.45, -0.4], text: 'Living trunk & roots' },
     { id: 'char', position: [0.6, -0.9, 0.35], text: 'Charred peat interface', tone: 'warm' },
@@ -349,13 +396,13 @@ function DepthGuide() {
   </>
 }
 
-function CameraRig({ view, resetToken }: Pick<StudySceneProps, 'view' | 'resetToken'>) {
+function CameraRig({ view, resetToken, version }: Pick<StudySceneProps, 'view' | 'resetToken' | 'version'>) {
   const { camera, size, invalidate } = useThree()
   const controls = useRef<OrbitControlsImpl>(null)
   const transition = useRef<{ elapsed: number; position: THREE.Vector3; target: THREE.Vector3; zoom: number; toPosition: THREE.Vector3; toTarget: THREE.Vector3; toZoom: number } | null>(null)
   const initialized = useRef(false)
   useEffect(() => {
-    const focus = view === 'root' ? new THREE.Vector3(1.35, -0.32, -0.6) : view === 'top' ? new THREE.Vector3(0, -0.18, -1.75) : new THREE.Vector3(0, -0.18, -0.75)
+    const focus = view === 'root' ? new THREE.Vector3(1.35, version === 'fracture' ? -1.05 : -0.32, -0.1) : view === 'top' ? new THREE.Vector3(0, -0.18, -1.75) : new THREE.Vector3(0, -0.18, -0.75)
     const position = view === 'top' ? new THREE.Vector3(0, 16, -1.7) : view === 'root' ? new THREE.Vector3(3.2, 1.8, 6.8) : new THREE.Vector3(6.2, 4.4, 13.5)
     const height = view === 'root' ? 4.6 : view === 'top' ? 6.4 : 7.7
     const zoom = Math.min(size.height / height, size.width / (view === 'root' ? 5.8 : view === 'top' ? 10.4 : 11.8))
@@ -367,7 +414,7 @@ function CameraRig({ view, resetToken }: Pick<StudySceneProps, 'view' | 'resetTo
       toPosition: position, toTarget: focus, toZoom: zoom,
     }
     invalidate()
-  }, [view, resetToken, size.height, size.width, camera, invalidate])
+  }, [view, resetToken, version, size.height, size.width, camera, invalidate])
   useFrame((_, delta) => {
     const step = transition.current
     if (!step) return
@@ -402,11 +449,15 @@ class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void
   }
 }
 
-export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, resetToken = 0, version = 'dynamics', launchSpeed = 2.8 }: StudySceneProps) {
+export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, resetToken = 0, version = 'fracture', launchSpeed = 2.8, soilOptions = SOIL_PARTICLE_DEFAULTS }: StudySceneProps) {
   const [retry, setRetry] = useState(0)
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const replay = useMemo(() => version === 'dynamics' ? buildDebrisReplay(cage, launchSpeed) : null, [version, cage.enabled, cage.heightM, cage.widthM, launchSpeed])
+  const soilReplay = useMemo(() => version === 'fracture' ? buildSoilReplay(soilOptions) : null, [version, soilOptions.pressurePa, soilOptions.densityGradient, soilOptions.peatDensity])
+  const soilTexture = useMemo(() => createSoilTexture(), [])
+  useLayoutEffect(() => { if (soilReplay) updateSoilTexture(soilTexture, soilReplay, time) }, [soilTexture, soilReplay, time])
+  useEffect(() => () => soilTexture.dispose(), [soilTexture])
   const labelElements = useRef(new Map<string, HTMLDivElement>())
   const descriptors = useMemo(() => labels && ready ? studyLabels(view, time, cage, version) : [], [labels, ready, view, time, cage, version])
   const onReady = useCallback(() => setReady(true), [])
@@ -423,17 +474,16 @@ export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, rese
           shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-normalBias={0.03} shadow-bias={-0.0001} />
         <directionalLight position={[6, 3, -6]} intensity={1.4} color="#9bd6ed" />
         <Suspense fallback={null}>
-          <StudyModel view={view} time={time} version={version} />
-          {version !== 'original' && <><GasExpansion time={time} /><MovingFragments time={time} replay={replay} /><CraterCage time={time} cage={cage} /></>}
-          <TransportTracer time={time} version={version} />
-          <WarmEmbers time={time} />
+          <StudyModel view={view} time={time} version={version} soilTexture={soilReplay ? soilTexture : undefined} />
+          {version !== 'original' && version !== 'fracture' && <><GasExpansion time={time} /><MovingFragments time={time} replay={replay} /><CraterCage time={time} cage={cage} /></>}
+          {soilReplay ? <><OakTree soilTexture={soilTexture} /><ConcaveCap replay={soilReplay} time={time} /><BondedSoil replay={soilReplay} time={time} /><DeepPeat replay={soilReplay} time={time} /><GasExpansion time={time} seated /></> : <><TransportTracer time={time} version={version} /><WarmEmbers time={time} /></>}
           {labels && view !== 'top' && view !== 'root' && <DepthGuide />}
           <ModelReady onReady={onReady} />
         </Suspense>
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.215, 0]} receiveShadow>
           <planeGeometry args={[200, 200]} /><meshStandardMaterial color="#18282d" roughness={1} />
         </mesh>
-        <CameraRig view={view} resetToken={resetToken} />
+        <CameraRig view={view} resetToken={resetToken} version={version} />
         <ProjectLabels labels={descriptors} elements={labelElements} />
       </Canvas>
     </SceneBoundary>

@@ -1,8 +1,9 @@
 /** Presentation time is independent of every physical solver clock. */
 export type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
-export type StudyVersion = 'dynamics' | 'release' | 'original'
+export type StudyVersion = 'fracture' | 'dynamics' | 'release' | 'original'
 export const STUDY_VERSIONS = [
-  { id: 'dynamics', title: '0.7 · Gravity & contact', subtitle: 'Latest · calculated debris motion, assumed release' },
+  { id: 'fracture', title: '0.8 · Cap & bonded soil', subtitle: 'Latest · seated cap, deeper peat, particle separation' },
+  { id: 'dynamics', title: '0.7 · Gravity & contact', subtitle: 'Earlier · calculated debris motion, assumed release' },
   { id: 'release', title: '0.6 · Rapid gas release', subtitle: 'Earlier · authored expansion, fragments and cage' },
   { id: 'original', title: '0.5 · Original cooling study', subtitle: 'Earlier · gradual cooling and transport, no cage' },
 ] as const
@@ -61,7 +62,7 @@ export function studyAnimation(time: number, version: StudyVersion = 'release') 
   const releaseAge = Math.max(0, t - STUDY_RELEASE_TIME)
   return {
     // The exported sphere is already at its approved final position.
-    sourceOffsetY: version === 'dynamics' ? Math.max(0, 3.5 - 0.5 * STUDY_GRAVITY * Math.max(0, t - (4 - Math.sqrt(7 / STUDY_GRAVITY))) ** 2) : 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
+    sourceOffsetY: (version === 'dynamics' || version === 'fracture') ? Math.max(0, 3.5 - 0.5 * STUDY_GRAVITY * Math.max(0, t - (4 - Math.sqrt(7 / STUDY_GRAVITY))) ** 2) : 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
     sourceVisible: version === 'original' || t < STUDY_RELEASE_TIME,
     releaseAge,
     // Authored display radius, not a pressure front or gas-volume prediction.
@@ -119,4 +120,11 @@ export const ORIGINAL_STUDY_PHASES = [
   { start: 4, end: 8, title: 'Local cooling', short: 'Cool', description: 'Illustrative cooling around the dry ice.' },
   { start: 8, end: 14, title: 'Transport', short: 'Spread', description: 'The original transport markers extend toward the peat.' },
   { start: 14, end: 20, title: 'Residual warmth', short: 'Observe', description: 'A warm peat region remains; no extinction prediction.' },
+] as const
+
+export const FRACTURE_STUDY_PHASES = [
+  { start: 0, end: 4, title: 'Source placement', short: 'Place', description: 'Held, then released under gravity to the borehole floor.' },
+  { start: 4, end: 9, title: 'Seat the concave cap', short: 'Seat cap', description: 'The cap drops directly onto the ice; its rim is restrained below ground.' },
+  { start: 9, end: 12, title: 'Cap flex and soil separation', short: 'Expand', description: 'An assumed lateral/upward load flexes the cap and separates particle bonds.' },
+  { start: 12, end: 20, title: 'Surface recovery and damage', short: 'Settle', description: 'The surface relaxes as the load fades; broken bonds remain broken.' },
 ] as const

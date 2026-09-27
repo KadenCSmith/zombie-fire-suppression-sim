@@ -49,24 +49,28 @@ app.on('browser-window-created', (_event, win) => {
         if (!document.body.textContent.includes('Ready / paused')) throw new Error('Solver did not pause cleanly');
         window.dispatchEvent(new CustomEvent('workspace-request', {detail: 'study'}));
         await waitFor(() => document.body.textContent.includes('One landscape. Four perspectives.'), 'scene studio');
-        await waitFor(() => document.body.textContent.includes('Buried smoldering peat'), 'landscape asset');
+        await waitFor(() => document.body.textContent.includes('Smoldering core · unburnt peat surround'), 'buried peat asset');
         const canvas = document.querySelector('canvas');
         const gl = canvas?.getContext('webgl2');
         if (!gl || gl.isContextLost()) throw new Error('WebGL2 unavailable');
+        const chooseVersion = async title => {
+          button('Simulation versions').click();
+          await waitFor(() => document.querySelector('.version-panel'), 'version picker');
+          [...document.querySelectorAll('.version-panel button')].find(b => b.textContent.includes(title)).click();
+          await waitFor(() => !document.querySelector('.version-panel') && document.querySelector('.study-concept-badge')?.textContent.includes(title), 'selected version');
+          await waitFor(() => document.querySelector('.study-scene-label'), 'selected landscape ready');
+          if (Number(document.querySelector('#study-playhead').value) !== 0) throw new Error('Version did not reset playback');
+        };
+        document.querySelectorAll('.study-chapter')[2].click();
+        await waitFor(() => document.body.textContent.includes('Concave cap · restrained rim') && document.body.textContent.includes('Assumed lateral gas load'), 'seated cap and gas load');
+        if (Number(document.querySelector('#study-playhead').value) !== 9) throw new Error('Incorrect new release time');
+        await chooseVersion('0.6');
         document.querySelectorAll('.study-chapter')[2].click();
         await waitFor(() => document.body.textContent.includes('CO₂ expansion · visual tracers'), 'instant conversion at 9 seconds');
         if (Number(document.querySelector('#study-playhead').value) !== 9) throw new Error('Incorrect release time');
         if (!document.body.textContent.includes('Inverted cage · 10 cm high')) throw new Error('Default cage missing');
         document.querySelectorAll('.study-chapter')[1].click();
         await waitFor(() => document.body.textContent.includes('Dry ice · Ø 0.50 m'), 'restored solid before conversion');
-        const chooseVersion = async title => {
-          button('Simulation versions').click();
-          await waitFor(() => document.querySelector('.version-panel'), 'version picker');
-          [...document.querySelectorAll('.version-panel button')].find(b => b.textContent.includes(title)).click();
-          await waitFor(() => !document.querySelector('.version-panel') && document.querySelector('.study-concept-badge')?.textContent.includes(title), 'selected version');
-          await waitFor(() => document.body.textContent.includes('Buried smoldering peat'), 'selected landscape ready');
-          if (Number(document.querySelector('#study-playhead').value) !== 0) throw new Error('Version did not reset playback');
-        };
         await chooseVersion('0.5');
         document.querySelectorAll('.study-chapter')[3].click();
         await waitFor(() => document.body.textContent.includes('Residual warmth'), 'original final phase');
@@ -76,6 +80,8 @@ app.on('browser-window-created', (_event, win) => {
         await waitFor(() => document.body.textContent.includes('CO₂ expansion · visual tracers'), 'earlier release');
         await chooseVersion('0.7');
         if (!document.body.textContent.includes('Calculated debris motion')) throw new Error('Latest dynamics missing');
+        await chooseVersion('0.8');
+        if (!document.body.textContent.includes('Cap & bonded soil')) throw new Error('Bonded soil missing');
         window.dispatchEvent(new CustomEvent('workspace-request', {detail: 'simulation'}));
         await waitFor(() => document.body.textContent.includes('0d 00h 02m'), 'preserved numerical run');
         button('Simulation versions').click();
@@ -84,6 +90,7 @@ app.on('browser-window-created', (_event, win) => {
         await waitFor(() => document.querySelector('.study-concept-badge')?.textContent.includes('0.5'), 'scientific menu opens older studio');
         return 'ok';
       })()`);
+      if (errors.some(message => /shader error|VALIDATE_STATUS|Error creating WebGL/i.test(message))) throw new Error('Shader compilation failed: ' + errors.join('; '));
       if (result !== 'ok') throw new Error('Unexpected smoke result');
       finish();
     } catch (error) { finish(String(error)); }

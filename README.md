@@ -2,13 +2,17 @@
 
 **Interactive scene studio and a separate, unvalidated scientific model.**
 
-A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration; its colors and motion are prescribed and are not solver results.
+A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal layers**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration. Its latest version adds a separate reduced particle calculation under assumed loading; gas and thermal displays remain illustrative.
 
 Choose **Open simulation** for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
 
-## Timed gas-release illustration
+## Seated cap, deep roots and bonded soil
+
+Version 0.8 adds a concave cap falling directly onto the ice, an assumed restrained rim with calculated flex, spring-bond soil separation and slight surface uplift. The deeper peat pocket has an unburnt surround. A young bur oak has lobed leaves, lateral roots and descending roots to about 2.7 m. Loading, root dimensions and mechanical coefficients remain assumptions. The **⋯ menu** retains versions 0.5–0.8. [Model, research rationale and ASCE citations](docs/CAP_SOIL_PARTICLES.md).
+
+## Earlier gas-release scenes
 
 Version 0.7 adds calculated debris translation with gravity, air resistance, inelastic bounce, friction and simplified cage-bar contacts. The **⋯ menu** at the top opens 0.5, 0.6 and 0.7 scenes for comparison. Release velocity is assumed and editable; gas pressure, fracture and cage strength are not predicted. [Dynamics, sources and limits](docs/SCENE_DYNAMICS.md).
 
@@ -22,7 +26,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.7.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.7.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download version 0.8.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.8.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
 [Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
 
@@ -47,7 +51,7 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.7.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.8.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 
