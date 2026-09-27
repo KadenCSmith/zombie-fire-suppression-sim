@@ -45,7 +45,7 @@ float scorchRadius=.13+.38*uGrassBurn;
 vGrassScorch=(1.0-smoothstep(scorchRadius*.5,scorchRadius,scorchDistance))*uGrassBurn;
 transformed.y*=1.0-.91*vGrassScorch;
 transformed.xz*=1.0-.4*vGrassScorch;
-if(abs(grassRoot.x-${G.sourceX.toFixed(3)})<${G.boreRadiusM.toFixed(3)}&&grassRoot.z>-.42&&uGrassBore>.5)transformed*=0.0;`)
+if(length(vec2(grassRoot.x-${G.sourceX.toFixed(3)},grassRoot.z))<${G.boreRadiusM.toFixed(3)}&&uGrassBore>.5)transformed*=0.0;`)
       shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `vec4 mvPosition=instanceMatrix*vec4(transformed,1.0);
 vec3 grassWorld=(modelMatrix*mvPosition).xyz+storyRuptureOffset(grassRoot,uGrassPulse,uGrassDamage);
 mvPosition=viewMatrix*vec4(grassWorld,1.0);

@@ -23,3 +23,8 @@ The release source includes the complete fire-first workspace, finite-source exp
 The local source verification passed 171 tests in 30 files, typecheck, lint and production build. A Windows CI run of the earlier milestone exceeded the 5-second timeout in the legacy high-load soil test because it allocated a matcher for every damage value. The repaired test traverses the same values once and checks the identical monotonicity condition; no physical criterion or tolerance was changed. The fire smoke harness checks accepted history, both source presentations, live-worker completion/cancellation, retained workspace state, full-film metadata and native byte-range seeking. CI logs distinguish these automated checks from native interaction on the user's Mac.
 
 The original independently edited Stage2 Blender SHA-256 was rechecked after the 0.14 scene changes and remains `e537ea14a6a75f83329675418bc565f1a4aa672da53011ec168581aa7531a638`.
+
+
+## Visual revision 0.15.0
+
+The development native window was visually checked at story19 s (44% illustrated involvement, no equipment),33 s (tracked excavator and narrowed bore),55.3 s (rapid soil separation/dust and plate),and the accepted temperature comparison. The final installed-app checks, exact package commit and cross-platform CI are recorded in the release asset `Native-0.15-Verification.json` to avoid changing the signed source while inspecting it. Surface propagation/pressure release remain staged; the accepted cache and original independent Blender source are unchanged.

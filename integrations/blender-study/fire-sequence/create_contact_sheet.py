@@ -7,7 +7,7 @@ parser=argparse.ArgumentParser();parser.add_argument('directory',type=Path);args
 root=args.directory
 font_path='/System/Library/Fonts/Supplemental/Arial.ttf'
 font=ImageFont.truetype(font_path,24);small=ImageFont.truetype(font_path,19)
-chapters=[('01-Ignition',5),('02-Peat-Growth',21),('03-Excavator',30),('04-Dry-Ice',44),('05-Buried-Plate',53),('06-Gas-Inversion',58),('07-Water-Paths',77),('08-Review',88)]
+chapters=[('01-Ignition',5),('02-Peat-Growth',21),('03-Excavator',30),('04-Dry-Ice',44),('05-Buried-Plate',53),('06-Pressure-Release',55.3),('07-Water-Paths',77),('08-Review',88)]
 sheet=Image.new('RGB',(1328,3312),'#142124');draw=ImageDraw.Draw(sheet)
 draw.text((20,18),'GRADUAL • accepted finite source',font=font,fill='#e4efed')
 draw.text((680,18),'RAPID • illustrative conversion',font=font,fill='#e4efed')

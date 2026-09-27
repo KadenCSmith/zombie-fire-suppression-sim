@@ -85,7 +85,7 @@ const RunningGear = memo(function RunningGear({travel, m}: {travel: number; m: P
   useLayoutEffect(() => {
     const object = new THREE.Object3D(), perimeter = 3.4 + Math.PI * .41
     for (let side = 0; side < 2; side++) for (let i = 0; i < 64; i++) {
-      const p = trackPoint(i / 64 * perimeter - travel), index = side * 64 + i
+      const p = trackPoint(i / 64 * perimeter + travel), index = side * 64 + i
       object.position.set(p.x, .25 + p.y, side ? .625 : -.625); object.rotation.set(0, 0, p.angle); object.scale.set(.079, .037, .36); object.updateMatrix(); shoes.current?.setMatrixAt(index, object.matrix)
       object.position.x -= Math.sin(p.angle) * .025; object.position.y += Math.cos(p.angle) * .025; object.scale.set(.027, .015, .34); object.updateMatrix(); ribs.current?.setMatrixAt(index, object.matrix)
     }

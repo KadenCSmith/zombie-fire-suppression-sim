@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Visual refinement — 0.15
+
+The 0.15 presentation changes do not modify numerical solvers or the accepted fire cache. It adds a connected randomized appearance atlas and rapid-only prescribed soil-piece motion. The user-requested visual realism gate uses a separate agent review and is **not** a physics-validation score. [Realism review](review/unified/realism-015.md) records the two review cycles; [code review](review/unified/visual-code-015.md) records animation corrections and remaining display limits. All 175 tests in 31 files, typecheck, lint and build pass locally. Native/package and final cross-platform checks are recorded with the release.
+
 ## Current unified fire workflow — 0.14
 
 The current app adds a complete interactive fire/treatment story, both gradual and illustrative rapid Blender films, and a cold-start numerical experiment with retained initial moisture. The accepted baseline covers24h plus30s finite-source treatment; source-generation checkpoint `a47721f` freezes the exact cache and source hashes. It sustains surface oxidation but does not resolve underground combustion propagation. The source loses1.7885g during treatment and continuing oxidation remains present. No suppression success is inferred.

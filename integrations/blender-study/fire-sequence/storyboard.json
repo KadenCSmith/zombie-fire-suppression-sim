@@ -5,12 +5,12 @@
     "sourceDepthM": 1.3,
     "sourceInitialMassKg": 4,
     "sourceDensityKgM3": 1560,
-    "boreRadiusM": 0.55,
+    "boreRadiusM": 0.24,
     "boreDepthM": 1.385,
-    "capRadiusM": 0.475,
-    "capRiseM": 0.1,
+    "capRadiusM": 0.2,
+    "capRiseM": 0.055,
     "capDepthM": 1.05,
-    "augerRadiusM": 0.5,
+    "augerRadiusM": 0.2,
     "domain": {
       "widthM": 8,
       "lengthM": 8,
@@ -67,10 +67,10 @@
       "id": "treatment",
       "start": 55,
       "end": 69,
-      "title": "The plate inverts upward",
+      "title": "A rapid pressure release",
       "short": "Gas & deformation",
-      "description": "Rapid mode illustrates gas release and upward plate inversion. Gradual mode retains the calculated finite source.",
-      "evidence": "CO₂ is invisible. Cyan tracers and cap bending are schematic, not solver-derived."
+      "description": "Rapid mode illustrates a pressure burst, ground uplift and plate inversion. Gradual mode retains the calculated finite source.",
+      "evidence": "Ground rupture and plate inversion are prescribed visual events. CO₂ is nonflammable; no detonation or rupture pressure is calculated."
     },
     {
       "id": "water",

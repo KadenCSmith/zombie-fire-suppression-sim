@@ -11,7 +11,7 @@ follow-up play at 2.8×; the story's 55–61 second event plays at 1×:
 3. Tracked excavator arrival, attached drill advance and withdrawal (24–37).
 4. Dry-ice placement (37–47).
 5. Inverted metal plate placement below ground, above the source (47–55).
-6. Gas visibility and rapid-only upward plate inversion (55–69).
+6. Gas visibility, rapid-only pressure-release movement and upward plate inversion (55–69).
 7. Water along assumed openings (69–85).
 8. Review of remaining peat (85–90).
 
@@ -25,21 +25,37 @@ initial 4 kg after 30 physical seconds. Its radius barely changes; that small
 change is intentionally preserved. The gradual plate retains its downward
 bowl because this protocol supplies no accepted plate mechanics.
 
-The plate rim is 1.05 m below ground. Its initial center is 1.15 m below ground,
+The plate rim is 1.05 m below ground. Its initial center is 1.105 m below ground,
 with clearance above the source's top near 1.215 m depth. The rapid animation
-inverts its center upward to 0.85 m depth. The plate radius is 0.475 m; the
-0.55 m bore and 0.50 m auger provide visible placement clearance. These are
+inverts its center upward to 0.885 m depth. The plate radius is 0.20 m; the
+0.24 m bore and 0.20 m auger provide visible placement clearance. These are
 presentation geometry choices, not a simulated installation design.
 
 The ignition/growth choreography, drilling/removed material, source placement,
 plate inversion, crack network and water motion remain
 illustrative. The porous solver does not establish those operations as a
-validated treatment or solve this liquid infiltration. Cyan shapes only make
-gas transport legible; CO2 is invisible. The narrative must not be read as
+validated treatment or solve this liquid infiltration. Small, separated, low-opacity tracer wisps are a visibility convention;
+CO2 is invisible and the wisps are not a calculated gas envelope. The narrative must not be read as
 proof that all peat is extinguished or that physical rupture occurred.
-The narrative retains 30% unburnt peat margin and ongoing fire at the end.
-Its 70% trigger is an exact area fraction of a displayed elliptical section;
-it is neither a three-dimensional burned volume nor calculated fuel loss.
+The narrative retains 30% unburnt peat margin and ongoing buried embers at the
+end. Surface flame and smoke fade during story20–27 as attention moves below
+ground; this presentation cue does not assert numerical extinguishment.
+The shared `public/fire-appearance.json` contains a seeded connected arrival
+order on a 200 × 80 irregular peat mask. The same ranks control char and ember
+onset. Only the displayed outer perimeter is relaxed to avoid pixel stair steps;
+its sampled ranks and scientific cache remain unchanged. At 24 presentation seconds the threshold reaches 70% of sampled peat
+area; it is neither a three-dimensional burned volume nor calculated fuel loss.
+The copied appearance map and its SHA-256 accompany the render provenance.
+
+The rapid scene uses 504 irregular extruded soil prisms with a prescribed
+pressure-release pulse, permanent separation, decorative airborne fragments
+and a short dust puff. The displacement envelope matches the interactive
+presentation; piece shrink and tilt make separation visible. This is not
+a fracture, gas detonation or ground-failure calculation. CO2 does not burn.
+The gradual scene has no rupture. Both scenes include over 51,000 fine grass
+blades and a compact tracked excavator with articulated hydraulic boom,
+non-rotating motor housing and rotating helical auger. These geometric details
+are editable presentation assets and add no solver elements or physical mass.
 
 The separate temperature inset displays held accepted cell values on a
 middle-y cross-section, with its own physical timestamps and fixed 283–850 K

@@ -19,6 +19,11 @@ from mathutils import Vector
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[2]
 STORY=json.loads((HERE/'storyboard.json').read_text())
+G=STORY['geometry']
+sys.path.insert(0,str(HERE))
+from visual_assets import dense_grass,compact_excavator,smooth_peat_outline
+from rupture_geometry import soil_prisms,animate_shape,debris,cell_for,move_detail,offset as rupture_offset
+APPEARANCE=json.loads((ROOT/'public/fire-appearance.json').read_text())
 parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--cache',type=Path)
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
 if args.output.name in ('Dry_Ice_Peat_Study.blend','Materials_Thermal_Stage_2.blend'):raise ValueError('Output must be a new derivative')
@@ -96,7 +101,7 @@ def scenesettings(scene):
     scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast'
     scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
     scene.world=bpy.data.worlds.new(scene.name+' world');scene.world.use_nodes=True
-    scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.09,.13,.15,1);scene.world.node_tree.nodes['Background'].inputs[1].default_value=.45
+    scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.04,.075,.079,1);scene.world.node_tree.nodes['Background'].inputs[1].default_value=.45
     scene['Presentation duration s']=90;scene['Video duration s']=36;scene['Physical interpretation']='Stage time is presentation time. Setup plays at 2.8x; event story 55–61s plays at 1x. Drilling, placement, cap inversion, cracks and water are staged; accepted source/field readouts use a separate clock.'
 
 def char_material(name):
@@ -115,12 +120,12 @@ def char_material(name):
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 static=bpy.data.collections.new('NATURAL SET • common illustrative geometry')
-soil_mats=[mat('Organic surface',(.068,.041,.019),noise=20),mat('Organic loam',(.21,.13,.061),noise=14),mat('Warm mineral subsoil',(.40,.27,.13),noise=11),mat('Sandy parent material',(.54,.42,.24),noise=16)]
+soil_mats=[mat('Organic surface',(.026,.043,.013),noise=20),mat('Organic loam',(.145,.088,.033),noise=14),mat('Warm mineral subsoil',(.26,.17,.083),noise=11),mat('Sandy parent material',(.43,.37,.24),noise=16)]
 peat_mat=mat('Buried organic peat',(.037,.018,.009),noise=22)
 bark=mat('Supplemental root bark',(.13,.074,.03),noise=24)
-metal=mat('Brushed steel',(.38,.45,.47),rough=.28,metal=.82,noise=9)
+metal=mat('Dark brushed steel plate',(.13,.18,.19),rough=.62,metal=.76,noise=9)
 blue=mat('Liquid water • illustrative paths',(.05,.46,.68),rough=.2,metal=.05,emission=.18,alpha=.8)
-cyan=mat('CO2 visible proxy • not visible real gas',(.10,.66,.75),rough=.9,emission=.4,alpha=.13)
+cyan=mat('CO2 subtle tracer wisps • real gas is invisible',(.15,.42,.44),rough=1,emission=.025,alpha=.026)
 ice=mat('Finite dry ice frost',(.69,.88,.97),rough=.65,noise=35)
 flame_mats=[mat('Fire outer orange',(1,.13,.012),rough=.5,emission=2.8,alpha=.76),mat('Fire inner gold',(1,.52,.055),rough=.5,emission=3.6,alpha=.88)]
 ember=mat('Smoldering visibility',(1,.055,.006),emission=2.5)
@@ -133,13 +138,27 @@ crack_mat=mat('Assumed opening',(.009,.007,.005),rough=1)
 with bpy.data.libraries.load(str(SOURCE),link=False) as (data_from,data_to):
     data_to.collections=[name for name in data_from.collections if name.startswith('TREE •')]
 tree_collection=data_to.collections[0]
-tree=bpy.data.objects.new('Original Blender tree • repositioned illustrative anatomy',None);tree.instance_type='COLLECTION';tree.instance_collection=tree_collection;tree.location=(-4.8,1.0,.015);static.objects.link(tree)
+tree=bpy.data.objects.new('Original Blender tree • repositioned illustrative anatomy',None);tree.instance_type='COLLECTION';tree.instance_collection=tree_collection;tree.scale=(1.25,1.25,1.03);tree.location=(1.65-2.23*1.25,.8-.35*1.25,.015);static.objects.link(tree)
 tree['scientific_role']='Preserved authored anatomy; not resolved root geometry in the solver'
 for i,points in enumerate([
-    [(-2.57,1.2,.03),(-2.6,.55,-.15),(-2.4,.1,-.65),(-1.8,.04,-1.2),(-1,.06,-1.7)],
-    [(-2.57,1.2,.03),(-3.2,.55,-.2),(-3.3,.06,-.65),(-3.65,.03,-1.2)],
-    [(-2.57,1.2,.03),(-2,.5,-.1),(-1.4,.06,-.35),(-.9,.03,-.7)],
-]):curve('Context root '+str(i),points,.035 if i else .055,static,bark)
+    [(1.65,.8,.05),(1.53,.3,-.15),(1.28,-.035,-.55),(.9,-.07,-1.1),(.55,-.08,-1.72)],
+    [(1.65,.8,.03),(2.02,.35,-.16),(2.2,-.03,-.55),(2.75,-.035,-1.18),(3,-.025,-1.62)],
+    [(1.65,.8,.05),(1.8,.15,-.1),(1.7,-.03,-.42),(1.55,-.04,-1.08),(1.3,-.04,-1.82)],
+    [(1.65,.8,.03),(1.2,.25,-.13),(.45,-.03,-.38),(-.35,-.035,-.8),(-1,-.03,-1.12)],
+]):
+    root=curve('Context root '+str(i),points,.037 if i else .052,static,bark)
+    root.data.splines[0].type='NURBS';root.data.splines[0].order_u=3;root.data.splines[0].use_endpoint_u=True
+    for j,point in enumerate(root.data.splines[0].points):point.radius=1-.78*j/(len(points)-1)
+    for j in range(2,5):
+        px,py,pz=points[j];direction=1 if (i+j)%2 else -1
+        twig_points=[(px,py-.006,pz),(px+direction*.10,py-.016,pz-.08),(px+direction*.22,py-.02,pz-.19),(px+direction*.27,py-.019,pz-.35)]
+        twig=curve('Context root '+str(i)+' fine branch '+str(j),twig_points,.009 if j>2 else .014,static,bark)
+        twig.data.splines[0].type='NURBS';twig.data.splines[0].order_u=3;twig.data.splines[0].use_endpoint_u=True
+        for k,p in enumerate(twig.data.splines[0].points):p.radius=1-.90*k/3
+for material in bpy.data.materials:
+    if material.name.startswith('Tree leaf') and material.use_nodes:
+        shader=material.node_tree.nodes.get('Principled BSDF')
+        if shader:shader.inputs['Base Color'].default_value=(.025,.095,.009,1)
 
 # Deterministic organic litter and irregular aggregates, shared by both modes.
 rock_mats=[mat('Aggregate '+str(i),color,noise=15) for i,color in enumerate([(.20,.15,.09),(.38,.30,.19),(.51,.44,.30),(.09,.052,.022)])]
@@ -147,150 +166,138 @@ bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1);template=bpy.cont
 base_verts=[tuple(v.co*(.8+RNG.random()*.38)) for v in template.data.vertices];base_faces=[tuple(p.vertices) for p in template.data.polygons]
 base_data=template.data;bpy.data.objects.remove(template,do_unlink=True);bpy.data.meshes.remove(base_data)
 rv=[];rf=[];rmi=[]
-for index in range(650):
+for index in range(520):
     front=index<460;x=RNG.uniform(-3.96,3.96);y=.006 if front else RNG.uniform(.1,3.9);z=RNG.uniform(-3.13,-.03) if front else RNG.uniform(.005,.035)
     # Keep the drilling visualization readable; decorative stones do not occupy its bore.
-    if abs(x-.4)<.58 and (front and z> -1.4 or not front and y<.57):continue
-    radius=.014+RNG.random()**2*.095;scale=(radius*RNG.uniform(.6,1.5),radius*(.22 if front else .8),radius*(.75 if front else .32));start=len(rv)
+    if abs(x-.4)<G['boreRadiusM']+.03 and (front and z> -1.4 or not front and y<G['boreRadiusM']+.03):continue
+    radius=(.014+RNG.random()**2*.095)*(1 if front else .45);scale=(radius*RNG.uniform(.6,1.5),radius*(.22 if front else .8),radius*(.75 if front else .32));start=len(rv)
     rv.extend((x+v[0]*scale[0],y+v[1]*scale[1]-(.008 if front else 0),z+v[2]*scale[2]) for v in base_verts)
     rf.extend(tuple(start+v for v in f) for f in base_faces);rmi.extend([RNG.randrange(4)]*len(base_faces))
 rocks=mesh('Seeded irregular aggregate detail • visual only',rv,rf,static,rock_mats[0])
 for m in rock_mats[1:]:rocks.data.materials.append(m)
 rocks.data.polygons.foreach_set('material_index',rmi)
-grass_mat=mat('Muted living ground',(.11,.15,.045),rough=1)
-gv=[];gf=[]
-for i in range(800):
-    x=RNG.uniform(-3.9,3.9);y=RNG.uniform(.12,3.9)
-    if (x-.4)**2+y*y<.45:continue
-    for blade in range(3):
-        angle=RNG.random()*math.tau;dx=.01*math.cos(angle);dy=.01*math.sin(angle);h=RNG.uniform(.045,.22);st=len(gv)
-        gv.extend([(x-dx,y-dy,0),(x+dx,y+dy,0),(x+RNG.uniform(-.065,.065),y+RNG.uniform(-.04,.04),h)]);gf.append((st,st+1,st+2))
-mesh('Scattered sedge and litter',gv,gf,static,grass_mat)
+static.objects.unlink(rocks)
+grass_library=bpy.data.collections.new('Fine grass geometry library')
+grass_objects=dense_grass(globals(),grass_library)
+context_objects=[obj for obj in static.objects if obj==tree or obj.name.startswith('Context root')]
+for obj in context_objects:static.objects.unlink(obj)
 
 def build_mode(mode):
-    print('BUILD_MODE '+mode,flush=True)
+    print('BUILD_MODE '+mode,flush=True);RNG.seed(15027)
     scene=bpy.data.scenes.new('GRADUAL • accepted source' if mode=='gradual' else 'RAPID • illustrative conversion');scenesettings(scene);bpy.context.window.scene=scene;scene.collection.children.link(static)
     actors=bpy.data.collections.new(mode+' staged operations');scene.collection.children.link(actors)
     captions=bpy.data.collections.new(mode+' readable scientific captions');scene.collection.children.link(captions)
     scene['Source mode']=mode
+    context_motion=bpy.data.objects.new(mode+' root and canopy context motion',None);actors.objects.link(context_motion);context_motion.location=(1.65,.8,0)
+    for template in context_objects:
+        obj=template.copy();actors.objects.link(obj);obj.parent=context_motion;obj.location=template.location-Vector((1.65,.8,0))
+    if mode=='rapid':
+        point=(1.65,.8,0);index=cell_for(point[0],point[2]);dp=rupture_offset(point,index);dd=rupture_offset(point,index,True)
+        for t in [0,54.9]+[55+i*.08 for i in range(51)]+[61,69,90]:
+            a=max(0,t-55);pulse=(1-math.exp(-12*a))*math.exp(-1.35*a)*1.45 if t>=55 else 0;damage=ease(t,55,55.65)
+            context_motion.location=tuple(point[k]+dp[k]*pulse+dd[k]*damage for k in range(3));context_motion.rotation_euler=(0,.012*pulse,0)
+            context_motion.keyframe_insert('location',frame=frame(t));context_motion.keyframe_insert('rotation_euler',frame=frame(t))
+    decorative=[]
+    for template in [rocks,*grass_objects]:
+        obj=template.copy();obj.data=template.data.copy();actors.objects.link(obj);obj.name=mode+' '+template.name;decorative.append(obj)
+        if obj.get('over_bore'):visible(obj,0,27.65)
     # Each layer retains an editable, animated cutter; removed soil is a staged operation.
-    cutter=cylinder(mode+' borehole excavation cutter',(.4,0,1),.55,2,actors,None,48);cutter.hide_render=True;cutter.display_type='WIRE'
+    cutter=cylinder(mode+' borehole excavation cutter',(.4,0,1),G['boreRadiusM'],2,actors,None,48);cutter.hide_render=True;cutter.display_type='WIRE'
     for t in [0,23.9]+list(range(24,32))+[90]:
         depth=min(1.385,max(0,2.95*ease(t,24,31)-1.55));cutter.location=(.4,0,.01-max(.001,depth)/2);cutter.scale=(1,1,max(.001,depth)/2)
         cutter.keyframe_insert('location',frame=frame(t));cutter.keyframe_insert('scale',frame=frame(t))
-    for name,top,bottom,material in [('O horizon',0,-.18,soil_mats[0]),('A horizon',-.18,-.65,soil_mats[1]),('B horizon',-.65,-2.2,soil_mats[2]),('C horizon',-2.2,-3.2,soil_mats[3])]:
-        layer=cube(mode+' '+name,(0,2,(top+bottom)/2),(4,2,(top-bottom)/2),actors,material)
-        boolean=layer.modifiers.new('Staged drilling cut • not solved excavation','BOOLEAN');boolean.operation='DIFFERENCE';boolean.object=cutter;boolean.solver='EXACT'
-    # A flattened exposed peat face makes underground fire visible through the section.
-    lens=uv(mode+' buried peat lens',(.5,-.008,-1.65),(3.1,.035,.68),actors,peat_mat,64,24)
-    lens['scientific_role']='Illustrative peat silhouette; accepted cell fields are provided as separate cache/readout'
-    lens_cut=lens.modifiers.new('Visible open drill path','BOOLEAN');lens_cut.operation='DIFFERENCE';lens_cut.object=cutter;lens_cut.solver='EXACT'
-    entry=Vector(((1.6-.5)/3.1,(-1.02+1.65)/.68));entry.normalize();tangent=Vector((-entry.y,entry.x))
-    def cap_fraction(q):return (math.acos(max(-1,min(1,q)))-q*math.sqrt(max(0,1-q*q)))/math.pi
-    def coverage_threshold(fraction):
-        low,high=-1.,1.
-        for _ in range(50):
-            mid=(low+high)/2
-            if cap_fraction(mid)>fraction:low=mid
-            else:high=mid
-        return (low+high)/2
-    def burn_vertices(coverage):
-        angle=math.acos(coverage_threshold(coverage));result=[]
-        for i in range(65):
-            theta=-angle+2*angle*i/64;v=entry*math.cos(theta)+tangent*math.sin(theta);result.append((.5+3.1*v.x,-.060,-1.65+.68*v.y))
-        return result
-    burning=mesh(mode+' connected illustrated peat involvement',burn_vertices(0),[tuple(range(65))],actors,char_material(mode+' burned peat glow'))
-    thick=burning.modifiers.new('Thin cutaway display sheet','SOLIDIFY');thick.thickness=.002
-    burn_cut=burning.modifiers.new('Open drill path in overlay','BOOLEAN');burn_cut.operation='DIFFERENCE';burn_cut.object=cutter;burn_cut.solver='EXACT'
-    burning.shape_key_add(name='Unburned start')
-    for t in range(13,25):
-        shape=burning.shape_key_add(name=f'Illustrated coverage at story {t}s')
-        for vertex,position in zip(shape.data,burn_vertices(.7*ease(t,12,24))):vertex.co=position
-        for key_t,value in [(12,0),(t-1,0),(t,1),(t+1,0 if t<24 else 1),(90,0 if t<24 else 1)]:shape.value=value;shape.keyframe_insert('value',frame=frame(key_t))
-    burning['area_fraction_at_treatment']=.7;burning['scientific_role']='Prescribed 2D ellipse area fraction, not calculated fuel consumption'
-    entry_path=[(1.72,-.065,.04),(1.74,-.065,-.2),(1.67,-.065,-.44),(1.65,-.065,-.72),(1.6,-.065,-1.02)]
-    char_path=curve(mode+' scorched entry channel',entry_path,.075,actors,char_material(mode+' scorched entry char'))
+    soil_prisms(globals(),mode,actors,cutter)
+    if mode=='rapid':
+        for obj in decorative:
+            group_size=8 if obj.get('blade_count') else len(base_verts);assignments=[]
+            for start in range(0,len(obj.data.vertices),group_size):
+                group=obj.data.vertices[start:start+group_size];center=sum((v.co for v in group),Vector())/len(group)
+                owner=(cell_for(center.x,center.z),max(0,min(5,int(center.y/(4/6)))))
+                assignments.extend([owner]*len(group))
+            animate_shape(globals(),obj,assignments)
+        debris(globals(),actors)
+    # One shared connected arrival field controls both char and ember onset.
+    nx,ny=APPEARANCE['nx'],APPEARANCE['ny'];dx=APPEARANCE['width']/nx;dz=APPEARANCE['height']/ny
+    pv=[];pf=[];arrival=[];eligible=[];peat_assignments=[];outline=smooth_peat_outline(APPEARANCE)
+    for j in range(ny):
+        for i in range(nx):
+            index=j*nx+i
+            if not APPEARANCE['mask'][index]:continue
+            v=len(pv);x=APPEARANCE['minX']+i*dx;z=APPEARANCE['minY']+j*dz
+            for corner in [(i,j),(i+1,j),(i+1,j+1),(i,j+1)]:
+                px,pz=outline.get(corner,(APPEARANCE['minX']+corner[0]*dx,APPEARANCE['minY']+corner[1]*dz));pv.append((px,-.052,pz))
+            pf.append((v,v+1,v+2,v+3));arrival.extend([APPEARANCE['arrival'][index]]*4);peat_assignments.extend([cell_for(x+dx/2,z+dz/2)]*4)
+            if APPEARANCE['arrival'][index]<=.7:eligible.append(index)
+    peat_display=char_material(mode+' irregular connected peat')
+    burning=mesh(mode+' connected illustrated peat involvement',pv,pf,actors,peat_display)
+    burning['area_fraction_at_treatment']=.7;burning['scientific_role']='Shared seeded connected arrival rank, not numerical fuel consumption'
+    burning.data.attributes.new('illustrated_arrival',type='FLOAT',domain='CORNER').data.foreach_set('value',arrival)
+    nodes=peat_display.node_tree.nodes;links=peat_display.node_tree.links;shader=nodes.get('Principled BSDF')
+    attribute=nodes.new('ShaderNodeAttribute');attribute.attribute_name='illustrated_arrival'
+    threshold=nodes.new('ShaderNodeValue');threshold.label='Authored peat involvement fraction'
+    for i in range(49):
+        t=12+i*.25;threshold.outputs[0].default_value=.7*ease(t,12,24);threshold.outputs[0].keyframe_insert('default_value',frame=frame(t))
+    mask=nodes.new('ShaderNodeMath');mask.operation='LESS_THAN';links.new(attribute.outputs['Fac'],mask.inputs[0]);links.new(threshold.outputs[0],mask.inputs[1])
+    char_color=shader.inputs['Base Color'].links[0].from_socket
+    mix=nodes.new('ShaderNodeMixRGB');mix.blend_type='MIX';mix.inputs[1].default_value=(.046,.020,.008,1);links.new(mask.outputs[0],mix.inputs[0]);links.new(char_color,mix.inputs[2]);links.new(mix.outputs[0],shader.inputs['Base Color'])
+    ember_amount=shader.inputs['Emission Strength'].links[0].from_socket
+    multiply=nodes.new('ShaderNodeMath');multiply.operation='MULTIPLY';links.new(mask.outputs[0],multiply.inputs[0]);links.new(ember_amount,multiply.inputs[1]);links.new(multiply.outputs[0],shader.inputs['Emission Strength'])
+    # Clip the display-only peat sheet in the shader. The soil prisms themselves
+    # have an actual cylindrical Boolean cut with a visible curved rear wall.
+    peat_display.surface_render_method='DITHERED'
+    position=nodes.new('ShaderNodeNewGeometry');separate=nodes.new('ShaderNodeSeparateXYZ');links.new(position.outputs['Position'],separate.inputs[0])
+    def math_node(operation,a,b=None):
+        node=nodes.new('ShaderNodeMath');node.operation=operation
+        for socket,value in zip(node.inputs,(a,b)):
+            if value is None:continue
+            if isinstance(value,(int,float)):socket.default_value=value
+            else:links.new(value,socket)
+        return node.outputs[0]
+    xx=math_node('SUBTRACT',separate.outputs['X'],.4);rr=math_node('ADD',math_node('MULTIPLY',xx,xx),math_node('MULTIPLY',separate.outputs['Y'],separate.outputs['Y']))
+    radial=math_node('LESS_THAN',rr,G['boreRadiusM']**2)
+    hole_depth=nodes.new('ShaderNodeValue')
+    for t in [0,24]+[24+i*.25 for i in range(29)]+[90]:
+        hole_depth.outputs[0].default_value=min(1.385,max(0,2.95*ease(t,24,31)-1.55));hole_depth.outputs[0].keyframe_insert('default_value',frame=frame(t))
+    within_depth=math_node('LESS_THAN',math_node('MULTIPLY',separate.outputs['Z'],-1),hole_depth.outputs[0]);alpha=math_node('SUBTRACT',1,math_node('MULTIPLY',radial,within_depth));links.new(alpha,shader.inputs['Alpha'])
+    if mode=='rapid':animate_shape(globals(),burning,peat_assignments)
+    entry_path=[(1.72,-.065,.04),(1.74,-.065,-.2),(1.67,-.065,-.44),(1.65,-.065,-.72),(1.58,-.065,-1.06)]
+    char_path=curve(mode+' scorched entry channel',entry_path,.063,actors,char_material(mode+' scorched entry char'))
     for i,point in enumerate(char_path.data.splines[0].points):point.radius=.83+.22*math.sin(i*2.1)**2
-    channel=curve(mode+' connected surface-to-peat entry',[(x,y-.085,z) for x,y,z in entry_path],.008,actors,mat(mode+' entry ember core',(.4,.022,.004),emission=1.3))
+    channel=curve(mode+' connected surface-to-peat entry',[(x,y-.072,z)for x,y,z in entry_path],.005,actors,mat(mode+' entry ember core',(.35,.018,.003),emission=1.0))
     for ob in (channel,char_path):
         ob.data.bevel_factor_end=0;ob.data.keyframe_insert('bevel_factor_end',frame=frame(8));ob.data.bevel_factor_end=1;ob.data.keyframe_insert('bevel_factor_end',frame=frame(12))
-    for i in range(90):
-        x=RNG.uniform(-.94,.94);z=RNG.uniform(-.94,.94)
-        if x*x+z*z>1:continue
-        projection=x*entry.x+z*entry.y
-        if projection<coverage_threshold(.7):continue
-        required=cap_fraction(projection);start,end=12.,24.
+    for i,index in enumerate(RNG.sample(eligible,min(160,len(eligible)))):
+        row,column=divmod(index,nx);x=APPEARANCE['minX']+(column+.5)*dx;z=APPEARANCE['minY']+(row+.5)*dz
+        if abs(x-.4)<G['boreRadiusM']+.05 and z>-1.43:continue
+        lo,hi=12.,24.
         for _ in range(30):
-            mid=(start+end)/2
-            if .7*ease(mid,12,24)<required:start=mid
-            else:end=mid
-        px=.5+3.1*x;pz=-1.65+.68*z
-        if abs(px-.4)<.62 and pz> -1.43:continue
-        ob=curve(mode+' peat ember '+str(i),[(px,-.079,pz),(px+.06,-.081,pz+.01),(px+.12,-.079,pz-.012)],.006,actors,ember);visible(ob,end)
+            mid=(lo+hi)/2
+            if .7*ease(mid,12,24)<APPEARANCE['arrival'][index]:lo=mid
+            else:hi=mid
+        ob=curve(mode+' peat ember '+str(i),[(x-.018,-.087,z),(x,-.088,z+.008),(x+.027,-.087,z-.003)],.0028,actors,ember);visible(ob,hi)
+        if mode=='rapid':move_detail(globals(),ob,(x,-.087,z))
     # Small surface ignition with gently irregular flame geometry and continuous flicker.
     for i in range(18):
         x=1.72+RNG.uniform(-.28,.28);y=RNG.uniform(.12,.5);h=RNG.uniform(.18,.52)
         flame=uv(mode+' surface flame '+str(i),(x,y,h*.45),(.045,.055,h*.52),actors,flame_mats[i%2],12,8)
+        if mode=='rapid':move_detail(globals(),flame,(x,y,0))
         for vertex in flame.data.vertices:
             height=(vertex.co.z+1)/2;taper=max(.04,1-.8*height**1.5)
             vertex.co.x=vertex.co.x*taper+.16*height*height*math.sin(i*1.3);vertex.co.y*=taper
         values=[]
         for t in range(0,91):
-            growth=ease(t,0,8);reduction=1;pulse=.8+.2*math.sin(t*3.1+i*1.7)
+            growth=ease(t,0,8)*(1-ease(t,20,27));reduction=1;pulse=.8+.2*math.sin(t*3.1+i*1.7)
             values.append((t,(.045*max(.001,growth)*pulse,.055*max(.001,growth),h*.52*max(.001,growth)*reduction*pulse)))
-        key(flame,'scale',values)
+        key(flame,'scale',values);visible(flame,0,27)
     for i in range(14):
         puff=uv(mode+' rising smoke '+str(i),(1.72, .35, .8),(1,1,1),actors,smoke,12,8)
         values=[];scales=[]
         for t in range(0,91):
-            age=((t*.2+i*.117)%1);growth=ease(t,2,10)
+            age=((t*.2+i*.117)%1);growth=ease(t,2,10)*(1-ease(t,20,27))
             values.append((t,(1.72+age*.35+.13*math.sin(t*.25+i),.35+age*.12,.45+age*2)))
             radius=(.11+age*.26)*growth;scales.append((t,(radius,radius*.8,radius*1.25)))
-        key(puff,'location',values);key(puff,'scale',scales)
-    # Tracked excavator enters, operates the attached auger, retracts and leaves.
-    yellow=mat(mode+' excavator ochre',(.88,.48,.055),rough=.47,metal=.15)
-    dark=mat(mode+' excavator tracks',(.035,.045,.044),rough=.78)
-    glass=mat(mode+' cab glazing',(.08,.24,.29),rough=.16,metal=.15)
-    rig=bpy.data.objects.new(mode+' tracked excavator',None);actors.objects.link(rig)
-    def vehicle_offset(t):return 6*(1-ease(t,24,27))+6*ease(t,37,40)
-    key(rig,'location',[(t,(2.7+vehicle_offset(t),1.6,0)) for t in range(24,41)])
-    vehicle_parts=[]
-    for side in (-1,1):
-        track=cube(mode+' track '+str(side),(0,side*.55,.23),(1,.22,.23),actors,dark);track.parent=rig;vehicle_parts.append(track)
-        for j in range(10):
-            tread=cube(mode+' tread '+str(side)+' '+str(j),(-.94+j*.21,side*.55,.48),(.055,.235,.035),actors,metal);tread.parent=rig;vehicle_parts.append(tread)
-    for name,location,scale,material in [('chassis',(0,0,.64),(.93,.68,.18),yellow),('counterweight',(.63,.05,.96),(.38,.64,.2),yellow),('cab',(-.22,.04,1.27),(.46,.48,.48),glass),('cab roof',(-.22,.04,1.78),(.52,.54,.045),yellow)]:
-        part=cube(mode+' excavator '+name,location,scale,actors,material);part.parent=rig;vehicle_parts.append(part)
-    for x in (-.69,.25):
-        for y in (-.45,.53):
-            post=cube(mode+' cab post '+str(x)+' '+str(y),(x,y,1.29),(.033,.033,.48),actors,yellow);post.parent=rig;vehicle_parts.append(post)
-    for part in vehicle_parts:visible(part,24,40)
-    def drill_tip(t):return 1.55-2.95*ease(t,24,31)*(1-ease(t,31,36))
-    def animated_beam(name,point_a,point_b,radius,material):
-        ob=cylinder(mode+' '+name,(0,0,0),radius,1,actors,material,16)
-        for t in range(24,41):
-            a=Vector(point_a(t));b=Vector(point_b(t));delta=b-a;ob.location=(a+b)/2;ob.rotation_euler=delta.to_track_quat('Z','Y').to_euler();ob.scale=(1,1,delta.length)
-            for path in ('location','rotation_euler','scale'):ob.keyframe_insert(path,frame=frame(t))
-        visible(ob,24,40);return ob
-    pivot=lambda t:(2.02+vehicle_offset(t),1.12,1.03)
-    elbow=lambda t:(1.65+vehicle_offset(t),.75,3.02)
-    head=lambda t:(.4+vehicle_offset(t),0,drill_tip(t)+2.30)
-    animated_beam('excavator main boom',pivot,elbow,.14,yellow)
-    animated_beam('excavator stick',elbow,head,.12,yellow)
-    animated_beam('exposed hydraulic cylinder',lambda t:(2.45+vehicle_offset(t),1.10,1.0),lambda t:(1.8+vehicle_offset(t),.82,2.4),.065,metal)
-    # Auger shaft and flights remain mechanically attached to the visible boom.
-    drill=bpy.data.objects.new(mode+' drill assembly',None);actors.objects.link(drill)
-    shaft=cylinder(mode+' drill shaft',(0,0,1.1),.075,2.2,actors,metal);shaft.parent=drill
-    helix=[]
-    for i in range(360):
-        t=i/359;angle=t*math.tau*7;helix.append((.46*math.cos(angle),.46*math.sin(angle),.12+t*1.96))
-    flight=curve(mode+' auger flight',helix,.04,actors,metal);flight.parent=drill
-    tip=uv(mode+' drill tip',(0,0,.04),(.35,.35,.14),actors,metal,16,8);tip.parent=drill
-    housing=cube(mode+' drill motor',(0,0,2.3),(.28,.26,.18),actors,yellow);housing.parent=drill
-    dpos=[]
-    for t in range(24,41):dpos.append((t,(.4+vehicle_offset(t),0,drill_tip(t))))
-    key(drill,'location',dpos);key(drill,'rotation_euler',[(24,(0,0,0)),(36,(0,0,math.tau*26))])
-    for child in [shaft,flight,tip,housing]:visible(child,24,40)
+        key(puff,'location',values);key(puff,'scale',scales);visible(puff,0,27)
+    compact_excavator(globals(),mode,actors,G)
     # Finite source geometry. Rapid mode is prescribed conversion and not a solver result.
     source=uv(mode+' dry ice source',(.4,0,2.2),(1,1,1),actors,ice,32,20);visible(source,39)
     key(source,'location',[(t,(.4,0,2.2-3.5*phase(t,39,44)**2)) for t in [37,39,40,41,42,43,44,90]])
@@ -300,14 +307,14 @@ def build_mode(mode):
         for state in FRAMES:
             t=55+30*(state['timeS']-first)/end;radius=(3*max(0,state['dryIceKg'])/(4*math.pi*1560))**(1/3);source_scale.append((t,(radius,)*3))
         source_scale.append((90,source_scale[-1][1]))
-    elif mode=='rapid':source_scale.extend([(58,(0,0,0)),(90,(0,0,0))])
+    elif mode=='rapid':source_scale.extend([(55.45,(0,0,0)),(90,(0,0,0))])
     else:source_scale.append((90,(r0,)*3))
     key(source,'scale',source_scale)
     # Buried concave-up plate clears the source; rapid mode inverts upward.
     verts=[];faces=[];rings=16;segments=64
     for ring in range(rings+1):
         r=ring/rings
-        for angle in range(segments):a=angle*math.tau/segments;verts.append((.475*r*math.cos(a),.475*r*math.sin(a),-.1*(1-r*r)))
+        for angle in range(segments):a=angle*math.tau/segments;verts.append((G['capRadiusM']*r*math.cos(a),G['capRadiusM']*r*math.sin(a),-G['capRiseM']*(1-r*r)))
     for ring in range(rings):
         for angle in range(segments):n=(angle+1)%segments;faces.append((ring*segments+angle,ring*segments+n,(ring+1)*segments+n,(ring+1)*segments+angle))
     cap=mesh(mode+' metal dome • schematic bend',verts,faces,actors,metal);cap.location=(.4,0,2.5)
@@ -315,16 +322,20 @@ def build_mode(mode):
     solid=cap.modifiers.new('Visible plate thickness','SOLIDIFY');solid.thickness=.009
     cap.shape_key_add(name='Basis');bend=cap.shape_key_add(name='Illustrated deflection, not a failure calculation')
     for vertex in bend.data:
-        r=min(1,math.hypot(vertex.co.x,vertex.co.y)/.475);vertex.co.z+=.3*(1-r*r)
-    for t,value in [(0,0),(55,0),(58,.5 if mode=='rapid' else 0),(61,1 if mode=='rapid' else 0),(90,1 if mode=='rapid' else 0)]:bend.value=value;bend.keyframe_insert('value',frame=frame(t))
+        r=min(1,math.hypot(vertex.co.x,vertex.co.y)/G['capRadiusM']);vertex.co.z+=.22*(1-r*r)
+    for t in [0,55]+[55+i*.025 for i in range(27)]+[90]:
+        bend.value=ease(t,55,55.65) if mode=='rapid' else 0;bend.keyframe_insert('value',frame=frame(t))
     key(cap,'location',[(47,(.4,0,2.5)),(48,(.4,0,2.5)),(53,(.4,0,-1.05)),(90,(.4,0,-1.05))]);visible(cap,47)
     cap['scientific_role']='Buried downward bowl; rapid-only prescribed inversion, not solved pressure response'
-    # Gas tracers are geometric visibility cues; numerical mole fractions are separately labeled.
-    for i in range(16):
-        x=.4-i*.16;z=-1.3+.16*math.sin(i*.7)
-        puff=uv(mode+' CO2 visibility proxy '+str(i),(x,-.1,z),(1,1,1),actors,cyan,16,10)
-        start=55+i*(.16 if mode=='rapid' else .55);size=.09+i*.011
-        key(puff,'scale',[(0,(0,0,0)),(start,(0,0,0)),(start+2,(size,.1,size*.68)),(85,(size*1.15,.1,size*.7)),(90,(size*1.15,.1,size*.7))])
+    rim=curve(mode+' plate copper rim',[(G['capRadiusM']*math.cos(i*math.tau/64),G['capRadiusM']*math.sin(i*math.tau/64),.002)for i in range(65)],.003,actors,mat(mode+' copper edge',(.22,.09,.029),rough=.48,metal=.72));rim.parent=cap;visible(rim,47)
+    # Separated low-opacity wisps are a visibility convention; real CO2 is invisible.
+    gas_rng=random.Random(550152)
+    for i in range(19):
+        x=.4-i*.127+gas_rng.uniform(-.045,.045);z=-1.3+gas_rng.uniform(-.24,.24)
+        puff=uv(mode+' CO2 faint tracer wisp '+str(i),(x,-.12-gas_rng.random()*.015,z),(1,1,1),actors,cyan,12,8)
+        start=55+i*(.16 if mode=='rapid' else .55);size=gas_rng.uniform(.036,.078)
+        puff.rotation_euler.y=gas_rng.uniform(-.6,.6)
+        key(puff,'scale',[(0,(0,0,0)),(start,(0,0,0)),(start+2,(size*1.3,.012,size*.42)),(85,(size*1.5,.012,size*.5)),(90,(size*1.5,.012,size*.5))])
     # Assumed fracture paths and water paths have no constitutive or hydraulic solver role.
     paths=[[(.4,-.08,-.12),(.17,-.08,-.45),(-.24,-.08,-.7),(-.68,-.08,-1.05),(-1.2,-.08,-1.48),(-1.65,-.08,-1.82)],
            [(.4,-.08,-.4),(.83,-.08,-.75),(1.14,-.08,-1.11),(1.7,-.08,-1.43),(2.12,-.08,-1.92)],
@@ -332,15 +343,16 @@ def build_mode(mode):
            [(.4,-.08,-1.36),(.17,-.08,-1.82),(-.25,-.08,-2.12),(-.5,-.08,-2.65)]]
     for i,points in enumerate(paths):
         crack=curve(mode+' assumed opening '+str(i),points,.026,actors,crack_mat)
-        crack.data.bevel_factor_end=0;crack.data.keyframe_insert('bevel_factor_end',frame=frame(61));crack.data.bevel_factor_end=1;crack.data.keyframe_insert('bevel_factor_end',frame=frame(70))
+        crack.data.bevel_depth=.021 if mode=='rapid' else .007
+        crack.data.bevel_factor_end=0;crack.data.keyframe_insert('bevel_factor_end',frame=frame(55 if mode=='rapid' else 69));crack.data.bevel_factor_end=1;crack.data.keyframe_insert('bevel_factor_end',frame=frame(55.65 if mode=='rapid' else 70))
         water=curve(mode+' illustrative water path '+str(i),[(x,y-.018,z) for x,y,z in points],.017,actors,blue)
         water.data.bevel_factor_end=0;water.data.keyframe_insert('bevel_factor_end',frame=frame(70+i));water.data.bevel_factor_end=1;water.data.keyframe_insert('bevel_factor_end',frame=frame(83+i*.6))
-    hose=curve(mode+' water hose',[(-1.4,.8,2.8),(-.4,.6,2.5),(1.02,.05,1.2),(1.02,0,.5)],.052,actors,mat(mode+' hose rubber',(.055,.08,.07)));visible(hose,69)
-    pour=curve(mode+' water inlet around rim',[(1.02,-.09,.50),(1.01,-.09,.12),(.91,-.09,-.05),(.91,-.09,-1.15),(.4,-.09,-1.36)],.028,actors,blue);visible(pour,70,85)
+    hose=curve(mode+' water hose',[(-1.4,.8,2.8),(-.4,.6,2.5),(.66,.05,1.2),(.66,0,.5)],.052,actors,mat(mode+' hose rubber',(.055,.08,.07)));visible(hose,69)
+    pour=curve(mode+' water inlet around rim',[(.66,-.025,.50),(.65,-.025,.12),(.62,-.025,-.05),(.62,-.025,-1.15),(.4,-.025,-1.36)],.010,actors,blue);visible(pour,70,85)
     # Wide stable camera preserves stage context and allows clear comparisons.
     cam_data=bpy.data.cameras.new(mode+' camera');camera=bpy.data.objects.new(mode+' camera',cam_data);scene.collection.objects.link(camera)
     camera.location=(8.4,-15.5,7.5);camera.rotation_euler=(Vector((-.15,1,-.15))-camera.location).to_track_quat('-Z','Y').to_euler();cam_data.type='ORTHO';cam_data.ortho_scale=16.4;scene.camera=camera
-    for name,location,energy,size in [('Key',(-3,-5,9),1700,7),('Fill',(6,-2,5),1250,6),('Rim',(-2,5,7),1800,5)]:
+    for name,location,energy,size in [('Key',(-3,-5,9),1400,7),('Fill',(6,-2,5),750,6),('Rim',(-2,5,7),1700,5)]:
         data=bpy.data.lights.new(mode+' '+name,'AREA');data.energy=energy;data.shape='DISK';data.size=size
         obj=bpy.data.objects.new(data.name,data);scene.collection.objects.link(obj);obj.location=location;obj.rotation_euler=(Vector((0,1,-.3))-obj.location).to_track_quat('-Z','Y').to_euler()
     title='GRADUAL / FINITE SOURCE' if mode=='gradual' else 'RAPID / ILLUSTRATIVE CONVERSION'
@@ -353,6 +365,8 @@ def build_mode(mode):
         title_obj=label(mode+' chapter '+stage['id'],stage_title.upper(),camera,captions,white,-5.9,-2.57,.19);visible(title_obj,stage['start'],stage['end']-.13 if stage['end']<90 else 90)
         evidence=stage['evidence']
         if stage['id']=='underground':evidence='Illustrated underground spread; the numerical front remains unresolved.'
+        if mode=='gradual' and stage['id']=='treatment':evidence='Finite source mass follows accepted states. The plate and ground remain intact.'
+        if mode=='rapid' and stage['id']=='treatment':evidence='Prescribed pressure release and soil rupture. CO₂ does not burn; fracture is not calculated.'
         line=label(mode+' evidence '+stage['id'],evidence,camera,captions,muted,-5.9,-2.87,.108);visible(line,stage['start'],stage['end']-.13 if stage['end']<90 else 90)
         scene.timeline_markers.new(stage['title'],frame=frame(stage['start']))
     # Stage-clock labels are independent of the solver clock.
@@ -426,9 +440,12 @@ def build_mode(mode):
 scenes=[build_mode(mode) for mode in ('gradual','rapid')]
 bpy.context.window.scene=scenes[0]
 manifest={'storyboard':STORY,'fps':FPS,'frames_per_mode':COUNT,'video_seconds_per_mode':COUNT/FPS,'source_blend_sha256':SOURCE_HASH,'source_repository_commit':'596bf84a32ed92d7dcddd7ba15001cb2fe258b0c','cache_sha256':hashlib.sha256(args.cache.read_bytes()).hexdigest() if args.cache else None,'cache_provenance':CACHE.get('provenance') if CACHE else None,'accepted_checkpoint_count':len(FRAMES),'scientific_scope':'Full staged narrative. Gradual source radius/readout uses accepted history where supplied. Rapid conversion, drilling, enlarged cap bending, fracture paths and liquid infiltration are explicitly illustrative and do not alter solver data. No extinguishment or field validation claim.','render':'720p EEVEE,24 samples,24fps; full sequence for both modes, original source never saved.'}
+manifest['appearance_sha256']=hashlib.sha256((ROOT/'public/fire-appearance.json').read_bytes()).hexdigest()
+manifest['appearance_scope']='Perimeter-only display smoothing; shared 200x80 seeded connected arrival ranks; 70% sampled peat area before treatment, not solved propagation.'
+manifest['rupture_scope']='Rapid-only authored pressure-release pulse, 504 irregular prisms, persistent gaps and decorative ballistic fragments; no CO2 detonation or fracture-solver claim.'
 manifest['presentation_clock']={'story_seconds':90,'playback_seconds':36,'normal_speed_story_interval':[55,61],'other_speed_multiplier':2.8,'mapping':'t/2.8 to55;55/2.8+t-55 to61;55/2.8+6+(t-61)/2.8 afterwards'}
-manifest['buried_plate']={'rim_elevation_m':-1.05,'initial_center_elevation_m':-1.15,'rapid_final_center_elevation_m':-.85,'radius_m':.475,'bore_radius_m':.55,'deformation':'prescribed rapid-only inversion; gradual remains unchanged'}
-manifest['illustrated_peat_involvement']={'trigger_fraction':.7,'time_story_s':24,'geometry':'2D elliptical cutaway area fraction; not numerical fuel consumption'}
+manifest['buried_plate']={'rim_elevation_m':-1.05,'initial_center_elevation_m':-G['capDepthM']-G['capRiseM'],'rapid_final_center_elevation_m':-G['capDepthM']-G['capRiseM']+.22,'radius_m':G['capRadiusM'],'bore_radius_m':G['boreRadiusM'],'deformation':'prescribed rapid-only inversion; gradual remains unchanged'}
+manifest['illustrated_peat_involvement']={'trigger_fraction':.7,'time_story_s':24,'geometry':'Shared irregular mask and connected arrival ranks; 70% sampled 2D peat area, not numerical fuel consumption'}
 manifest['embedded_cache_encoding']='base64(gzip(JSON)), stored in ACCEPTED_FIRE_CACHE.json.gz.b64'
 if CACHE and CACHE.get('kind')=='surface-ignition-protocol':
     manifest['cache_provenance']={key:CACHE.get(key) for key in ('kind','generatedAt','sourceHashes','config','ignitionSource','treatmentSource','treatmentStartS','propagationResolved','status','stopReason')}
@@ -439,10 +456,11 @@ text=bpy.data.texts.new('FIRE_SEQUENCE_MANIFEST.json');text.write(json.dumps(man
 if CACHE:
     payload=base64.b64encode(gzip.compress(json.dumps(CACHE,separators=(',',':')).encode(),mtime=0)).decode()
     bpy.data.texts.new('ACCEPTED_FIRE_CACHE.json.gz.b64').write('\n'.join(payload[i:i+76] for i in range(0,len(payload),76)))
+bpy.data.texts.new('ILLUSTRATED_FIRE_APPEARANCE.json').write(json.dumps(APPEARANCE,separators=(',',':')))
 bpy.data.texts.new('START HERE').write('Use the scene dropdown to select GRADUAL or RAPID. Both are full staged narratives. Timeline is 90 presentation seconds in 36 playback seconds: setup 2.8x, event story55–61 at1x. Numerical readouts have their own clock. Gradual source mass follows accepted cache; rapid conversion and all excavation/water/fracture actions are illustrative. The buried plate is a downward bowl, inverted upward only in rapid mode. Native geometry and animation are editable. Original study is byte-preserved. Embedded accepted cache is base64(gzip(JSON)) with newlines; use gzip.decompress(base64.b64decode(text)) to recover it, or open the adjacent Accepted-Fire-Cache.json.\n')
 for image in bpy.data.images:
     if image.source=='FILE' and not image.packed_file and image.has_data:image.pack()
-args.output.parent.mkdir(parents=True,exist_ok=True);print('SAVING_SCENES',flush=True);bpy.ops.wm.save_as_mainfile(filepath=str(args.output.resolve()),compress=True)
+args.output.parent.mkdir(parents=True,exist_ok=True);bpy.context.preferences.filepaths.save_version=0;print('SAVING_SCENES',flush=True);bpy.ops.wm.save_as_mainfile(filepath=str(args.output.resolve()),compress=True)
 args.output.with_suffix('.manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 assert hashlib.sha256(SOURCE.read_bytes()).hexdigest()==SOURCE_HASH
 print('FIRE_STORY_BUILT '+json.dumps({'output':str(args.output),'objects':len(bpy.data.objects),'frames':COUNT,'cache_frames':len(FRAMES)}),flush=True)
