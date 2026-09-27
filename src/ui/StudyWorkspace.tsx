@@ -16,7 +16,8 @@ import Tags from 'lucide-react/dist/esm/icons/tags.mjs'
 import Thermometer from 'lucide-react/dist/esm/icons/thermometer.mjs'
 import { StudyScene } from './StudyScene'
 import './study.css'
-import { DEFAULT_STUDY_CAGE, STUDY_DURATION, STUDY_PHASES, STUDY_RELEASE_TIME } from './studyModel'
+import { StudyVersions } from './StudyVersions'
+import { DEFAULT_STUDY_CAGE, STUDY_DURATION, STUDY_PHASES, STUDY_RELEASE_TIME, ORIGINAL_STUDY_PHASES, STUDY_VERSIONS, type StudyVersion } from './studyModel'
 
 type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
 type PlaybackSpeed = 0.5 | 1 | 2
@@ -29,7 +30,6 @@ const VIEWS = [
   { id: 'root', number: '04', title: 'Roots & peat', subtitle: 'A closer look underground', icon: Leaf },
 ] as const
 
-const PHASES = STUDY_PHASES
 
 const VIEW_NOTES: Record<StudyView, { title: string; description: string; observation: string }> = {
   cutaway: {
@@ -65,7 +65,9 @@ function formatTime(value: number) {
   return `00:${value.toFixed(1).padStart(4, '0')}`
 }
 
-export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?: () => void }) {
+export default function StudyWorkspace({ onOpenSimulation, version = 'dynamics', onVersionChange }: { onOpenSimulation?: () => void; version?: StudyVersion; onVersionChange: (version: StudyVersion) => void }) {
+  const PHASES = version === 'original' ? ORIGINAL_STUDY_PHASES : STUDY_PHASES
+  const [launchSpeed, setLaunchSpeed] = useState(2.8)
   const [view, setView] = useState<StudyView>('cutaway')
   const [time, setTime] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -114,6 +116,8 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
     return () => window.cancelAnimationFrame(frame)
   }, [playing, speed, loop, seek])
 
+  const selectVersion = (next: StudyVersion) => { setPlaying(false); seek(0); onVersionChange(next) }
+
   const togglePlayback = () => {
     if (!playing && timeRef.current >= DURATION) seek(0)
     setPlaying((current) => !current)
@@ -136,8 +140,9 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
         <div><strong>ZOMBIE FIRE</strong><span>Soil &amp; suppression study</span></div>
       </div>
       <div className="study-header-actions">
-        <span className="study-concept-badge"><span aria-hidden="true" />Interactive illustration</span>
+        <span className="study-concept-badge"><span aria-hidden="true" />{STUDY_VERSIONS.find(item => item.id === version)?.title}</span>
         {onOpenSimulation && <button className="study-simulation-link" onClick={onOpenSimulation} type="button">Open simulation <ArrowUpRight size={15} /></button>}
+        <StudyVersions version={version} onSelect={selectVersion} />
       </div>
     </header>
 
@@ -166,7 +171,7 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
             <button type="button" className="study-tool-button study-tool-icon" onClick={() => setResetToken((current) => current + 1)} aria-label="Reset camera to the selected view" title="Reset camera"><Focus size={17} /></button>
           </div>
         </div>
-        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} /></div>
+        <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} version={version} launchSpeed={launchSpeed} /></div>
         <div className="study-viewport-footer">
           <span><MoveUpRight size={12} /> Drag to orbit <span className="study-hint-divider">/</span> Scroll to zoom</span>
           <span className="study-frame-state">{playing ? 'Playing' : time >= DURATION ? 'Sequence complete' : 'Paused'}<i aria-hidden="true" /></span>
@@ -195,23 +200,29 @@ export default function StudyWorkspace({ onOpenSimulation }: { onOpenSimulation?
           <dl><div><dt>Soil footprint</dt><dd>8 × 8 <span>m</span></dd></div><div><dt>Borehole width</dt><dd>0.75 <span>m</span></dd></div><div><dt>Borehole depth</dt><dd>2.44 <span>m</span></dd></div><div><dt>Dry-ice diameter</dt><dd>0.50 <span>m</span></dd></div></dl>
         </section>
 
-        <section className="study-cage-controls" aria-label="Cage illustration settings">
+        {version !== 'original' && <section className="study-cage-controls" aria-label="Cage illustration settings">
           <h3>Inverted cage</h3>
           <label className="study-cage-toggle"><input type="checkbox" checked={cage.enabled} onChange={event => setCage(old => ({ ...old, enabled: event.target.checked }))} />Cover the crater opening</label>
           <div><label htmlFor="study-cage-height">Height</label><input id="study-cage-height" type="number" min="1" max="100" step="1" value={Math.round(cage.heightM * 100)} onChange={event => { const value = Number(event.target.value); if (value >= 1 && value <= 100) setCage(old => ({ ...old, heightM: value / 100 })) }} /><span>cm</span></div>
           <div><label htmlFor="study-cage-width">Width</label><input id="study-cage-width" type="number" min="10" max="200" step="5" value={Math.round(cage.widthM * 100)} onChange={event => { const value = Number(event.target.value); if (value >= 10 && value <= 200) setCage(old => ({ ...old, widthM: value / 100 })) }} /><span>cm</span></div>
-          <p>Open underneath. Placed after landing. Dimensions describe the illustration; containment and bar collisions are not calculated.</p>
-        </section>
+          <p>{version === 'dynamics' ? 'Open underneath. Simplified particle contacts with rigid bars; cage strength and deformation are not modeled.' : 'Open underneath. Placed after landing. Containment and bar collisions are not calculated.'}</p>
+        </section>}
 
-        <div className="study-observation"><span className="study-observation-icon"><Focus size={16} /></span><p>{notes.observation}</p></div>
-        <p className="study-disclaimer">Staged instant conversion and fragment motion. CO₂ is invisible; colored gas tracers show the effect. This sequence does not predict pressure, fracture or treatment success.</p>
+        {version === 'dynamics' && <section className="study-cage-controls" aria-label="Debris dynamics assumptions">
+          <h3>Calculated debris motion</h3>
+          <p>Gravity · air resistance · bounce · friction · cage contacts</p>
+          <div><label htmlFor="debris-launch-speed">Assumed release speed</label><input id="debris-launch-speed" type="number" min="0" max="5" step="0.2" value={launchSpeed} onChange={event => { const value = Number(event.target.value); if (Number.isFinite(value) && value >= 0 && value <= 5) { setPlaying(false); seek(0); setLaunchSpeed(value) } }} /><span>m/s</span></div>
+          <p>Gravity 9.80665 m/s². Assumed debris density 1800 kg/m³, drag coefficient 0.8, rebound 0.22 and friction 0.6. Exposed debris settles onto simplified ground planes. Gas pressure does not set the release speed.</p>
+        </section>}
+        <div className="study-observation"><span className="study-observation-icon"><Focus size={16} /></span><p>{version === 'original' ? 'Original cooling and transport study, preserved for comparison. The source remains visible.' : notes.observation}</p></div>
+        <p className="study-disclaimer">{version === 'dynamics' ? 'Calculated particle translation with assumed release. The source is held, then falls under gravity before landing at 4 s. Gas and thermal colors remain illustrative; no pressure, fracture or containment prediction.' : version === 'original' ? 'Earlier authored cooling and transport. No calculated temperature or treatment outcome.' : 'Earlier staged conversion and fragment motion. Gas tracers are illustrative; no pressure or fracture prediction.'}</p>
       </aside>
     </main>
 
     <section className="study-playback" aria-label="Illustrative sequence playback">
       <div className="study-playback-topline">
         <div className="study-current-phase" aria-live="polite" aria-atomic="true"><span className="study-phase-index">0{phaseIndex + 1}</span><div><strong>{phase.title}</strong><p>{phase.description}</p></div></div>
-        <span className="study-playback-badge">Release at {STUDY_RELEASE_TIME} s · 5 s after landing</span>
+        <span className="study-playback-badge">{version === 'original' ? 'Original 0.5 sequence' : <>Release at {STUDY_RELEASE_TIME} s · 5 s after landing</>}</span>
       </div>
       <div className="study-transport">
         <div className="study-play-buttons">

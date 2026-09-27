@@ -1,6 +1,6 @@
 # Scene studio
 
-Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. The animation is a prescribed visual explanation. It is not connected to the scientific solver and does not calculate temperature, gas concentration, deformation or treatment success.
+Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. The latest version calculates debris translation under gravity, drag and simplified contacts with an assumed release velocity. Gas and thermal displays remain authored. It is not connected to the scientific solver and does not calculate temperature, gas concentration, fracture or treatment success. The top-right ⋯ menu also replays the earlier 0.5 cooling and 0.6 rapid-release scenes. See [dynamics, evidence and limitations](SCENE_DYNAMICS.md).
 
 ## Views
 
@@ -14,6 +14,9 @@ Scene studio is the app's opening workspace. It presents the authored Blender la
 Selecting a screen changes the camera and display treatment while keeping the same sequence time. Drag to orbit and scroll to zoom. **Labels** toggles annotations; the focus icon restores the selected screen's camera.
 
 ## Playback
+
+The following authored timing describes version 0.6. Version 0.7 retains landing at 4 s and release at 9 s, with a held-then-free-fall source and calculated particle translation. Version 0.5 uses its original cooling/transport chapters.
+
 
 The sequence starts paused. **Play** starts it; **Pause** holds the current time; **Restart** begins again at zero. The time slider and chapter buttons seek to a frame and pause playback. Speed can be 0.5×, 1× or 2×, and **Loop** repeats the sequence. At the end of a nonlooping sequence, Play replays it from zero. Backgrounding the document pauses playback. Animation callbacks are cancelled when the workspace closes; frame advances are clamped to prevent a long stalled frame from skipping the story.
 
@@ -30,7 +33,7 @@ These seconds belong to the illustration's playback clock. They are not a conver
 
 The default cage is **10 cm high and 95 cm wide**, centered over the 75 cm opening. The 10 cm measurement was interpreted as height because its intended dimension was unspecified; both height and width are editable in the scene sidebar. A checkbox hides it. Its top and four sides have bars; its underside has a perimeter frame with no base grid. It is placed after landing so the falling sphere does not pass through the lid. Bar spacing is at most 10 cm. Dimensions use meters internally.
 
-The cage, gas tracers and moving fragments are illustration geometry, not new physical constraints. No bar collisions, pressure-rated containment, fracture or molecular dynamics are calculated. CO₂ is colorless; visible particles are markers, not a claim about its appearance. Timings and trajectories are deterministic functions of playback time, so reverse seeking and looping restore the same state. The scientific solver and the original Blender/GLB asset are unchanged by this feature.
+In version 0.6, cage and fragment motion are authored with no bar collisions. Version 0.7 adds simplified particle/bar contacts; neither version calculates pressure-rated containment, cage deformation, fracture or molecular dynamics. CO₂ is colorless; visible particles are markers, not a claim about its appearance. Timings and trajectories are deterministic functions of playback time, so reverse seeking and looping restore the same state. The scientific solver and the original Blender/GLB asset are unchanged by this feature.
 
 ## Open the scientific workspace
 

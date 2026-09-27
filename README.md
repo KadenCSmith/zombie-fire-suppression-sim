@@ -10,6 +10,8 @@ Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com
 
 ## Timed gas-release illustration
 
+Version 0.7 adds calculated debris translation with gravity, air resistance, inelastic bounce, friction and simplified cage-bar contacts. The **⋯ menu** at the top opens 0.5, 0.6 and 0.7 scenes for comparison. Release velocity is assumed and editable; gas pressure, fracture and cage strength are not predicted. [Dynamics, sources and limits](docs/SCENE_DYNAMICS.md).
+
 Version 0.6 adds a **five-second delay after landing**: the sphere lands at 4 s and instantly disappears into expanding gas tracers at 9 s. Soil grains and rocks move outward and settle. An inverted, open-bottom cage is placed over the opening after landing; its default height is 10 cm and its width is 95 cm. Toggle it or edit these dimensions in the scene sidebar. Replay, reverse seeking and all four views share the same event time. This is prescribed animation, with no calculated gas pressure or cage containment. [Sequence guide](docs/SCENE_STUDIO.md).
 
 ## Research materials and Developer tools
@@ -20,7 +22,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.6.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.6.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download version 0.7.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.7.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
 [Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
 
@@ -45,7 +47,7 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.6.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.7.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 

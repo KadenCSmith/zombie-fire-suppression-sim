@@ -1,5 +1,12 @@
 /** Presentation time is independent of every physical solver clock. */
 export type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
+export type StudyVersion = 'dynamics' | 'release' | 'original'
+export const STUDY_VERSIONS = [
+  { id: 'dynamics', title: '0.7 · Gravity & contact', subtitle: 'Latest · calculated debris motion, assumed release' },
+  { id: 'release', title: '0.6 · Rapid gas release', subtitle: 'Earlier · authored expansion, fragments and cage' },
+  { id: 'original', title: '0.5 · Original cooling study', subtitle: 'Earlier · gradual cooling and transport, no cage' },
+] as const
+export const STUDY_GRAVITY = 9.80665
 export const STUDY_DURATION = 20
 export const STUDY_LANDING_TIME = 4
 export const STUDY_RELEASE_DELAY = 5
@@ -49,18 +56,18 @@ export function smoothPhase(time: number, start: number, end: number): number {
   return x * x * (3 - 2 * x)
 }
 
-export function studyAnimation(time: number) {
+export function studyAnimation(time: number, version: StudyVersion = 'release') {
   const t = studyTime(time)
   const releaseAge = Math.max(0, t - STUDY_RELEASE_TIME)
   return {
     // The exported sphere is already at its approved final position.
-    sourceOffsetY: 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
-    sourceVisible: t < STUDY_RELEASE_TIME,
+    sourceOffsetY: version === 'dynamics' ? Math.max(0, 3.5 - 0.5 * STUDY_GRAVITY * Math.max(0, t - (4 - Math.sqrt(7 / STUDY_GRAVITY))) ** 2) : 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
+    sourceVisible: version === 'original' || t < STUDY_RELEASE_TIME,
     releaseAge,
     // Authored display radius, not a pressure front or gas-volume prediction.
     expansionRadius: t < STUDY_RELEASE_TIME ? 0 : 0.25 + 1.5 * (1 - Math.exp(-5 * releaseAge)),
     cold: smoothPhase(t, 4, 8),
-    transport: smoothPhase(t, STUDY_RELEASE_TIME, 14),
+    transport: smoothPhase(t, version === 'original' ? 8 : STUDY_RELEASE_TIME, 14),
     // A visible residual hotspot prevents an implied claim of extinction.
     warmth: 1 - 0.38 * smoothPhase(t, 14, 20),
   }
@@ -106,3 +113,10 @@ export function studyObjectRole(name: string): 'source' | 'peat' | 'soil' | 'nat
   if (/^0[1-4](?:\s|$)/.test(plain)) return 'soil'
   return 'natural'
 }
+
+export const ORIGINAL_STUDY_PHASES = [
+  { start: 0, end: 4, title: 'Source placement', short: 'Place', description: 'The original smooth descent into the borehole.' },
+  { start: 4, end: 8, title: 'Local cooling', short: 'Cool', description: 'Illustrative cooling around the dry ice.' },
+  { start: 8, end: 14, title: 'Transport', short: 'Spread', description: 'The original transport markers extend toward the peat.' },
+  { start: 14, end: 20, title: 'Residual warmth', short: 'Observe', description: 'A warm peat region remains; no extinction prediction.' },
+] as const

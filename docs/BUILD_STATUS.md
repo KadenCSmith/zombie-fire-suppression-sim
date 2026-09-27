@@ -1,5 +1,12 @@
 # Build status and handoff
 
+## Scene dynamics and version history (2026-09-26, version 0.7.0)
+
+The top-right three-dot control in both workspaces replays 0.5 cooling, 0.6 rapid release and the latest 0.7 debris dynamics. Earlier behavior uses shared current assets/renderer fixes; it does not run archived binaries. The latest scene adds held-then-free-fall source placement, fixed-step particle gravity/drag, inelastic contacts, friction and rigid cage-bar contact. Assumed release speed is editable. Gas/thermal displays remain authored; no CFD, fracture, cage strength or experimental validation is claimed. The numerical scientific workspace is unchanged. [Equations, assumptions and ASCE sources](SCENE_DYNAMICS.md).
+
+Typecheck, lint, 99 tests in 14 files, production build and local native Electron smoke passed. The smoke exercise switches all three versions, checks original solid/cage behavior and preserves the 120 s scientific state. Six added tests cover analytical fall/refinement, drag dissipation, contact energy, cage contact, settling/replay and version timing. The independent Stage 2 Blender edit remains excluded. Release and installed-app checks are recorded after packaging.
+
+
 ## Timed release and cage illustration (2026-09-26, version 0.6.0)
 
 Scene studio now lands the dry ice at 4 s, waits exactly five playback seconds, and hides the solid instantaneously at 9 s while gas tracers expand and 88 soil/rock fragments move outward and settle. The inverted cage defaults to 10 cm high and 95 cm wide, with an open underside, editable dimensions and a visibility switch. Height was the stated assumption for the unspecified 10 cm measurement. It is lowered after landing. All four views use the shared timeline. These effects are prescribed illustration; gas pressure, molecular dynamics, cage collisions/containment and new fracture physics are not calculated.

@@ -1,3 +1,5 @@
+import { StudyVersions } from './ui/StudyVersions'
+import type { StudyVersion } from './ui/studyModel'
 import DeveloperTools from './ui/DeveloperTools'
 import { resolveMaterials } from './sim/materials'
 import { ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -175,6 +177,7 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 }
 
 function App() {
+  const [studyVersion, setStudyVersion] = useState<StudyVersion>('dynamics')
   const [workspace, setWorkspace] = useState<'study' | 'simulation'>(() => new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
   const initial = useMemo(() => createDefaultScenario(), [])
   const [scenario, setScenario] = useState<Scenario>(initial)
@@ -645,14 +648,14 @@ function App() {
   }, [])
 
   if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
-    <StudyWorkspace onOpenSimulation={() => setWorkspace('simulation')} />
+    <StudyWorkspace key={studyVersion} version={studyVersion} onVersionChange={setStudyVersion} onOpenSimulation={() => setWorkspace('simulation')} />
   </Suspense>
 
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.6</span></small></div></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.7</span></small></div></div>
       <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
-      <div className="topbar-actions"><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
+      <div className="topbar-actions"><StudyVersions version={studyVersion} onSelect={next => { setStudyVersion(next); openStudy() }} /><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>
 
     <nav className="workflow-tabs" role="tablist" aria-label="App sections">

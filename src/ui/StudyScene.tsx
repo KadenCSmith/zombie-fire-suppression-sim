@@ -6,10 +6,12 @@ import { useGLTF } from '@react-three/drei/core/Gltf.js'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import * as THREE from 'three'
-import { DEFAULT_STUDY_CAGE, STUDY_FRAGMENTS, STUDY_LANDING_TIME, STUDY_PEAT, STUDY_RELEASE_TIME, STUDY_SOURCE, smoothPhase, studyAnimation, studyCageBars, studyFragmentPose, studyObjectRole, studyTime, type StudyCage, type StudyView } from './studyModel'
+import { DEFAULT_STUDY_CAGE, STUDY_FRAGMENTS, STUDY_LANDING_TIME, STUDY_PEAT, STUDY_RELEASE_TIME, STUDY_SOURCE, smoothPhase, studyAnimation, studyCageBars, studyFragmentPose, studyObjectRole, studyTime, type StudyCage, type StudyView, type StudyVersion } from './studyModel'
+
+import { buildDebrisReplay, debrisPose, type DebrisReplay } from './studyDynamics'
 
 export type { StudyView } from './studyModel'
-export type StudySceneProps = { view: StudyView; time: number; labels: boolean; cage?: StudyCage; resetToken?: number }
+export type StudySceneProps = { view: StudyView; time: number; labels: boolean; cage?: StudyCage; resetToken?: number; version?: StudyVersion; launchSpeed?: number }
 const MODEL_URL = `${import.meta.env.BASE_URL}models/peat-study.glb`
 type Role = ReturnType<typeof studyObjectRole>
 type Batch = { geometry: THREE.BufferGeometry; material: THREE.MeshStandardMaterial; role: Role; name: string }
@@ -113,19 +115,19 @@ export function prepareStudyBatches(root: THREE.Object3D, uniforms: DisplayUnifo
   })
 }
 
-function StudyModel({ view, time }: Pick<StudySceneProps, 'view' | 'time'>) {
+function StudyModel({ view, time, version }: Pick<StudySceneProps, 'view' | 'time' | 'version'>) {
   const { scene } = useGLTF(MODEL_URL, false, false)
   const invalidate = useThree(state => state.invalidate)
   const uniforms = useMemo<DisplayUniforms>(() => ({ thermal: { value: 0 }, cold: { value: 0 }, warmth: { value: 1 }, sourceY: { value: 3.5 } }), [])
   const batches = useMemo(() => prepareStudyBatches(scene, uniforms), [scene, uniforms])
-  const phase = studyAnimation(time)
+  const phase = studyAnimation(time, version)
   useLayoutEffect(() => {
     uniforms.thermal.value = view === 'thermal' ? 1 : 0
     uniforms.cold.value = phase.cold
     uniforms.warmth.value = phase.warmth
     uniforms.sourceY.value = phase.sourceOffsetY
     invalidate()
-  }, [view, time, phase.cold, phase.warmth, phase.sourceOffsetY, uniforms, invalidate])
+  }, [view, time, version, phase.cold, phase.warmth, phase.sourceOffsetY, uniforms, invalidate])
   useEffect(() => () => {
     batches.forEach(batch => { batch.geometry.dispose(); batch.material.dispose() })
   }, [batches])
@@ -141,10 +143,11 @@ const tracerVertex = `
 uniform float uTime;
 uniform float uCold;
 uniform float uTransport;
+uniform float uStart;
 attribute vec4 seed;
 varying float vAlpha;
 void main() {
-  float phase = fract(seed.x + max(0.0, uTime - ${STUDY_RELEASE_TIME.toFixed(1)}) * 0.13);
+  float phase = fract(seed.x + max(0.0, uTime - uStart) * 0.13);
   float reach = uTransport * phase;
   vec3 p = mix(vec3(-1.4, -2.05, 0.22), vec3(1.5, -0.62, 0.22), reach);
   float spread = 0.1 + 0.28 * phase;
@@ -163,13 +166,14 @@ void main() {
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }`
-function TransportTracer({ time }: { time: number }) {
+function TransportTracer({ time, version }: { time: number; version: StudyVersion }) {
   const material = useRef<THREE.ShaderMaterial>(null)
   useFrame(() => {
     if (!material.current) return
-    const phase = studyAnimation(time), target = material.current.uniforms
+    const phase = studyAnimation(time, version), target = material.current.uniforms
     target.uTime.value = studyTime(time)
-    target.uCold.value = phase.sourceVisible ? 0 : phase.cold * (1 - smoothPhase(time, 12, 17))
+    target.uCold.value = version === 'original' ? phase.cold : phase.sourceVisible ? 0 : phase.cold * (1 - smoothPhase(time, 12, 17))
+    target.uStart.value = version === 'original' ? 8 : STUDY_RELEASE_TIME
     target.uTransport.value = phase.transport
   })
   const geometry = useMemo(() => {
@@ -183,7 +187,7 @@ function TransportTracer({ time }: { time: number }) {
     result.setAttribute('seed', new THREE.Float32BufferAttribute(seed, 4))
     return result
   }, [])
-  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uCold: { value: 0 }, uTransport: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uCold: { value: 0 }, uTransport: { value: 0 }, uStart: { value: 9 } }), [])
   useEffect(() => () => geometry.dispose(), [geometry])
   return <points geometry={geometry} frustumCulled={false} renderOrder={2}>
     <shaderMaterial ref={material} uniforms={uniforms} vertexShader={tracerVertex} fragmentShader={tracerFragment} transparent depthWrite={false} />
@@ -232,22 +236,22 @@ function GasExpansion({ time }: { time: number }) {
   </points>
 }
 
-function MovingFragments({ time }: { time: number }) {
+function MovingFragments({ time, replay }: { time: number; replay: DebrisReplay | null }) {
   const mesh = useRef<THREE.InstancedMesh>(null)
   const object = useMemo(() => new THREE.Object3D(), [])
   useLayoutEffect(() => {
     if (!mesh.current) return
     STUDY_FRAGMENTS.forEach((seed, i) => {
       const pose = studyFragmentPose(i, time)
-      object.position.set(...pose.position)
-      object.rotation.set(...pose.rotation)
+      object.position.set(...(replay ? debrisPose(replay, i, time) : pose.position))
+      object.rotation.set(...(replay ? seed.spin : pose.rotation))
       const size = seed.surface || time >= STUDY_RELEASE_TIME ? seed.size : 0
       object.scale.set(size, size * 0.7, size * 0.85)
       object.updateMatrix()
       mesh.current!.setMatrixAt(i, object.matrix)
     })
     mesh.current.instanceMatrix.needsUpdate = true
-  }, [time, object])
+  }, [time, object, replay])
   useLayoutEffect(() => {
     if (!mesh.current) return
     STUDY_FRAGMENTS.forEach((seed, i) => mesh.current!.setColorAt(i, new THREE.Color(seed.surface ? '#837a64' : i % 3 ? '#796249' : '#ab9f82')))
@@ -305,16 +309,16 @@ function WarmEmbers({ time }: { time: number }) {
 }
 
 type LabelDescriptor = { id: string; position: [number, number, number]; text: ReactNode; tone?: 'warm' | 'cool' }
-function studyLabels(view: StudyView, time: number, cage: StudyCage): LabelDescriptor[] {
+function studyLabels(view: StudyView, time: number, cage: StudyCage, version: StudyVersion): LabelDescriptor[] {
   if (view === 'root') return [
     { id: 'root', position: [1.2, 0.45, -0.4], text: 'Living trunk & roots' },
     { id: 'char', position: [0.6, -0.9, 0.35], text: 'Charred peat interface', tone: 'warm' },
   ]
   const result: LabelDescriptor[] = [
-    { id: 'source', position: [-1.4, STUDY_SOURCE[1] + studyAnimation(time).sourceOffsetY - 0.39, 0.6], text: studyAnimation(time).sourceVisible ? 'Dry ice · Ø 0.50 m' : 'CO₂ expansion · visual tracers', tone: 'cool' },
+    { id: 'source', position: [-1.4, STUDY_SOURCE[1] + studyAnimation(time, version).sourceOffsetY - 0.39, 0.6], text: studyAnimation(time, version).sourceVisible ? 'Dry ice · Ø 0.50 m' : 'CO₂ expansion · visual tracers', tone: 'cool' },
     { id: 'peat', position: [1.5, -0.23, 0.1], text: 'Buried smoldering peat', tone: 'warm' },
   ]
-  if (cage.enabled && time >= STUDY_LANDING_TIME) result.push({ id: 'cage', position: [-1.4, cage.heightM + 0.5, -0.15], text: `Inverted cage · ${Math.round(cage.heightM * 100)} cm high` })
+  if (version !== 'original' && cage.enabled && time >= STUDY_LANDING_TIME) result.push({ id: 'cage', position: [-1.4, cage.heightM + 0.5, -0.15], text: `Inverted cage · ${Math.round(cage.heightM * 100)} cm high` })
   if (view !== 'top') result.push({ id: 'depth', position: [-3.25, -1.2, 0.3], text: <>2.44 m<br /><small>Borehole depth</small></> })
   return result
 }
@@ -398,12 +402,13 @@ class SceneBoundary extends Component<{ children: ReactNode; onRetry: () => void
   }
 }
 
-export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, resetToken = 0 }: StudySceneProps) {
+export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, resetToken = 0, version = 'dynamics', launchSpeed = 2.8 }: StudySceneProps) {
   const [retry, setRetry] = useState(0)
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
+  const replay = useMemo(() => version === 'dynamics' ? buildDebrisReplay(cage, launchSpeed) : null, [version, cage.enabled, cage.heightM, cage.widthM, launchSpeed])
   const labelElements = useRef(new Map<string, HTMLDivElement>())
-  const descriptors = useMemo(() => labels && ready ? studyLabels(view, time, cage) : [], [labels, ready, view, time, cage])
+  const descriptors = useMemo(() => labels && ready ? studyLabels(view, time, cage, version) : [], [labels, ready, view, time, cage, version])
   const onReady = useCallback(() => setReady(true), [])
   const onError = useCallback(() => { setFailed(true); setReady(false) }, [])
   return <div className="study-scene" style={{ width: '100%', height: '100%', position: 'relative', minHeight: 300 }}>
@@ -418,11 +423,9 @@ export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, rese
           shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-normalBias={0.03} shadow-bias={-0.0001} />
         <directionalLight position={[6, 3, -6]} intensity={1.4} color="#9bd6ed" />
         <Suspense fallback={null}>
-          <StudyModel view={view} time={time} />
-          <GasExpansion time={time} />
-          <MovingFragments time={time} />
-          <CraterCage time={time} cage={cage} />
-          <TransportTracer time={time} />
+          <StudyModel view={view} time={time} version={version} />
+          {version !== 'original' && <><GasExpansion time={time} /><MovingFragments time={time} replay={replay} /><CraterCage time={time} cage={cage} /></>}
+          <TransportTracer time={time} version={version} />
           <WarmEmbers time={time} />
           {labels && view !== 'top' && view !== 'root' && <DepthGuide />}
           <ModelReady onReady={onReady} />

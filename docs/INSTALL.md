@@ -1,6 +1,6 @@
-# Download and open Zombie Fire Suppression Sim 0.6.0
+# Download and open Zombie Fire Suppression Sim 0.7.0
 
-[Download release 0.6.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.6.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
+[Download release 0.7.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.7.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
 This repository is private. Sign into a GitHub account with access before downloading. The application runs locally without Node.js, Python, Blender, an API key, or an internet connection after download. No automatic updater is included; download a newer release to update.
 
@@ -8,12 +8,12 @@ This repository is private. Sign into a GitHub account with access before downlo
 
 | Computer | File | Install |
 | --- | --- | --- |
-| Mac, Apple Silicon **or** Intel | `Zombie-Fire-Sim-0.6.0-macOS-universal.dmg` | Open the disk image and drag the app to Applications. |
-| Mac, alternative archive | `Zombie-Fire-Sim-0.6.0-macOS-universal.zip` | Extract and move the whole app into Applications. |
-| Windows, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.6.0-Windows-x64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Windows, ARM64 | `Zombie-Fire-Sim-0.6.0-Windows-arm64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Linux, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.6.0-Linux-x64.tar.gz` | Extract, then run `Open simulation.sh` or `Open scene studio.sh`. |
-| Linux, ARM64 | `Zombie-Fire-Sim-0.6.0-Linux-arm64.tar.gz` | Extract, then run the same launch scripts. |
+| Mac, Apple Silicon **or** Intel | `Zombie-Fire-Sim-0.7.0-macOS-universal.dmg` | Open the disk image and drag the app to Applications. |
+| Mac, alternative archive | `Zombie-Fire-Sim-0.7.0-macOS-universal.zip` | Extract and move the whole app into Applications. |
+| Windows, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.7.0-Windows-x64.zip` | Extract the whole folder, then open the application `.exe`. |
+| Windows, ARM64 | `Zombie-Fire-Sim-0.7.0-Windows-arm64.zip` | Extract the whole folder, then open the application `.exe`. |
+| Linux, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.7.0-Linux-x64.tar.gz` | Extract, then run `Open simulation.sh` or `Open scene studio.sh`. |
+| Linux, ARM64 | `Zombie-Fire-Sim-0.7.0-Linux-arm64.tar.gz` | Extract, then run the same launch scripts. |
 
 Windows and Linux downloads are portable applications, not system installers. Keep all extracted files together. The included runtime is Electron 44.3.0. Mac requires **macOS 13 or later**, and all packages are 64-bit, consistent with [Electron 44 platform support](https://www.electronjs.org/blog/electron-44-0). Windows requires a supported 64-bit Windows installation. Linux requires a graphical desktop, Electron's system libraries, and an available Chromium sandbox (for example a distribution permitting unprivileged user namespaces). Linux distribution compatibility and Windows/Intel/ARM native execution are not certified merely by creating an archive. See [verification status](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/VALIDATION_STATUS.md) for actual tested scope.
 
@@ -62,7 +62,7 @@ From the extracted Linux folder:
 Download `SHA256SUMS.txt` beside the files. On Mac, from that folder, run:
 
 ```sh
-shasum -a 256 Zombie-Fire-Sim-0.6.0-macOS-universal.dmg
+shasum -a 256 Zombie-Fire-Sim-0.7.0-macOS-universal.dmg
 ```
 
 Compare the displayed hash with the matching entry in `SHA256SUMS.txt`. Linux uses `sha256sum`; Windows PowerShell uses `Get-FileHash -Algorithm SHA256`. `release-manifest.json` records the source commit, Electron version, file sizes, architectures and hashes.
@@ -88,7 +88,7 @@ npm run package:mac  # Universal Mac DMG and ZIP
 npm run package:all  # Mac + Windows + Linux, x64 and ARM64
 ```
 
-Release packaging runs on macOS and uses the official Electron binaries for each target. Files are written under `work/releases/v0.6.0/`, excluded from Git. A supplied `ELECTRON_ZIP_DIR` must contain official Electron archives and their `SHASUMS256.txt`; cached inputs are checked against that manifest before use. Otherwise Packager downloads the pinned Electron release. No native Windows/Linux execution is implied by cross-packaging on a Mac.
+Release packaging runs on macOS and uses the official Electron binaries for each target. Files are written under `work/releases/v0.7.0/`, excluded from Git. A supplied `ELECTRON_ZIP_DIR` must contain official Electron archives and their `SHASUMS256.txt`; cached inputs are checked against that manifest before use. Otherwise Packager downloads the pinned Electron release. No native Windows/Linux execution is implied by cross-packaging on a Mac.
 
 ## Model scope
 
