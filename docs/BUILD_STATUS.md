@@ -14,7 +14,7 @@ Native development inspection showed the irregular roots, extensive buried fire,
 
 Verified copies are in `~/Downloads/Zombie Fire Sim/v0.9.0/`. Mac universal architecture, strict signatures, clean ZIP extraction and DMG integrity passed; Windows/Linux executable architectures and archives passed integrity checks. The bundles include 67 production-dependency notices. Mac signing is ad-hoc, not notarized; Windows is unsigned, and Windows/Linux downloads are portable. Native execution on an Intel Mac and Windows/Linux ARM devices has not been verified.
 
-The Mac was locked when the installed-app update was attempted. **Version 0.8 remains installed in `~/Applications`; installation and native review of the packaged 0.9 build are pending an unlocked session.** Development-native rendering and the production desktop smoke passed before packaging. The independent Stage 2 Blender edit remains preserved and excluded from these commits.
+After the Mac was unlocked, the paused 0.8 app was closed and preserved intact in `work/installed-backup-0.8/`. The checksum-verified 0.9 universal ZIP was extracted cleanly into `~/Applications/Zombie Fire Suppression Sim.app`; the installed bundle reports 0.9.0 and passes strict deep code-signature verification. The native installed window opens directly in the studio and displays the 0.9 scene. Playback inspection confirmed the cap seated on the ice, irregular deep roots, broad buried peat bed and ground opening. Development-native rendering and the production desktop smoke also passed before packaging. The independent Stage 2 Blender edit remains preserved and excluded from these commits.
 
 ## Seated cap, bonded soil and bur oak (2026-09-26, version 0.8.0)
 
