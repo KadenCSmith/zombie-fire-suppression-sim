@@ -25,6 +25,7 @@ let mainWindow;
 let appOrigin;
 let requestedWorkspace = workspaceFromArguments(process.argv);
 function workspaceFromArguments(args) {
+  if (args.includes('--coupled')) return 'coupled';
   if (args.includes('--mechanics')) return 'mechanics';
   if (args.includes('--simulation')) return 'simulation';
   if (args.includes('--studio')) return 'study';
@@ -32,8 +33,8 @@ function workspaceFromArguments(args) {
 }
 function sendWorkspaceRequest() {
   if (!requestedWorkspace || !mainWindow || mainWindow.isDestroyed()) return;
-  // Only these three fixed values can reach the renderer, never arbitrary CLI text.
-  const target = requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
+  // Only these four fixed values can reach the renderer, never arbitrary CLI text.
+  const target = requestedWorkspace === 'coupled' ? 'coupled' : requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
   mainWindow.webContents.executeJavaScript(`window.dispatchEvent(new CustomEvent('workspace-request', {detail: '${target}'}))`).catch(console.error);
 }
 

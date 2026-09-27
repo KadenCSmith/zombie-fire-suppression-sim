@@ -33,3 +33,9 @@ jobs:
         # GitHub's ephemeral Linux runner restricts the Chromium namespace sandbox.
         # This flag is confined to the CI process; shipped launchers keep it enabled.
         run: xvfb-run -a npx electron --no-sandbox scripts/smoke-desktop.cjs
+      - name: Coupled scenario, replay and cancellation (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-coupled.cjs
+      - name: Coupled scenario (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-coupled.cjs

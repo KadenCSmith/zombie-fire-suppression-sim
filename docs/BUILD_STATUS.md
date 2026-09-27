@@ -1,5 +1,15 @@
 # Build status and handoff
 
+## Coupled continuum integration (2026-09-27, 0.11.0 development)
+
+New 3D phase-aware finite-volume transport and heterogeneous initialized brick FEM share a canonical 8 × 8 × 3.2 m scenario. Gas enthalpy, finite source energy, water phase equilibrium, conservative mass/species balances, two-way pore-volume/pressure-work feedback, embedded root trusses and an experimental spatial phase field are implemented. See [equations, parameter evidence and exact limits](COUPLED_MODEL.md) and [resumable implementation record](COUPLED_IMPLEMENTATION.md). The independently modified Blender file remains excluded and unchanged.
+
+The first full integration passed typecheck, lint, **126 tests in 20 files** and production build. Native coupled smoke passed worker calculation, replay, input invalidation, workspace retention and cancellation. The first measured native preview samples were 85–120 fps, cancellation <=102 ms at 100 ms polling resolution, and summed process working sets peaked near 700 MB (shared/GPU allocation caveats apply). Analytical consolidation amplitude errors decreased 0.51% → 0.19% → 0.071% with combined mesh/timestep refinement. These are numerical/software results, not matched experimental validation. Final refinements, release-source and installation checks will be recorded separately.
+
+`examples/coupledValidation.json`, `coupledNativeBenchmark.json` and `coupledOptimizationBenchmark.json` record actual solver experiments. Float64 intact-law/gather optimization preserved displacement to <1.5e-16 m and pressure to <9e-11 Pa in compared 10 s scenarios, reducing median elapsed time roughly 30–38%. C++ applies the same tested operator faster in larger batches, but per-call process transfer is not a production acceleration backend. WebGPU is present on Apple/Metal, without an exposed float64 shader feature; no GPU solver has been substituted. The local wasm32 compiler has no wasm-ld linker, so WASM acceleration remains unmeasured.
+
+Known implementation gaps include cap shell/contact coupling, a resolved borehole conduit, finite deformation/sharp fracture contact, liquid flow/ice heave, char/pyrolysis and calibrated rate-dependent peat failure. Spatial damage is not experimentally validated and can stop on pressure-controlled instability. These gaps are visible in the application; no completed field rupture or treatment-success claim is made.
+
 ## Model workbench (2026-09-26, version 0.10.0)
 
 The model selector now distinguishes the preserved terrain demonstration, existing porous gas/heat workspace and new soil-mechanics benchmark. The paired fixture runs explicit elasticity and frictional plasticity with identical inputs and load/unload stages. Calculated displacement, incremental stress, plastic strain, mesh inspection, shared orthographic camera/color scale, unit-bearing sliders, resets, worker cancellation, stored replay and JSON export are implemented. Physical edits invalidate prior results. See [audit, equations and implementation sequence](MODEL_WORKBENCH.md) and [separate parameter evidence](WORKBENCH_PARAMETER_EVIDENCE.md).

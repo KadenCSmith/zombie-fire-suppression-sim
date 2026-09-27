@@ -1,0 +1,241 @@
+{
+  "createdAt": "2026-09-27T07:17:34.040Z",
+  "host": {
+    "cpu": "Apple M3 Pro",
+    "node": "v26.8.2",
+    "physicalMemoryBytes": 38654705664
+  },
+  "acceptance": {
+    "massRelative": 1e-9,
+    "thermalEnergyRelative": 1e-8,
+    "equilibriumN": 0.0001,
+    "consolidationAmplitudeError": 0.03,
+    "consolidationRefinement": "strictly decreasing"
+  },
+  "sourceHashes": {
+    "model": "5771beb5d36481a3e016f265bf20a29acfd13d679e3e7d642be118a23b707a38",
+    "mechanics": "bc221f96eced51f4f8c49daafdac820079515691399e5e33669eacf9af61baad",
+    "thermodynamics": "783e476e347de2e38ca4363f9adb118ec3e7a36981cee1cb818baecd97f1a73f",
+    "engine": "70fc5616057fc5e413fabe13027dd31b39f9d4d3b3bf7e1edb8cc89198113e82",
+    "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd"
+  },
+  "consolidation": [
+    {
+      "nz": 4,
+      "dt": 1,
+      "solveMs": 225.656958,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.5091990267954145,
+      "relativeAmplitudeError": 0.005091990267954145,
+      "rmsErrorPa": 0.3711215197191197,
+      "mechanicalResidualN": 2.861146208843479e-9,
+      "massResidualKg": 0,
+      "energyResidualJ": -1.862645149230957e-9,
+      "mechanicalWorkResidualJ": -1.9563645021607743e-10
+    },
+    {
+      "nz": 8,
+      "dt": 0.5,
+      "solveMs": 877.01075,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.19055375481737258,
+      "relativeAmplitudeError": 0.0019055375481737257,
+      "rmsErrorPa": 0.1401991055340981,
+      "mechanicalResidualN": 4.777125361954404e-10,
+      "massResidualKg": -2.2737367544323206e-13,
+      "energyResidualJ": -3.166496753692627e-8,
+      "mechanicalWorkResidualJ": -1.0350899909804668e-10
+    },
+    {
+      "nz": 16,
+      "dt": 0.25,
+      "solveMs": 2953.5681250000002,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.07132985629998245,
+      "relativeAmplitudeError": 0.0007132985629998245,
+      "rmsErrorPa": 0.05572007040881313,
+      "mechanicalResidualN": 5.226569732563746e-10,
+      "massResidualKg": 2.2737367544323206e-13,
+      "energyResidualJ": -2.60770320892334e-8,
+      "mechanicalWorkResidualJ": 4.901032265826132e-10
+    }
+  ],
+  "fracture": [
+    {
+      "n": 4,
+      "ell": 0.25,
+      "spacing": 0.25,
+      "elapsedMs": 56.91075000000001,
+      "status": "complete",
+      "fractureJ": 0.000008122621033008105,
+      "maxDamage": 0.0014972689278230083,
+      "maxStrain": 0.00042990565179566525,
+      "residualN": 6.966556043153105e-8,
+      "damagedCells": []
+    },
+    {
+      "n": 6,
+      "ell": 0.25,
+      "spacing": 0.16666666666666666,
+      "elapsedMs": 194.03370799999993,
+      "status": "complete",
+      "fractureJ": 0.000021006443843609915,
+      "maxDamage": 0.003218080087690467,
+      "maxStrain": 0.0005651064673150895,
+      "residualN": 0.0000013411504902194338,
+      "damagedCells": []
+    },
+    {
+      "n": 8,
+      "ell": 0.25,
+      "spacing": 0.125,
+      "elapsedMs": 485.5778330000003,
+      "status": "complete",
+      "fractureJ": 0.000023173284657318824,
+      "maxDamage": 0.003844693442640056,
+      "maxStrain": 0.0006109543200607383,
+      "residualN": 0.0000017676774977104515,
+      "damagedCells": []
+    }
+  ],
+  "performanceRecords": [
+    {
+      "fidelity": "preview",
+      "samples": [
+        {
+          "setupMs": 30.91112499999963,
+          "solveMs": 433.4869170000002,
+          "rssBytes": 195280896
+        },
+        {
+          "setupMs": 28.23474999999962,
+          "solveMs": 434.7417090000008,
+          "rssBytes": 196739072
+        },
+        {
+          "setupMs": 56.89666699999998,
+          "solveMs": 431.6409169999997,
+          "rssBytes": 198672384
+        }
+      ],
+      "simulatedS": 10,
+      "maxPressurePa": 101383.23834371912,
+      "maxTemperatureK": 543.2320881533055,
+      "dryIceKg": 3.99990325960342,
+      "ledger": {
+        "energyResidualJ": 0.000001430511474609375,
+        "massResidualKg": 8.731149137020111e-11,
+        "speciesResidualMol": [
+          4.547473508864641e-13,
+          -6.8833827526759706e-15,
+          8.185452315956354e-12,
+          4.423782229423523e-9
+        ],
+        "boundaryEnergyOutJ": -532.4044877907867,
+        "heaterJ": 0,
+        "pressureWorkJ": 18.918342737148564,
+        "reactionJ": 109613.5392108298,
+        "boundaryMassOutKg": 0.00014953198742451748,
+        "maxPoreRe": 0.00017441840669114853,
+        "maxMach": 2.8267353302645997e-7,
+        "pressureResidualMol": 6.669402443509886e-11,
+        "steps": 5,
+        "rejectedSteps": 0
+      },
+      "mechanicalBalanceJ": 1.5001329976946538e-9,
+      "geostaticResidualN": 8.49468051455915e-10
+    },
+    {
+      "fidelity": "engineering",
+      "samples": [
+        {
+          "setupMs": 109.39683299999979,
+          "solveMs": 3265.9842089999993,
+          "rssBytes": 210092032
+        },
+        {
+          "setupMs": 106.82050000000163,
+          "solveMs": 3201.5915829999994,
+          "rssBytes": 227295232
+        },
+        {
+          "setupMs": 120.10079199999927,
+          "solveMs": 3223.1861660000013,
+          "rssBytes": 230866944
+        }
+      ],
+      "simulatedS": 10,
+      "maxPressurePa": 101371.40649748812,
+      "maxTemperatureK": 543.2447159179983,
+      "dryIceKg": 3.9999139306459126,
+      "ledger": {
+        "energyResidualJ": -0.00000667572021484375,
+        "massResidualKg": 1.4551915228366852e-10,
+        "speciesResidualMol": [
+          -2.0463630789890885e-12,
+          1.509903313490213e-14,
+          -2.864908310584724e-11,
+          6.984919309616089e-9
+        ],
+        "boundaryEnergyOutJ": -344.62082615893166,
+        "heaterJ": 0,
+        "pressureWorkJ": 17.489979133830698,
+        "reactionJ": 97434.82675163796,
+        "boundaryMassOutKg": 0.00015597904567507155,
+        "maxPoreRe": 0.00014363916405227593,
+        "maxMach": 2.4629321106674346e-7,
+        "pressureResidualMol": 7.073620416622392e-11,
+        "steps": 10,
+        "rejectedSteps": 0
+      },
+      "mechanicalBalanceJ": 7.090724143504453e-10,
+      "geostaticResidualN": 7.4078343459405e-10
+    },
+    {
+      "fidelity": "research",
+      "samples": [
+        {
+          "setupMs": 280.74679200000173,
+          "solveMs": 16037.328292000002,
+          "rssBytes": 272531456
+        },
+        {
+          "setupMs": 306.96545799999876,
+          "solveMs": 15906.9585,
+          "rssBytes": 274300928
+        },
+        {
+          "setupMs": 289.450499999999,
+          "solveMs": 16258.710540999993,
+          "rssBytes": 305479680
+        }
+      ],
+      "simulatedS": 10,
+      "maxPressurePa": 101374.18052235835,
+      "maxTemperatureK": 543.2447131727636,
+      "dryIceKg": 3.9999167698160987,
+      "ledger": {
+        "energyResidualJ": 0.000002384185791015625,
+        "massResidualKg": 1.7462298274040222e-10,
+        "speciesResidualMol": [
+          -1.9554136088117957e-11,
+          -1.3988810110276972e-14,
+          8.458300726488233e-11,
+          7.683411240577698e-9
+        ],
+        "boundaryEnergyOutJ": -257.02235533521986,
+        "heaterJ": 0,
+        "pressureWorkJ": 20.249869413071547,
+        "reactionJ": 109590.32674901103,
+        "boundaryMassOutKg": 0.00010037997306512902,
+        "maxPoreRe": 0.00017345903622147105,
+        "maxMach": 2.780789339511366e-7,
+        "pressureResidualMol": 4.369607480752061e-11,
+        "steps": 20,
+        "rejectedSteps": 0
+      },
+      "mechanicalBalanceJ": 2.037105962363647e-10,
+      "geostaticResidualN": 9.89530235528946e-10
+    }
+  ]
+}

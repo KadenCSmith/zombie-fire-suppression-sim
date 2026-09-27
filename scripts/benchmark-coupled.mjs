@@ -1,0 +1,5 @@
+import {createServer} from 'vite';import {writeFile} from 'node:fs/promises';import {cpus,totalmem} from 'node:os';
+const server=await createServer({server:{middlewareMode:true,hmr:false},appType:'custom'});
+try{const {CoupledTransport,coupledScenario,DEFAULT_COUPLED}=await server.ssrLoadModule('/src/coupled/model.ts');const records=[];
+for(const fidelity of ['preview','engineering','research']){const s=coupledScenario({...DEFAULT_COUPLED,fidelity});const t=performance.now(),sim=new CoupledTransport(s);const setupMs=performance.now()-t;const start=performance.now();sim.advance(10);records.push({fidelity,cells:sim.n,setupMs,solveMs:performance.now()-start,ledger:sim.ledger,dryIceKg:sim.dryIce,maxTemperature:Math.max(...sim.temperature),maxPressure:Math.max(...sim.pressure),memory:process.memoryUsage()});console.log(records.at(-1));}
+await writeFile('examples/coupledBenchmark.json',JSON.stringify({date:new Date().toISOString(),host:{cpu:cpus()[0].model,memory:totalmem(),node:process.version},records},null,2)+'\n');}finally{await server.close()}

@@ -1,0 +1,56 @@
+{
+  "createdAt": "2026-09-27T07:14:21.952Z",
+  "notes": "Actual 10-second coupled scenario. Three alternating before/after runs, includes setup. Float64 gather reuse and intact linear constitutive evaluation. Reference snapshot is archived by the first integration commit.",
+  "hashes": {
+    "work/coupled-before/mechanics.ts": "d7648e5543175f68d6953945b0063b583e08bc1c9969d0703c693dfd3bd0a2d8",
+    "src/coupled/mechanics.ts": "bc221f96eced51f4f8c49daafdac820079515691399e5e33669eacf9af61baad"
+  },
+  "records": [
+    {
+      "fidelity": "preview",
+      "samples": [
+        {
+          "beforeMs": 752.954833,
+          "afterMs": 521.524125,
+          "maxDisplacementErrorM": 1.497414490309306e-16,
+          "maxPressureErrorPa": 4.3655745685100555e-11
+        },
+        {
+          "beforeMs": 733.6927499999999,
+          "afterMs": 518.6598329999999,
+          "maxDisplacementErrorM": 1.497414490309306e-16,
+          "maxPressureErrorPa": 4.3655745685100555e-11
+        },
+        {
+          "beforeMs": 688.568792,
+          "afterMs": 471.7545839999998,
+          "maxDisplacementErrorM": 1.497414490309306e-16,
+          "maxPressureErrorPa": 4.3655745685100555e-11
+        }
+      ]
+    },
+    {
+      "fidelity": "engineering",
+      "samples": [
+        {
+          "beforeMs": 5617.517084000001,
+          "afterMs": 3491.598417000001,
+          "maxDisplacementErrorM": 6.615327318056086e-17,
+          "maxPressureErrorPa": 8.731149137020111e-11
+        },
+        {
+          "beforeMs": 5717.031792000002,
+          "afterMs": 3373.4480839999997,
+          "maxDisplacementErrorM": 6.615327318056086e-17,
+          "maxPressureErrorPa": 8.731149137020111e-11
+        },
+        {
+          "beforeMs": 5650.776374999998,
+          "afterMs": 3519.869666999999,
+          "maxDisplacementErrorM": 6.615327318056086e-17,
+          "maxPressureErrorPa": 8.731149137020111e-11
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "date": "2026-09-27T06:59:21.059Z",
+  "host": {
+    "cpu": "Apple M3 Pro",
+    "memory": 38654705664,
+    "node": "v26.8.2"
+  },
+  "records": [
+    {
+      "fidelity": "preview",
+      "cells": 256,
+      "setupMs": 5.379417000000018,
+      "solveMs": 24.88250000000002,
+      "ledger": {
+        "energyResidualJ": 0.0000019073486328125,
+        "massResidualKg": -2.9103830456733704e-11,
+        "speciesResidualMol": [
+          3.751665644813329e-12,
+          -2.6645352591003757e-15,
+          -4.547473508864641e-13,
+          -5.3551048040390015e-9
+        ],
+        "boundaryEnergyOutJ": 1451.844077472383,
+        "heaterJ": 0,
+        "pressureWorkJ": 0,
+        "reactionJ": 109565.57159272181,
+        "boundaryMassOutKg": 0.01868660281988846,
+        "maxPoreRe": 0.030998633056434157,
+        "maxMach": 0.000052979013955297417,
+        "pressureResidualMol": 8.355392766556946e-11,
+        "steps": 5,
+        "rejectedSteps": 0
+      },
+      "dryIceKg": 3.9995787707081636,
+      "maxTemperature": 543.2006024555415,
+      "maxPressure": 101417.79830095834,
+      "memory": {
+        "rss": 129236992,
+        "heapTotal": 58621952,
+        "heapUsed": 34643840,
+        "external": 7325781,
+        "arrayBuffers": 1201712
+      }
+    },
+    {
+      "fidelity": "engineering",
+      "cells": 864,
+      "setupMs": 7.550874999999991,
+      "solveMs": 107.85458299999999,
+      "ledger": {
+        "energyResidualJ": -9.5367431640625e-7,
+        "massResidualKg": -3.2014213502407074e-10,
+        "speciesResidualMol": [
+          -4.206412995699793e-12,
+          0,
+          2.2737367544323206e-11,
+          -1.7229467630386353e-8
+        ],
+        "boundaryEnergyOutJ": 1671.0840443724942,
+        "heaterJ": 0,
+        "pressureWorkJ": 0,
+        "reactionJ": 97386.39817160631,
+        "boundaryMassOutKg": 0.01887933374511099,
+        "maxPoreRe": 0.04797454181945088,
+        "maxMach": 0.00008267891463270944,
+        "pressureResidualMol": 9.194709577053928e-11,
+        "steps": 10,
+        "rejectedSteps": 0
+      },
+      "dryIceKg": 3.9995774380976936,
+      "maxTemperature": 543.297337901513,
+      "maxPressure": 101416.49116496078,
+      "memory": {
+        "rss": 135086080,
+        "heapTotal": 59670528,
+        "heapUsed": 34798800,
+        "external": 8031189,
+        "arrayBuffers": 1907080
+      }
+    },
+    {
+      "fidelity": "research",
+      "cells": 2048,
+      "setupMs": 12.372915999999975,
+      "solveMs": 457.314875,
+      "ledger": {
+        "energyResidualJ": 0.00000667572021484375,
+        "massResidualKg": 3.2014213502407074e-10,
+        "speciesResidualMol": [
+          8.526512829121202e-12,
+          -1.7985612998927536e-14,
+          -2.4556356947869062e-11,
+          1.816079020500183e-8
+        ],
+        "boundaryEnergyOutJ": 2315.6050430012774,
+        "heaterJ": 0,
+        "pressureWorkJ": 0,
+        "reactionJ": 109533.05585704953,
+        "boundaryMassOutKg": 0.024048246008945943,
+        "maxPoreRe": 0.0859071841343545,
+        "maxMach": 0.0001524561530039544,
+        "pressureResidualMol": 6.885697914627009e-11,
+        "steps": 20,
+        "rejectedSteps": 0
+      },
+      "dryIceKg": 3.9994161893197178,
+      "maxTemperature": 543.2971654424703,
+      "maxPressure": 101417.21898776408,
+      "memory": {
+        "rss": 139165696,
+        "heapTotal": 62029824,
+        "heapUsed": 29110088,
+        "external": 8402381,
+        "arrayBuffers": 2278272
+      }
+    }
+  ]
+}

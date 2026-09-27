@@ -1,3 +1,4 @@
+import type { CoupledSession } from './ui/CoupledWorkspace'
 import type { TensileSession } from './ui/PeatTensionLab'
 import { ModelSelector, type PhysicsWorkspace } from './ui/ModelSelector'
 import type { MechanicsSession } from './ui/MechanicsWorkspace'
@@ -45,6 +46,7 @@ type Tab = 'setup' | 'simulation' | 'results' | 'event' | 'developer'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
+const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
 const MechanicsWorkspace = lazy(() => import('./ui/MechanicsWorkspace'))
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
 
@@ -183,7 +185,8 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 
 function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
-  const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => new URLSearchParams(window.location.search).get('workspace') === 'mechanics' ? 'mechanics' : new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
+  const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => new URLSearchParams(window.location.search).get('workspace') === 'coupled' ? 'coupled' : new URLSearchParams(window.location.search).get('workspace') === 'mechanics' ? 'mechanics' : new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : new URLSearchParams(window.location.search).get('workspace') === 'study' ? 'study' : 'coupled')
+  const coupledSession = useRef<CoupledSession | undefined>(undefined)
   const tensileSession = useRef<TensileSession | undefined>(undefined)
   const mechanicsSession = useRef<MechanicsSession | undefined>(undefined)
   const mechanicsCamera = useRef<CameraMemory | undefined>(undefined)
@@ -645,7 +648,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics') return
+      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -658,6 +661,7 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
+  if (workspace === 'coupled') return <Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense>
   if (workspace === 'mechanics') return <Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense>
 
   if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
