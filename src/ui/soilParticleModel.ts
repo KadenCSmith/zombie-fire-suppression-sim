@@ -2,29 +2,32 @@
  * about a supported state. This is not calibrated DEM/peridynamics or gas CFD. */
 import { STUDY_GRAVITY, STUDY_RELEASE_TIME, STUDY_SOURCE, studyTime } from './studyModel'
 export const SOIL_GRID = { nx: 49, ny: 25, left: -4, bottom: -3.2, width: 8, height: 3.2 }
+export const WIDE_PEAT = { x: 0, y: -1.5, rx: 3.35, ry: 0.65 }
 export const BURIED_PEAT = { x: 1.35, y: -1.65, rx: 1.2, ry: 0.5 }
 export type SoilParticleOptions = { pressurePa: number; densityGradient: number; peatDensity: number }
 export const SOIL_PARTICLE_DEFAULTS: SoilParticleOptions = { pressurePa: 18000, densityGradient: 220, peatDensity: 300 }
-export function peatFraction(x: number, y: number) {
-  return ((x - BURIED_PEAT.x) / BURIED_PEAT.rx) ** 2 + ((y - BURIED_PEAT.y) / BURIED_PEAT.ry) ** 2 <= 1
+export function peatFraction(x: number, y: number, wide = false) {
+  const peat = wide ? WIDE_PEAT : BURIED_PEAT
+  return ((x - peat.x) / peat.rx) ** 2 + ((y - peat.y) / peat.ry) ** 2 <= 1
 }
-export function soilDensity(x: number, y: number, options = SOIL_PARTICLE_DEFAULTS) {
-  return peatFraction(x, y) ? options.peatDensity : 1050 + Math.max(0, -y) * options.densityGradient
+export function soilDensity(x: number, y: number, options = SOIL_PARTICLE_DEFAULTS, wide = false) {
+  return peatFraction(x, y, wide) ? options.peatDensity : 1050 + Math.max(0, -y) * options.densityGradient
 }
 /** Prescribed lateral pressure footprint widens and moves upward; this is an input,
  * not an emergent fracture direction and not a conserved gas inventory. */
-export function assumedPressure(x: number, y: number, age: number, peak: number) {
+export function assumedPressure(x: number, y: number, age: number, peak: number, wide = false) {
   if (age <= 0) return 0
-  const sx = 0.35 + Math.min(age, 3) * 0.9, sy = 0.2 + Math.min(age, 4) * 0.25
-  const centerY = STUDY_SOURCE[1] + Math.min(age, 4) * 0.24
-  const envelope = (1 - Math.exp(-age * 10)) * Math.exp(-age / 2.4)
+  const sx = wide ? 0.6 + Math.min(age, 4) * 1.35 : 0.35 + Math.min(age, 3) * 0.9
+  const sy = wide ? 0.35 + Math.min(age, 4) * 0.22 : 0.2 + Math.min(age, 4) * 0.25
+  const centerY = STUDY_SOURCE[1] + Math.min(age, 4) * (wide ? 0.37 : 0.24)
+  const envelope = (1 - Math.exp(-age * 10)) * Math.exp(-age / (wide ? 4.5 : 2.4))
   return peak * envelope * Math.exp(-(((x - STUDY_SOURCE[0]) / sx) ** 2) - ((y - centerY) / sy) ** 2)
 }
 export function shellPlacement(time: number) {
   const start = 4.35, initial = 0.65, seat = -2.04
   return Math.max(seat, initial - 0.5 * STUDY_GRAVITY * Math.max(0, studyTime(time) - start) ** 2)
 }
-export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEFAULTS) {
+export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEFAULTS, wide = false) {
   if (!Number.isFinite(options.pressurePa) || options.pressurePa < 0 || options.pressurePa > 30000 || !Number.isFinite(options.densityGradient) || options.densityGradient < 0 || options.densityGradient > 350 || !Number.isFinite(options.peatDensity) || options.peatDensity < 150 || options.peatDensity > 600) throw new Error('Unsupported particle scenario inputs.')
   const { nx, ny, left, bottom, width, height } = SOIL_GRID, count = nx * ny
   const dx = width / (nx - 1), dy = height / (ny - 1), volume = dx * dy
@@ -35,7 +38,7 @@ export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEF
     rest[n * 2] = x; rest[n * 2 + 1] = y
     active[n] = Math.abs(x - STUDY_SOURCE[0]) < 0.34 && y > -2.44 ? 0 : 1
     fixed[n] = j === 0 || i === 0 || i === nx - 1 ? 1 : 0
-    masses[n] = soilDensity(x, y, options) * volume
+    masses[n] = soilDensity(x, y, options, wide) * volume
   }
   const bonds: { a: number; b: number; length: number; k: number; critical: number; breakTime: number }[] = []
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
@@ -47,11 +50,11 @@ export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEF
       const b = nj * nx + ni
       if (!active[b]) continue
       const x = (rest[a * 2] + rest[b * 2]) / 2, y = (rest[a * 2 + 1] + rest[b * 2 + 1]) / 2
-      const peat = peatFraction(x, y), depth = Math.max(0, -y)
+      const peat = peatFraction(x, y, wide), depth = Math.max(0, -y)
       // Assumed effective stiffness/stretch; depth strengthens confinement.
       // Weaker vertical bonds represent bedding that favors horizontal openings.
-      bonds.push({ a, b, length: Math.hypot(di * dx, dj * dy), k: peat ? 9000 : 45000,
-        critical: ((peat ? 0.009 : 0.014) + 0.003 * depth) * (di === 0 ? 0.6 : 1), breakTime: Infinity })
+      bonds.push({ a, b, length: Math.hypot(di * dx, dj * dy), k: (peat ? 9000 : 45000) * (wide ? 0.65 : 1),
+        critical: ((peat ? 0.009 : 0.014) + 0.003 * depth) * (wide ? 0.65 + 0.7 * ((Math.sin(a * 12.9898 + b * 78.233) * 43758.5453 % 1 + 1) % 1) : di === 0 ? 0.6 : 1), breakTime: Infinity })
     }
   }
   const fps = 30, frameCount = 11 * fps + 1, substeps = 8, dt = 1 / (fps * substeps)
@@ -65,10 +68,10 @@ export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEF
       for (let n = 0; n < count; n++) {
         if (!active[n] || fixed[n]) continue
         const x = rest[n * 2], y = rest[n * 2 + 1], epsilon = 0.01
-        forces[n * 2] = -(assumedPressure(x + epsilon, y, age, options.pressurePa) - assumedPressure(x - epsilon, y, age, options.pressurePa)) / (2 * epsilon) * volume
-        forces[n * 2 + 1] = -(assumedPressure(x, y + epsilon, age, options.pressurePa) - assumedPressure(x, y - epsilon, age, options.pressurePa)) / (2 * epsilon) * volume
+        forces[n * 2] = -(assumedPressure(x + epsilon, y, age, options.pressurePa, wide) - assumedPressure(x - epsilon, y, age, options.pressurePa, wide)) / (2 * epsilon) * volume
+        forces[n * 2 + 1] = -(assumedPressure(x, y + epsilon, age, options.pressurePa, wide) - assumedPressure(x, y - epsilon, age, options.pressurePa, wide)) / (2 * epsilon) * volume
         // Distributed elastic confinement to the surrounding out-of-plane soil.
-        const confinement = 4500 + 3000 * Math.max(0, -y)
+        const confinement = wide ? 450 + 500 * Math.max(0, -y) : 4500 + 3000 * Math.max(0, -y)
         forces[n * 2] -= confinement * displacements[n * 2]
         forces[n * 2 + 1] -= confinement * displacements[n * 2 + 1]
       }
@@ -91,7 +94,7 @@ export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEF
         }
       }
       // One deforming cap mode: assumed fixed rim, spring stiffness, damping and mass.
-      const p = assumedPressure(STUDY_SOURCE[0], STUDY_SOURCE[1], age, options.pressurePa)
+      const p = assumedPressure(STUDY_SOURCE[0], STUDY_SOURCE[1], age, options.pressurePa, wide)
       capVelocity += (p * Math.PI * 0.32 ** 2 - 42000 * capPosition - 180 * capVelocity) / 8 * dt
       capPosition += capVelocity * dt
     }
@@ -106,7 +109,7 @@ export function buildSoilReplay(options: SoilParticleOptions = SOIL_PARTICLE_DEF
       energy[frame] += 0.5 * masses[n] * (velocity[n * 2] ** 2 + velocity[n * 2 + 1] ** 2)
     }
   }
-  return { rest, active, fixed, masses, bonds, count, fps, frameCount, frames, damage, cap, energy, options }
+  return { rest, active, fixed, masses, bonds, count, fps, frameCount, frames, damage, cap, energy, options, wide }
 }
 export type SoilReplay = ReturnType<typeof buildSoilReplay>
 export function soilFrame(replay: SoilReplay, time: number) {

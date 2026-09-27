@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { wholeSoilVertexFields } from './WideSoilScene'
+import { sampleSoil, type SoilReplay } from './soilParticleModel'
 import { soilVertexFields } from './FractureStudy'
 
 type Point = [number, number, number]
@@ -8,7 +10,7 @@ type Limb = { points: Point[]; radius: number; tip: number }
 const BASE: Point = [1.4, 0, -0.08]
 /** Illustrative young bur oak. Depth is a scenario assumption, not a growth model.
  * Every descending root starts at the root collar or a connected lateral. */
-export function oakStructure() {
+export function oakStructure(natural = false) {
   const wood: Limb[] = [{ points: [BASE, [1.43, 0.75, -0.09], [1.32, 1.4, -0.12], [1.51, 2.1, -0.14], [1.45, 3.18, -0.2]], radius: 0.19, tip: 0.015 }]
   const roots: Limb[] = []
   const tips: Point[] = []
@@ -53,7 +55,34 @@ export function oakStructure() {
       roots.push({ points: [p.toArray(), [p.x + side * 0.22, p.y - 0.04, p.z], end], radius: 0.022 - j * 0.0016, tip: 0.0015 })
     }
   }
-  return { wood, roots, tips }
+  return { wood, roots: natural ? naturalRoots() : roots, tips }
+}
+function naturalRoots(): Limb[] {
+  let seed = 81923
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+  const roots: Limb[] = []
+  for (let i = 0; i < 14; i++) {
+    const deep = i < 5, angle = random() * Math.PI * 2, reach = deep ? 0.45 + random() * 1.8 : 1.0 + random() * 1.65
+    const depth = deep ? 2.15 + random() * 0.7 : 0.2 + random() * 0.45
+    const points: Point[] = [BASE]
+    for (let j = 1; j <= 7; j++) {
+      const t = j / 7, wander = Math.sin(t * Math.PI) * (random() - 0.5) * 0.38
+      points.push([1.4 + Math.cos(angle) * reach * t + wander, -depth * t + Math.sin(t * Math.PI) * (random() - 0.5) * 0.22,
+        i < 4 || i % 3 === 0 ? 0.09 + wander * 0.025 : -0.08 - Math.abs(Math.sin(angle)) * reach * t])
+    }
+    const root = { points, radius: deep ? 0.08 + random() * 0.045 : 0.045 + random() * 0.07, tip: 0.004 + random() * 0.008 }
+    roots.push(root)
+    const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)))
+    for (let j = 0; j < 6 + Math.floor(random() * 8); j++) {
+      const t = 0.16 + random() * 0.78, p = curve.getPoint(t), side = random() < 0.5 ? -1 : 1
+      const length = 0.15 + random() * 0.58, drop = 0.07 + random() * 0.31
+      const end: Point = [p.x + side * length, p.y - drop, p.z + (random() - 0.5) * 0.04]
+      roots.push({ points: [p.toArray(), [p.x + side * length * 0.45, p.y - drop * 0.2, p.z + 0.01], end], radius: 0.012 + (1 - t) * 0.015, tip: 0.0015 })
+      if (random() > 0.4) roots.push({ points: [end, [end[0] + side * 0.1, end[1] - 0.08, end[2]], [end[0] + side * (0.12 + random() * 0.13), end[1] - 0.13, end[2]]], radius: 0.004, tip: 0.0008 })
+    }
+  }
+  roots.forEach(root => root.points.forEach(p => { p[0] = THREE.MathUtils.clamp(p[0], -3.85, 3.85); p[1] = Math.max(-3.05, p[1]) }))
+  return roots
 }
 function taperedGeometry(limbs: Limb[]) {
   const parts = limbs.map(limb => {
@@ -86,26 +115,26 @@ function oakLeaf() {
   for (let i = 0; i < p.count; i++) p.setZ(i, 0.08 * Math.sin(p.getY(i) * Math.PI) - p.getX(i) ** 2 * 0.5)
   geometry.computeVertexNormals(); return geometry
 }
-export function OakTree({ soilTexture }: { soilTexture: THREE.DataTexture }) {
+export function OakTree({ soilTexture, replay, time = 0, natural = false }: { soilTexture: THREE.DataTexture; replay?: SoilReplay; time?: number; natural?: boolean }) {
   const foliage = useRef<THREE.InstancedMesh>(null)
-  const data = useMemo(() => oakStructure(), [])
+  const data = useMemo(() => oakStructure(natural), [natural])
   const geometry = useMemo(() => ({ wood: taperedGeometry(data.wood), roots: taperedGeometry(data.roots), leaf: oakLeaf() }), [data])
   const materials = useMemo(() => {
     const bark = new THREE.MeshStandardMaterial({ color: '#766046', roughness: 0.97 })
     const root = bark.clone()
     const addBark = (material: THREE.MeshStandardMaterial, underground: boolean) => {
       material.onBeforeCompile = shader => {
-        shader.vertexShader = 'varying vec3 vOak;\n' + (underground ? soilVertexFields : '') + shader.vertexShader
+        shader.vertexShader = 'varying vec3 vOak;\n' + (underground ? natural ? wholeSoilVertexFields : soilVertexFields : '') + shader.vertexShader
         shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvOak = position;\n' + (underground ? 'transformed.xy += soilOffset(position);' : ''))
         if (underground) shader.uniforms.uSoilField = { value: soilTexture }
         shader.fragmentShader = 'varying vec3 vOak;\n' + shader.fragmentShader
         shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\nfloat grain = sin(vOak.x*140.0 + sin(vOak.y*11.0)*1.2) * sin(vOak.z*135.0 + vOak.y*2.0);\ndiffuseColor.rgb *= 0.77 + 0.23*smoothstep(-0.5,0.8,grain);')
       }
-      material.customProgramCacheKey = () => `oak-bark-${underground}`
+      material.customProgramCacheKey = () => `oak-bark-${underground}-${natural}`
     }
     addBark(bark, false); addBark(root, true)
     return { bark, root }
-  }, [soilTexture])
+  }, [soilTexture, natural])
   useLayoutEffect(() => {
     const object = new THREE.Object3D()
     data.tips.forEach((tip, k) => {
@@ -121,11 +150,12 @@ export function OakTree({ soilTexture }: { soilTexture: THREE.DataTexture }) {
     if (foliage.current) { foliage.current.instanceMatrix.needsUpdate = true; if (foliage.current.instanceColor) foliage.current.instanceColor.needsUpdate = true }
   }, [data])
   useEffect(() => () => { Object.values(geometry).forEach(g => g.dispose()); Object.values(materials).forEach(m => m.dispose()) }, [geometry, materials])
+  const ground = replay && natural ? sampleSoil(replay, BASE[0], BASE[1], time) : [0, 0]
   return <group>
-    <mesh geometry={geometry.wood} material={materials.bark} castShadow receiveShadow />
-    <mesh geometry={geometry.roots} material={materials.root} receiveShadow />
+    <group position={[ground[0], ground[1], 0]}><mesh geometry={geometry.wood} material={materials.bark} castShadow receiveShadow />
     <instancedMesh ref={foliage} args={[geometry.leaf, undefined, data.tips.length * 36]} castShadow receiveShadow frustumCulled={false}>
       <meshStandardMaterial roughness={0.86} side={THREE.DoubleSide} />
-    </instancedMesh>
+    </instancedMesh></group>
+    <mesh geometry={geometry.roots} material={materials.root} receiveShadow />
   </group>
 }

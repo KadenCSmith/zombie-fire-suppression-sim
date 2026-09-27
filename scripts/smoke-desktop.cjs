@@ -49,7 +49,7 @@ app.on('browser-window-created', (_event, win) => {
         if (!document.body.textContent.includes('Ready / paused')) throw new Error('Solver did not pause cleanly');
         window.dispatchEvent(new CustomEvent('workspace-request', {detail: 'study'}));
         await waitFor(() => document.body.textContent.includes('One landscape. Four perspectives.'), 'scene studio');
-        await waitFor(() => document.body.textContent.includes('Smoldering core · unburnt peat surround'), 'buried peat asset');
+        await waitFor(() => document.body.textContent.includes('Extensive buried peat · smoldering'), 'wide buried peat asset');
         const canvas = document.querySelector('canvas');
         const gl = canvas?.getContext('webgl2');
         if (!gl || gl.isContextLost()) throw new Error('WebGL2 unavailable');
@@ -64,6 +64,16 @@ app.on('browser-window-created', (_event, win) => {
         document.querySelectorAll('.study-chapter')[2].click();
         await waitFor(() => document.body.textContent.includes('Concave cap · restrained rim') && document.body.textContent.includes('Assumed lateral gas load'), 'seated cap and gas load');
         if (Number(document.querySelector('#study-playhead').value) !== 9) throw new Error('Incorrect new release time');
+        document.querySelectorAll('.study-chapter')[3].click();
+        const speed = document.querySelector('select[aria-label="Playback speed"]');
+        speed.value = '2'; speed.dispatchEvent(new Event('change', {bubbles: true}));
+        button('Play illustrative sequence').click();
+        await waitFor(() => document.body.textContent.includes('Small surface fire · staged'), 'staged surface outlet');
+        button('Pause illustrative playback')?.click();
+        document.querySelectorAll('.study-chapter')[0].click();
+        await waitFor(() => Number(document.querySelector('#study-playhead').value) === 0, 'wide scene rewind');
+        if (document.body.textContent.includes('Small surface fire · staged')) throw new Error('Surface fire persisted after rewind');
+        if (!document.body.textContent.includes('Bur oak · irregular deep roots')) throw new Error('Irregular oak roots missing');
         await chooseVersion('0.6');
         document.querySelectorAll('.study-chapter')[2].click();
         await waitFor(() => document.body.textContent.includes('CO₂ expansion · visual tracers'), 'instant conversion at 9 seconds');
@@ -82,6 +92,8 @@ app.on('browser-window-created', (_event, win) => {
         if (!document.body.textContent.includes('Calculated debris motion')) throw new Error('Latest dynamics missing');
         await chooseVersion('0.8');
         if (!document.body.textContent.includes('Cap & bonded soil')) throw new Error('Bonded soil missing');
+        await chooseVersion('0.9');
+        if (!document.body.textContent.includes('Ground opening & broad peat fire')) throw new Error('Wide soil version missing');
         window.dispatchEvent(new CustomEvent('workspace-request', {detail: 'simulation'}));
         await waitFor(() => document.body.textContent.includes('0d 00h 02m'), 'preserved numerical run');
         button('Simulation versions').click();

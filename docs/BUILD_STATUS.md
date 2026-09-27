@@ -1,5 +1,13 @@
 # Build status and handoff
 
+## Broad opening, irregular roots and surface fire (2026-09-26, version 0.9.0)
+
+The latest scene replaces the horizontal bond markers with irregular soil pieces opening under a broader assumed load and weaker soil coefficients. The oak root network uses reproducible irregular directions, curves, depths and branches. A peat bed spans most of the section, with an unburnt margin and a narrow staged path to a small surface fire. Version 0.8 is retained alongside 0.5–0.7. [Model changes, display approximations and two additional peer-reviewed fire studies with ASCE references](WIDE_RUPTURE_FIRE.md).
+
+Typecheck, lint, all **106 tests in 16 files**, production build and local native desktop smoke passed. The three added tests cover broad surface motion/fixed supports/replay, zero and maximum loads, and irregular display-cell area/finite geometry. Default broad-scenario outputs are about 0.282 m peak surface uplift, 1,872 failed bonds, and 43 of 49 surface nodes lifted over 0.025 m at a stored frame. They are numerical results under assumed coefficients, not validated rupture.
+
+Native development inspection showed the irregular roots, extensive buried fire, separating ground and small surface flame. The smoke test exercises the late fire label, its removal on rewind, all five scene versions and preservation of the scientific 120 s state. Ground display motion now samples the field in the GPU, avoiding per-frame CPU interpolation for the large display mesh. Crack shapes/out-of-plane motion remain illustrative; fire growth is staged and not fed by CO₂ or coupled to combustion. Release verification follows when complete.
+
 ## Seated cap, bonded soil and bur oak (2026-09-26, version 0.8.0)
 
 Added a concave cap that drops onto the ice, assumed rim restraint and one calculated flex mode, a deeper lower-density peat lens with unburnt surround, and a young bur oak with connected lateral and descending roots to approximately 2.7 m. Soil motion comes from a 2D unit-thickness spring lattice with irreversible tensile bond failure under an **assumed** lateral/upward pressure footprint. Surface uplift is shown at the calculated scale. The scientific workspace and older scene versions remain separate and available. [Model, source rationale and ASCE references](CAP_SOIL_PARTICLES.md).
@@ -7,6 +15,13 @@ Added a concave cap that drops onto the ice, assumed rim restraint and one calcu
 Typecheck, lint, all **103 tests in 15 files**, production build and local native Electron smoke passed. New numerical checks cover zero load, cap seating, input bounds, finite results at 30 kPa, irreversible damage, fixed supports and reverse seeking. The default model gives 225 failed bonds, about 1.04 cm peak surface uplift and 10.92 cm peak cap deflection. These are assumed-scenario outputs, not experimental validation. Native development inspection confirmed the oak crown, deep connected roots, deeper peat, seated cap, damage markers and Roots & peat camera. The previous shallow peat cavity is visually filled. The independent Stage 2 Blender edit is preserved and excluded.
 
 Cap support/strength, gas flow, root reinforcement, moisture-dependent fracture and field containment are not validated or fully solved. Increasing density alone does not establish fracture direction. The current root depth is illustrative, informed by bur-oak rooting literature. Release checks are recorded separately when complete.
+
+### Version 0.8 release and installed-app checks
+
+[The private 0.8 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.8.0) is published. All nine uploaded asset sizes and SHA-256 digests match the local files built from `f3e7f16eedd0bfc0efb41b5525fa0cb1702127c4`. Mac universal architecture, strict signatures, clean ZIP extraction and DMG integrity passed; Windows/Linux executable architectures and archives passed integrity checks. Verified copies are in `~/Downloads/Zombie Fire Sim/v0.8.0/`. Mac signing is ad-hoc, not notarized; Intel Mac and Windows/Linux ARM native execution remain untested separately.
+
+All 103 tests, typecheck, lint, production builds and native desktop smoke passed on macOS, Windows and Ubuntu ([CI run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36295220330)). The installed 0.7 bundle was closed and preserved intact in `work/installed-backup-0.7/`; version 0.8 was extracted cleanly into `~/Applications` and passed strict signature verification. Native inspection showed the cap directly on the ice at 6 s in development and the deep-root/damaged-soil view in the installed app.
+
 
 ## Scene dynamics and version history (2026-09-26, version 0.7.0)
 

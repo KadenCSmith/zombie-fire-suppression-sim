@@ -1,8 +1,9 @@
 /** Presentation time is independent of every physical solver clock. */
 export type StudyView = 'cutaway' | 'thermal' | 'top' | 'root'
-export type StudyVersion = 'fracture' | 'dynamics' | 'release' | 'original'
+export type StudyVersion = 'rupture' | 'fracture' | 'dynamics' | 'release' | 'original'
 export const STUDY_VERSIONS = [
-  { id: 'fracture', title: '0.8 · Cap & bonded soil', subtitle: 'Latest · seated cap, deeper peat, particle separation' },
+  { id: 'rupture', title: '0.9 · Ground rupture & fire', subtitle: 'Latest · irregular roots, separating ground, broad peat fire' },
+  { id: 'fracture', title: '0.8 · Cap & bonded soil', subtitle: 'Earlier · seated cap, deeper peat, particle separation' },
   { id: 'dynamics', title: '0.7 · Gravity & contact', subtitle: 'Earlier · calculated debris motion, assumed release' },
   { id: 'release', title: '0.6 · Rapid gas release', subtitle: 'Earlier · authored expansion, fragments and cage' },
   { id: 'original', title: '0.5 · Original cooling study', subtitle: 'Earlier · gradual cooling and transport, no cage' },
@@ -62,7 +63,7 @@ export function studyAnimation(time: number, version: StudyVersion = 'release') 
   const releaseAge = Math.max(0, t - STUDY_RELEASE_TIME)
   return {
     // The exported sphere is already at its approved final position.
-    sourceOffsetY: (version === 'dynamics' || version === 'fracture') ? Math.max(0, 3.5 - 0.5 * STUDY_GRAVITY * Math.max(0, t - (4 - Math.sqrt(7 / STUDY_GRAVITY))) ** 2) : 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
+    sourceOffsetY: (version === 'dynamics' || version === 'fracture' || version === 'rupture') ? Math.max(0, 3.5 - 0.5 * STUDY_GRAVITY * Math.max(0, t - (4 - Math.sqrt(7 / STUDY_GRAVITY))) ** 2) : 3.5 * (1 - smoothPhase(t, 0, STUDY_LANDING_TIME)),
     sourceVisible: version === 'original' || t < STUDY_RELEASE_TIME,
     releaseAge,
     // Authored display radius, not a pressure front or gas-volume prediction.

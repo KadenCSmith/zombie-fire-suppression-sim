@@ -8,6 +8,10 @@ Choose **Open simulation** for the separate scientific workspace. Its default do
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
 
+## Broad ground opening and surface fire
+
+Version 0.9 replaces the short damage marks with irregular soil pieces that separate under a broader assumed load. The bur oak has uneven deep branching roots. A wide buried peat fire has an unburnt margin and a staged narrow path to a small surface fire. All earlier versions remain in the **⋯ menu**. [Mechanics assumptions, display choices and peer-reviewed fire evidence](docs/WIDE_RUPTURE_FIRE.md).
+
 ## Seated cap, deep roots and bonded soil
 
 Version 0.8 adds a concave cap falling directly onto the ice, an assumed restrained rim with calculated flex, spring-bond soil separation and slight surface uplift. The deeper peat pocket has an unburnt surround. A young bur oak has lobed leaves, lateral roots and descending roots to about 2.7 m. Loading, root dimensions and mechanical coefficients remain assumptions. The **⋯ menu** retains versions 0.5–0.8. [Model, research rationale and ASCE citations](docs/CAP_SOIL_PARTICLES.md).
@@ -26,7 +30,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.8.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.8.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download version 0.9.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.9.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
 [Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
 
@@ -51,7 +55,7 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.8.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.9.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 

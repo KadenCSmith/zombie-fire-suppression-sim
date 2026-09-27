@@ -177,7 +177,7 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 }
 
 function App() {
-  const [studyVersion, setStudyVersion] = useState<StudyVersion>('fracture')
+  const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
   const [workspace, setWorkspace] = useState<'study' | 'simulation'>(() => new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
   const initial = useMemo(() => createDefaultScenario(), [])
   const [scenario, setScenario] = useState<Scenario>(initial)
@@ -653,7 +653,7 @@ function App() {
 
   return <div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.8</span></small></div></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.9</span></small></div></div>
       <div className="topbar-center"><span className="research-badge"><Activity size={14} /> Exploratory animation — reduced, unvalidated physics</span></div>
       <div className="topbar-actions"><StudyVersions version={studyVersion} onSelect={next => { setStudyVersion(next); openStudy() }} /><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>

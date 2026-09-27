@@ -1,8 +1,12 @@
 # Scene studio
 
-Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. Version 0.7 calculates debris translation under gravity, drag and simplified contacts with an assumed release velocity. Gas and thermal displays remain authored. It is not connected to the scientific solver and does not calculate temperature, gas concentration, fracture or treatment success. The top-right ⋯ menu replays versions 0.5–0.8. See [dynamics, evidence and limitations](SCENE_DYNAMICS.md).
+Scene studio is the app's opening workspace. It presents the authored Blender landscape as an interactive 3D illustration, with four camera views and one shared 20-second sequence. Version 0.7 calculates debris translation under gravity, drag and simplified contacts with an assumed release velocity. Gas and thermal displays remain authored. It is not connected to the scientific solver and does not calculate temperature, gas concentration, fracture or treatment success. The top-right ⋯ menu replays versions 0.5–0.9. See [dynamics, evidence and limitations](SCENE_DYNAMICS.md).
 
-## Latest: 0.8 cap and bonded soil
+## Latest: 0.9 broad ground opening and fire
+
+The latest version uses an assumed weaker-soil scenario and wider load to move most of the cross-section. Irregular ground pieces open apart; the former short horizontal damage marks are absent. The oak roots have uneven direction, taper, depth and branching. The peat bed spans much of the scene and an authored narrow path reaches a small surface fire late in playback. This fire progression is not calculated combustion or a response predicted from the gas event. [Model, rendering and research evidence](WIDE_RUPTURE_FIRE.md).
+
+## Earlier: 0.8 cap and bonded soil
 
 The cap falls onto the ice and seats underground before the 9 s release. An assumed lateral/upward pressure footprint drives a 2D spring-bond particle section and a single cap deformation mode. The soil shows slight uplift and persistent bond-damage markers. A deeper peat lens centered at 1.65 m contains a smoldering core and unburnt surround. A procedural bur oak replaces the old tree, with shallow laterals and descending roots to about 2.7 m. Roots move visually with the soil field but provide no calculated reinforcement. **Roots & peat** frames the deeper section.
 
