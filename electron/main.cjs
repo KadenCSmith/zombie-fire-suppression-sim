@@ -97,8 +97,9 @@ async function createWindow() {
 
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   session.defaultSession.setPermissionCheckHandler(() => false);
+  const windowTitle = `Zombie Fire Suppression Sim ${app.getVersion()}`;
   mainWindow = new BrowserWindow({
-    title: 'Zombie Fire Suppression Sim',
+    title: windowTitle,
     width: 1600,
     height: 1000,
     minWidth: 1180,
@@ -111,6 +112,10 @@ async function createWindow() {
       sandbox: true,
       webSecurity: true,
     },
+  });
+  mainWindow.on('page-title-updated', event => {
+    event.preventDefault();
+    mainWindow.setTitle(windowTitle);
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

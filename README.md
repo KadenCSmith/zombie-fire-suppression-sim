@@ -45,14 +45,14 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download the 0.12.0 reference release**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) — choose the **macOS arm64 DMG** or ZIP for Apple Silicon. This unified release is not a universal Mac build. GitHub access is required while the repository is private; the packaged app works offline.
+[**Download the 0.13.0 accuracy release**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) — choose the **macOS arm64 DMG** or ZIP for Apple Silicon. This unified release is not a universal Mac build. GitHub access is required while the repository is private; the packaged app works offline.
 
-The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
+The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 
 Open a versioned reference installation:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.12.app" --args --coupled
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.13.app" --args --coupled
 ```
 
 From this checkout, `npm run mac -- --coupled` finds the installed minor version matching `package.json`. It checks the bundle version and preserves older installations. Mac requires macOS 13 or later; the app is ad-hoc signed and not Apple notarized.

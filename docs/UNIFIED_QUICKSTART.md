@@ -13,7 +13,7 @@ Open the versioned Mac app and start with the cold source-only case. The default
 
 The five grids retain old reference sizes and add 2,560 and 20,480 cells. All lab grids project a shared 20,480-voxel material atlas conservatively. Mesh changes preserve extensive inventories but can alter local averaged temperature, pressure and numerical error. More elements are not experimental proof of greater accuracy.
 
-Version 0.12 retains the element-by-element reference backend by default. Version 0.13 enables the matched float64 sparse elastic backend; the reference remains selectable through the exported/source inputs. Fracture continues to use its original research path and validity gates.
+Version 0.12 retains the element-by-element reference backend by default. Version 0.13 enables the matched float64 sparse elastic backend; the reference remains selectable under Numerical implementation. Both precision meshes use 0.125 s maximum steps, versus 0.5/0.25 s in 0.12. More steps can make the default slower even with a faster operator. Exported calculations record the application version, step limit and backend. Fracture continues to use its original research path and validity gates.
 
 ## Limits that remain
 

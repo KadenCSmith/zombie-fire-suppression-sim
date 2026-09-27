@@ -1,0 +1,17 @@
+# Native release verification
+
+27 September 2026. Root integration review on the user's Apple Silicon Mac.
+
+## Reference 0.12.0
+
+Frozen source: `1ec0710c4addc39f8aa1c06cf2a6b06840862d38`. The Mac arm64 ZIP and DMG were built from the committed source using the checked official Electron archive. Strict deep ad-hoc signature verification passed before and after clean ZIP extraction; architecture was verified as arm64; DMG integrity verification passed. These bundles are not Apple notarized.
+
+Installed beside older versions as `~/Applications/Zombie Fire Suppression Sim 0.12.app`; no older app was replaced. CUA launched the installed bundle and observed its native window, new lab controls, natural cutaway, detailed tree and irregular aggregates. The startup preset displayed 2,560 elements and 10 physical seconds. The installed app subsequently displayed a complete 10 s reference run. CUA saved its export through the native Save dialog into the task outputs. The 20 MB JSON contains 21 accepted frames, 2,560 values per scalar field, complete status and a 20.776 s reported solve; it passes the strict Blender cache validator. This establishes native saving rather than relying on the earlier IAB download-event timeout. Separate browser checks inspected replay/comparison/cancellation; see `ui.md`.
+
+GitHub verification for the reference commit passed macOS, Windows and Ubuntu checks, including both Electron smoke harnesses. This is CI execution, not a claim of shipped unified installers or native-device certification on all operating systems.
+
+The original independently edited Stage2 Blender file retains SHA-256 `e537ea14a6a75f83329675418bc565f1a4aa672da53011ec168581aa7531a638`.
+
+## Accuracy 0.13.0
+
+Packaging and native interaction checks follow the frozen reference and are recorded after they are completed. No native-run claim is made by this placeholder.

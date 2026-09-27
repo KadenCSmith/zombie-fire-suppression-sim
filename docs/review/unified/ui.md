@@ -41,3 +41,5 @@ User-facing screenshot artifacts are saved beside the repository in the task out
 ## Limits
 
 No interactive desktop performance FPS claim is made: demand rendering intentionally sleeps when the state and camera are unchanged. The browser checks do not establish native-package startup, experimental validation, or converged field predictions. The scientific solver and benchmark evidence are documented separately. The updated CI harness explicitly selects Preview, 10 seconds and Scientific mode so its runtime does not silently depend on the higher-resolution application default.
+
+Later root native-package review resolved the export observation: the installed 0.12 app saved a complete 2,560-cell/10 s JSON through the macOS Save dialog; its 21-frame export passed the strict Blender validator. See `native.md`.

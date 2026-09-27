@@ -8,7 +8,7 @@ import {advanceDryIceSource} from './source'
 import { R,T0,MOLAR,gasU,gasH,co2SolidU,equilibrate,saturationPressure,LF } from './thermodynamics'
 
 export type Fidelity = 'preview'|'engineering'|'research'|'precision2560'|'precision20480'
-export const PRESETS = {preview:{nx:8,ny:8,nz:4,maxStepS:2},engineering:{nx:12,ny:12,nz:6,maxStepS:1},research:{nx:16,ny:16,nz:8,maxStepS:0.5},precision2560:{nx:16,ny:16,nz:10,maxStepS:0.5},precision20480:{nx:32,ny:32,nz:20,maxStepS:0.25}} as const
+export const PRESETS = {preview:{nx:8,ny:8,nz:4,maxStepS:2},engineering:{nx:12,ny:12,nz:6,maxStepS:1},research:{nx:16,ny:16,nz:8,maxStepS:0.5},precision2560:{nx:16,ny:16,nz:10,maxStepS:0.125},precision20480:{nx:32,ny:32,nz:20,maxStepS:0.125}} as const
 export const TERRAIN_CASES = {
  'rooted-peat':{label:'Rooted peat',description:'An assumed organic lens with eight bonded axial root trusses.'},
  layered:{label:'Layered peat / mineral',description:'An assumed horizontal peat layer above mineral soil; no root reinforcement.'},
@@ -16,7 +16,7 @@ export const TERRAIN_CASES = {
 } as const
 export interface CoupledInputs {terrain?:keyof typeof TERRAIN_CASES;initialization?:'conservative'|'legacy';mechanicalBackend?:'reference'|'optimized';fidelity:Fidelity;durationS:number;dryIceKg:number;heaterW:number;moisture:number;permeabilityM2:number;reaction:boolean;mechanics:boolean;fracture:boolean;roots:boolean;cap:boolean;capRadiusM:number;capRiseM:number;capThicknessM:number;youngsPa:number;fractureEnergyJm2:number;lengthScaleM:number}
 export const DEFAULT_COUPLED:CoupledInputs={fidelity:'preview',durationS:120,dryIceKg:4,heaterW:0,moisture:0.2,permeabilityM2:8e-12,reaction:true,mechanics:true,fracture:false,roots:true,cap:true,capRadiusM:0.475,capRiseM:0.1,capThicknessM:0.005,youngsPa:1e6,fractureEnergyJm2:5,lengthScaleM:1}
-export const LAB_DEFAULT_COUPLED:CoupledInputs={...DEFAULT_COUPLED,fidelity:'precision2560',durationS:10,terrain:'rooted-peat',reaction:false}
+export const LAB_DEFAULT_COUPLED:CoupledInputs={...DEFAULT_COUPLED,fidelity:'precision2560',durationS:10,terrain:'rooted-peat',reaction:false,mechanicalBackend:'optimized'}
 export function coupledScenario(input:CoupledInputs):Scenario {
   const s=createDefaultScenario(),p=PRESETS[input.fidelity]
   s.name='Coupled oak-site continuum';s.domain={widthM:8,lengthM:8,depthM:3.2,nx:p.nx,ny:p.ny,nz:p.nz}

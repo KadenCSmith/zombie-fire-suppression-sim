@@ -134,4 +134,4 @@ The original element-by-element float64 mechanics implementation remains the
 0.12 reference. The 0.13 optimized sparse backend uses the same inputs and
 acceptance criteria; its numerical agreement and measured timings are recorded
 in [the optimization report](review/unified/optimization.md). Fracture keeps its
-original research path. No CUDA dependency is required.
+original research path. Both new precision meshes use 0.125 s maximum steps in 0.13. The additional steps reduce observed short-case temporal differences but can increase total runtime; matched backend speedups must not be confused with a release-to-release speedup. See the accuracy-release performance and convergence reports. No CUDA dependency is required.

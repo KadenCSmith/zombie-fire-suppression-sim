@@ -28,3 +28,11 @@ The natural cutaway follows the requested layered-soil/oak reference: 570 fixed-
 The original Blender study is preserved with commit/file provenance. The new importer maps accepted grid topology, units, source mass and checkpoint times into an editable derivative; scientific and natural vertices agree exactly. A five-checkpoint 2,560-cell example, rendered previews and labeled review clip accompany six passing Python contract tests.
 
 A completed browser reference run reached 10 s at 2,560 cells. Replay, previous-result restore, cancellation, terrain changes and synchronized views were inspected. Rendering uploads exposed faces only, reuses geometry buffers and sleeps when idle; this does not reduce solver element count. Full tests: 148 in 25 files, plus six Python tests; typecheck, lint and production build pass. Native packaging is verified separately.
+
+## Milestone 3: accuracy-focused defaults
+
+Version 0.12 freezes the reference operator with 0.5/0.25 s maximum steps on the 2,560/20,480 grids. Version 0.13 selects the independently checked sparse undamaged-elastic operator and 0.125 s maximum steps on both new grids. The original three presets and reference operator remain available. No conservation, force, phase-validity, strain or fracture gate changes. Finer temporal resolution means more solves; matched-operator speedup is not a claim that 0.13 defaults finish faster than 0.12.
+
+Independent short cold transport studies support the step reduction on both meshes. Source-loss differences against a 0.0625 s comparator fall from 0.961% to 0.141% at 2,560 cells, and from 0.363% to 0.122% at 20,480 cells. These percentages use sublimated mass as their denominator and are numerical differences, not field uncertainty. Spatial local outputs remain nonmonotonic; the mesh is not certified converged. Raw reports preserve source hashes and inputs.
+
+The source model couples finite radius/contact, sensible cooling, latent heat and composition-dependent Stefan film transfer with equilibrium vapor pressure and unchanged thermodynamic bounds. Empirical contact/diffusion coefficients remain assumptions. The Blender example separately records nine numerical-source hashes and holds five checkpoints from a 2 s cold calculation for a 2.5 s review clip. No fabricated continuous motion or source provenance is implied.
