@@ -1,32 +1,32 @@
 {
-  "createdAt": "2026-09-27T07:12:43.785Z",
+  "createdAt": "2026-09-27T07:39:51.764Z",
   "compiler": "Apple clang -O3 -ffp-contract=off; float64; no fast math",
   "notes": "Identical actual FEM operator; kernel timing and process/input/output wall time separately. Native executable is an experiment, not a shipped solver. Xcode clang wasm32 compiler available but wasm-ld linker missing; WebAssembly candidate not measured.",
   "records": [
     {
       "n": 4,
       "repeat": 100,
-      "tsMs": 4.974458999999996,
-      "nativeMs": 2.728458,
-      "nativeWallMs": 236.14016700000002,
+      "tsMs": 2.4199589999999773,
+      "nativeMs": 1.096042,
+      "nativeWallMs": 3.559584000000001,
       "payloadBytes": 14911,
       "maxError": 0
     },
     {
       "n": 8,
       "repeat": 100,
-      "tsMs": 46.501709000000005,
-      "nativeMs": 10.311875,
-      "nativeWallMs": 13.57529199999999,
+      "tsMs": 16.039999999999992,
+      "nativeMs": 10.314208,
+      "nativeWallMs": 13.558791000000014,
       "payloadBytes": 79603,
       "maxError": 0
     },
     {
       "n": 12,
       "repeat": 100,
-      "tsMs": 164.839833,
-      "nativeMs": 37.438375,
-      "nativeWallMs": 43.41758399999992,
+      "tsMs": 54.44241599999998,
+      "nativeMs": 36.970958,
+      "nativeWallMs": 42.924375,
       "payloadBytes": 250567,
       "maxError": 0
     }

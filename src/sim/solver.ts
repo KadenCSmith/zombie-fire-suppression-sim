@@ -144,7 +144,7 @@ export class Simulation {
   private cumulativeResolvedHeatExpectedJ = 0;
   private cumulativeResolvedHeatActualJ = 0;
 
-  constructor(scenario: Scenario) {
+  constructor(scenario: Scenario, initialization?: { phaseStateOwnedExternally: true }) {
     const result = validateScenario(scenario);
     if (!result.valid) throw new Error(`Invalid scenario: ${result.errors.join(' ')}`);
     this.scenario = JSON.parse(JSON.stringify(scenario)) as Scenario;
@@ -182,7 +182,7 @@ export class Simulation {
     this.heaterEnabled = scenario.source.enabled;
     this.heaterGenerationWm3 = scenario.source.heatGenerationWm3;
     this.initializeCells();
-    if (this.hasUnsupportedFrozenWater()) {
+    if (!initialization?.phaseStateOwnedExternally && this.hasUnsupportedFrozenWater()) {
       throw new Error('Initial liquid water is below 273.15 K; freezing and thawing are not modeled.');
     }
     this.buildFaces();

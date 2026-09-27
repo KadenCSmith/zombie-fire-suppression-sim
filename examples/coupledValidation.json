@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-09-27T07:17:34.040Z",
+  "createdAt": "2026-09-27T07:38:19.157Z",
   "host": {
     "cpu": "Apple M3 Pro",
     "node": "v26.8.2",
@@ -13,51 +13,91 @@
     "consolidationRefinement": "strictly decreasing"
   },
   "sourceHashes": {
-    "model": "5771beb5d36481a3e016f265bf20a29acfd13d679e3e7d642be118a23b707a38",
-    "mechanics": "bc221f96eced51f4f8c49daafdac820079515691399e5e33669eacf9af61baad",
-    "thermodynamics": "783e476e347de2e38ca4363f9adb118ec3e7a36981cee1cb818baecd97f1a73f",
-    "engine": "70fc5616057fc5e413fabe13027dd31b39f9d4d3b3bf7e1edb8cc89198113e82",
-    "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd"
+    "model": "6c7e81911be418e4c44ceb03a9d056169be3e317efbc277d4cf8d44aaf3d4236",
+    "mechanics": "681e07dcc3e86abfc61335ad7b35aea662330103287100a07b8d7178b9b320e8",
+    "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+    "engine": "34b3def9b362d9d2f9a5cef3816a9f3097af1b6bf2c54fcdd48c27329e733a2c",
+    "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+    "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
   },
   "consolidation": [
     {
       "nz": 4,
       "dt": 1,
-      "solveMs": 225.656958,
+      "solveMs": 164.61995800000003,
       "diffusivity": 0.010160217072172887,
-      "maxErrorPa": 0.5091990267954145,
-      "relativeAmplitudeError": 0.005091990267954145,
-      "rmsErrorPa": 0.3711215197191197,
-      "mechanicalResidualN": 2.861146208843479e-9,
+      "maxErrorPa": 0.5091990252674634,
+      "relativeAmplitudeError": 0.005091990252674634,
+      "rmsErrorPa": 0.3711215201417559,
+      "mechanicalResidualN": 2.8790014816593157e-9,
       "massResidualKg": 0,
-      "energyResidualJ": -1.862645149230957e-9,
-      "mechanicalWorkResidualJ": -1.9563645021607743e-10
+      "energyResidualJ": 0,
+      "mechanicalWorkResidualJ": -1.9563746720449148e-10
     },
     {
       "nz": 8,
       "dt": 0.5,
-      "solveMs": 877.01075,
+      "solveMs": 652.866833,
       "diffusivity": 0.010160217072172887,
-      "maxErrorPa": 0.19055375481737258,
-      "relativeAmplitudeError": 0.0019055375481737257,
-      "rmsErrorPa": 0.1401991055340981,
-      "mechanicalResidualN": 4.777125361954404e-10,
+      "maxErrorPa": 0.19055375657815432,
+      "relativeAmplitudeError": 0.0019055375657815433,
+      "rmsErrorPa": 0.1401991061916553,
+      "mechanicalResidualN": 4.6536541287167665e-10,
       "massResidualKg": -2.2737367544323206e-13,
       "energyResidualJ": -3.166496753692627e-8,
-      "mechanicalWorkResidualJ": -1.0350899909804668e-10
+      "mechanicalWorkResidualJ": -1.0350910247672383e-10
     },
     {
       "nz": 16,
       "dt": 0.25,
-      "solveMs": 2953.5681250000002,
+      "solveMs": 2134.524542,
       "diffusivity": 0.010160217072172887,
-      "maxErrorPa": 0.07132985629998245,
-      "relativeAmplitudeError": 0.0007132985629998245,
-      "rmsErrorPa": 0.05572007040881313,
-      "mechanicalResidualN": 5.226569732563746e-10,
+      "maxErrorPa": 0.07132985937043657,
+      "relativeAmplitudeError": 0.0007132985937043656,
+      "rmsErrorPa": 0.05572007061881102,
+      "mechanicalResidualN": 4.957036447983398e-10,
       "massResidualKg": 2.2737367544323206e-13,
-      "energyResidualJ": -2.60770320892334e-8,
-      "mechanicalWorkResidualJ": 4.901032265826132e-10
+      "energyResidualJ": -2.0489096641540527e-8,
+      "mechanicalWorkResidualJ": 4.901040016296184e-10
+    },
+    {
+      "nz": 8,
+      "dt": 1,
+      "solveMs": 319.2137080000002,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.3344135355747113,
+      "relativeAmplitudeError": 0.003344135355747113,
+      "rmsErrorPa": 0.2422517480850597,
+      "mechanicalResidualN": 1.543169675377598e-9,
+      "massResidualKg": -2.2737367544323206e-13,
+      "energyResidualJ": -1.1175870895385742e-8,
+      "mechanicalWorkResidualJ": -1.9895855926985563e-10
+    },
+    {
+      "nz": 8,
+      "dt": 0.25,
+      "solveMs": 980.486292,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.11770464548506254,
+      "relativeAmplitudeError": 0.0011770464548506254,
+      "rmsErrorPa": 0.08857712784002034,
+      "mechanicalResidualN": 8.409855034585689e-10,
+      "massResidualKg": 0,
+      "energyResidualJ": -1.1175870895385742e-8,
+      "mechanicalWorkResidualJ": 4.88026013042414e-10
+    },
+    {
+      "nz": 4,
+      "dt": 0.25,
+      "solveMs": 476.7556249999998,
+      "diffusivity": 0.010160217072172887,
+      "maxErrorPa": 0.299201769519442,
+      "relativeAmplitudeError": 0.00299201769519442,
+      "rmsErrorPa": 0.21991036160467248,
+      "mechanicalResidualN": 6.916756056796203e-11,
+      "massResidualKg": 0,
+      "energyResidualJ": 9.313225746154785e-9,
+      "mechanicalWorkResidualJ": 4.797872920034746e-10
     }
   ],
   "fracture": [
@@ -65,7 +105,7 @@
       "n": 4,
       "ell": 0.25,
       "spacing": 0.25,
-      "elapsedMs": 56.91075000000001,
+      "elapsedMs": 58.82795900000019,
       "status": "complete",
       "fractureJ": 0.000008122621033008105,
       "maxDamage": 0.0014972689278230083,
@@ -77,7 +117,7 @@
       "n": 6,
       "ell": 0.25,
       "spacing": 0.16666666666666666,
-      "elapsedMs": 194.03370799999993,
+      "elapsedMs": 206.03362500000003,
       "status": "complete",
       "fractureJ": 0.000021006443843609915,
       "maxDamage": 0.003218080087690467,
@@ -89,7 +129,7 @@
       "n": 8,
       "ell": 0.25,
       "spacing": 0.125,
-      "elapsedMs": 485.5778330000003,
+      "elapsedMs": 500.52237499999956,
       "status": "complete",
       "fractureJ": 0.000023173284657318824,
       "maxDamage": 0.003844693442640056,
@@ -103,139 +143,142 @@
       "fidelity": "preview",
       "samples": [
         {
-          "setupMs": 30.91112499999963,
-          "solveMs": 433.4869170000002,
-          "rssBytes": 195280896
+          "setupMs": 31.96954199999982,
+          "solveMs": 449.7621670000008,
+          "rssBytes": 201441280
         },
         {
-          "setupMs": 28.23474999999962,
-          "solveMs": 434.7417090000008,
-          "rssBytes": 196739072
+          "setupMs": 29.077249999999367,
+          "solveMs": 431.8411670000005,
+          "rssBytes": 204242944
         },
         {
-          "setupMs": 56.89666699999998,
-          "solveMs": 431.6409169999997,
-          "rssBytes": 198672384
+          "setupMs": 28.393667000000278,
+          "solveMs": 437.1516250000004,
+          "rssBytes": 207142912
         }
       ],
       "simulatedS": 10,
-      "maxPressurePa": 101383.23834371912,
-      "maxTemperatureK": 543.2320881533055,
-      "dryIceKg": 3.99990325960342,
+      "maxPressurePa": 101385.3742946301,
+      "maxTemperatureK": 543.2320938526425,
+      "dryIceKg": 3.9999031405213117,
       "ledger": {
-        "energyResidualJ": 0.000001430511474609375,
-        "massResidualKg": 8.731149137020111e-11,
+        "energyResidualJ": 0.00000286102294921875,
+        "massResidualKg": 1.1641532182693481e-10,
         "speciesResidualMol": [
-          4.547473508864641e-13,
-          -6.8833827526759706e-15,
+          5.684341886080801e-13,
+          -7.993605777301127e-15,
           8.185452315956354e-12,
           4.423782229423523e-9
         ],
-        "boundaryEnergyOutJ": -532.4044877907867,
+        "boundaryEnergyOutJ": -704.8741521360016,
         "heaterJ": 0,
-        "pressureWorkJ": 18.918342737148564,
-        "reactionJ": 109613.5392108298,
-        "boundaryMassOutKg": 0.00014953198742451748,
-        "maxPoreRe": 0.00017441840669114853,
-        "maxMach": 2.8267353302645997e-7,
-        "pressureResidualMol": 6.669402443509886e-11,
+        "pressureWorkJ": 21.98297857973058,
+        "gravityWorkJ": 0.02810142071412178,
+        "reactionJ": 109613.54478327563,
+        "boundaryMassOutKg": -0.0015036423771523839,
+        "maxPoreRe": 0.00017489232154869233,
+        "maxMach": 2.8203946177029235e-7,
+        "pressureResidualMol": 6.199781833748919e-11,
         "steps": 5,
         "rejectedSteps": 0
       },
-      "mechanicalBalanceJ": 1.5001329976946538e-9,
-      "geostaticResidualN": 8.49468051455915e-10
+      "mechanicalBalanceJ": 1.9126443321038625e-9,
+      "geostaticResidualN": 8.985807653516531e-10
     },
     {
       "fidelity": "engineering",
       "samples": [
         {
-          "setupMs": 109.39683299999979,
-          "solveMs": 3265.9842089999993,
-          "rssBytes": 210092032
+          "setupMs": 110.43154099999992,
+          "solveMs": 3226.7521669999996,
+          "rssBytes": 228655104
         },
         {
-          "setupMs": 106.82050000000163,
-          "solveMs": 3201.5915829999994,
-          "rssBytes": 227295232
+          "setupMs": 132.38354199999958,
+          "solveMs": 3240.507291,
+          "rssBytes": 242974720
         },
         {
-          "setupMs": 120.10079199999927,
-          "solveMs": 3223.1861660000013,
-          "rssBytes": 230866944
+          "setupMs": 104.25083300000006,
+          "solveMs": 3239.7021669999976,
+          "rssBytes": 259915776
         }
       ],
       "simulatedS": 10,
-      "maxPressurePa": 101371.40649748812,
-      "maxTemperatureK": 543.2447159179983,
-      "dryIceKg": 3.9999139306459126,
+      "maxPressurePa": 101372.50874529156,
+      "maxTemperatureK": 543.2447188595579,
+      "dryIceKg": 3.999913139882958,
       "ledger": {
-        "energyResidualJ": -0.00000667572021484375,
-        "massResidualKg": 1.4551915228366852e-10,
+        "energyResidualJ": -0.0000095367431640625,
+        "massResidualKg": 8.731149137020111e-11,
         "speciesResidualMol": [
-          -2.0463630789890885e-12,
-          1.509903313490213e-14,
-          -2.864908310584724e-11,
-          6.984919309616089e-9
+          -2.6147972675971687e-12,
+          1.554312234475219e-14,
+          -3.1377567211166024e-11,
+          4.889443516731262e-9
         ],
-        "boundaryEnergyOutJ": -344.62082615893166,
+        "boundaryEnergyOutJ": -528.2217953939052,
         "heaterJ": 0,
-        "pressureWorkJ": 17.489979133830698,
-        "reactionJ": 97434.82675163796,
-        "boundaryMassOutKg": 0.00015597904567507155,
-        "maxPoreRe": 0.00014363916405227593,
-        "maxMach": 2.4629321106674346e-7,
-        "pressureResidualMol": 7.073620416622392e-11,
+        "pressureWorkJ": 21.02353276684186,
+        "gravityWorkJ": 0.040935803215639235,
+        "reactionJ": 97434.82912535632,
+        "boundaryMassOutKg": -0.0016037268454741186,
+        "maxPoreRe": 0.0001441836350374421,
+        "maxMach": 2.4673158273462634e-7,
+        "pressureResidualMol": 6.892782671670192e-11,
         "steps": 10,
         "rejectedSteps": 0
       },
-      "mechanicalBalanceJ": 7.090724143504453e-10,
-      "geostaticResidualN": 7.4078343459405e-10
+      "mechanicalBalanceJ": 8.398984501912784e-10,
+      "geostaticResidualN": 7.480593922082335e-10
     },
     {
       "fidelity": "research",
       "samples": [
         {
-          "setupMs": 280.74679200000173,
-          "solveMs": 16037.328292000002,
-          "rssBytes": 272531456
+          "setupMs": 278.03541699999914,
+          "solveMs": 16848.701458000003,
+          "rssBytes": 330514432
         },
         {
-          "setupMs": 306.96545799999876,
-          "solveMs": 15906.9585,
-          "rssBytes": 274300928
+          "setupMs": 295.43133300000045,
+          "solveMs": 17236.263166999997,
+          "rssBytes": 321339392
         },
         {
-          "setupMs": 289.450499999999,
-          "solveMs": 16258.710540999993,
-          "rssBytes": 305479680
+          "setupMs": 296.70499999999447,
+          "solveMs": 16898.011208000004,
+          "rssBytes": 327041024
         }
       ],
       "simulatedS": 10,
-      "maxPressurePa": 101374.18052235835,
-      "maxTemperatureK": 543.2447131727636,
-      "dryIceKg": 3.9999167698160987,
+      "maxPressurePa": 101374.35973625626,
+      "maxTemperatureK": 543.2447136495664,
+      "dryIceKg": 3.9999153214609673,
       "ledger": {
-        "energyResidualJ": 0.000002384185791015625,
-        "massResidualKg": 1.7462298274040222e-10,
+        "energyResidualJ": -0.000001430511474609375,
+        "massResidualKg": 1.4551915228366852e-10,
         "speciesResidualMol": [
-          -1.9554136088117957e-11,
-          -1.3988810110276972e-14,
-          8.458300726488233e-11,
-          7.683411240577698e-9
+          -2.05773176276125e-11,
+          -1.0658141036401503e-14,
+          9.140421752817929e-11,
+          5.587935447692871e-9
         ],
-        "boundaryEnergyOutJ": -257.02235533521986,
+        "boundaryEnergyOutJ": -424.17027658385143,
         "heaterJ": 0,
-        "pressureWorkJ": 20.249869413071547,
-        "reactionJ": 109590.32674901103,
-        "boundaryMassOutKg": 0.00010037997306512902,
-        "maxPoreRe": 0.00017345903622147105,
-        "maxMach": 2.780789339511366e-7,
-        "pressureResidualMol": 4.369607480752061e-11,
+        "pressureWorkJ": 23.185658841878986,
+        "gravityWorkJ": 0.039880351958995024,
+        "reactionJ": 109590.32736054726,
+        "boundaryMassOutKg": -0.0015025406168808488,
+        "maxPoreRe": 0.0001743033147450166,
+        "maxMach": 2.800115708602524e-7,
+        "pressureResidualMol": 4.2628079777000394e-11,
         "steps": 20,
         "rejectedSteps": 0
       },
-      "mechanicalBalanceJ": 2.037105962363647e-10,
-      "geostaticResidualN": 9.89530235528946e-10
+      "mechanicalBalanceJ": 1.59246842696481e-9,
+      "geostaticResidualN": 9.185896487906575e-10
     }
   ]
 }

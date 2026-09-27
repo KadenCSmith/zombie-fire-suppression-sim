@@ -17,3 +17,11 @@ Conservation requirements are software thresholds, not experimental validation. 
 ## Method decisions (provisional until measurements)
 
 Reuse the existing TypeScript finite-volume and brick-FEM knowledge, but isolate the new coupled state from legacy schemas. Typed Float64 storage is the reference. Finite-volume face conservation and implicit pressure avoid an acoustic timestep where Darcy applies. Small-strain FEM supports bounded elastic/deformation calculations; large separation requires its own supported method. Phase-field and cohesive spatial discretizations will be evaluated by energy/path checks, not rendered appearance. No CUDA dependency.
+
+## Completed integrations and remaining work
+
+- First tested/pushed integration: a3c3361, with phase-aware 3D FVM, initialized heterogeneous FEM, root bars, phase-field research, workers and native UI. Three-platform CI passed.
+- Second integration: buoyancy/energy, frozen initial states, explicit reduced cap shell/contact/anchors/venting, separate sensitivity studies, intact-operator optimization, and strict failed-fracture reporting. 133 tests pass. Detailed failed and passed gates are in COUPLED_VALIDATION.md.
+- Release work: build and verify archives, install 0.11 beside the running/preserved 0.10, publish source and downloads/checksums, inspect installed native window and record final source CI.
+
+Do not overwrite the independent Blender edit or sources. Do not claim the failed fracture mesh/energy gates passed. All remaining model/data gaps are listed individually in COUPLED_VALIDATION.md.

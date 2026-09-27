@@ -11,7 +11,7 @@ describe('coupled caloric and transport reference',()=>{
   expect(gasH(1,300)-gasU(1,300)).toBeCloseTo(R*300,10)
  })
  it('preserves an insulated closed uniform equilibrium',()=>{
-  const sim=new CoupledTransport(box()),before=sim.frame();sim.advance(20)
+  const sim=new CoupledTransport(box()),before=sim.frame();sim.gasGravityMS2=0;sim.advance(20)
   expect(sim.ledger.steps).toBeGreaterThan(1);expect(Math.abs(sim.ledger.energyResidualJ)).toBeLessThan(1e-5);expect(Math.abs(sim.ledger.massResidualKg)).toBeLessThan(1e-9)
   expect(Math.max(...sim.ledger.speciesResidualMol.map(Math.abs))).toBeLessThan(1e-8)
   expect(Math.max(...sim.temperature)-Math.min(...sim.temperature)).toBeLessThan(1e-8);expect(sim.frame().temperatureK).toEqual(before.temperatureK)
@@ -30,4 +30,18 @@ describe('coupled caloric and transport reference',()=>{
   const sim=new CoupledTransport(box()),t=sim.time,m=sim.totalMass();sim.kh.fill(1e5);sim.energy[0]+=1e6;sim.resolve();const initial=sim.frame()
   expect(()=>sim.step(1)).toThrow();expect(sim.time).toBe(t);expect(sim.totalMass()).toBe(m);expect(sim.frame().temperatureK).toEqual(initial.temperatureK)
  })
+})
+
+it('accounts for Darcy gravity and thermal conversion of gas potential energy',()=>{
+ const s=box();s.soil.moistureSaturation=0;s.atmosphere.waterVaporMoleFraction=0
+ const sim=new CoupledTransport(s),potential=()=>{let sum=0;for(let i=0;i<sim.n;i++){const z=(Math.floor(i/16)+0.5)*sim.dz;sum-=(sim.gas[0][i]*0.031998+sim.gas[1][i]*0.0440095+sim.gas[2][i]*0.0280134)*9.80665*z}return sum},before=potential()
+ sim.advance(20)
+ expect(sim.pressure[0]).toBeLessThan(sim.pressure[sim.n-1]);expect(Math.abs(potential()-before+sim.ledger.gravityWorkJ)).toBeLessThan(1e-10);expect(Math.abs(sim.ledger.energyResidualJ)).toBeLessThan(1e-5)
+})
+
+it('starts a subzero wet scenario with ice and retains mass/energy through heating',()=>{
+ const s=box();s.atmosphere.temperatureC=s.atmosphere.deepTemperatureC=-10;s.atmosphere.surfaceHeatTransferWm2K=50
+ const sim=new CoupledTransport(s);expect(sim.ice.reduce((a,b)=>a+b,0)).toBeGreaterThan(0);expect(Math.max(...sim.temperature)).toBeCloseTo(263.15,8)
+ sim.scenario.atmosphere.temperatureC=20;sim.advance(100)
+ expect(Math.max(...sim.temperature)).toBeGreaterThan(263.15);expect(Math.abs(sim.ledger.massResidualKg)).toBeLessThan(1e-8);expect(Math.abs(sim.ledger.energyResidualJ)).toBeLessThan(1e-5)
 })

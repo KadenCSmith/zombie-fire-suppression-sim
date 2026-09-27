@@ -29,6 +29,11 @@ export function phaseAt(t: number, waterKg: number, poreM3: number, dryCapacity:
 }
 /** Enthalpy inversion includes the isothermal freezing plateau. No latent heat clipping. */
 export function equilibrate(energy: number, waterKg: number, poreM3: number, dryCapacity: number, gas: ArrayLike<number>): Phase {
+  // Exact all-vapor caloric inversion avoids iterative phase work when unsaturated.
+  let capacity=dryCapacity+waterKg*CV[3]/MOLAR[3]
+  for(let s=0;s<3;s++)capacity+=gas[s]*CV[s]
+  const gasT=T0+(energy-waterKg*VAPOR_U0)/capacity
+  if(gasT>=150&&gasT<=1200&&waterKg*WATER_R*gasT/poreM3<=saturationPressure(gasT))return{temperature:gasT,liquid:0,ice:0,vapor:waterKg,energy,gasVolume:poreM3}
   const frozen = phaseAt(T0, waterKg, poreM3, dryCapacity, gas, true), melted = phaseAt(T0, waterKg, poreM3, dryCapacity, gas, false)
   if (energy >= frozen.energy && energy <= melted.energy && waterKg > 0) {
     const fraction = (energy - frozen.energy) / (melted.energy - frozen.energy)

@@ -24,6 +24,8 @@ let server;
 let mainWindow;
 let appOrigin;
 let requestedWorkspace = workspaceFromArguments(process.argv);
+// Keep installed minor releases independent so a preserved version may stay open.
+if (app.isPackaged) app.setPath('userData', path.join(app.getPath('appData'), `Zombie Fire Suppression Sim ${app.getVersion().split('.').slice(0, 2).join('.')}`));
 function workspaceFromArguments(args) {
   if (args.includes('--coupled')) return 'coupled';
   if (args.includes('--mechanics')) return 'mechanics';

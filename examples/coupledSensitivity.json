@@ -1,0 +1,73 @@
+{
+  "createdAt": "2026-09-27T07:39:03.988Z",
+  "acceptance": {
+    "thermalMaxErrorK": 0.03,
+    "thermalRefinement": "strictly decreasing",
+    "domain": "report difference, no predetermined field accuracy claim",
+    "timestep": "report same-grid quantities separately from geometry changes"
+  },
+  "thermal": [
+    {
+      "nz": 4,
+      "dt": 50,
+      "errorK": 0.017334015860569707,
+      "energyResidualJ": -2.7939677238464355e-9
+    },
+    {
+      "nz": 8,
+      "dt": 50,
+      "errorK": 0.004423972242989294,
+      "energyResidualJ": -3.725290298461914e-9
+    },
+    {
+      "nz": 16,
+      "dt": 50,
+      "errorK": 0.0009556071806287036,
+      "energyResidualJ": -4.6566128730773926e-9
+    }
+  ],
+  "domains": [
+    {
+      "widthM": 8,
+      "cells": 256,
+      "solveMs": 470.93125,
+      "sourceCellPressurePa": 101333.01352566328,
+      "peakDisplacementM": 0.000020401025630202662,
+      "mechanicalBalanceJ": 1.9141452178783664e-9
+    },
+    {
+      "widthM": 12,
+      "cells": 576,
+      "solveMs": 1030.9057910000001,
+      "sourceCellPressurePa": 101332.97257763162,
+      "peakDisplacementM": 0.000020435703848408718,
+      "mechanicalBalanceJ": 1.947439117506794e-9
+    }
+  ],
+  "timesteps": [
+    {
+      "dt": 2,
+      "maxPressurePa": 101400.86407236946,
+      "maxTemperatureK": 543.3136560097548,
+      "dryIceKg": 3.9996805796154193,
+      "energyResidualJ": 4.76837158203125e-7,
+      "mechanicalBalanceJ": 2.5842038954151916e-9
+    },
+    {
+      "dt": 1,
+      "maxPressurePa": 101401.23439404098,
+      "maxTemperatureK": 543.3136158068615,
+      "dryIceKg": 3.999681388102822,
+      "energyResidualJ": -4.76837158203125e-7,
+      "mechanicalBalanceJ": 3.756720464199336e-9
+    },
+    {
+      "dt": 0.5,
+      "maxPressurePa": 101401.41556723161,
+      "maxTemperatureK": 543.3135956748827,
+      "dryIceKg": 3.9996817926259456,
+      "energyResidualJ": 0,
+      "mechanicalBalanceJ": -2.0960202818959017e-9
+    }
+  ]
+}

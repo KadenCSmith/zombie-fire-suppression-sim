@@ -1,5 +1,15 @@
 # Download and open Zombie Fire Suppression Sim 0.10.0
 
+## Version 0.11 coupled continuum
+
+The app now opens the coupled continuum by default. Use **Calculate coupled scenario** for the default 120 s run, inspect fields/probes, and replay accepted frames. Select an earlier model from Physics model. `--coupled`, `--simulation`, `--mechanics`, and `--studio` select workspaces. Windows/Linux archives include matching launchers.
+
+On this Mac, version 0.11 is installed as `~/Applications/Zombie Fire Suppression Sim 0.11.app`; the existing `~/Applications/Zombie Fire Suppression Sim.app` remains version 0.10 and is preserved. Launch the new bundle directly. Packaged minor versions use separate application-data directories so preserved versions may remain open.
+
+For reproducible source: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`. `node scripts/validate-coupled.mjs`, `node scripts/validate-coupled-sensitivity.mjs` and `node scripts/validate-spatial-fracture.mjs` reproduce physics studies. `node scripts/compare-coupled-optimization.mjs` compares the committed reference. Native kernel experiment: `clang++ -O3 -ffp-contract=off src/coupled/kernels/benchmark.cpp -o work/coupled-validation/brick-native`, then `node scripts/benchmark-native.mjs` (create that work folder first). Packaging: `npm run package:all` on macOS. No CUDA dependency.
+
+See `COUPLED_MODEL.md` and `COUPLED_VALIDATION.md` for supported physics and failed/unresolved validation gates. Cap behavior is a shallow-shell/contact approximation. Diffuse fracture is experimental and can fail the explicit energy gate; the default coupled model keeps fracture disabled. No experimentally validated field-suppression prediction is claimed.
+
 [Download release 0.10.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.10.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
 This repository is private. Sign into a GitHub account with access before downloading. The application runs locally without Node.js, Python, Blender, an API key, or an internet connection after download. No automatic updater is included; download a newer release to update.

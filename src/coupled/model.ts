@@ -1,13 +1,14 @@
+import type {CapState} from './cap'
 import { Simulation } from '../sim/solver'
 import { createDefaultScenario } from '../sim/scenario'
 import type { Scenario } from '../sim/types'
 import { pcg } from './linear'
-import { R,T0,MOLAR,gasU,gasH,co2SolidU,CO2_SUB_T,CO2_SUB_H,CO2_SOLID_CP,equilibrate,saturationPressure } from './thermodynamics'
+import { R,T0,MOLAR,gasU,gasH,co2SolidU,CO2_SUB_T,CO2_SUB_H,CO2_SOLID_CP,equilibrate,saturationPressure,LF } from './thermodynamics'
 
 export type Fidelity = 'preview'|'engineering'|'research'
 export const PRESETS = {preview:{nx:8,ny:8,nz:4,maxStepS:2},engineering:{nx:12,ny:12,nz:6,maxStepS:1},research:{nx:16,ny:16,nz:8,maxStepS:0.5}} as const
-export interface CoupledInputs {fidelity:Fidelity;durationS:number;dryIceKg:number;heaterW:number;moisture:number;permeabilityM2:number;reaction:boolean;mechanics:boolean;fracture:boolean;roots:boolean;cap:boolean;youngsPa:number;fractureEnergyJm2:number;lengthScaleM:number}
-export const DEFAULT_COUPLED:CoupledInputs={fidelity:'preview',durationS:120,dryIceKg:4,heaterW:0,moisture:0.2,permeabilityM2:8e-12,reaction:true,mechanics:true,fracture:false,roots:true,cap:true,youngsPa:1e6,fractureEnergyJm2:5,lengthScaleM:1}
+export interface CoupledInputs {fidelity:Fidelity;durationS:number;dryIceKg:number;heaterW:number;moisture:number;permeabilityM2:number;reaction:boolean;mechanics:boolean;fracture:boolean;roots:boolean;cap:boolean;capRadiusM:number;capRiseM:number;capThicknessM:number;youngsPa:number;fractureEnergyJm2:number;lengthScaleM:number}
+export const DEFAULT_COUPLED:CoupledInputs={fidelity:'preview',durationS:120,dryIceKg:4,heaterW:0,moisture:0.2,permeabilityM2:8e-12,reaction:true,mechanics:true,fracture:false,roots:true,cap:true,capRadiusM:0.475,capRiseM:0.1,capThicknessM:0.005,youngsPa:1e6,fractureEnergyJm2:5,lengthScaleM:1}
 export function coupledScenario(input:CoupledInputs):Scenario {
   const s=createDefaultScenario(),p=PRESETS[input.fidelity]
   s.name='Coupled oak-site continuum';s.domain={widthM:8,lengthM:8,depthM:3.2,nx:p.nx,ny:p.ny,nz:p.nz}
@@ -19,22 +20,22 @@ export function coupledScenario(input:CoupledInputs):Scenario {
   s.model.maxStepS=p.maxStepS;if(!input.reaction)s.model.smolderRateS=0
   return s
 }
-export interface Face {a:number;b:number;axis:number;area:number;distance:number;g:number;diff:number;thermal:number}
-export interface Ledger {energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
-export interface CoupledFrame {timeS:number;temperatureK:Float32Array;pressurePa:Float32Array;oxygen:Float32Array;co2:Float32Array;iceKg:Float32Array;liquidKg:Float32Array;fuelKg:Float32Array;porosity:Float32Array;damage:Float32Array;displacementM:Float32Array;dryIceKg:number;dryIceTemperatureK:number;ledger:Ledger;mechanical?:{elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}}
+export interface Face {a:number;b:number;axis:number;area:number;distance:number;g:number;diff:number;thermal:number;gravity:number;capFraction:number;ventGap:number;ventRadius:number}
+export interface Ledger {energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;gravityWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
+export interface CoupledFrame {timeS:number;temperatureK:Float32Array;pressurePa:Float32Array;oxygen:Float32Array;co2:Float32Array;iceKg:Float32Array;liquidKg:Float32Array;fuelKg:Float32Array;porosity:Float32Array;damage:Float32Array;displacementM:Float32Array;dryIceKg:number;dryIceTemperatureK:number;ledger:Ledger;cap?:CapState;mechanical?:{elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}}
 const harmonic=(a:number,b:number)=>a+b>0?2*a*b/(a+b):0
 const sum=(v:ArrayLike<number>)=>{let s=0;for(let i=0;i<v.length;i++)s+=v[i];return s}
 const FUEL_MOLAR=6*MOLAR[1]+5*MOLAR[3]-6*MOLAR[0]
 export class CoupledTransport {
-  readonly scenario:Scenario;readonly n:number;readonly volume:number;readonly dx:number;readonly dy:number;readonly dz:number
+  readonly scenario:Scenario;gasGravityMS2=9.80665;readonly n:number;readonly volume:number;readonly dx:number;readonly dy:number;readonly dz:number
   readonly gas:Float64Array[];readonly water:Float64Array;readonly fuel:Float64Array;readonly mineral:Float64Array;readonly solidCp:Float64Array;readonly energy:Float64Array
   readonly temperature:Float64Array;readonly pressure:Float64Array;readonly liquid:Float64Array;readonly ice:Float64Array;readonly gasVolume:Float64Array
   readonly porosity0:Float64Array;readonly pore:Float64Array;readonly kh:Float64Array;readonly kv:Float64Array;readonly conductivity:Float64Array;readonly peat:Float64Array
   readonly faces:Face[]=[];readonly sourceWeights:{i:number;w:number}[]=[]
-  time=0;dryIce:number;dryIceT:number;ledger:Ledger={energyResidualJ:0,massResidualKg:0,speciesResidualMol:[0,0,0,0],boundaryEnergyOutJ:0,heaterJ:0,pressureWorkJ:0,reactionJ:0,boundaryMassOutKg:0,maxPoreRe:0,maxMach:0,pressureResidualMol:0,steps:0,rejectedSteps:0}
+  time=0;dryIce:number;dryIceT:number;ledger:Ledger={energyResidualJ:0,massResidualKg:0,speciesResidualMol:[0,0,0,0],boundaryEnergyOutJ:0,heaterJ:0,pressureWorkJ:0,gravityWorkJ:0,reactionJ:0,boundaryMassOutKg:0,maxPoreRe:0,maxMach:0,pressureResidualMol:0,steps:0,rejectedSteps:0}
   private initialEnergy=0;private initialMass=0;private initialSpecies:number[]=[];private boundarySpecies=[0,0,0,0];private sources=[0,0,0,0]
   constructor(scenario:Scenario) {
-    this.scenario=structuredClone(scenario);const original=new Simulation(scenario),a=original.serialize().arrays
+    this.scenario=structuredClone(scenario);const original=new Simulation(scenario,{phaseStateOwnedExternally:true}),a=original.serialize().arrays
     this.n=original.cellCount;this.volume=original.cellVolume;this.dx=original.dx;this.dy=original.dy;this.dz=original.dz
     const take=(key:string)=>Float64Array.from(a[key]),zero=()=>new Float64Array(this.n)
     this.gas=['oxygen','co2','background','vapor'].map(take);this.water=take('water');this.fuel=take('fuel');this.mineral=take('mineral');this.solidCp=take('solidHeatCapacity')
@@ -51,12 +52,12 @@ export class CoupledTransport {
     for(let i=0;i<this.n;i++){
       // Prepared initial hot region is dry; superheated liquid at atmospheric pressure is not a realizable initial state.
       const t=this.temperature[i];if(t>373.15)this.water[i]=0
-      const volume=this.availablePore(i)-this.water[i]/1000,pa=scenario.atmosphere.pressurePa
+      const volume=this.availablePore(i)-this.water[i]/(t<T0?917:1000),pa=scenario.atmosphere.pressurePa
       const vaporPressure=this.water[i]>0?Math.min(pa*0.95,saturationPressure(t)):scenario.atmosphere.waterVaporMoleFraction*pa
       const dryTotal=this.gas[0][i]+this.gas[1][i]+this.gas[2][i]
       for(let species=0;species<3;species++)this.gas[species][i]=(pa-vaporPressure)*volume/(R*t)*this.gas[species][i]/dryTotal
       this.gas[3][i]=vaporPressure*volume/(R*t)
-      this.energy[i]=this.dryCapacity(i)*(t-T0)+this.water[i]*4186*(t-T0)
+      this.energy[i]=this.dryCapacity(i)*(t-T0)+this.water[i]*(t<T0?2100*(t-T0)-LF:4186*(t-T0))
       for(let s=0;s<4;s++)this.energy[i]+=this.gas[s][i]*gasU(s,t)
       this.water[i]+=this.gas[3][i]*MOLAR[3]
     }
@@ -81,7 +82,7 @@ export class CoupledTransport {
   private speciesTotals(){return[sum(this.gas[0]),sum(this.gas[1]),sum(this.gas[2]),sum(this.water)/MOLAR[3]]}
   private buildFaces(){
     const d=this.scenario.domain,atm=this.scenario.atmosphere
-    const add=(a:number,b:number,axis:number,area:number,distance:number)=>this.faces.push({a,b,axis,area,distance,g:0,diff:0,thermal:b<0?0:harmonic(this.conductivity[a],this.conductivity[b])*area/distance})
+    const add=(a:number,b:number,axis:number,area:number,distance:number)=>this.faces.push({a,b,axis,area,distance,g:0,diff:0,gravity:0,capFraction:0,ventGap:0,ventRadius:0,thermal:b<0?0:harmonic(this.conductivity[a],this.conductivity[b])*area/distance})
     for(let z=0;z<d.nz;z++)for(let y=0;y<d.ny;y++)for(let x=0;x<d.nx;x++){
       const i=(z*d.ny+y)*d.nx+x
       if(x+1<d.nx)add(i,i+1,0,this.dy*this.dz,this.dx)
@@ -139,16 +140,23 @@ export class CoupledTransport {
   private flow(dt:number){
     const atm=this.scenario.atmosphere,ta=atm.temperatureC+T0,pa=atm.pressurePa,n=this.n,mu=1.8e-5
     const capacity=Float64Array.from(this.gasVolume,(v,i)=>v/(R*this.temperature[i])),rhs=Float64Array.from(capacity,(c,i)=>this.totalGas(i)-c*pa)
-    const gauge=Float64Array.from(this.pressure,v=>v-pa),diagonal=new Float64Array(n)
+    const baseRhs=rhs.slice(),gauge=Float64Array.from(this.pressure,v=>v-pa),diagonal=new Float64Array(n)
     const mobility=(i:number,axis:number)=>{const phi=this.pore[i]/this.volume,phi0=this.porosity0[i],kc=(phi/phi0)**3*((1-phi0)/(1-phi))**2;return(axis===2?this.kv[i]:this.kh[i])*kc*(this.gasVolume[i]/this.pore[i])**3}
     // Nonlinear compressible molar mobility, Picard iterated at fixed thermal state.
     for(let iteration=0;iteration<16;iteration++){
-      diagonal.set(capacity)
+      diagonal.set(capacity);rhs.set(baseRhs)
       for(const f of this.faces){const b=f.b,k=f.b<0?mobility(f.a,f.axis):harmonic(mobility(f.a,f.axis),mobility(b,f.axis)),temp=b<0?(this.temperature[f.a]+ta)/2:(this.temperature[f.a]+this.temperature[b])/2
         const pbar=(gauge[f.a]+pa+(b<0?pa:gauge[b]+pa))/2
-        f.g=k/mu*f.area/f.distance*pbar/(R*temp)
+        f.g=k/mu*f.area/f.distance*pbar/(R*temp)*(1-f.capFraction)
+        if(b<0&&f.ventGap>0){const ventArea=f.capFraction*f.area,share=ventArea/(Math.PI*f.ventRadius**2),slot=2*Math.PI*f.ventRadius*f.ventGap,coefficient=slot*f.ventGap**2/(12*mu*0.02)*share*pbar/(R*temp),velocity=coefficient*Math.abs(gauge[f.a])*R*temp/pbar/Math.max(1e-30,slot*share),re=pbar/(R*temp)*0.029*velocity*2*f.ventGap/mu
+          if(re>1000||velocity/Math.sqrt(1.4*R*temp/0.029)>0.05)throw new Error('Cap vent exceeded laminar-slot Reynolds/Mach limits.')
+          f.g+=coefficient}
+        const molarMass=(i:number)=>this.gas.reduce((sum,v,s)=>sum+v[i]*MOLAR[s],0)/this.totalGas(i)
+        const mass=b<0?molarMass(f.a):0.5*(molarMass(f.a)+molarMass(b))
+        f.gravity=f.axis===2?pbar/(R*temp)*mass*this.gasGravityMS2*f.distance*(b<0?-1:1):0
+        rhs[f.a]-=dt*f.g*f.gravity;if(b>=0)rhs[b]+=dt*f.g*f.gravity
         const diff=this.scenario.soil.gasDiffusivityM2S/this.scenario.soil.tortuosity*Math.min(this.gasVolume[f.a],b<0?this.gasVolume[f.a]:this.gasVolume[b])/this.volume
-        f.diff=(b<0?atm.exchangeVelocityMS:diff/f.distance)*f.area*pbar/(R*temp)
+        f.diff=(b<0?atm.exchangeVelocityMS:diff/f.distance)*f.area*pbar/(R*temp)*(1-f.capFraction)
         diagonal[f.a]+=dt*f.g;if(b>=0)diagonal[b]+=dt*f.g
       }
       const old=gauge.slice()
@@ -160,7 +168,7 @@ export class CoupledTransport {
     const transfers=this.gas.map(()=>new Float64Array(n)),energy=new Float64Array(n),outgoing=this.gas.map(()=>new Float64Array(n))
     const fractions=[atm.oxygenMoleFraction,atm.co2MoleFraction,1-atm.oxygenMoleFraction-atm.co2MoleFraction-atm.waterVaporMoleFraction,atm.waterVaporMoleFraction]
     for(const f of this.faces){
-      const a=f.a,b=f.b,flow=f.g*(gauge[a]-(b<0?0:gauge[b])),totalA=this.totalGas(a),totalB=b<0?1:this.totalGas(b)
+      const a=f.a,b=f.b,flow=f.g*(gauge[a]-(b<0?0:gauge[b])+f.gravity),totalA=this.totalGas(a),totalB=b<0?1:this.totalGas(b)
       const rho=(pa+gauge[a])/(R*this.temperature[a])*0.029,u=Math.abs(flow)*R*this.temperature[a]/(pa+gauge[a])/f.area
       const poreRadius=Math.sqrt(8*Math.max(this.kh[a],this.kv[a])/this.porosity0[a]),re=rho*u/Math.max(0.01,this.gasVolume[a]/this.volume)*poreRadius/mu,mach=u/Math.sqrt(1.4*R*this.temperature[a]/0.029)
       this.ledger.maxPoreRe=Math.max(this.ledger.maxPoreRe,re);this.ledger.maxMach=Math.max(this.ledger.maxMach,mach)
@@ -169,6 +177,8 @@ export class CoupledTransport {
         const xa=this.gas[s][a]/totalA,xb=b<0?fractions[s]:this.gas[s][b]/totalB
         const transfer=dt*(flow*(flow>=0?xa:xb)+f.diff*(xa-xb))
         const upstreamT=transfer>=0?this.temperature[a]:b<0?ta:this.temperature[b],heat=transfer*gasH(s,upstreamT)
+        const gravitational=transfer*MOLAR[s]*this.gasGravityMS2*(f.axis===2?f.distance*(b<0?-1:1):0)
+        this.ledger.gravityWorkJ+=gravitational;energy[a]+=gravitational*(b<0?1:0.5);if(b>=0)energy[b]+=gravitational*0.5
         transfers[s][a]-=transfer;energy[a]-=heat;if(transfer>0)outgoing[s][a]+=transfer
         if(b>=0){transfers[s][b]+=transfer;energy[b]+=heat;if(transfer<0)outgoing[s][b]-=transfer}
         else{this.boundarySpecies[s]+=transfer;this.ledger.boundaryMassOutKg+=transfer*MOLAR[s];this.ledger.boundaryEnergyOutJ+=heat}
@@ -224,7 +234,7 @@ export class CoupledTransport {
     this.resolve();this.initialEnergy=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT);this.initialMass=this.totalMass();this.initialSpecies=this.speciesTotals();this.updateLedger()
   }
   updateLedger(){
-    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.initialEnergy
+    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.ledger.gravityWorkJ-this.initialEnergy
     this.ledger.massResidualKg=this.totalMass()+this.ledger.boundaryMassOutKg-this.initialMass
     const totals=this.speciesTotals();this.ledger.speciesResidualMol=totals.map((v,s)=>v+this.boundarySpecies[s]-this.sources[s]-this.initialSpecies[s])
   }

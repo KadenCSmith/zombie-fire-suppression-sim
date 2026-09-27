@@ -1,10 +1,12 @@
 # Zombie Fire Suppression Sim
 
-**Interactive scene studio and a separate, unvalidated scientific model.**
+**A coupled research simulator with preserved demonstration and benchmark workspaces.**
 
-A local desktop application for macOS, Windows and Linux that opens in **Scene studio**: four interactive views of the authored Blender landscape, with soil strata, an illustrative thermal overlay and a 20-second animated sequence. Switch between **Soil cutaway**, **Thermal illustration**, **Surface view** and **Roots & peat** without resetting playback. The studio uses an 8 m × 8 m illustration. Its latest version adds a separate reduced particle calculation under assumed loading; gas and thermal displays remain illustrative.
+Version 0.11 opens in **Coupled continuum**: a canonical 3D gas, heat, water-phase and initialized soil-mechanics calculation. Finite dry ice, oxygen-limited oxidation, conservative pressure work, embedded root bars and a reduced cap shell/contact model share the same evolving state. Compute in a worker, compare the same scenario with rigid pores, inspect fields, replay stored results and export the calculation. Physical edits invalidate prior results; camera and replay controls do not change the solution.
 
-Choose **Porous gas & heat** in the **Physics model** selector for the separate scientific workspace. Its default domain is 20 ft × 20 ft (6.096 m × 6.096 m), with a finite buried dry-ice source, heater input, peat smoldering and slow gas/heat transport. A bounded radial gas event drives a reduced vertical mechanics calculation, and a separate continuum mechanics benchmark is available. These calculations compare assumptions and numerical behavior; they do not establish field suppression, fracture or safety. [Scene studio guide](docs/SCENE_STUDIO.md).
+**Numerically verified within stated bounds; experimentally unvalidated.** The optional spatial-fracture model fails its current mesh-energy and coupled-energy acceptance gates. Those failures are reported and rejected, not hidden. No completed terrain rupture or field-suppression claim is made. [Equations and parameter evidence](docs/COUPLED_MODEL.md) · [Measured validation, speed, memory and exact gaps](docs/COUPLED_VALIDATION.md) · [Resumable implementation record](docs/COUPLED_IMPLEMENTATION.md).
+
+The Physics model selector retains the fast scene demonstration, original porous gas/heat model and mechanics/tensile benchmarks. Earlier scenes remain available in the demonstration's version menu. The oak anatomy and borehole in the coupled view are explicitly illustrative context. [Scene studio guide](docs/SCENE_STUDIO.md).
 
 Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
 
@@ -38,15 +40,14 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.10.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.10.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download version 0.11.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
 
 [Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
 
-On this Mac, open either workspace directly:
+On this Mac, open the new coupled release directly (the earlier 0.10 app is preserved separately):
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --simulation
-open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --studio
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --coupled
 ```
 
 Mac requires macOS 13+. The app is locally signed, not Apple notarized; Windows and Linux packages are portable archives. See the installation guide for first launch and whole-bundle replacement instructions.
@@ -63,7 +64,7 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.10.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.11.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 

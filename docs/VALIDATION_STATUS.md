@@ -1,5 +1,13 @@
 # Verification and validation status
 
+## Coupled cap, buoyancy and acceptance gates (2026-09-27, 0.11.0 release candidate)
+
+The second integration adds a shallow concave-shell Ritz model, compressive rim contact and anchors, fractional surface sealing, laminar gap venting, and work-conjugate force/cavity-volume feedback to the initialized 3D gas/heat/soil model. Gas buoyancy now has an explicit gravitational-energy ledger; subzero wet initialization works. Failed calculations export/retain their last accepted state. Numerical stepping is independent of replay sampling.
+
+**133 tests in 22 files**, typecheck, lint, production build and native coupled smoke pass. The first pushed integration also passed all checks and both desktop smoke suites on macOS, Windows and Ubuntu ([run 36302903334](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36302903334)). Final release-source platform verification follows separately.
+
+[Full validation, performance, method choices and exact remaining gaps](COUPLED_VALIDATION.md). The 5% spatial-fracture mesh-energy gate **failed** at ~5.74%; a default coupled-fracture attempt is rejected by the new energy gate (~4.99 J mismatch). Neither result is labeled validated rupture. The default elastic coupled scenario passes work/mass/thermal checks. The cap is now computed; its general nonlinear shell, support failure and experimental calibration remain unresolved. The borehole remains illustrative geometry, not a silently assumed pipe.
+
 ## Coupled continuum integration (2026-09-27, 0.11.0 development)
 
 New 3D phase-aware finite-volume transport and heterogeneous initialized brick FEM share a canonical 8 × 8 × 3.2 m scenario. Gas enthalpy, finite source energy, water phase equilibrium, conservative mass/species balances, two-way pore-volume/pressure-work feedback, embedded root trusses and an experimental spatial phase field are implemented. See [equations, parameter evidence and exact limits](COUPLED_MODEL.md) and [resumable implementation record](COUPLED_IMPLEMENTATION.md). The independently modified Blender file remains excluded and unchanged.
@@ -8,7 +16,7 @@ The first full integration passed typecheck, lint, **126 tests in 20 files** and
 
 `examples/coupledValidation.json`, `coupledNativeBenchmark.json` and `coupledOptimizationBenchmark.json` record actual solver experiments. Float64 intact-law/gather optimization preserved displacement to <1.5e-16 m and pressure to <9e-11 Pa in compared 10 s scenarios, reducing median elapsed time roughly 30–38%. C++ applies the same tested operator faster in larger batches, but per-call process transfer is not a production acceleration backend. WebGPU is present on Apple/Metal, without an exposed float64 shader feature; no GPU solver has been substituted. The local wasm32 compiler has no wasm-ld linker, so WASM acceleration remains unmeasured.
 
-Known implementation gaps include cap shell/contact coupling, a resolved borehole conduit, finite deformation/sharp fracture contact, liquid flow/ice heave, char/pyrolysis and calibrated rate-dependent peat failure. Spatial damage is not experimentally validated and can stop on pressure-controlled instability. These gaps are visible in the application; no completed field rupture or treatment-success claim is made.
+At this first milestone, implementation gaps included cap shell/contact coupling (added in the second integration), a resolved borehole conduit, finite deformation/sharp fracture contact, liquid flow/ice heave, char/pyrolysis and calibrated rate-dependent peat failure. Spatial damage is not experimentally validated and can stop on pressure-controlled instability. These gaps are visible in the application; no completed field rupture or treatment-success claim is made.
 
 ## Model workbench (2026-09-26, version 0.10.0)
 

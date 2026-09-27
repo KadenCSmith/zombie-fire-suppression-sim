@@ -24,18 +24,20 @@ function FieldMesh({frame,fidelity,field,cut,amplification,onProbe}:{frame?:Coup
  useEffect(()=>()=>geometry.dispose(),[geometry])
  return <mesh geometry={geometry} onClick={e=>{e.stopPropagation();onProbe(ids[Math.floor((e.faceIndex??0)/12)])}}><meshStandardMaterial vertexColors roughness={0.95} side={THREE.DoubleSide}/></mesh>
 }
-function Context({frame}:{frame?:CoupledFrame}){
+function Context({frame,capEnabled,capRadius,capRise}:{frame?:CoupledFrame;capEnabled:boolean;capRadius:number;capRise:number}){
  const oak=useMemo(()=>oakStructure(true),[])
+ const capGeometry=useMemo(()=>new THREE.LatheGeometry(Array.from({length:33},(_,i)=>{const x=i/32,shape=(1-x*x)**2;return new THREE.Vector2(capRadius*x,capRise*(1-x*x)+(frame?.cap?.centerUpM??0)-(frame?.cap?.flexM??0)+(frame?.cap?.flexM??0)*shape)}),48),[capRadius,capRise,frame])
+ useEffect(()=>()=>capGeometry.dispose(),[capGeometry])
  const geometries=useMemo(()=>[...oak.wood,...oak.roots].map(limb=>new THREE.TubeGeometry(new THREE.CatmullRomCurve3(limb.points.map(p=>new THREE.Vector3(...p))),12,limb.radius,5,false)),[oak])
  useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries])
  return <>
   <group position={[-3.24,0,0.09]}>{geometries.map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial color={i<oak.wood.length?'#4c3d2a':'#a28358'} roughness={1}/></mesh>)}{oak.tips.filter((_,i)=>i%4===0).map((p,i)=><mesh key={i} position={p}><sphereGeometry args={[0.34,7,5]}/><meshStandardMaterial color="#536342" roughness={1}/></mesh>)}</group>
   <Line points={[[0.4,0.1,0],[0.4,-1.3,0]]} color="#bec7ba" dashed dashSize={0.06} gapSize={0.06}/>
   <mesh position={[0.4,-1.3,0]}><sphereGeometry args={[Math.cbrt(3*(frame?.dryIceKg??4)/(4*Math.PI*1560)),16,12]}/><meshStandardMaterial color="#c4e6e8" roughness={0.8}/></mesh>
-  <mesh position={[0.4,0.02,0]} rotation={[Math.PI,0,0]}><sphereGeometry args={[0.475,24,12,0,Math.PI*2,0,0.3]}/><meshStandardMaterial color="#8c9999" metalness={0.7} roughness={0.4} side={THREE.DoubleSide}/></mesh>
+  {capEnabled&&<mesh position={[0.4,0.005,0]} geometry={capGeometry}><meshStandardMaterial color="#8c9999" metalness={0.7} roughness={0.4} side={THREE.DoubleSide}/></mesh>}
  </>
 }
 function Metrics(){const {gl}=useThree(),stats=useRef({last:performance.now(),frames:0});useFrame(()=>{stats.current.frames++;const now=performance.now();if(now-stats.current.last>=1000){gl.domElement.dataset.fps=String(stats.current.frames*1000/(now-stats.current.last));stats.current={last:now,frames:0}}});return null}
-export function CoupledScene(props:{frame?:CoupledFrame;fidelity:Fidelity;field:CoupledField;cut:boolean;amplification:number;context:boolean;onProbe:(i:number)=>void}){
- return <Canvas dpr={[1,1.5]} camera={{position:[8,6,10],fov:45,near:0.05,far:100}}><color attach="background" args={['#172222']}/><ambientLight intensity={1.5}/><directionalLight position={[4,10,8]} intensity={2}/><FieldMesh {...props}/>{props.context&&<Context frame={props.frame}/>}<OrbitControls makeDefault target={[0,-0.5,0]}/><gridHelper args={[16,16,'#536154','#293c34']} position={[0,-3.23,0]}/><Metrics/></Canvas>
+export function CoupledScene(props:{capEnabled:boolean;capRadius:number;capRise:number;frame?:CoupledFrame;fidelity:Fidelity;field:CoupledField;cut:boolean;amplification:number;context:boolean;onProbe:(i:number)=>void}){
+ return <Canvas dpr={[1,1.5]} camera={{position:[8,6,10],fov:45,near:0.05,far:100}}><color attach="background" args={['#172222']}/><ambientLight intensity={1.5}/><directionalLight position={[4,10,8]} intensity={2}/><FieldMesh {...props}/>{props.context&&<Context frame={props.frame} capEnabled={props.capEnabled} capRadius={props.capRadius} capRise={props.capRise}/>}<OrbitControls makeDefault target={[0,-0.5,0]}/><gridHelper args={[16,16,'#536154','#293c34']} position={[0,-3.23,0]}/><Metrics/></Canvas>
 }

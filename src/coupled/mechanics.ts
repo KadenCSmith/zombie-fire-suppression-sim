@@ -33,7 +33,7 @@ export class PoroMechanics {
   private preloading=false
   geostaticResidualN=0
   private roots:{a:number;b:number;direction:number[];stiffness:number}[]=[]
-  constructor(readonly nx:number,readonly ny:number,readonly nz:number,readonly width:number,readonly length:number,readonly depth:number,materials:BrickMaterial[],readonly ell:number,reinforce=false){
+  constructor(readonly nx:number,readonly ny:number,readonly nz:number,readonly width:number,readonly length:number,readonly depth:number,materials:BrickMaterial[],readonly ell:number,reinforce=false,readonly initialTopForce?:Float64Array){
     this.n=nx*ny*nz;this.nodeCount=(nx+1)*(ny+1)*(nz+1);this.dx=width/nx;this.dy=length/ny;this.dz=depth/nz;this.volume=this.dx*this.dy*this.dz
     if(materials.length!==this.n||materials.some(m=>m.poisson<0||m.poisson>=0.45||m.youngsPa<=0||m.fractureEnergyJm2<=0)||ell<=0)throw new Error('Invalid poromechanical material/grid.')
     this.u=new Float64Array(3*this.nodeCount);this.fixed=new Uint8Array(this.u.length);this.damage=new Float64Array(this.n);this.history=new Float64Array(this.n);this.diagonal=new Float64Array(this.u.length)
@@ -110,15 +110,17 @@ export class PoroMechanics {
   fractureEnergy(){let total=0;for(let i=0;i<this.n;i++){const gc=this.elements[i].material.fractureEnergyJm2;total+=gc*this.damage[i]**2/(2*this.ell)*this.volume
     const x=i%this.nx,y=Math.floor(i/this.nx)%this.ny,z=Math.floor(i/(this.nx*this.ny));for(const[j,h]of [[x+1<this.nx?i+1:-1,this.dx],[y+1<this.ny?i+this.nx:-1,this.dy],[z+1<this.nz?i+this.nx*this.ny:-1,this.dz]])if(j>=0){const gj=this.elements[j].material.fractureEnergyJm2;total+=gc*gj/(gc+gj)*this.ell*(this.damage[i]-this.damage[j])**2/(h*h)*this.volume}}
     return total}
-  solve(pressureIncrement:Float64Array,fracture=false,topTractionPa=0):MechanicalState{
+  solve(pressureIncrement:Float64Array,fracture=false,topTractionPa=0,extraForce?:Float64Array):MechanicalState{
     if(pressureIncrement.length!==this.n)throw new Error('Pressure grid mismatch.')
     const oldU=this.u.slice(),oldD=this.damage.slice(),oldH=this.history.slice(),force=new Float64Array(this.u.length)
     this.elements.forEach((e,id)=>{for(const b of this.B)for(let a=0;a<24;a++)force[e.dofs[a]]+=e.material.biot*pressureIncrement[id]*(b[a]+b[24+a]+b[48+a])*this.volume/8})
     for(let j=0;j<this.ny;j++)for(let i=0;i<this.nx;i++)for(const[a,b]of[[i,j],[i+1,j],[i,j+1],[i+1,j+1]])force[3*this.node(a,b,0)+2]+=topTractionPa*this.dx*this.dy/4
     if(this.preloading)this.elements.forEach(e=>{for(let a=0;a<8;a++)force[e.dofs[3*a+2]]+=e.material.densityKgM3*9.80665*this.volume/8})
+    if(this.preloading&&this.initialTopForce)for(let i=0;i<force.length;i++)force[i]+=this.initialTopForce[i]
+    if(extraForce)for(let i=0;i<force.length;i++)force[i]+=extraForce[i]
     let iterations=0,residualN=0
     try{
-      for(let outer=0;outer<(fracture?40:1);outer++){
+      for(let outer=0;outer<(fracture?80:1);outer++){
         this.diagonal.fill(0);this.elements.forEach((e,id)=>{for(let a=0;a<24;a++)this.diagonal[e.dofs[a]]+=this.stiffnessScale(id)*e.stiffness[a*24+a]})
         for(const r of this.roots)for(let c=0;c<3;c++){this.diagonal[r.a*3+c]+=r.stiffness*r.direction[c]**2;this.diagonal[r.b*3+c]+=r.stiffness*r.direction[c]**2}for(let i=0;i<this.u.length;i++)if(this.fixed[i])this.diagonal[i]=1
         for(let iter=0;iter<200;iter++){
@@ -132,7 +134,7 @@ export class PoroMechanics {
         }
         if(!fracture)break
         const state=this.state(this.u,fracture),before=this.damage.slice();for(let i=0;i<this.n;i++)this.history[i]=Math.max(this.history[i],state.positive[i]);this.damageSolve(oldD)
-        let change=0;for(let i=0;i<this.n;i++)change=Math.max(change,Math.abs(before[i]-this.damage[i]));if(change<1e-7)break;if(outer===39)throw new Error('Staggered fracture convergence failed.')
+        let change=0;for(let i=0;i<this.n;i++)change=Math.max(change,Math.abs(before[i]-this.damage[i]));if(change<1e-7){const check=this.state(this.u,true);let forceError=0;for(let i=0;i<this.u.length;i++)if(!this.fixed[i])forceError=Math.max(forceError,Math.abs(check.internal[i]-force[i]));if(forceError<1e-5)break}if(outer===79)throw new Error('Staggered fracture convergence failed.')
       }
       const state=this.state(this.u,fracture,true);residualN=0;for(let i=0;i<this.u.length;i++)if(!this.fixed[i])residualN=Math.max(residualN,Math.abs(state.internal[i]-force[i]))
       if(state.maxStrain>0.02)throw new Error('2% incremental principal strain exceeded: finite-deformation/contact discretization required.')
