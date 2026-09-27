@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
 
 describe('story and accepted-state separation', () => {
   const frames = [
@@ -79,8 +79,8 @@ describe('variable playback clock and illustrated treatment trigger', () => {
   it('seats the inverted plate below ground and inverts it only in the illustrative rapid mode', () => {
     const initial=fireSequencePose(54,'rapid'),inverted=fireSequencePose(61,'rapid')
     expect(initial.capY).toBeCloseTo(-1.05)
-    expect(initial.capY-.1+initial.bend).toBeCloseTo(-1.15)
-    expect(inverted.capY-.1+inverted.bend).toBeCloseTo(-.85)
+    expect(initial.capY-G.capRiseM+initial.bend).toBeCloseTo(-1.105)
+    expect(inverted.capY-G.capRiseM+inverted.bend).toBeCloseTo(-.885)
     expect(fireSequencePose(90,'gradual').bend).toBe(0)
   })
 })

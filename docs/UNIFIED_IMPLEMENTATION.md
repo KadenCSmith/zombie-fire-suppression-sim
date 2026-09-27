@@ -51,3 +51,12 @@ The complete scene now follows a visible surface-to-peat connection. A contiguou
 A shared monotonic clock maps 90 story seconds to 36 playback seconds: 55–61 story seconds run at 1:1, while the other stages run 2.8×. Both modes, films, seeks and interactive playback use the same clock. Manual speed is a multiplier. The normal-speed event remains an authored rapid-conversion illustration and does not establish a real explosion duration.
 
 Films retain their immutable bundled calculation; custom numerical experiments affect only their own interactive fields and exports. A delayed baseline download cannot overwrite a newly accepted run, and terminated workers cannot replace current results. Native film seeking uses bounded byte-range streaming rather than reading entire movie files into the main process.
+
+
+## 0.15 visual revision — 2026-09-27
+
+- Restored the reference dark teal/copper layout and broad natural cutaway. Added instanced fine grass, realistic tracked/IK/hydraulic excavation equipment and a 0.48 m presentation bore.
+- Replaced radial peat progression with a deterministic connected weighted arrival field; 70% of its 4,141 samples gates treatment. Shared JSON drives interactive and Blender appearance. This is not combustion physics.
+- Added rapid-only prescribed piece separation, dust/debris and residual gaps. Scientific fields stay on accepted pre-treatment data for rapid mode; no new pressure or fracture prediction is implied.
+- Retained the cold-fire numerical history, 2,560/20,480-cell laboratory choices, sparse/reference agreement and source/energy acceptance gates. Numerical cache generation remains a47721ffb7d17ebde0e42a12261094843e618aba.
+- Added connectedness, sampled-area, source/auger/plate clearance and burst persistence tests. Independent realism review uses the user-requested threshold of 7/10, with at most three review cycles.

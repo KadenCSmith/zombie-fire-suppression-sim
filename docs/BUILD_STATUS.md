@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Visual revision — 0.15
+
+The dark teal/copper cutaway now includes dense fine grass, a compact articulated tracked excavator, a 0.48 m illustrative bore, connected heterogeneous peat appearance and a rapid pressure-release illustration with persistent separated pieces. Treatment still waits for 70% illustrated involvement; growth precedes all equipment. Scientific calculations and the accepted cache are unchanged. Both complete Blender films are rebuilt from the shared appearance contract. Independent realism review is recorded separately before delivery.
+
 ## Current unified fire workflow — 0.14
 
 The current app adds a complete interactive fire/treatment story, both gradual and illustrative rapid Blender films, and a cold-start numerical experiment with retained initial moisture. The accepted baseline covers24h plus30s finite-source treatment; source-generation checkpoint `a47721f` freezes the exact cache and source hashes. It sustains surface oxidation but does not resolve underground combustion propagation. The source loses1.7885g during treatment and continuing oxidation remains present. No suppression success is inferred.

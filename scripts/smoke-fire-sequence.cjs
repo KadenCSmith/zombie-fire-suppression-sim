@@ -15,6 +15,8 @@ app.on('browser-window-created',(_event,win)=>{
         const button=label=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===label||b.getAttribute('aria-label')===label);
         const change=(label,value)=>{const el=document.querySelector('input[aria-label="'+label+'"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,String(value));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
         await wait(()=>button('Play fire sequence')&&document.body.textContent.includes('Bundled numerical history loaded'),'default sequence and accepted cache');
+        [...document.querySelectorAll('.fire-mode-switch button')].find(b=>b.textContent.includes('Gradual')).click();
+        await wait(()=>[...document.querySelectorAll('.fire-mode-switch button')].some(b=>b.textContent.includes('Gradual')&&b.getAttribute('aria-pressed')==='true'),'select gradual for comparison');
         change('Fire sequence time',63);
         await wait(()=>document.querySelector('.fire-timeline-track strong')?.textContent.includes('63.0'),'story seek');
         button('Temperature').click();

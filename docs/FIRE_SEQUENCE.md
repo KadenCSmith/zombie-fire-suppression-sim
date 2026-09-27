@@ -2,7 +2,11 @@
 
 The application opens with the complete fire-and-treatment story: a small surface flame, underground peat illustration, a tracked excavator arriving with a boom-mounted auger, drilling and withdrawal, dry-ice placement, buried inverted metal plate placement and upward inversion, gas tracers, and water along assumed openings. Treatment is gated until 70% of the illustrated peat region is involved. The surface-to-peat connection and growing region are prescribed spatial cues; this is not a numerical burning-volume measurement. The remaining 30% stays visibly unburned when the excavator begins.
 
-The natural cutaway retains the detailed oak, exposed roots, layered soil and seeded irregular aggregates and grass requested by the user.
+The natural cutaway restores the dark teal/copper presentation, detailed oak and exposed roots. It adds 30,000 individually varied, folded grass blades in one instanced draw, random mineral aggregates and batched irregular soil pieces. The reference grass screenshot guides appearance; it is not redistributed as a seamless texture. The tracked excavator has continuous shoes, rollers, glazed cab, vents, hydraulic cylinders, hoses and a two-link boom whose end follows the auger. The illustrative bore is now 0.48 m in diameter, with a 0.40 m auger and plate. These are presentation dimensions, not a field design.
+
+The peat front follows a seeded, connected weighted arrival graph rather than a uniform expanding oval. All newly reached samples connect to earlier samples. The trigger is the involved fraction of 4,141 display samples in a 200 × 80 appearance atlas, not numerical fuel consumption. Boundary smoothing does not change the sampled trigger. Both Blender and the interactive scene use the same exported appearance data.
+
+Rapid mode visibly raises and separates irregular soil pieces, throws decorative dust/debris and retains gaps after settling; grass, mineral aggregates and roots share the prescribed displacement envelope. No pressure, explosive yield or mechanical failure threshold is inferred from these movements. [NIOSH identifies carbon dioxide as nonflammable](https://www.cdc.gov/niosh/npg/npgd0103.html); the depicted event is an illustrative pressure release. Gradual mode does not receive this burst. Fresh installations open Rapid mode to show the requested sequence; a saved choice is retained.
 
 ## Two clocks and two source modes
 
