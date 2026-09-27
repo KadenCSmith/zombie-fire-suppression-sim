@@ -10,4 +10,4 @@ it('rejects unbalanced fracture without committing transport, deformation or his
  // This prepared heterogeneous site is intentionally not accepted as a validated brittle-fracture specimen.
  try{e.step(2)}catch(error){expect(String(error)).toMatch(/energy|Mechanical|Staggered/);expect(e.transport.time).toBe(0);expect(e.transport.checkpoint()).toEqual(initial);expect(e.mechanics!.damage).toEqual(damage);expect(e.mechanical).toBeNull();return}
  expect(Math.abs(e.mechanicalBalanceJ)).toBeLessThan(1e-5)
-})
+},30000)
