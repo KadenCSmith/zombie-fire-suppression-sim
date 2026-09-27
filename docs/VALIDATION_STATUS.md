@@ -21,7 +21,18 @@ Calculated force/opening, irreversible damage, unloading and a complete work/sto
 
 Typecheck, lint, all **117 tests in 18 files**, production build and expanded local native desktop smoke passed. Six tensile tests cover independent bilinear response, full fracture work, partial unload/reload irreversibility, 2/4/8/32 bar subdivisions, 100/200 load steps, unstable/small-strain scope guards and strict measurement import. The native UI check exercised separation, rewind, display-only changes, a clearly synthetic CSV, preserved sessions and physical-input invalidation. Screenshot inspection confirmed readable charts and controls. The [timing and conservation report](../examples/tensileFractureBenchmark.json) measured 201-frame median solve time 0.054 ms, 801-frame median 0.147 ms, and energy residuals below 1.4e-17 J. The scalar coupon remains synchronous because even the tested API maximum took below 0.57 ms; the 3D FEM uses a worker. These are local solver timings excluding rendering/import.
 
-The first workbench integration passed hosted macOS, Windows and Ubuntu checks ([run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36299116091)). Hosted checks for the tensile addition and release/install verification follow when complete.
+The first workbench integration passed hosted macOS, Windows and Ubuntu checks ([run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36299116091)). The tensile addition and release/install verification are recorded below.
+
+
+### Version 0.10 release and installation verification
+
+[Version 0.10.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.10.0) is published as latest in the private repository, built from `ecc8daa557894b618c9fc1d18a2e6a37ce2a570d`. All nine uploaded file sizes and SHA-256 digests match the verified local files. Mac universal DMG/ZIP, Windows x64/ARM64 ZIPs and Linux x64/ARM64 tarballs are available with instructions, checksums and a source manifest. Verified local copies and a short guide are in `~/Documents/Codex/2026-09-26/continue-zombie-fire-simulation-physics-and/outputs/`.
+
+All **117 tests**, typecheck, lint, production builds and expanded native desktop smoke passed on macOS, Windows and Ubuntu ([release-source CI](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36299835413)). Mac universal executable architectures, strict signatures after clean ZIP extraction and inside the mounted read-only DMG, DMG integrity, and Windows/Linux executable architectures/archive integrity passed. Mac signing remains ad-hoc, not notarized; Windows is unsigned. Intel Mac and Windows/Linux ARM native execution have not been separately verified.
+
+The closed 0.9 installed application was copied and checked against all 347 file/symlink entries before replacement. The original 0.9 bundle is preserved intact in `work/installed-backup-0.9/Zombie Fire Suppression Sim.app`. The clean 0.10 extraction is now installed at `~/Applications/Zombie Fire Suppression Sim.app`, reports 0.10.0, and passes strict deep signature verification. **Final inspection of the installed native window remains pending because the Mac is locked.** No open installed-app process was terminated. Development-native screenshot/interaction checks and hosted desktop checks passed; they are not recorded as a completed installed-window inspection.
+
+The independent Blender edit retains SHA-256 `e537ea14a6a75f83329675418bc565f1a4aa672da53011ec168581aa7531a638`; synced sources remain unchanged. Finder Red tags identify newly created release/backup/verification folders and retain prior Red tags on Codex-created source folders. Modified pre-existing output/task folders and Applications are Orange; unrelated tags are preserved. No tags are written inside signed application bundles.
 
 
 ## Broad opening, irregular roots and surface fire (2026-09-26, version 0.9.0)
