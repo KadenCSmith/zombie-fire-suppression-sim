@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-27T10:47:22.306599+00:00",
+  "referenceDriverCommit": "a47721f",
+  "comparison": "Exact equality of all five captured temperature, pressure, gas, inventory, event and ledger frames between frozen driver and shared async runner. Same two-second cold ignition followed by a 0.25 s source treatment.",
+  "options": {
+    "durationS": 2,
+    "ignitionDurationS": 1,
+    "ignitionPowerW": 100,
+    "moistureDryBasis": 0.1,
+    "maxStepS": 20,
+    "captureEveryS": 1,
+    "surfaceExchangeVelocityMS": 0.0016
+  },
+  "treatmentDurationS": 0.25,
+  "frameCount": 5,
+  "exactFieldsAndLedgersEqual": true,
+  "bundledCacheUnchanged": true,
+  "sharedSourceHashes": {
+    "fireProtocol": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+    "fireProtocolRunner": "d10427dee4e8a4ad2d0d33d9a0e8603b0dce9b88415fbd82edcb54db843c68f4",
+    "model": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+    "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+    "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+    "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+    "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045"
+  },
+  "initializationHashes": {
+    "solver": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+    "scenario": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+    "materials": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb"
+  },
+  "generatorHash": "496f2fe6a2768dc9dbc4c09b6fc2f28a49c86503b7f9c87d5ea03275e020bedb",
+  "scope": "Small integration regression, not long-duration convergence or physical validation."
+}
