@@ -12,6 +12,8 @@ Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com
 
 The **Physics model** selector opens the fast demonstration, existing porous gas/heat workspace, or new soil-deformation workbench. In the latter, compare identical load/unload stages through explicit linear elasticity and frictional plasticity, using shared cameras/scales and calculated displacement, incremental stress and plastic strain. Sliders have units, numeric entry and resets; changing physical inputs invalidates the previous trajectory. A new analytical benchmark exposed and repaired an unloading convergence defect. The homogeneous fixture is separate from the oak landscape and is not coupled fracture.
 
+The **Peat tensile fracture lab** adds irreversible separation, a force–extension chart, an energy ledger and measured CSV comparison. Documented Krimpen strength observations guide the tensile range; stiffness and fracture energy remain explicit assumptions. [Tensile equations, evidence and validation criteria](docs/PEAT_TENSILE_FAILURE.md).
+
 [Workbench, audit and next stages](docs/MODEL_WORKBENCH.md) · [Parameter evidence](docs/WORKBENCH_PARAMETER_EVIDENCE.md). Open directly with `--mechanics`. Earlier scenes remain in ⋯.
 
 ## Broad ground opening and surface fire

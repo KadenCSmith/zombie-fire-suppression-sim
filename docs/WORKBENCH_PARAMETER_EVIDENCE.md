@@ -1,6 +1,6 @@
 # Workbench parameter evidence — 0.10.0
 
-Reviewed September 26, 2026. This supplements, rather than replaces, [the existing material evidence registry](MATERIAL_EVIDENCE_ASCE.md). The workbench is a homogeneous numerical fixture. **No measured peat material preset is adopted in this increment.** All below mechanical constants are declared assumptions inherited from the existing solver, with the loading chosen to cross its illustrative yield surface slightly. UI ranges are software limits, not experimental confidence intervals.
+Reviewed September 26, 2026. This supplements, rather than replaces, [the existing material evidence registry](MATERIAL_EVIDENCE_ASCE.md). The compression workbench is a homogeneous numerical fixture. **No measured peat material preset is adopted for compression.** The separate [tensile laboratory evidence](PEAT_TENSILE_FAILURE.md) records the documented Krimpen strength observations and its remaining assumptions. All below mechanical constants are declared assumptions inherited from the existing solver, with the loading chosen to cross its illustrative yield surface slightly. UI ranges are software limits, not experimental confidence intervals.
 
 ## Adopted inputs
 

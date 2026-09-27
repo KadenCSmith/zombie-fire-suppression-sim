@@ -1,3 +1,4 @@
+import PeatTensionLab, { type TensileSession } from './PeatTensionLab'
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react'
 import { BENCHMARK_SIZE, DEFAULT_BENCHMARK, MECHANICS_FIELDS, fieldValues, peakDisplacement, type BenchmarkInputs, type BenchmarkRun, type MechanicsField, type MechanicsLaw } from '../mechanics/comparison'
 import ComparisonWorker from '../worker/mechanicsComparison.worker.ts?worker'
@@ -8,14 +9,15 @@ import { StudyVersions } from './StudyVersions'
 import type { StudyVersion } from './studyModel'
 
 export interface MechanicsSession {
-  inputs: BenchmarkInputs; runs: Partial<Record<MechanicsLaw, BenchmarkRun>>; stage: number; field: MechanicsField; view: MechanicsCamera; compare: boolean; law: MechanicsLaw; amplification: number; mesh: boolean
+  fixture: 'compression' | 'tension'; inputs: BenchmarkInputs; runs: Partial<Record<MechanicsLaw, BenchmarkRun>>; stage: number; field: MechanicsField; view: MechanicsCamera; compare: boolean; law: MechanicsLaw; amplification: number; mesh: boolean
 }
 const NAMES: Record<MechanicsLaw,string> = { elastic: 'Linear elastic', 'drucker-prager': 'Frictional plasticity' }
-export default function MechanicsWorkspace({ onWorkspace, version, onVersion, session, camera }: {
+export default function MechanicsWorkspace({ onWorkspace, version, onVersion, session, camera, tensileSession }: {
   onWorkspace: (value: PhysicsWorkspace) => void; version: StudyVersion; onVersion: (version: StudyVersion) => void;
-  session: MutableRefObject<MechanicsSession | undefined>; camera: MutableRefObject<CameraMemory | undefined>
+  tensileSession: MutableRefObject<TensileSession | undefined>; session: MutableRefObject<MechanicsSession | undefined>; camera: MutableRefObject<CameraMemory | undefined>
 }) {
   const saved = session.current
+  const [fixture,setFixture] = useState<'compression'|'tension'>(saved?.fixture ?? 'compression')
   const [inputs,setInputs] = useState(saved?.inputs ?? structuredClone(DEFAULT_BENCHMARK))
   const [runs,setRuns] = useState<Partial<Record<MechanicsLaw,BenchmarkRun>>>(saved?.runs ?? {})
   const [stage,setStage] = useState(saved?.stage ?? 0)
@@ -32,7 +34,7 @@ export default function MechanicsWorkspace({ onWorkspace, version, onVersion, se
   const [rate,setRate] = useState(3)
   const [probe,setProbe] = useState('Click an element to inspect its value.')
   const worker = useRef<Worker | null>(null)
-  useEffect(() => { session.current = { inputs,runs,stage,field,view,compare,law,amplification,mesh } }, [inputs,runs,stage,field,view,compare,law,amplification,mesh,session])
+  useEffect(() => { session.current = { fixture,inputs,runs,stage,field,view,compare,law,amplification,mesh } }, [fixture,inputs,runs,stage,field,view,compare,law,amplification,mesh,session])
   useEffect(() => () => worker.current?.terminate(), [])
   const laws: MechanicsLaw[] = compare ? ['elastic','drucker-prager'] : [law]
   const frameCount = Math.min(...laws.map(key => runs[key]?.frames.length ?? 0))
@@ -76,9 +78,10 @@ export default function MechanicsWorkspace({ onWorkspace, version, onVersion, se
     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mechanics-comparison.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
   }
   const info=MECHANICS_FIELDS[field]
+  if (fixture === 'tension') return <PeatTensionLab onWorkspace={onWorkspace} onBack={()=>setFixture('compression')} session={tensileSession} />
   return <div className="ops-shell">
     <header className="ops-header"><div className="ops-brand"><strong>ZOMBIE FIRE</strong><span>SIMULATION ENVIRONMENT / 0.10</span></div><ModelSelector value="mechanics" onChange={onWorkspace} /><StudyVersions version={version} onSelect={onVersion} /></header>
-    <div className="ops-title"><div><span className="ops-eyebrow">MECHANICS / VERIFICATION FIXTURE 01</span><h1>Load. Deform. Recover.</h1></div><span className="ops-status">{running ? 'CALCULATING' : frameCount ? 'RESULTS READY' : 'AWAITING CALCULATION'}<i /></span></div>
+    <div className="ops-title"><div><span className="ops-eyebrow">MECHANICS / VERIFICATION FIXTURE 01</span><h1>Load. Deform. Recover.</h1></div><button className="ops-secondary" onClick={()=>{stop();setFixture('tension')}}>Peat tensile fracture lab</button><span className="ops-status">{running ? 'CALCULATING' : frameCount ? 'RESULTS READY' : 'AWAITING CALCULATION'}<i /></span></div>
     <main className="ops-main">
       <aside className="ops-controls" aria-label="Mechanics scenario controls">
         <h2>Scenario controls</h2><p>Homogeneous 2 × 2 × 1 m block. Both laws use identical inputs, roller base and free sides.</p>

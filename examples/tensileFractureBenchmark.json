@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-09-27T06:19:55.261Z",
+  "node": "v26.8.2",
+  "cpu": "Apple M3 Pro",
+  "source": "src/mechanics/tensileFracture.ts",
+  "sourceSha256": "d63fe0c014d5e0208d7a980dee28dcefd3bce51aa4d54d221d23a66e91a9ca0b",
+  "warmups": 10,
+  "repetitions": 25,
+  "scope": "Scalar series-bar/cohesive-interface calculation only; excludes rendering, CSV import and startup. Numerical verification, not experimental validation.",
+  "cases": [
+    {
+      "increments": 100,
+      "frames": 201,
+      "medianSolveMs": 0.05374999999999375,
+      "maximumSolveMs": 0.2325830000000053,
+      "peakSampledForceN": 14.48976451662756,
+      "exactPeakForceN": 14.54007619897696,
+      "maximumAbsEnergyResidualJ": 9.11589310639536e-18,
+      "finalDissipationJ": 0.017105971998796425,
+      "expectedDissipationJ": 0.017105971998796425
+    },
+    {
+      "increments": 400,
+      "frames": 801,
+      "medianSolveMs": 0.14654200000001083,
+      "maximumSolveMs": 0.29716700000000174,
+      "peakSampledForceN": 14.502651464980687,
+      "exactPeakForceN": 14.54007619897696,
+      "maximumAbsEnergyResidualJ": 1.367383965959304e-17,
+      "finalDissipationJ": 0.017105971998796425,
+      "expectedDissipationJ": 0.017105971998796425
+    },
+    {
+      "increments": 1000,
+      "frames": 2001,
+      "medianSolveMs": 0.31962500000000205,
+      "maximumSolveMs": 0.5609999999999928,
+      "peakSampledForceN": 14.532591252177706,
+      "exactPeakForceN": 14.54007619897696,
+      "maximumAbsEnergyResidualJ": 1.2154524141860481e-17,
+      "finalDissipationJ": 0.017105971998796425,
+      "expectedDissipationJ": 0.017105971998796425
+    }
+  ]
+}

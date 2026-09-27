@@ -13,6 +13,17 @@ The local [profile report](../examples/mechanicsComparisonBenchmark.json) record
 The independent Blender file retains its recorded SHA-256 and is excluded; synced sources are unchanged. Release, hosted platform and installed-app checks are recorded below only when complete.
 
 
+### Tensile failure laboratory and measurement comparison
+
+The same release now includes a bounded Mode-I cohesive specimen under the mechanics workspace. The documented reference is Krimpen woody peat: 66 × 100 mm horizontal direct-tension specimens with unsubmerged strength observations of 3.5 and 5 kPa. The 4.25 kPa default is their midpoint assumption. Bulk/interface stiffness and fracture energy are unmeasured assumptions, visibly identified. [Full parameter evidence, ASCE references, equations and validation acceptance criteria](PEAT_TENSILE_FAILURE.md).
+
+Calculated force/opening, irreversible damage, unloading and a complete work/storage/dissipation ledger drive the specimen geometry and chart. Unit-bearing CSV observations can be overlaid without extrapolation; fitting/holdout declaration and specimen notes accompany exports. Physical edits discard the prior trajectory; camera, stage and imported observations survive workspace changes. The model is one prescribed plane, not a spatial crack-path solver. No matched experimental validation has passed, and no coupled field-fracture claim is made.
+
+Typecheck, lint, all **117 tests in 18 files**, production build and expanded local native desktop smoke passed. Six tensile tests cover independent bilinear response, full fracture work, partial unload/reload irreversibility, 2/4/8/32 bar subdivisions, 100/200 load steps, unstable/small-strain scope guards and strict measurement import. The native UI check exercised separation, rewind, display-only changes, a clearly synthetic CSV, preserved sessions and physical-input invalidation. Screenshot inspection confirmed readable charts and controls. The [timing and conservation report](../examples/tensileFractureBenchmark.json) measured 201-frame median solve time 0.054 ms, 801-frame median 0.147 ms, and energy residuals below 1.4e-17 J. The scalar coupon remains synchronous because even the tested API maximum took below 0.57 ms; the 3D FEM uses a worker. These are local solver timings excluding rendering/import.
+
+The first workbench integration passed hosted macOS, Windows and Ubuntu checks ([run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36299116091)). Hosted checks for the tensile addition and release/install verification follow when complete.
+
+
 ## Broad opening, irregular roots and surface fire (2026-09-26, version 0.9.0)
 
 The latest scene replaces the horizontal bond markers with irregular soil pieces opening under a broader assumed load and weaker soil coefficients. The oak root network uses reproducible irregular directions, curves, depths and branches. A peat bed spans most of the section, with an unburnt margin and a narrow staged path to a small surface fire. Version 0.8 is retained alongside 0.5–0.7. [Model changes, display approximations and two additional peer-reviewed fire studies with ASCE references](WIDE_RUPTURE_FIRE.md).

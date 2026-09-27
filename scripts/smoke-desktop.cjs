@@ -16,7 +16,7 @@ if (process.platform !== 'darwin') {
   app.commandLine.appendSwitch('enable-unsafe-swiftshader');
 }
 const errors = [];
-const timeout = setTimeout(() => finish('Desktop smoke test timed out.'), 90000);
+const timeout = setTimeout(() => finish('Desktop smoke test timed out.'), 150000);
 function finish(error) {
   clearTimeout(timeout);
   if (error) console.error(error, errors);
@@ -153,6 +153,44 @@ app.on('browser-window-created', (_event, win) => {
         await waitFor(()=>document.querySelector('.ops-timeline output')?.textContent.includes('20 / 20'),'mechanics restored for visual check');
         setRange('Mechanics load stage',10);
         await waitFor(()=>document.querySelector('.ops-timeline output')?.textContent.includes('9.20 kPa'),'verified default load');
+        button('Peat tensile fracture lab').click();
+        await waitFor(()=>button('Calculate tensile fracture'),'peat tensile laboratory');
+        button('Calculate tensile fracture').click();
+        await waitFor(()=>document.querySelector('input[aria-label="Tensile load stage"]')?.max==='200','tensile calculation');
+        setRange('Tensile load stage',100);
+        await waitFor(()=>document.querySelector('.ops-status')?.textContent.includes('SEPARATED'),'calculated complete separation');
+        if(!document.querySelector('.ops-telemetry').textContent.includes('1.0000')) throw new Error('Missing irreversible tensile damage');
+        const tensileTelemetry=document.querySelector('.ops-telemetry').textContent;
+        const display=document.querySelector('select[aria-label="Tensile display magnification"]');
+        display.value='4';display.dispatchEvent(new Event('change',{bubbles:true}));
+        await waitFor(()=>document.querySelector('select[aria-label="Tensile display magnification"]')?.value==='4','tensile visual setting');
+        if(document.querySelector('.ops-telemetry').textContent!==tensileTelemetry) throw new Error('Tensile rendering mutated physics');
+        const files=new DataTransfer();
+        // Synthetic UI fixture only. It is never shipped or labeled as laboratory evidence.
+        files.items.add(new File(['extension_mm,force_N\\n0,0\\n0.2,5\\n0.4,10'], 'synthetic-ui-check.csv', {type:'text/csv'}));
+        const csv=document.querySelector('input[type="file"]');csv.files=files.files;csv.dispatchEvent(new Event('change',{bubbles:true}));
+        await waitFor(()=>document.querySelector('.tensile-data')?.textContent.includes('RMSE'),'measurement comparison and units');
+        if(!document.querySelector('select[aria-label="Tensile observation data use"]')) throw new Error('Missing data provenance control');
+        setRange('Tensile load stage',0);
+        await waitFor(()=>document.querySelector('.ops-status')?.textContent.includes('INTACT'),'tensile rewind');
+        setRange('Tensile load stage',100);
+        await chooseModel('study');
+        await waitFor(()=>document.querySelector('#study-playhead'),'return to terrain');
+        await chooseModel('mechanics');
+        await waitFor(()=>Number(document.querySelector('input[aria-label="Tensile load stage"]')?.value)===100,'preserved fracture laboratory');
+        if(!document.querySelector('.tensile-data').textContent.includes('RMSE')) throw new Error('Lost imported tensile observations');
+        setRange('Tensile strength slider',4);
+        await waitFor(()=>document.querySelector('input[aria-label="Tensile load stage"]')?.max==='0','tensile physical edit invalidates results');
+        button('Reset tensile inputs').click();
+        await waitFor(()=>Number(document.querySelector('input[aria-label="Tensile strength slider"]').value)===4.25,'tensile default reset');
+        button('Calculate tensile fracture').click();
+        await waitFor(()=>document.querySelector('input[aria-label="Tensile load stage"]')?.max==='200','restored tensile calculation');
+        setRange('Tensile load stage',45);
+        await waitFor(()=>document.querySelector('.ops-status')?.textContent.includes('SOFTENING'),'visible tensile opening');
+        button('Back to compression comparison').click();
+        await waitFor(()=>document.querySelector('.ops-timeline output')?.textContent.includes('9.20 kPa'),'compression comparison retained');
+        button('Peat tensile fracture lab').click();
+        await waitFor(()=>Number(document.querySelector('input[aria-label="Tensile load stage"]')?.value)===45,'tensile replay retained');
         return 'ok';
       })()`);
       if (errors.some(message => /shader error|VALIDATE_STATUS|Error creating WebGL/i.test(message))) throw new Error('Shader compilation failed: ' + errors.join('; '));

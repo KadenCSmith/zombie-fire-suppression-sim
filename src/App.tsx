@@ -1,3 +1,4 @@
+import type { TensileSession } from './ui/PeatTensionLab'
 import { ModelSelector, type PhysicsWorkspace } from './ui/ModelSelector'
 import type { MechanicsSession } from './ui/MechanicsWorkspace'
 import type { CameraMemory } from './ui/MechanicsScene'
@@ -183,6 +184,7 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
   const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => new URLSearchParams(window.location.search).get('workspace') === 'mechanics' ? 'mechanics' : new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : 'study')
+  const tensileSession = useRef<TensileSession | undefined>(undefined)
   const mechanicsSession = useRef<MechanicsSession | undefined>(undefined)
   const mechanicsCamera = useRef<CameraMemory | undefined>(undefined)
   const studySession = useRef<StudySession | undefined>(undefined)
@@ -656,7 +658,7 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
-  if (workspace === 'mechanics') return <Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} /></Suspense>
+  if (workspace === 'mechanics') return <Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense>
 
   if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
     <StudyWorkspace key={studyVersion} version={studyVersion} onVersionChange={next => { studySession.current=undefined; setStudyVersion(next) }} onOpenSimulation={() => changeWorkspace('simulation')} onWorkspace={changeWorkspace} session={studySession} />
