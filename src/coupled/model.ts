@@ -33,7 +33,7 @@ export function coupledScenario(input:CoupledInputs):Scenario {
   return s
 }
 export interface Face {a:number;b:number;axis:number;area:number;distance:number;g:number;diff:number;thermal:number;gravity:number;capFraction:number;ventGap:number;ventRadius:number}
-export interface Ledger {sourceDepositionLimited?:boolean;energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;gravityWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
+export interface Ledger {sourceDepositionLimited?:boolean;externalSolidMassInKg?:number;externalSolidEnergyInJ?:number;insertionWorkJ?:number;energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;gravityWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
 export interface CoupledFrame {materialPeatFraction?:Float32Array;initialization?:{method:string;preparedWaterRemovedKg:number;atlasCells:number};timeS:number;temperatureK:Float32Array;pressurePa:Float32Array;oxygen:Float32Array;co2:Float32Array;iceKg:Float32Array;liquidKg:Float32Array;fuelKg:Float32Array;porosity:Float32Array;damage:Float32Array;displacementM:Float32Array;dryIceKg:number;dryIceTemperatureK:number;ledger:Ledger;cap?:CapState;mechanical?:{elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}}
 const harmonic=(a:number,b:number)=>a+b>0?2*a*b/(a+b):0
 const sum=(v:ArrayLike<number>)=>{let s=0;for(let i=0;i<v.length;i++)s+=v[i];return s}
@@ -243,8 +243,8 @@ export class CoupledTransport {
     }
     this.resolve();this.updateLedger()
   }
-  checkpoint(){return{arrays:this.arrays().map(a=>a.slice()),ledger:structuredClone(this.ledger),boundary:this.boundarySpecies.slice(),sources:this.sources.slice(),time:this.time,dryIce:this.dryIce,dryIceT:this.dryIceT}}
-  restore(checkpoint:ReturnType<CoupledTransport['checkpoint']>){this.arrays().forEach((a,i)=>a.set(checkpoint.arrays[i]));this.ledger=structuredClone(checkpoint.ledger);this.boundarySpecies=checkpoint.boundary.slice();this.sources=checkpoint.sources.slice();this.time=checkpoint.time;this.dryIce=checkpoint.dryIce;this.dryIceT=checkpoint.dryIceT;this.resolve()}
+  checkpoint(){return{arrays:this.arrays().map(a=>a.slice()),ledger:structuredClone(this.ledger),boundary:this.boundarySpecies.slice(),sources:this.sources.slice(),sourceWeights:this.sourceWeights.map(p=>({...p})),sourceCenter:{xM:this.scenario.source.centerXM,yM:this.scenario.source.centerYM,depthM:this.scenario.source.centerDepthM},time:this.time,dryIce:this.dryIce,dryIceT:this.dryIceT}}
+  restore(checkpoint:ReturnType<CoupledTransport['checkpoint']>){this.arrays().forEach((a,i)=>a.set(checkpoint.arrays[i]));this.ledger=structuredClone(checkpoint.ledger);this.boundarySpecies=checkpoint.boundary.slice();this.sources=checkpoint.sources.slice();this.sourceWeights.splice(0,this.sourceWeights.length,...checkpoint.sourceWeights.map(p=>({...p})));Object.assign(this.scenario.source,{centerXM:checkpoint.sourceCenter.xM,centerYM:checkpoint.sourceCenter.yM,centerDepthM:checkpoint.sourceCenter.depthM});this.time=checkpoint.time;this.dryIce=checkpoint.dryIce;this.dryIceT=checkpoint.dryIceT;this.resolve()}
   private arrays(){return[...this.gas,this.water,this.fuel,this.energy,this.pore]}
   step(requested:number){
     if(!Number.isFinite(requested)||requested<=0)throw new Error('Positive finite timestep required.')
@@ -264,13 +264,67 @@ export class CoupledTransport {
     throw new Error('Adaptive timestep exhausted.')
   }
   advance(seconds:number){const target=this.time+seconds;while(this.time<target-1e-9)this.step(target-this.time);return this.frame()}
+  /** Import a finite solid inventory into existing pores without resetting the fire
+   * history or its conservation baseline. This is NOT an excavation/contact solve.
+   * External placement supplies reversible pressure-volume work; impact is omitted.
+   */
+  insertDryIce(massKg:number,temperatureK:number,center:{xM:number;yM:number;depthM:number}){
+    const source=this.scenario.source,d=this.scenario.domain
+    if(!Number.isFinite(massKg)||massKg<=0||massKg>20||!Number.isFinite(temperatureK)||temperatureK<150||temperatureK>216.58)throw new Error('Solid insertion requires 0–20 kg and 150–216.58 K within the source model scope.')
+    if(this.dryIce>1e-12)throw new Error('Remove or exhaust the existing source before inserting another solid inventory.')
+    if(source.enabled&&this.time<source.startTimeS+source.durationS)throw new Error('Finish or disable surface ignition before relocating the source.')
+    const radius=Math.cbrt(3*massKg/(4*Math.PI*source.densityKgM3))
+    const positions=[center.xM,center.yM,center.depthM],sizes=[d.widthM,d.lengthM,d.depthM]
+    if(positions.some((v,i)=>!Number.isFinite(v)||v<radius||v>sizes[i]-radius))throw new Error('Inserted sphere must remain inside the domain.')
+    const saved=this.checkpoint(),oldWeights=this.sourceWeights.map(w=>({...w})),oldCenter=[source.centerXM,source.centerYM,source.centerDepthM]
+    // The same fixed physical atlas used by initialization defines placement support.
+    const atlas={...d,nx:32,ny:32,nz:20},partition=new Float64Array(32*32*20)
+    const coordinates=positions.map((v,i)=>v/sizes[i]*[32,32,20][i]-0.5)
+    for(let z=Math.floor(coordinates[2]);z<=Math.floor(coordinates[2])+1;z++)for(let y=Math.floor(coordinates[1]);y<=Math.floor(coordinates[1])+1;y++)for(let x=Math.floor(coordinates[0]);x<=Math.floor(coordinates[0])+1;x++){
+      if(x<0||x>=32||y<0||y>=32||z<0||z>=20)continue
+      const w=(1-Math.abs(x-coordinates[0]))*(1-Math.abs(y-coordinates[1]))*(1-Math.abs(z-coordinates[2]))
+      if(w>0)partition[(z*32+y)*32+x]=w
+    }
+    const projected=conservativeRemap(partition,atlas,d),weightSum=sum(projected),oldPressure=this.pressure.slice()
+    try{
+      this.sourceWeights.length=0
+      for(let i=0;i<this.n;i++)if(projected[i]>0)this.sourceWeights.push({i,w:projected[i]/weightSum})
+      source.centerXM=center.xM;source.centerYM=center.yM;source.centerDepthM=center.depthM
+      this.dryIce=massKg;this.dryIceT=temperatureK
+      let totalWork=0
+      for(const point of this.sourceWeights){
+        const i=point.i,oldEnergy=this.energy[i],volumeRemoved=point.w*massKg/source.densityKgM3,gas=[this.gas[0][i],this.gas[1][i],this.gas[2][i]]
+        let pressure=oldPressure[i],work=0,converged=false
+        for(let iteration=0;iteration<40;iteration++){
+          work=0.5*(oldPressure[i]+pressure)*volumeRemoved
+          const phase=equilibrate(oldEnergy+work,this.water[i],this.availablePore(i),this.dryCapacity(i),gas)
+          if(phase.gasVolume<=1e-6*this.volume)throw new Error('Insertion exhausts gas pore space; resolved excavation is required.')
+          const next=(gas[0]+gas[1]+gas[2]+phase.vapor/MOLAR[3])*R*phase.temperature/phase.gasVolume
+          if(Math.abs(next-pressure)<1e-7){converged=true;break}
+          pressure=next
+        }
+        if(!converged)throw new Error('Insertion pressure-work iteration did not converge.')
+        this.energy[i]=oldEnergy+work;totalWork+=work
+      }
+      this.ledger.externalSolidMassInKg=(this.ledger.externalSolidMassInKg??0)+massKg
+      this.ledger.externalSolidEnergyInJ=(this.ledger.externalSolidEnergyInJ??0)+massKg*co2SolidU(temperatureK)
+      this.ledger.insertionWorkJ=(this.ledger.insertionWorkJ??0)+totalWork
+      this.ledger.pressureWorkJ-=totalWork
+      this.resolve();this.updateLedger()
+    }catch(error){
+      this.sourceWeights.splice(0,this.sourceWeights.length,...oldWeights)
+      ;[source.centerXM,source.centerYM,source.centerDepthM]=oldCenter
+      this.restore(saved);throw error
+    }
+  }
   sealInitialState(){
     if(this.time!==0)throw new Error('Initial conditions can only be sealed at t = 0.')
+    if(this.ledger.externalSolidMassInKg)throw new Error('Cannot erase the conservation baseline after source insertion.')
     this.resolve();this.initialEnergy=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT);this.initialMass=this.totalMass();this.initialSpecies=this.speciesTotals();this.updateLedger()
   }
   updateLedger(){
-    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.ledger.gravityWorkJ-this.initialEnergy
-    this.ledger.massResidualKg=this.totalMass()+this.ledger.boundaryMassOutKg-this.initialMass
+    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.ledger.gravityWorkJ-(this.ledger.externalSolidEnergyInJ??0)-this.initialEnergy
+    this.ledger.massResidualKg=this.totalMass()+this.ledger.boundaryMassOutKg-(this.ledger.externalSolidMassInKg??0)-this.initialMass
     const totals=this.speciesTotals();this.ledger.speciesResidualMol=totals.map((v,s)=>v+this.boundarySpecies[s]-this.sources[s]-this.initialSpecies[s])
   }
   frame():CoupledFrame{return{materialPeatFraction:Float32Array.from(this.peat),initialization:{method:this.initializationMethod,preparedWaterRemovedKg:this.preparedWaterRemovedKg,atlasCells:this.atlasCells},timeS:this.time,temperatureK:Float32Array.from(this.temperature),pressurePa:Float32Array.from(this.pressure),oxygen:Float32Array.from(this.gas[0],(v,i)=>v/this.totalGas(i)),co2:Float32Array.from(this.gas[1],(v,i)=>v/this.totalGas(i)),iceKg:Float32Array.from(this.ice),liquidKg:Float32Array.from(this.liquid),fuelKg:Float32Array.from(this.fuel),porosity:Float32Array.from(this.pore,v=>v/this.volume),damage:new Float32Array(this.n),displacementM:new Float32Array((this.scenario.domain.nx+1)*(this.scenario.domain.ny+1)*(this.scenario.domain.nz+1)*3),dryIceKg:this.dryIce,dryIceTemperatureK:this.dryIceT,ledger:structuredClone(this.ledger)}}
