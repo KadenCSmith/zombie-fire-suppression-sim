@@ -4,7 +4,15 @@
 
 The top-right three-dot control in both workspaces replays 0.5 cooling, 0.6 rapid release and the latest 0.7 debris dynamics. Earlier behavior uses shared current assets/renderer fixes; it does not run archived binaries. The latest scene adds held-then-free-fall source placement, fixed-step particle gravity/drag, inelastic contacts, friction and rigid cage-bar contact. Assumed release speed is editable. Gas/thermal displays remain authored; no CFD, fracture, cage strength or experimental validation is claimed. The numerical scientific workspace is unchanged. [Equations, assumptions and ASCE sources](SCENE_DYNAMICS.md).
 
-Typecheck, lint, 99 tests in 14 files, production build and local native Electron smoke passed. The smoke exercise switches all three versions, checks original solid/cage behavior and preserves the 120 s scientific state. Six added tests cover analytical fall/refinement, drag dissipation, contact energy, cage contact, settling/replay and version timing. The independent Stage 2 Blender edit remains excluded. Release and installed-app checks are recorded after packaging.
+Typecheck, lint, 99 tests in 14 files, production build and local native Electron smoke passed. The smoke exercise switches all three versions, checks original solid/cage behavior and preserves the 120 s scientific state. Six added tests cover analytical fall/refinement, drag dissipation, contact energy, cage contact, settling/replay and version timing. The independent Stage 2 Blender edit remains excluded. Release and installed-app checks follow.
+
+### Desktop packaging and native installation
+
+[Version 0.7 is published](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.7.0) in the private repository. All nine uploaded asset sizes and SHA-256 digests match the tested local files.
+
+All six archives were built from `ea65388215567f3605510c1f8ae90d2562a4514e`. Universal Mac architecture, strict deep signatures, clean ZIP extraction and DMG integrity passed. Windows/Linux archives passed executable-architecture and archive-integrity checks. Local verified copies are in `~/Downloads/Zombie Fire Sim/v0.7.0/`. ARM Windows/Linux and Intel Mac native execution remain untested separately. Mac signing is ad-hoc, not notarized.
+
+All 99 tests, typecheck, lint, production builds and desktop smoke passed on macOS, Windows and Ubuntu ([CI run](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36293438222)). Native development inspection showed the menu, original paused scene and settled debris in the latest scene. The installed 0.6 app was closed and preserved in `work/installed-backup-0.6/`; the checksum-verified 0.7 ZIP was extracted into `~/Applications`. The installed version reports 0.7.0, passes strict signature verification and opens Scene studio with all three versions in its top-right menu. These are software checks, not experimental physics validation.
 
 
 ## Timed release and cage illustration (2026-09-26, version 0.6.0)
