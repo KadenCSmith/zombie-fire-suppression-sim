@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "kind": "zombie-fire-sequence-render-assets",
+  "movies": [
+    {
+      "mode": "gradual",
+      "sourceFilename": "Fire_Sequence_Gradual.mp4",
+      "url": "/renders/peat-fire-gradual.mp4",
+      "durationSeconds": 36.0,
+      "fps": 24.0,
+      "width": 1280,
+      "height": 720,
+      "encodedFrames": 864,
+      "sha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "bytes": 6781380
+    },
+    {
+      "mode": "rapid",
+      "sourceFilename": "Fire_Sequence_Rapid.mp4",
+      "url": "/renders/peat-fire-rapid.mp4",
+      "durationSeconds": 36.0,
+      "fps": 24.0,
+      "width": 1280,
+      "height": 720,
+      "encodedFrames": 864,
+      "sha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "bytes": 6747342
+    }
+  ],
+  "posterUrl": "/renders/Fire_Sequence_Poster.png",
+  "contactSheetUrl": "/renders/Fire_Sequence_Contact_Sheet.png",
+  "cacheSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+  "originalStudySha256": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+  "editableScene": {
+    "filename": "Fire_Sequence_Gradual_and_Rapid.blend",
+    "sha256": "d24a0b3eefc9a38196cbc4fe0563b974b581c88ef6132d60cf8c5f47f1b0ccfc",
+    "bytes": 3477205,
+    "texturesPacked": true
+  },
+  "presentationClock": {
+    "story_seconds": 90,
+    "playback_seconds": 36,
+    "normal_speed_story_interval": [
+      55,
+      61
+    ],
+    "other_speed_multiplier": 2.8,
+    "mapping": "t/2.8 to55;55/2.8+t-55 to61;55/2.8+6+(t-61)/2.8 afterwards"
+  },
+  "buriedPlate": {
+    "rim_elevation_m": -1.05,
+    "initial_center_elevation_m": -1.15,
+    "rapid_final_center_elevation_m": -0.85,
+    "radius_m": 0.475,
+    "bore_radius_m": 0.55,
+    "deformation": "prescribed rapid-only inversion; gradual remains unchanged"
+  },
+  "illustratedPeatInvolvement": {
+    "trigger_fraction": 0.7,
+    "time_story_s": 24,
+    "geometry": "2D elliptical cutaway area fraction; not numerical fuel consumption"
+  },
+  "scope": "Full staged narrative. Gradual source radius/readout uses accepted history where supplied. Rapid conversion, drilling, enlarged cap bending, fracture paths and liquid infiltration are explicitly illustrative and do not alter solver data. No extinguishment or field validation claim.",
+  "acceptedFieldScope": "Held accepted temperature cross-section through middle-y cells. Rapid mode holds the pre-treatment state; no rapid-conversion field is supplied.",
+  "undergroundCaption": "Illustrated underground spread; the numerical front remains unresolved.",
+  "sourceFilesSha256": {
+    "integrations/blender-study/fire-sequence/README.md": "7fe64eaa048014f88463267de70241594281821586e1586e6d57d4fcb75b8f7d",
+    "integrations/blender-study/fire-sequence/build_fire_sequence.py": "e59f3af226b960b189a0f4c4d02be311a983a4f0574303ae1dfeec7446dad18a",
+    "integrations/blender-study/fire-sequence/create_contact_sheet.py": "e3936d17d54f8913b9e2cee4b2c2d7a4497bcc81f2c03a2285bfc57ffd81edc8",
+    "integrations/blender-study/fire-sequence/package_render_assets.py": "40b0250e7677d8b9899966051cd3b987e63ee3f5eb3c954e8148a984a6e45e24",
+    "integrations/blender-study/fire-sequence/render_delivery.py": "c94e74aec6c67bacc442ce41d158127af480dd1b72c60280bb2ebf52be14409d",
+    "integrations/blender-study/fire-sequence/render_fire_sequence.py": "7de14c991013f197fd8658281096ca8b77650e700c797b3ee9e01be2a9c484ab",
+    "integrations/blender-study/fire-sequence/storyboard.json": "f6e24655a5864e0d315705f32bdf3cec9994d3e3e75f4f9941856788413baf5f",
+    "integrations/blender-study/fire-sequence/verify_fire_sequence.py": "786cf176c8feb9435bc6ca31ca9d7580f58284465b602fbad37e678f61d60fdd",
+    "integrations/blender-study/fire-sequence/verify_movies.py": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c"
+  },
+  "ready": true,
+  "films": {
+    "gradual": {
+      "file": "peat-fire-gradual.mp4",
+      "sha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "durationS": 36.0,
+      "durationSeconds": 36.0,
+      "frames": 864
+    },
+    "rapid": {
+      "file": "peat-fire-rapid.mp4",
+      "sha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "durationS": 36.0,
+      "durationSeconds": 36.0,
+      "frames": 864
+    }
+  }
+}

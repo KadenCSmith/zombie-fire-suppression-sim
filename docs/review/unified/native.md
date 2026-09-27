@@ -15,3 +15,11 @@ The original independently edited Stage2 Blender file retains SHA-256 `e537ea14a
 ## Accuracy 0.13.0
 
 Frozen source: `6ac5b404eb2f87894704e91c876a7a05887528d2`. Apple Silicon ZIP/DMG packaging, strict deep signatures, clean archive extraction and DMG integrity checks passed. The release and its source/manifest/checksums were published. This version was not separately installed and inspected; native interaction evidence above applies to 0.12 only.
+
+## Fire sequence 0.14.0
+
+The release source includes the complete fire-first workspace, finite-source experiment worker and two bundled Blender films. The exact packaged commit, Apple Silicon architecture, file hashes and editable-scene provenance are recorded in the release's `release-manifest.json` and film verification records. Post-build installation and UI inspection are recorded separately in `Native-Verification.json`, distributed with the [0.14 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.14.0), so the signed application's source commit stays fixed during its inspection.
+
+The local source verification passed 171 tests in 30 files, typecheck, lint and production build. A Windows CI run of the earlier milestone exceeded the 5-second timeout in the legacy high-load soil test because it allocated a matcher for every damage value. The repaired test traverses the same values once and checks the identical monotonicity condition; no physical criterion or tolerance was changed. The fire smoke harness checks accepted history, both source presentations, live-worker completion/cancellation, retained workspace state, full-film metadata and native byte-range seeking. CI logs distinguish these automated checks from native interaction on the user's Mac.
+
+The original independently edited Stage2 Blender SHA-256 was rechecked after the 0.14 scene changes and remains `e537ea14a6a75f83329675418bc565f1a4aa672da53011ec168581aa7531a638`.
