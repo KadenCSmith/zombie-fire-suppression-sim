@@ -1,6 +1,9 @@
 #!/bin/zsh
 set -euo pipefail
-app_path="$HOME/Applications/Zombie Fire Suppression Sim.app"
+app_path="$HOME/Applications/Zombie Fire Suppression Sim 0.11.app"
+if [[ ! -d "$app_path" ]]; then
+  app_path="$HOME/Applications/Zombie Fire Suppression Sim.app"
+fi
 if [[ ! -d "$app_path" ]]; then
   app_path="/Applications/Zombie Fire Suppression Sim.app"
 fi

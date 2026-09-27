@@ -1,4 +1,4 @@
-# Download and open Zombie Fire Suppression Sim 0.10.0
+# Download and open Zombie Fire Suppression Sim 0.11.0
 
 ## Version 0.11 coupled continuum
 
@@ -10,7 +10,7 @@ For reproducible source: `npm ci`, `npm run typecheck`, `npm run lint`, `npm tes
 
 See `COUPLED_MODEL.md` and `COUPLED_VALIDATION.md` for supported physics and failed/unresolved validation gates. Cap behavior is a shallow-shell/contact approximation. Diffuse fracture is experimental and can fail the explicit energy gate; the default coupled model keeps fracture disabled. No experimentally validated field-suppression prediction is claimed.
 
-[Download release 0.10.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.10.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
+[Download release 0.11.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
 This repository is private. Sign into a GitHub account with access before downloading. The application runs locally without Node.js, Python, Blender, an API key, or an internet connection after download. No automatic updater is included; download a newer release to update.
 
@@ -18,12 +18,12 @@ This repository is private. Sign into a GitHub account with access before downlo
 
 | Computer | File | Install |
 | --- | --- | --- |
-| Mac, Apple Silicon **or** Intel | `Zombie-Fire-Sim-0.10.0-macOS-universal.dmg` | Open the disk image and drag the app to Applications. |
-| Mac, alternative archive | `Zombie-Fire-Sim-0.10.0-macOS-universal.zip` | Extract and move the whole app into Applications. |
-| Windows, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.10.0-Windows-x64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Windows, ARM64 | `Zombie-Fire-Sim-0.10.0-Windows-arm64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Linux, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.10.0-Linux-x64.tar.gz` | Extract, then run `Open simulation.sh` or `Open scene studio.sh`. |
-| Linux, ARM64 | `Zombie-Fire-Sim-0.10.0-Linux-arm64.tar.gz` | Extract, then run the same launch scripts. |
+| Mac, Apple Silicon **or** Intel | `Zombie-Fire-Sim-0.11.0-macOS-universal.dmg` | Open the disk image and drag the app to Applications. |
+| Mac, alternative archive | `Zombie-Fire-Sim-0.11.0-macOS-universal.zip` | Extract and move the whole app into Applications. |
+| Windows, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.11.0-Windows-x64.zip` | Extract the whole folder, then open the application `.exe`. |
+| Windows, ARM64 | `Zombie-Fire-Sim-0.11.0-Windows-arm64.zip` | Extract the whole folder, then open the application `.exe`. |
+| Linux, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.11.0-Linux-x64.tar.gz` | Extract, then run `Open coupled continuum.sh`. |
+| Linux, ARM64 | `Zombie-Fire-Sim-0.11.0-Linux-arm64.tar.gz` | Extract, then run the same launch scripts. |
 
 Windows and Linux downloads are portable applications, not system installers. Keep all extracted files together. The included runtime is Electron 44.3.0. Mac requires **macOS 13 or later**, and all packages are 64-bit, consistent with [Electron 44 platform support](https://www.electronjs.org/blog/electron-44-0). Windows requires a supported 64-bit Windows installation. Linux requires a graphical desktop, Electron's system libraries, and an available Chromium sandbox (for example a distribution permitting unprivileged user namespaces). Linux distribution compatibility and Windows/Intel/ARM native execution are not certified merely by creating an archive. See [verification status](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/VALIDATION_STATUS.md) for actual tested scope.
 
@@ -31,25 +31,31 @@ Windows and Linux downloads are portable applications, not system installers. Ke
 
 The working installation is in `~/Applications`. Copy either command into Terminal:
 
-**Scientific simulation**
+**Coupled continuum**
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --simulation
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --coupled
+```
+
+**Preserved porous gas/heat simulation**
+
+```sh
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --simulation
 ```
 
 **Mechanics comparison**
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --mechanics
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --mechanics
 ```
 
 **Animated scene studio**
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --studio
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --studio
 ```
 
-If installed by dragging from the DMG into the system Applications folder, use `/Applications/Zombie Fire Suppression Sim.app` instead. Opening the icon starts Scene studio. The **Physics model** selector switches among the demonstration, porous gas/heat model and the new soil-deformation benchmark. Reopening with these commands switches the existing app and pauses numerical playback without discarding the current run. The `-n` flag delivers the requested workspace to the existing single-instance application; it does not create a second solver window.
+If installed by dragging from the DMG into the system Applications folder, use `/Applications/Zombie Fire Suppression Sim.app` instead. Opening the icon starts Coupled continuum. The **Physics model** selector switches among coupled continuum, demonstration, porous gas/heat and the soil-deformation benchmark. Reopening with these commands switches the existing app and pauses numerical playback without discarding the current run. The `-n` flag delivers the requested workspace to the existing single-instance application; it does not create a second solver window.
 
 ### First launch and updates
 
@@ -62,6 +68,7 @@ Before updating, export any scenario/checkpoint you want to keep and quit the ap
 From the extracted Windows folder in PowerShell:
 
 ```powershell
+& '.\Zombie Fire Suppression Sim.exe' --coupled
 & '.\Zombie Fire Suppression Sim.exe' --simulation
 & '.\Zombie Fire Suppression Sim.exe' --studio
 & '.\Zombie Fire Suppression Sim.exe' --mechanics
@@ -70,6 +77,7 @@ From the extracted Windows folder in PowerShell:
 From the extracted Linux folder:
 
 ```sh
+./'Open coupled continuum.sh'
 ./'Open simulation.sh'
 ./'Open scene studio.sh'
 ./'Open mechanics.sh'
@@ -80,7 +88,7 @@ From the extracted Linux folder:
 Download `SHA256SUMS.txt` beside the files. On Mac, from that folder, run:
 
 ```sh
-shasum -a 256 Zombie-Fire-Sim-0.10.0-macOS-universal.dmg
+shasum -a 256 Zombie-Fire-Sim-0.11.0-macOS-universal.dmg
 ```
 
 Compare the displayed hash with the matching entry in `SHA256SUMS.txt`. Linux uses `sha256sum`; Windows PowerShell uses `Get-FileHash -Algorithm SHA256`. `release-manifest.json` records the source commit, Electron version, file sizes, architectures and hashes.
@@ -106,7 +114,7 @@ npm run package:mac  # Universal Mac DMG and ZIP
 npm run package:all  # Mac + Windows + Linux, x64 and ARM64
 ```
 
-Release packaging runs on macOS and uses the official Electron binaries for each target. Files are written under `work/releases/v0.10.0/`, excluded from Git. A supplied `ELECTRON_ZIP_DIR` must contain official Electron archives and their `SHASUMS256.txt`; cached inputs are checked against that manifest before use. Otherwise Packager downloads the pinned Electron release. No native Windows/Linux execution is implied by cross-packaging on a Mac.
+Release packaging runs on macOS and uses the official Electron binaries for each target. Files are written under `work/releases/v0.11.0/`, excluded from Git. A supplied `ELECTRON_ZIP_DIR` must contain official Electron archives and their `SHASUMS256.txt`; cached inputs are checked against that manifest before use. Otherwise Packager downloads the pinned Electron release. No native Windows/Linux execution is implied by cross-packaging on a Mac.
 
 ## Model scope
 
