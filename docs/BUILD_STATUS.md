@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Hose and contact cooling — 0.16 development
+
+The successor adds woven-hose placement, finite contact-cooling assumptions, local wetting and a larger coherently inserted dome. The accepted field cache and earlier releases are preserved. [Acceptance criteria and preservation scope](HOSE_COOLING_IMPLEMENTATION.md) are recorded before verification. Final review, test, film and release results remain pending at this development milestone.
+
 ## Visual revision — 0.15
 
 The dark teal/copper cutaway now includes dense fine grass, a compact articulated tracked excavator, a 0.48 m illustrative bore, connected heterogeneous peat appearance and a rapid pressure-release illustration with persistent separated pieces. Treatment still waits for 70% illustrated involvement; growth precedes all equipment. Scientific calculations and the accepted cache are unchanged. Both complete Blender films are rebuilt from the shared appearance contract. Independent realism review is recorded separately before delivery.

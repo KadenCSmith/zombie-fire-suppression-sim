@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Hose and contact cooling — 0.16 development
+
+The successor adds woven-hose placement, finite contact-cooling assumptions, local wetting and a larger coherently inserted dome. The accepted field cache and earlier releases are preserved. [Acceptance criteria and preservation scope](HOSE_COOLING_IMPLEMENTATION.md) are recorded before verification. Final review, test, film and release results remain pending at this development milestone.
+
 ## Visual refinement — 0.15
 
 The 0.15 presentation changes do not modify numerical solvers or the accepted fire cache. It adds a connected randomized appearance atlas and rapid-only prescribed soil-piece motion. The user-requested visual realism gate uses a separate agent review and is **not** a physics-validation score. [Realism review](review/unified/realism-015.md) records the two review cycles; [code review](review/unified/visual-code-015.md) records animation corrections and remaining display limits. All 175 tests in 31 files, typecheck, lint and build pass locally. Native/package and final cross-platform checks are recorded with the release.
