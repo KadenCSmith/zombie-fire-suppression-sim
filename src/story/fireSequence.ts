@@ -23,13 +23,21 @@ export function fireSequencePose(time: number, mode: FireSourceMode) {
 }
 
 /** Select stored states, preserving the zero-time dry-ice insertion discontinuity. */
-export function acceptedFireFrame<T extends { timeS: number; phase: string }>(frames: readonly T[], presentationTime: number): T | undefined {
+export function acceptedFireFrame<T extends { timeS: number; phase: string }>(frames: readonly T[], presentationTime: number, ignitionEndS?: number): T | undefined {
   const growth = frames.filter(frame => frame.phase !== 'treatment')
   const treatment = frames.filter(frame => frame.phase === 'treatment')
   const active = presentationTime >= 55 && treatment.length ? treatment : growth
   if (!active.length) return undefined
   const first = active[0].timeS, last = active[active.length - 1].timeS
-  const requested = first + (presentationTime >= 55 && treatment.length ? phase(presentationTime, 55, 85) : phase(presentationTime, 0, 24)) * (last - first)
+  let requested: number
+  if (presentationTime >= 55 && treatment.length) requested = first + phase(presentationTime, 55, 85) * (last - first)
+  else if (ignitionEndS !== undefined && Number.isFinite(ignitionEndS)) {
+    // Match the film's two physical phases without extending a partial history.
+    const ignitionEnd = Math.max(first, Math.min(last, ignitionEndS))
+    requested = presentationTime <= 10
+      ? first + phase(presentationTime, 0, 10) * (ignitionEnd - first)
+      : ignitionEnd + phase(presentationTime, 10, 24) * (last - ignitionEnd)
+  } else requested = first + phase(presentationTime, 0, 24) * (last - first)
   let index = 0
   for (let i = 1; i < active.length && active[i].timeS <= requested; i++) index = i
   return active[index]

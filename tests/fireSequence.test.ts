@@ -23,6 +23,29 @@ describe('story and accepted-state separation', () => {
     expect(acceptedFireFrame(frames.slice(0, 2), 80)).toBe(frames[1])
     expect(acceptedFireFrame([], 80)).toBeUndefined()
   })
+  it('matches the film ignition and later growth clocks', () => {
+    const history = [
+      { timeS:0,phase:'forced-ignition' },
+      { timeS:3600,phase:'forced-ignition' },
+      { timeS:7200,phase:'unforced-reaction' },
+      { timeS:86400,phase:'unforced-reaction' },
+      { timeS:86400,phase:'treatment' },
+    ]
+    expect(acceptedFireFrame(history,5,7200)).toBe(history[1])
+    expect(acceptedFireFrame(history,10,7200)).toBe(history[2])
+    expect(acceptedFireFrame(history,24,7200)).toBe(history[3])
+    expect(acceptedFireFrame(history,54.9,7200)).toBe(history[3])
+    expect(acceptedFireFrame(history,55,7200)).toBe(history[4])
+  })
+  it('clamps the ignition cutoff to the last accepted early-stop state', () => {
+    const partial = [
+      { timeS:0,phase:'forced-ignition' },
+      { timeS:1800,phase:'forced-ignition' },
+      { timeS:3600,phase:'forced-ignition' },
+    ]
+    expect(acceptedFireFrame(partial,5,7200)).toBe(partial[1])
+    for(const time of [10,24,55,90]) expect(acceptedFireFrame(partial,time,7200)).toBe(partial[2])
+  })
   it('does not excavate before contact and clears the drill before source entry', () => {
     expect(fireSequencePose(25, 'gradual').drillDepth).toBe(0)
     expect(fireSequencePose(31, 'gradual').drillDepth).toBeCloseTo(1.385)

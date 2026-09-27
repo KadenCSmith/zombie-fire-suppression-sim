@@ -42,7 +42,7 @@ export default function FireSequenceWorkspace({onWorkspace,session}:{onWorkspace
   const seek=(next:number)=>{const bounded=Math.max(0,Math.min(DURATION,next));timeRef.current=bounded;setTime(bounded);if(presentation==='film'&&videoRef.current&&Number.isFinite(videoRef.current.duration))videoRef.current.currentTime=storyToPlayback(bounded)/FIRE_SEQUENCE_PLAYBACK_DURATION*videoRef.current.duration}
   const play=()=>{if(time>=DURATION)seek(0);setPlaying(value=>!value)}
   const displayCache=presentation==='film'?bundledCache.current:cache
-  const cacheFrame=useMemo(()=>displayCache?acceptedFireFrame(displayCache.frames,mode==='rapid'&&time>=55?54.9:time):undefined,[displayCache,time,mode])
+  const cacheFrame=useMemo(()=>displayCache?acceptedFireFrame(displayCache.frames,mode==='rapid'&&time>=55?54.9:time,displayCache.ignitionEndS):undefined,[displayCache,time,mode])
   const fieldFrame=useMemo<FireFieldSnapshot|undefined>(()=>displayCache&&cacheFrame?{...cacheFrame,dryIceKg:cacheFrame.phase==='treatment'?cacheFrame.dryIceKg:undefined,nx:displayCache.domain.nx,ny:displayCache.domain.ny,nz:displayCache.domain.nz}:undefined,[displayCache,cacheFrame])
   const gap=time>=69?'Water and cracks are an assumed visualization. Liquid infiltration and fracture-driven flow are not solved.':mode==='rapid'&&time>=55?'Rapid conversion is a prescribed illustration. Numerical fields and readouts hold the accepted pre-treatment state.':'Drilling, source placement and enlarged dome bending are staged geometry, not solved operations.'
   const coverage=illustratedPeatCoverage(time)

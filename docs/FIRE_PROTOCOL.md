@@ -24,7 +24,7 @@ Each accepted step was checked against mass residual ≤10⁻⁷ kg and energy r
 
 ## Treatment and presentation contract
 
-The continuation imports 4 kg of dry ice at 194.65 K and the original study coordinate (4.4, 4, 1.3) m. `CoupledTransport.insertDryIce` books external solid mass, internal energy and pressure-volume compression work without resetting the fire history or conservation baseline. This is an idealized placement intervention into existing pore space, not a drilled-cavity, collision or fracture calculation. The roughly 1.3 m separation from the surface reaction zone is preserved. No extinction or rapid conversion is prescribed.
+The continuation imports 4 kg of dry ice at 194.65 K and the original coupled-scenario coordinate (4.4, 4, 1.3) m. `CoupledTransport.insertDryIce` books external solid mass, internal energy and pressure-volume compression work without resetting the fire history or conservation baseline. This is an idealized placement intervention into existing pore space, not a drilled-cavity, collision or fracture calculation. The roughly 1.3 m separation from the surface reaction zone is preserved. No extinction or rapid conversion is prescribed.
 
 The post-insertion calculation requests 0.125 s steps for 30 seconds and captures every two seconds. The JSON contains a same-time before/after insertion pair at 86400 s; the post-insertion member is marked `phase: "treatment"`, `event: "dry-ice-insertion"`. Consumers must filter growth and treatment frames by phase and must not interpolate the insertion jump as a gradual import. Source disappearance in rapid illustration mode is an animation assumption and must never alter the accepted source mass, fields or ledgers.
 
