@@ -7,9 +7,18 @@
     "sourceDensityKgM3": 1560,
     "boreRadiusM": 0.24,
     "boreDepthM": 1.385,
-    "capRadiusM": 0.2,
-    "capRiseM": 0.055,
-    "capDepthM": 1.05,
+    "capRadiusM": 0.58,
+    "capFoldedRadiusM": 0.15,
+    "capRiseM": 0.16,
+    "capDepthM": 0.98,
+    "capInversionM": 0.32,
+    "capWedgeRadiusM": 0.69,
+    "capGapCenterRad": 0.7853981633974483,
+    "capGapHalfAngleRad": 0.4,
+    "cavityRadiusM": 0.65,
+    "cavityCenterY": -0.95,
+    "cavityHalfHeightM": 0.28,
+    "hoseRadiusM": 0.055,
     "augerRadiusM": 0.2,
     "domain": {
       "widthM": 8,
@@ -40,9 +49,9 @@
       "id": "drilling",
       "start": 24,
       "end": 37,
-      "title": "Drill, then withdraw",
+      "title": "Drill and open a buried pocket",
       "short": "Borehole",
-      "description": "At 70% illustrated peat involvement, a tracked excavator arrives, drills the opening, then withdraws.",
+      "description": "At 70% illustrated peat involvement, a tracked excavator arrives, drills the shaft, opens a wider buried pocket with a folding cutter, then withdraws.",
       "evidence": "Drilling, excavation and displaced cuttings are staged; not a solved excavation model."
     },
     {
@@ -52,7 +61,7 @@
       "title": "Lower the dry ice",
       "short": "Dry ice",
       "description": "A finite dry-ice sphere enters the open borehole after the drill is removed.",
-      "evidence": "Placement is prescribed. Gradual source mass follows accepted calculation when available."
+      "evidence": "Placement is prescribed. Natural-view source mass follows the separate finite contact-model inventory; accepted experiment inventory is reported separately."
     },
     {
       "id": "dome",
@@ -60,8 +69,8 @@
       "end": 55,
       "title": "A buried inverted plate",
       "short": "Metal dome",
-      "description": "The inverted plate lowers into the borehole above the dry-ice sphere, with clearance for both.",
-      "evidence": "Placement is staged. The following bend is enlarged illustration, not a failure prediction."
+      "description": "A folded segmented steel shell passes through the shaft and opens into the illustrated buried pocket above the dry ice.",
+      "evidence": "Folding, underreaming, deployment and wedge engagement are authored mechanisms, not a tool design or failure prediction."
     },
     {
       "id": "treatment",
@@ -69,7 +78,7 @@
       "end": 69,
       "title": "A rapid pressure release",
       "short": "Gas & deformation",
-      "description": "Rapid mode illustrates a pressure burst, ground uplift and plate inversion. Gradual mode retains the calculated finite source.",
+      "description": "Rapid mode illustrates a pressure burst, ground uplift and plate inversion. Gradual mode retains its finite contact-model source.",
       "evidence": "Ground rupture and plate inversion are prescribed visual events. CO₂ is nonflammable; no detonation or rupture pressure is calculated."
     },
     {
@@ -78,8 +87,8 @@
       "end": 85,
       "title": "Water follows assumed paths",
       "short": "Water stage",
-      "description": "Water enters the borehole and travels along a displayed network of assumed openings.",
-      "evidence": "Crack opening, liquid flow and resulting cooling are illustrative; infiltration is not solved."
+      "description": "A woven fabric hose feeds the borehole; nearby cracks and soil darken gradually as a limited wetting front advances.",
+      "evidence": "Paths and wetting rates are assumed. Local contact cooling has a separate finite mass/energy budget; infiltration and treatment success are not predicted."
     },
     {
       "id": "review",
@@ -90,11 +99,5 @@
       "description": "Some peat can remain hot. Compare the visual narrative with the available solver evidence.",
       "evidence": "This is not a validated treatment procedure or a prediction of extinguishment."
     }
-  ],
-  "playbackSeconds": 36,
-  "normalSpeedStoryInterval": [
-    55,
-    61
-  ],
-  "otherSpeedMultiplier": 2.8
+  ]
 }

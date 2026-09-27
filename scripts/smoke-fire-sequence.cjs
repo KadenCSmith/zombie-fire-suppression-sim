@@ -22,6 +22,8 @@ app.on('browser-window-created',(_event,win)=>{
         button('Temperature').click();
         await wait(()=>document.querySelector('.fire-evidence-badge')?.textContent.includes('Accepted numerical field'),'numerical view');
         const metrics=document.querySelector('.fire-evidence-strip').textContent;
+        if(!metrics.includes('Accepted experiment time')||!metrics.includes('Accepted source inventory'))throw new Error('Accepted experiment labels missing');
+        if(!document.querySelector('.fire-contact-readout')?.textContent.includes('Separate assumed hot specimens'))throw new Error('Separate contact model disclosure missing');
         [...document.querySelectorAll('.fire-mode-switch button')].find(b=>b.textContent.includes('Rapid')).click();
         await wait(()=>document.querySelector('.fire-evidence-badge')?.textContent.includes('Accepted pre-treatment reference'),'rapid reference honesty');
         if(document.querySelector('.fire-evidence-strip').textContent===metrics)throw new Error('Rapid reference failed to hold pre-treatment state');
@@ -57,6 +59,7 @@ app.on('browser-window-created',(_event,win)=>{
         button('Interactive').click();
         await wait(()=>button('Temperature'),'return to interaction');
         change('Fire sequence time',78);
+        await wait(()=>document.querySelector('.fire-contact-readout')?.textContent.includes('Water supplied 1.32 / 5 kg'),'contact water ledger advances after hose placement');
         window.dispatchEvent(new CustomEvent('workspace-request',{detail:'coupled'}));
         await wait(()=>!document.querySelector('.fire-sequence-shell'),'lab navigation');
         window.dispatchEvent(new CustomEvent('workspace-request',{detail:'sequence'}));

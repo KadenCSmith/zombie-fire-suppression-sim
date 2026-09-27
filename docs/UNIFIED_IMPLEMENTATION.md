@@ -60,3 +60,10 @@ Films retain their immutable bundled calculation; custom numerical experiments a
 - Added rapid-only prescribed piece separation, dust/debris and residual gaps. Scientific fields stay on accepted pre-treatment data for rapid mode; no new pressure or fracture prediction is implied.
 - Retained the cold-fire numerical history, 2,560/20,480-cell laboratory choices, sparse/reference agreement and source/energy acceptance gates. Numerical cache generation remains a47721ffb7d17ebde0e42a12261094843e618aba.
 - Added connectedness, sampled-area, source/auger/plate clearance and burst persistence tests. Independent realism review uses the user-requested threshold of 7/10, with at most three review cycles.
+
+
+## 0.16 hose and contact-cooling implementation — 2026-09-27
+
+Acceptance milestone `8117a04` records preservation and verification requirements before final review. The successor adds a curved procedural woven hose, slow assumed wetting, an explicit underreamed chamber, folded steel-shell insertion and rapid inversion with soil engagement. Fractures now begin with the rapid event. Shared geometry/timing/contact trajectories drive the live view and both film builders.
+
+A separate open near-atmospheric contact calorimeter accounts for finite dry ice, incoming water, liquid retention, vapor and bypass. Its assumed hot specimens are separate from the unchanged accepted fire cache; natural source mass follows the contact inventory, and rapid residual removal gains no sublimation heat credit. The implementation milestone passed 193 tests in 32 files plus typecheck, lint and build. Final realism/film/package evidence is recorded separately; these numerical checks do not validate field treatment.

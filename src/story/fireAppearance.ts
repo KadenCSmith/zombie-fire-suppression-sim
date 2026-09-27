@@ -1,4 +1,4 @@
-import { eased, type FireSourceMode } from './fireSequence'
+import { eased, STORY_CRACK_PATHS, storyWettingProgress, pointAlongStoryPath, type FireSourceMode } from './fireSequence'
 
 /** Authored appearance only. Arrival order is not a combustion calculation. */
 export const PEAT_APPEARANCE_GRID = { nx: 200, ny: 80, minX: -4, minY: -3.2, width: 8, height: 3.2, seed: 29173 } as const
@@ -89,3 +89,28 @@ vec3 storyRuptureOffset(vec3 p,float pulse,float damage){
  return vec3((p.x-.4)*(.065*pulse+.018*damage),.60*pulse+.11*damage,sign(p.z-.3)*(.07*pulse+.025*damage))*strength;
 }
 `
+
+/** Authored local wetting halo around the reached part of each shared path. */
+export function buildStoryWettingGrid(time: number) {
+  const width=128,height=64,data=new Float32Array(width*height*4)
+  if(time<=72)return {width,height,data}
+  const paths=STORY_CRACK_PATHS.map((path,branch)=>{
+    const front=storyWettingProgress(time,branch)
+    return {front,points:Array.from({length:18},(_,i)=>pointAlongStoryPath(path,front*i/17)),radius:.028+.12*Math.sqrt(Math.max(0,Math.min(1,(time-72-branch*.65)/18)))}
+  })
+  for(let j=0;j<height;j++)for(let i=0;i<width;i++){
+    const x=-4+(i+.5)*8/width,y=-3.2+(j+.5)*3.2/height
+    let wet=0
+    for(const path of paths){if(path.front<=0)continue
+      let nearest=Infinity
+      for(let k=1;k<path.points.length;k++){
+        const a=path.points[k-1],b=path.points[k],dx=b[0]-a[0],dy=b[1]-a[1],f=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy+1e-12)))
+        nearest=Math.min(nearest,Math.hypot(x-a[0]-dx*f,y-a[1]-dy*f))
+      }
+      const radius=path.radius*(.86+.23*Math.sin(x*47+y*31)*Math.sin(x*19-y*43)),q=Math.max(0,Math.min(1,(radius-nearest)/.055))
+      wet=Math.max(wet,q*q*(3-2*q))
+    }
+    data[(j*width+i)*4]=wet;data[(j*width+i)*4+3]=1
+  }
+  return {width,height,data}
+}

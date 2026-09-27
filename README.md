@@ -6,6 +6,7 @@ An integrated Mac research app combining the coupled simulator with the editable
 
 - [Start here](docs/UNIFIED_QUICKSTART.md)
 - [Full fire sequence and both source modes](docs/FIRE_SEQUENCE.md)
+- [Separate contact-cooling model and conservation scope](docs/CONTACT_COOLING.md)
 - [Cold-start fire experiment and exact limitations](docs/FIRE_PROTOCOL.md)
 - [Implementation and assumptions](docs/UNIFIED_IMPLEMENTATION.md)
 - [Measured optimization](docs/review/unified/optimization.md)
@@ -47,19 +48,19 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download the 0.15.0 fire-sequence release**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.15.0) — choose the **macOS arm64 DMG** or ZIP for Apple Silicon. This unified release is not a universal Mac build. GitHub access is required while the repository is private; the packaged app works offline.
+[**Download the 0.16.0 hose and contact-cooling release**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) — choose the **macOS arm64 DMG** or ZIP for Apple Silicon. This unified release is not a universal Mac build. GitHub access is required while the repository is private; the packaged app works offline.
 
 The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 
 Open the versioned fire-sequence installation:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.15.app" --args --sequence
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.16.app" --args --sequence
 ```
 
 From this checkout, `npm run mac -- --coupled` finds the installed minor version matching `package.json`. It checks the bundle version and preserves older installations. Mac requires macOS 13 or later; the app is ad-hoc signed and not Apple notarized.
 
-The startup screen offers a 90-second interactive story, two 36-second Blender films, and a separate cold-start fire experiment. The 24-hour baseline retains initial moisture and sustains surface oxidation but does not resolve an underground combustion front. Drilling, dome bending, fractures and water remain illustrative. In the physics lab, start with the cold source-only case and 2,560 cells. Calculate, then switch between Natural cutaway, Scientific fields and synchronized Compare views. Terrain changes require a new calculation; presentation controls preserve accepted states. The historical Blender comparison retains its distinct mass, geometry and normalized timing. [Current controls and model limits](docs/UNIFIED_QUICKSTART.md).
+The startup screen offers a 90-second interactive story, two 36-second Blender films, and a separate cold-start fire experiment. The 24-hour baseline retains initial moisture and sustains surface oxidation but does not resolve an underground combustion front. Drilling, dome bending, fracture and wetting paths remain illustrative. A separate finite contact calorimeter supplies local cooling and natural-scene source mass; its ledgers are not added to the accepted field experiment. In the physics lab, start with the cold source-only case and 2,560 cells. Calculate, then switch between Natural cutaway, Scientific fields and synchronized Compare views. Terrain changes require a new calculation; presentation controls preserve accepted states. The historical Blender comparison retains its distinct mass, geometry and normalized timing. [Current controls and model limits](docs/UNIFIED_QUICKSTART.md).
 
 [Earlier 0.11.0 platform downloads](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) remain available for Intel Mac, Windows and Linux. They contain the earlier application, not the unified 0.12 features. New platform support is determined by the assets and validation records of each release.
 

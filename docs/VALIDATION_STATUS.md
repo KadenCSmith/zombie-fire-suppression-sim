@@ -2,7 +2,7 @@
 
 ## Hose and contact cooling — 0.16 development
 
-The successor adds woven-hose placement, finite contact-cooling assumptions, local wetting and a larger coherently inserted dome. The accepted field cache and earlier releases are preserved. [Acceptance criteria and preservation scope](HOSE_COOLING_IMPLEMENTATION.md) are recorded before verification. Final review, test, film and release results remain pending at this development milestone.
+The successor adds woven-hose placement, a separate finite contact calorimeter, local assumed wetting and a larger folded/deployed dome in an explicitly excavated chamber. The accepted field cache is unchanged. Initial local verification passed: **193 tests in 32 files**, typecheck, lint and production build. These checks verify implementation and reduced-model balances, not experimental performance. [Acceptance criteria](HOSE_COOLING_IMPLEMENTATION.md) and [contact equations, assumptions and measured balances](CONTACT_COOLING.md) define the scope. Final visual review, complete films, final-source CI and package/native results remain pending at this implementation milestone.
 
 ## Visual refinement — 0.15
 

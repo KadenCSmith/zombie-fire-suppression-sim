@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildPeatAppearance, storyRupture, storyRuptureOffset } from '../src/story/fireAppearance'
+import { buildPeatAppearance, buildStoryWettingGrid, storyRupture, storyRuptureOffset } from '../src/story/fireAppearance'
 import { FIRE_SEQUENCE_GEOMETRY as G, illustratedPeatCoverage } from '../src/story/fireSequence'
 
 describe('connected, reproducible presentation appearance', () => {
@@ -26,7 +26,7 @@ describe('connected, reproducible presentation appearance', () => {
     const sphereRadius=Math.cbrt(3*G.sourceInitialMassKg/(4*Math.PI*G.sourceDensityKgM3))
     expect(G.boreRadiusM).toBe(.24)
     expect(G.augerRadiusM).toBeLessThan(G.boreRadiusM)
-    expect(G.capRadiusM).toBeLessThan(G.boreRadiusM)
+    expect(G.capFoldedRadiusM).toBeLessThan(G.boreRadiusM)
     expect(G.capDepthM+G.capRiseM).toBeLessThan(G.sourceDepthM-sphereRadius)
   })
   it('keeps the rapid visual pulse independent from gradual physics and leaves lasting gaps', () => {
@@ -38,5 +38,15 @@ describe('connected, reproducible presentation appearance', () => {
     const peak=storyRupture(55.3,'rapid')
     expect(storyRuptureOffset(.4,0,0,peak.pulse,peak.damage)[1]).toBeGreaterThan(.5)
     expect(storyRuptureOffset(.4,-3.2,0,peak.pulse,peak.damage)).toEqual([0,0,-0])
+  })
+})
+
+describe('limited local soil wetting appearance',()=>{
+  it('has no pre-water stain and never wets most of the section',()=>{
+    expect(Array.from(buildStoryWettingGrid(71.99).data).every(v=>v===0)).toBe(true)
+    const late=buildStoryWettingGrid(90),early=buildStoryWettingGrid(73)
+    const count=(data:Float32Array)=>Array.from(data).filter((v,i)=>i%4===0&&v>.05).length
+    expect(count(late.data)).toBeGreaterThan(count(early.data))
+    expect(count(late.data)/(late.width*late.height)).toBeLessThan(.15)
   })
 })
