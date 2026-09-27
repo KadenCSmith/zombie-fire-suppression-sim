@@ -1,5 +1,12 @@
 # Verification and validation status
 
+## Current unified fire workflow — 0.14
+
+The current app adds a complete interactive fire/treatment story, both gradual and illustrative rapid Blender films, and a cold-start numerical experiment with retained initial moisture. The accepted baseline covers24h plus30s finite-source treatment; source-generation checkpoint `a47721f` freezes the exact cache and source hashes. It sustains surface oxidation but does not resolve underground combustion propagation. The source loses1.7885g during treatment and continuing oxidation remains present. No suppression success is inferred.
+
+Drilling, enlarged dome bending, created fractures and water pathways are staged. Scientific views exclude these shapes and expose only accepted values; rapid mode holds pre-treatment fields. The physics lab retains2560/20480-cell meshes and matched sparse/reference backends. [Fire protocol](FIRE_PROTOCOL.md), [sequence scope](FIRE_SEQUENCE.md), [native release record](review/unified/native.md) and [implementation milestones](UNIFIED_IMPLEMENTATION.md) distinguish current evidence from the historical records below.
+
+
 ## Published 0.11.0 delivery (2026-09-27)
 
 [Release 0.11.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) is published as latest. All **17 uploaded assets** match local byte sizes and GitHub's SHA-256 digests: six desktop archives, full source snapshot, validation evidence, standalone model/validation/installation guides, native development screenshot, source/release/verification manifests and checksums. The total is 1,211,208,798 bytes. [Upload verification](../examples/coupledReleaseVerification.json).

@@ -1,6 +1,10 @@
 # Unified physics lab
 
-Open the versioned Mac app and start with the cold source-only case. The default 2,560-cell mesh has exactly ten times the former preview count. Calculate, then scrub the accepted checkpoints. Camera and presentation changes never rerun or modify physics.
+Open the versioned 0.14 Mac app to the complete peat-fire sequence. Choose Gradual or Rapid, play the 90-second story, or use Rendered film to watch either complete 36-second Blender render. Chapters jump to ignition, underground peat, excavator drilling, source placement, a buried inverted plate, gas and water. Grass and seeded aggregates provide visual context. Setup is sped up; the six-second event segment plays at normal speed. The natural scene is illustrated; Temperature, Oxygen and CO₂ show accepted numerical values. Rapid mode holds the pre-treatment reference after intervention because rapid conversion is not calculated.
+
+Expand **Fire experiment** to change duration, moisture, igniter duration and power, then calculate a new accepted history. Cancelling retains the previous result; Restore bundled result restores the 24-hour baseline plus 30-second finite-source branch. That baseline sustains surface oxidation but does not resolve downward combustion propagation. The source loses about 1.79 g in 30 s; no extinction is claimed.
+
+Select **Open physics lab** for the coupled laboratory and start with the cold source-only case. The default 2,560-cell mesh has exactly ten times the former preview count. Calculate, then scrub the accepted checkpoints. Camera and presentation changes never rerun or modify physics.
 
 - Natural cutaway: textured soil layers, detailed oak and seeded irregular aggregate detail. Aggregates and oak anatomy are presentation geometry, not separate mechanical contact elements.
 - Scientific fields: cell data with physical units and fixed scales. Only the visible boundary is drawn; all cells are still solved and exported.

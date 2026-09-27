@@ -14,4 +14,4 @@ The original independently edited Stage2 Blender file retains SHA-256 `e537ea14a
 
 ## Accuracy 0.13.0
 
-Packaging and native interaction checks follow the frozen reference and are recorded after they are completed. No native-run claim is made by this placeholder.
+Frozen source: `6ac5b404eb2f87894704e91c876a7a05887528d2`. Apple Silicon ZIP/DMG packaging, strict deep signatures, clean archive extraction and DMG integrity checks passed. The release and its source/manifest/checksums were published. This version was not separately installed and inspected; native interaction evidence above applies to 0.12 only.

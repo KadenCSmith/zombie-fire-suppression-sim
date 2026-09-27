@@ -1,12 +1,12 @@
 # Install Zombie Fire Unified Physics Lab
 
 The unified releases target **Apple Silicon Macs running macOS 13 or later**.
-Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
+Version **0.14.0** adds the fire-first workflow, editable numerical experiment and both complete Blender films. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
 accuracy-workflow successor: it retains the same physics and acceptance gates,
-with a verified sparse mechanics backend. Neither version claims experimental
+with a verified sparse mechanics backend. No version claims experimental
 accuracy or validated field suppression.
 
-[Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
+[Fire-sequence release 0.14.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.14.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
 Download assets only from a published release. GitHub access is required while
 the repository is private. The packaged app runs offline without Node.js,
@@ -17,6 +17,7 @@ optional Blender derivatives. There is no automatic updater.
 
 | Release | Apple Silicon disk image | Alternative archive |
 | --- | --- | --- |
+| 0.14 full fire sequence | `Zombie-Fire-Sim-0.14.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.14.0-macOS-arm64.zip` |
 | 0.12 reference | `Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.12.0-macOS-arm64.zip` |
 | 0.13 accuracy workflow | `Zombie-Fire-Sim-0.13.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.13.0-macOS-arm64.zip` |
 
@@ -24,7 +25,7 @@ Open the DMG and drag the complete application to Applications, or extract the
 ZIP and move the whole `.app`. These new packages are **arm64**, not universal
 Mac builds. Earlier Intel Mac, Windows and Linux packages remain in the
 [0.11.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0).
-They contain the earlier application and do not include the unified 0.12/0.13
+They contain the earlier application and do not include the unified 0.12–0.14
 features. Availability of an archive does not establish native testing on that
 platform; consult [validation status](VALIDATION_STATUS.md).
 
@@ -37,7 +38,7 @@ system-wide security settings need changing.
 
 Keep the earlier applications when comparing results. The local convention is
 `~/Applications/Zombie Fire Suppression Sim 0.12.app` and
-`~/Applications/Zombie Fire Suppression Sim 0.13.app`; their minor versions use
+`~/Applications/Zombie Fire Suppression Sim 0.14.app`; their minor versions use
 separate application-data directories. The DMG itself contains the generic
 application name. Rename a copied bundle to the versioned name before placing
 it beside an existing generic bundle.
@@ -48,17 +49,17 @@ Open the reference release:
 open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.12.app" --args --coupled
 ```
 
-Open the optimized accuracy release after installing it:
+Open the current fire-sequence release after installing it:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.13.app" --args --coupled
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.14.app" --args --sequence
 ```
 
 For an unrenamed app in system Applications, use
 `/Applications/Zombie Fire Suppression Sim.app`. Other workspace flags are
 `--simulation` (earlier porous gas/heat model), `--mechanics` (mechanics
-benchmarks) and `--studio` (authored scene studio). Opening the icon enters the
-coupled workspace; **Physics model** switches workspaces. Export results before
+benchmarks) and `--studio` (authored scene studio). Opening the 0.14 icon enters the
+complete fire sequence (`--sequence`); `--coupled` opens the lab, and **Physics model** switches workspaces. Export results before
 quitting or replacing a bundle. Replace complete applications, never merge
 bundle contents.
 
@@ -67,7 +68,11 @@ From a source checkout, `npm run mac -- --coupled` reads the minor version from
 checks its actual bundle version. It will not silently open a preserved older
 version. This command does not build or install the app.
 
-## Start a calculation
+## Start the complete sequence
+
+Play or scrub the 90-second interactive story, choose Gradual or Rapid, and use Rendered film for the complete 36-second films. Temperature/Oxygen/CO₂ switch to accepted numerical fields. Fire experiment recalculates a cold, wet assumed peat specimen; the bundled baseline resolves sustained surface oxidation, not a verified underground front. Drilling, dome deformation, fractures and mobile water remain illustrated. See the [sequence guide](FIRE_SEQUENCE.md).
+
+## Start a laboratory calculation
 
 1. Begin with the cold source-only case and **2,560 cells**. Click **Calculate**
    and wait for accepted states. The 20,480-cell option solves ten times the old
@@ -101,7 +106,7 @@ Download the release's `SHA256SUMS.txt`. For the reference DMG:
 shasum -a 256 Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg
 ```
 
-Compare the result with the matching checksum. Use the 0.13 filename and its own
+Compare the result with the matching checksum. Use the matching version filename and its own
 checksum file for that release. `release-manifest.json` records source commit,
 architecture, Electron version, file sizes and hashes. Keep these records with
 exported results when comparing versions.
