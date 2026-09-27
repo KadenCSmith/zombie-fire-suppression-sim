@@ -235,3 +235,7 @@ Status reviewed against source on 2026-09-25. “Implemented” means code exist
 ## Next agent task
 
 The immediate physics dependencies are measured peat/root material and source-contact properties, a dry-gas effective-stress/storage formulation with a conservative interface to the FEM mesh, and a matched peat-column benchmark. Then add independently checked liquid/ice and multistep char chemistry only within measured validity ranges. Check the remaining pace/replay settings, imports and exports, and sustained performance separately. Do not interpret the six coarse-grid comparisons as field suppression predictions.
+
+## 2026-09-27 unified physics milestone
+
+A separate checkout preserves the user's original Blender edit. Adds exactly 10× mesh options, common conservative material/source initialization, a finite CO₂ heat/mass-transfer source and an opt-in float64 sparse elastic operator. Existing reference backend remains default during the comparison audit. Typecheck, lint, 148 tests in 25 files, and production build passed together on this integration. UI natural-cutaway polish and final Blender cache are still in progress; this entry is not a release-completion claim.

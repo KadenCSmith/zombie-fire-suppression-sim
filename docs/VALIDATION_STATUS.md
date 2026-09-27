@@ -337,3 +337,9 @@ Selected declared tolerances: short-run source energy residual <10⁻⁶ J; clos
 ## Experimental validation needed
 
 Compare temperature, oxygen, CO₂, moisture, pressure, emissions, fuel/char, and rebound histories against controlled experiments using measured geometry and properties. A comparison to the 30 cm moss-peat column in Huang and Rein (S6) would require reproducing its material, moisture basis, reactor boundaries, ignition, and kinetics; this app does not presently do so. Details of that study and all other sources are in `SOURCES.md`.
+
+## Unified physics integration — 27 September 2026
+
+148 tests / 25 files passed; typecheck, lint and build passed. New tests check invariant extensive inventories and source support across mesh choices, film-source limits and timestep refinement, and matched elastic/coupled trajectories between reference and optional sparse operators. Initialization independently reviewed in three rounds (frozen); source independently reviewed in two rounds. See `docs/review/unified/initialization.md`, `docs/review/unified-source-review.md`, and `docs/CO2_SOURCE_MODEL.md`.
+
+Cold source-only is the new lab default. Prepared hot specimens explicitly disclose removed initial water and remain assumed cases. No experimental/field validation, resolved excavation or mobile liquid infiltration is claimed. Equal initial totals do not establish solution convergence. Final performance, natural-cutaway UI and Blender visual review are pending at this milestone.
