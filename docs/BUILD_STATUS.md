@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone mechanics kernels (2026-09-29)
+
+Integrated Agent A's eleven source/test files plus one local type-only shape needed by the absent shared contract. All 464 new tests and the full **1,701-test suite** passed, with typecheck, lint and production build. No active global solver uses these kernels. [Scope and adaptation](MECHANICS_PACKAGE_INTEGRATION.md).
+
 ## Standalone transport and thermochemistry (2026-09-29)
 
 Integrated 11 hash-verified Agent B source/test files. All 130 new tests and the full **1,237-test suite** passed with typecheck, lint and build. The active solver does not yet call these modules. [Scope and adoption gates](TRANSPORT_PACKAGE_INTEGRATION.md).

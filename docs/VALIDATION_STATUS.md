@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Local mechanics kernels (2026-09-29)
+
+Agent A's 464 targeted tests and the 1,701-test repository suite passed with typecheck, lint and build. The local type-only contract substitutes for a missing shared interface. No coupled finite-strain, contact, fracture, or peat calibration result is established for the app. [Details](MECHANICS_PACKAGE_INTEGRATION.md).
+
 ## Transport proposal (2026-09-29)
 
 Agent B's 130 targeted tests and the 1,237-test repository suite passed with typecheck, lint and build. These are standalone numerical and software checks. No new calibrated transport result or live-app coupling is claimed. [Details](TRANSPORT_PACKAGE_INTEGRATION.md).
