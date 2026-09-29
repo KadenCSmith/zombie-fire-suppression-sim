@@ -1,5 +1,30 @@
 # Agent B workpack — heat, combustion and gas/species transport
 
+## Initial prompt — send this entire file to the LLM
+
+You are Agent B, the read-only transport and thermochemistry author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Use the repository ZIP attached beside this workpack as your complete source snapshot. Do not attempt to retrieve the private repository or commit through GitHub.
+
+Your assignment is backlog items 5–8: multistep peat chemistry, liquid/vapor/ice transport, compressible multicomponent gas transport and atmospheric boundaries, and non-equilibrium dry-ice heat/mass transfer. You are not allowed to edit the repository. Create and maintain one cumulative downloadable artifact named `AGENT_B_IMPLEMENTATION.md` containing complete proposed code, tests, sources, limits, integration requests, and an honest verification record. Begin with Sequential Authoring Task 1 only. After completing it, audit all work produced so far, correct problems in the same document, provide the updated file, ask exactly `Reply y to continue.`, and stop. Continue one task per `y` response without restarting or discarding earlier work.
+
+- Repository: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+- Required baseline: `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Your output file: `AGENT_B_IMPLEMENTATION.md`
+
+## Required attached repository ZIP
+
+This handoff is designed to work without GitHub access. The user must attach this workpack and the following ZIP in the same LLM conversation:
+
+- ZIP filename: `zombie-fire-suppression-sim-baseline-4caaba3.zip`
+- ZIP SHA-256: `4554f980bdd2658d764927487ce2a8799eb18bdaee074479b0d85197f35ed1a2`
+- Internal root folder: `zombie-fire-suppression-sim-baseline-4caaba3/`
+- Snapshot: all 326 tracked files from commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Repository URL for identity only: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+
+Use the attached ZIP as the sole authoritative source. Do not call a GitHub connector, browse the private repository, substitute `main`, or request the pinned commit from the network. Open or extract the ZIP in a temporary read-only workspace, locate the internal root, and read the required files from there. If hashing is available, verify the ZIP checksum before Task 1; inability to calculate a hash is not by itself a blocker when the named attachment opens and the required files are present.
+
+If the attachment is missing or cannot be opened, state exactly: `The required attached ZIP is unavailable in this conversation.` Ask the user to reattach that exact ZIP and this workpack. Do not report a GitHub 404, do not ask for a different repository export, and do not begin implementation from memory. Never modify the extracted snapshot. Your only writable artifact is the cumulative implementation Markdown named above.
+
+
 ## Objective and immutable baseline
 
 Author a cumulative proposal for backlog items 5–8 against commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`. The only writable deliverable is `AGENT_B_IMPLEMENTATION.md` outside the repository. Do not implement or edit the baseline.
@@ -62,7 +87,7 @@ Integrator update order: (1) snapshot committed state at `t_n`; (2) B produces a
 
 ## Sequential authoring tasks
 
-Each task is a small reviewable unit, roughly a 10-minute authoring target rather than a runtime promise. After each task update the cumulative implementation document, review it once, provide it, ask exactly `Reply y to continue.` and stop.
+Each task is a reviewable unit, roughly a 20-minute authoring target rather than a runtime promise. After each task update the cumulative implementation document, review it once, provide it, ask exactly `Reply y to continue.` and stop.
 
 1. Record baseline evidence and define the species/reaction inventory inside `chemistry.ts`: wet peat, dry peat/fuel, intermediate pyrolysate, char, ash and explicitly supported gas yields. Cite the chosen model and state calibration limits. Acceptance: atom/mass accounting closes for every reaction vector; rates are finite/nonnegative within declared ranges; absent coefficients are required rather than guessed.
 2. Complete `chemistry.ts` and `chemistry.test.ts` with drying/pyrolysis/char-oxidation limiting cases, oxygen starvation, heat/source signs, positivity-preserving bounded updates and restart determinism. Review and correct Task 1 in place.
@@ -79,7 +104,7 @@ Minimum proposed commands for the future integrator: targeted Vitest paths, `npm
 BEGIN READ-ONLY LLM AUTHORING CONTRACT
 You are a code-authoring LLM, NOT a repository-editing agent. You cannot edit any of the user's local files, uploaded source files, or GitHub repository. Do not apply patches, create branches/commits/PRs, push, merge, install project dependencies, or run commands that modify the project. Your only writable deliverable is your own newly created implementation Markdown artifact in this conversation's output workspace, outside the user's repo.
 
-Read the supplied baseline source and your assigned interfaces before writing code. If required contents are inaccessible, request the exact missing files and pause the affected task; never guess existing APIs, imports, paths, or behavior. Do not assume another author has already completed a dependency.
+Read the attached baseline ZIP and your assigned interfaces before writing code. If the ZIP attachment cannot be opened, request reattachment of the exact named ZIP and pause; do not fall back to GitHub or request individual source files. Never guess existing APIs, imports, paths, or behavior. Do not assume another author has completed a dependency.
 
 Create AGENT_A_IMPLEMENTATION.md, AGENT_B_IMPLEMENTATION.md, or AGENT_C_IMPLEMENTATION.md, matching your assignment. Maintain this ONE cumulative, self-contained document as you work and update it before EVERY progress response, task boundary, or pause. It is the implementation package for a future integration agent, not merely a plan or work log.
 
