@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Intervention schedule package (2026-09-29)
+
+Agent E's 170 targeted tests and the 1,107-test repository suite passed with typecheck, lint and build. These checks cover command accounting and replay; no live treatment or measured suppression result is established. [Details](INTERVENTION_PACKAGE_INTEGRATION.md).
+
 ## Physical-state persistence package (2026-09-29)
 
 Agent H's 165 targeted tests and the 937-test repository suite passed with typecheck, lint and build. These verify the standalone serialization contract against the installed D/F/G packages. Live solver restart and installed-app behavior are not established. [Details](PERSISTENCE_PACKAGE_INTEGRATION.md).

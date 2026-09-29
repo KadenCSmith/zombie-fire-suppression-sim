@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone intervention schedules and ledgers (2026-09-29)
+
+Integrated 14 hash-verified Agent E source/test files. All 170 new tests and the full **1,107-test suite** passed, with typecheck, lint and production build. The package is not connected to the live solver or UI. [Scope and activation gates](INTERVENTION_PACKAGE_INTEGRATION.md).
+
 ## Standalone physical-state persistence (2026-09-29)
 
 Integrated 14 hash-verified Agent H source/test files. All 165 new tests and the full **937-test suite** passed, with typecheck, lint and production build. The app does not yet use the new persistence format. [Scope and adoption gates](PERSISTENCE_PACKAGE_INTEGRATION.md).
