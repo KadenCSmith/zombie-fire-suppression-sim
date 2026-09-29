@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone material evidence library (2026-09-29)
+
+Integrated the user-supplied Agent F units, provenance, registry, distribution metadata and guarded projection code as 14 new, hash-verified source/test files. The library has no live consumers. All 228 new tests, the existing 20 material tests and the complete **513-test suite** passed, with typecheck, lint and production build also passing. [Scope and remaining contract requirements](MATERIAL_REGISTRY_INTEGRATION.md).
+
 ## Standalone conservative geometry package (2026-09-29)
 
 Integrated the user-supplied Agent D geometry source and tests as 14 new, hash-verified paths under `src/physics-next/geometry/` and `tests/physics-next/geometry/`. The package has no imports from the active simulation or UI. All 86 new tests and the complete **285-test suite** on the merged 0.16 main branch passed, as did typecheck, lint and production build. The separate Blender edit remains untouched. [Integration review and activation limits](GEOMETRY_INTEGRATION.md).

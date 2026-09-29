@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Standalone material evidence library (2026-09-29)
+
+Agent F's 14 source/test files match the supplied hashes. Actual Vitest checks passed: 228 new material tests, 20 pre-existing material tests and **513 tests in 47 files** overall. TypeScript 7.0.2 typecheck, lint and production build passed; lint emitted two non-failing style warnings in the supplied files. The package is not imported by the active physics, workers or UI and has no experimentally verified material dataset. [Integration and binding limits](MATERIAL_REGISTRY_INTEGRATION.md).
+
 ## Standalone conservative geometry package (2026-09-29)
 
 The 14 supplied geometry source/test payloads match their manifest hashes. Actual checks on merged 0.16 main passed: 86 new tests, **285 tests overall**, TypeScript 7.0.2 typecheck, lint and production build. The modules are not imported by the existing physics, workers, UI or installed app, so no changed simulation behavior or physical validation is claimed. The handoff baseline is available as an ancestor, but current solver interfaces and physical inputs still need review before activation. [Scope, verification and activation prerequisites](GEOMETRY_INTEGRATION.md).
