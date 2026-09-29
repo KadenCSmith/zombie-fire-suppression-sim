@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Provisional mechanics boundary (2026-09-29)
+
+Added Agent A's complementary D/F/G mechanics boundary and four repository integration tests. The full **1,706-test suite**, typecheck, lint and build passed. It has no live solver import. [Details](MECHANICS_PACKAGE_INTEGRATION.md).
+
 ## Conservative transport exchange contract (2026-09-29)
 
 Added the complementary Agent B exchange contract and its 25-case fixture under repository Vitest. The full **1,702-test suite**, typecheck, lint and build passed. It is a standalone staging boundary and does not activate transport. [Details](TRANSPORT_PACKAGE_INTEGRATION.md).

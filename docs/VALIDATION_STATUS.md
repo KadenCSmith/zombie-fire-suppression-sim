@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Provisional mechanics boundary (2026-09-29)
+
+Four new tests passed against installed D/G modules; the 1,706-test suite, typecheck, lint and build passed. This proves adapter behavior for synthetic cases, not global equilibrium or measured soil fracture. [Details](MECHANICS_PACKAGE_INTEGRATION.md).
+
 ## Transport exchange contract (2026-09-29)
 
 The older Agent B contract's 25 manufactured cases passed under Vitest; the 1,702-test full suite, typecheck, lint and build passed. No active solver exchange plan or experimental result was checked. [Details](TRANSPORT_PACKAGE_INTEGRATION.md).
