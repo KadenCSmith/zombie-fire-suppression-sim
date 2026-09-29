@@ -1,5 +1,13 @@
 # Build status and handoff
 
+## Version comparison and interchangeable interface layouts — current 0.16 candidate
+
+The app now has a version-comparison workspace covering every catalog entry from 0.8.0 through 0.16.0. Preserved replays are selectable for 0.8, 0.9, 0.14, 0.15 and the current 0.16 candidate. Versions 0.10–0.13 remain visible but disabled because the current repository does not contain immutable replay bundles for them; their source history remains available at the recorded commits. A shared clock aligns recorded event markers within compatible scene families and explicitly labels duration-normalized fallback across unlike families. Every replay card reports version, Animation Mode, presentation time and playback rate, and states that physical simulation time is unavailable for an animation replay.
+
+A persistent interface bar makes Animation Mode and Physics Simulation Mode explicit and keeps validation status separate. Refined, Instrument and Technical layouts use the same React controls and state; changing layout does not remount a workspace or duplicate model logic. The Instrument layout uses an original white/black modular treatment with oversized type, square controls and an orange accent inspired by the visual language of Teenage Engineering's website.
+
+Local verification passed typecheck, lint, production build and **199 tests in 33 files**. The browser UI smoke selected three concurrent replays, scrubbed the shared clock to 10.0 s, confirmed 45.0 s duration-normalized fallback on v0.14, switched layouts without losing selection or time, and confirmed the Physics Simulation Mode disclosure. The Electron comparison harness is included in CI; its local run was blocked by the current desktop single-instance/runtime environment and is not claimed as a local pass.
+
 ## Hose and contact cooling — 0.16 development
 
 The successor adds woven-hose placement, a separate finite contact calorimeter, local assumed wetting and a larger folded/deployed dome in an explicitly excavated chamber. The accepted field cache is unchanged. Initial local verification passed: **193 tests in 32 files**, typecheck, lint and production build. These checks verify implementation and reduced-model balances, not experimental performance. [Acceptance criteria](HOSE_COOLING_IMPLEMENTATION.md) and [contact equations, assumptions and measured balances](CONTACT_COOLING.md) define the scope. Final visual review, complete films, final-source CI and package/native results remain pending at this implementation milestone.

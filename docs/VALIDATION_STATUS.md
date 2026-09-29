@@ -1,5 +1,13 @@
 # Verification and validation status
 
+## Version-comparison presentation scope — current 0.16 candidate
+
+The version comparison is a presentation and provenance feature. It does not create a new physical solver, make historical solvers comparable by accuracy, or convert authored animation time into physical simulation time. Recorded event alignment is used only when both selected replays publish the same event-marker family. Cross-family playback uses duration normalization and labels that fallback on each affected card.
+
+Available replay status is evidence-based: v0.8 and v0.9 use preserved interactive scene definitions; v0.14 and v0.15 use exact bundled films from their versioned histories; v0.16 uses the current interactive candidate. V0.10–v0.13 are listed as unavailable because no immutable replay assets are bundled in the current source tree. Their absence is not filled with the current solver or an invented reconstruction. Layout switching changes presentation only and preserves the same model controls and in-memory state.
+
+Software checks cover semantic-version ordering, catalog boundaries, unavailable-status handling, event alignment, fallback mapping, explicit mode classification, layout parsing and state-preserving browser interaction. These checks do not establish field validation, calibrated fidelity or equivalence between releases.
+
 ## Hose and contact cooling — 0.16 development
 
 The successor adds woven-hose placement, a separate finite contact calorimeter, local assumed wetting and a larger folded/deployed dome in an explicitly excavated chamber. The accepted field cache is unchanged. Initial local verification passed: **193 tests in 32 files**, typecheck, lint and production build. These checks verify implementation and reduced-model balances, not experimental performance. [Acceptance criteria](HOSE_COOLING_IMPLEMENTATION.md) and [contact equations, assumptions and measured balances](CONTACT_COOLING.md) define the scope. Final visual review, complete films, final-source CI and package/native results remain pending at this implementation milestone.

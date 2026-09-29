@@ -45,3 +45,9 @@ jobs:
       - name: Fire sequence (Linux CI display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npx electron --no-sandbox scripts/smoke-fire-sequence.cjs
+      - name: Version comparison, shared controls and layouts (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-comparison.cjs
+      - name: Version comparison (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-comparison.cjs
