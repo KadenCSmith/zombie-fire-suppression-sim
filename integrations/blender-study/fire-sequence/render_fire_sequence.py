@@ -9,7 +9,7 @@ import bpy
 
 parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['gradual','rapid'],default='gradual');parser.add_argument('--output',type=Path,required=True);parser.add_argument('--still',type=float);parser.add_argument('--samples',type=int,default=24);parser.add_argument('--start',type=int);parser.add_argument('--end',type=int)
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
-scene=bpy.data.scenes['GRADUAL • accepted source' if args.mode=='gradual' else 'RAPID • illustrative conversion'];bpy.context.window.scene=scene
+scene=bpy.data.scenes['GRADUAL • conserved contact' if args.mode=='gradual' else 'RAPID • illustrative release'];bpy.context.window.scene=scene
 scene.eevee.taa_render_samples=args.samples;scene.render.filepath=str(args.output.resolve());args.output.parent.mkdir(parents=True,exist_ok=True)
 if args.start:scene.frame_start=args.start
 if args.end:scene.frame_end=args.end

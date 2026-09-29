@@ -1,105 +1,110 @@
-# Full fire and treatment story
+# Full fire and treatment story — 0.16
 
-This new editable Blender sequence accompanies the application's canonical
-`src/story/fireSequence.ts` storyboard. `storyboard.json` is its exported stage
-and geometry contract. There are two complete scenes, each 864 frames at 24 fps
-(36 seconds of video) covering all 90 seconds of presentation time. Setup and
-follow-up play at 2.8×; the story's 55–61 second event plays at 1×:
+The two editable scenes each contain **864 frames at 24 fps: complete 36-second
+films** covering the full 90-second presentation. Setup and follow-up play at
+2.8×; story 55–61 seconds plays at 1×. The original user-edited blend and the
+0.15 delivery are preserved. A new numbered output directory receives each
+successor.
 
-1. Surface ignition (0–10 presentation seconds).
-2. Connected surface-to-peat entry and illustrated spread to 70% involvement (10–24).
-3. Tracked excavator arrival, attached drill advance and withdrawal (24–37).
-4. Dry-ice placement (37–47).
-5. Inverted metal plate placement below ground, above the source (47–55).
-6. Gas visibility, rapid-only pressure-release movement and upward plate inversion (55–69).
-7. Water along assumed openings (69–85).
-8. Review of remaining peat (85–90).
+The sequence keeps a small surface ignition, connected irregular underground
+peat involvement, the 70% illustrated treatment gate, tracked excavator and
+attached auger, finite dry-ice placement, buried steel shell, rapid-only pressure
+release, fabric hose placement, limited wetting and remaining hot peat. Over
+51,000 fine grass blades per scene preserve the dark natural cutaway treatment.
 
-**Gradual** shows finite source mass from the attached accepted cache when one
-is supplied. Rendered radius interpolates between accepted samples for smooth
-display; it is not an extra numerical solve. Accepted elapsed seconds appear
-separately from the presentation clock. **Rapid** prescribes a complete visual
-source conversion; it is explicitly not an accepted sublimation calculation.
-The final accepted gradual treatment retains 3.998211470103149 kg from the
-initial 4 kg after 30 physical seconds. Its radius barely changes; that small
-change is intentionally preserved. The gradual plate retains its downward
-bowl because this protocol supplies no accepted plate mechanics.
+## Shared geometry and timing
 
-The plate rim is 1.05 m below ground. Its initial center is 1.105 m below ground,
-with clearance above the source's top near 1.215 m depth. The rapid animation
-inverts its center upward to 0.885 m depth. The plate radius is 0.20 m; the
-0.24 m bore and 0.20 m auger provide visible placement clearance. These are
-presentation geometry choices, not a simulated installation design.
+`public/fire-sequence-contract.json` exports canonical TypeScript geometry,
+poses, cracks, wetting progress and **centripetal hose samples**. The film uses
+those samples directly, without resplining. Live coordinates `[x, up, toward
+viewer]` map to Blender `[x, -toward viewer, up]` because the two cutaways use
+opposite depth signs. The 200 × 80 arrival field remains
+`public/fire-appearance.json`; 70% means sampled two-dimensional illustrated
+peat area, not calculated burned volume or fuel loss.
 
-The ignition/growth choreography, drilling/removed material, source placement,
-plate inversion, crack network and water motion remain
-illustrative. The porous solver does not establish those operations as a
-validated treatment or solve this liquid infiltration. Small, separated, low-opacity tracer wisps are a visibility convention;
-CO2 is invisible and the wisps are not a calculated gas envelope. The narrative must not be read as
-proof that all peat is extinguished or that physical rupture occurred.
-The narrative retains 30% unburnt peat margin and ongoing buried embers at the
-end. Surface flame and smoke fade during story20–27 as attention moves below
-ground; this presentation cue does not assert numerical extinguishment.
-The shared `public/fire-appearance.json` contains a seeded connected arrival
-order on a 200 × 80 irregular peat mask. The same ranks control char and ember
-onset. Only the displayed outer perimeter is relaxed to avoid pixel stair steps;
-its sampled ranks and scientific cache remain unchanged. At 24 presentation seconds the threshold reaches 70% of sampled peat
-area; it is neither a three-dimensional burned volume nor calculated fuel loss.
-The copied appearance map and its SHA-256 accompany the render provenance.
+The unchanged bore radius is 0.24 m. During story 31–33 the folding cutter opens
+an authored ellipsoidal pocket of radius 0.65 m, centered 0.95 m below the surface
+with 0.28 m half-height; it folds before drill withdrawal. The segmented shell
+enters with radius 0.15 m, then opens during 51.5–54 to radius 0.58 m and downward
+rise 0.16 m at rim depth 0.98 m. The sphere beneath retains clearance. The rapid
+55–55.65 event reverses the center upward, increases shell radius to 0.645 m and
+moves shoes outward to 0.69 m, showing shoulder engagement. This is a prescribed
+folding/deformation mechanism and explicit soil penetration by the shoes;
+it is not a manufactured tool design or calculated pressure/soil response.
+Gradual mode leaves the shell downward and the ground intact.
 
-The rapid scene uses 504 irregular extruded soil prisms with a prescribed
-pressure-release pulse, permanent separation, decorative airborne fragments
-and a short dust puff. The displacement envelope matches the interactive
-presentation; piece shrink and tilt make separation visible. This is not
-a fracture, gas detonation or ground-failure calculation. CO2 does not burn.
-The gradual scene has no rupture. Both scenes include over 51,000 fine grass
-blades and a compact tracked excavator with articulated hydraulic boom,
-non-rotating motor housing and rotating helical auger. These geometric details
-are editable presentation assets and add no solver elements or physical mass.
+An original procedural ivory woven jacket, seams, oval resting section and
+metal coupling create the flexible fire hose. No stock photograph or texture
+is copied. It lies on the grass, enters the existing bore during 69–72, and
+passes through a declared shell service sector. Shared continuous-curve tests
+check shaft, source and passage clearance. The rapid fracture paths begin at
+the 55-second release; gradual mode has no newly opened fractures. Water starts
+at 72. Its assumed branch-dependent front reaches only part of each path by 90,
+with small irregular damp footprints around local contacts. This is not a
+Darcy flow or fracture-flow solution.
 
-The separate temperature inset displays held accepted cell values on a
-middle-y cross-section, with its own physical timestamps and fixed 283–850 K
-scale. The 24-hour cold-start protocol did not resolve a moving underground
-front. Rapid mode holds the last pre-treatment field; it does not reuse the
-gradual post-insertion gas calculation as a rapid-conversion prediction.
+## Distinct numerical cases
 
-The source tree collection is loaded read-only from the preserved Blender
-study, then repositioned as contextual anatomy. Random aggregate details use a
-fixed seed and add no solver mass or mechanical contacts. Original source files
-are never saved over. All used image dependencies are packed in the derivative.
-Its embedded cache is stored as `ACCEPTED_FIRE_CACHE.json.gz.b64`; recover the
-JSON using `gzip.decompress(base64.b64decode(text))`. The adjacent uncompressed
-`Accepted-Fire-Cache.json` has the recorded source-file SHA-256.
+The natural source radius and local smolder attenuation follow
+`public/contact-cooling.json`, a **separate conserved reduced hot-contact
+calculation**. Thirteen independent 0.5 kg hot peat specimens exchange finite
+heat with 4 kg dry ice and water supplied from a 5 kg inventory. Temperatures,
+source mass and heat readouts use its exported values. Arrival times, footprint
+locations and conductances are assumptions; footprints do not define resolved
+spatial control volumes. Red charcoal visibility is reduced only at those
+contacts. Uncontacted peat remains hot. There is no imposed extinguishment,
+oxidation solve or experimental validation claim.
+
+Rapid mode exports the remaining dry-ice inventory at 55 seconds with no extra
+sublimation or gas-expansion heat credit. It is an illustrative release, not a
+calculated conversion, detonation or CO2 combustion. Faint separate gas tracers
+are a visibility convention; real CO2 is invisible.
+
+The temperature inset and explicitly labeled **field-case** dry-ice/gas readout
+retain the older accepted 24-hour + 30-second porous calculation. They are not
+combined with the contact balance. Rapid holds the pre-treatment field. That
+accepted cache does not resolve a travelling underground front. The embedded
+`ACCEPTED_FIRE_CACHE.json.gz.b64` can be recovered with
+`gzip.decompress(base64.b64decode(text))`. The contact and presentation JSONs
+are embedded separately. All used image dependencies are packed.
+
+The manifest records the original study hash, preserved user-original hash,
+accepted-cache hash, appearance hash, shared sequence-contract hash and contact
+model hash. Source files and data supplied beside the films make the distinction
+between calculation and illustration reviewable.
 
 ## Build, inspect and render
+
+Generate the shared contract/contact exports before building. Then:
 
 ```sh
 blender --factory-startup -b --python-exit-code 1 \
   --python integrations/blender-study/fire-sequence/build_fire_sequence.py -- \
-  --output /path/Fire_Sequence.blend --cache /path/accepted-fire.json
+  --output /path/Fire_Sequence_Gradual_and_Rapid.blend \
+  --cache public/fire-sequence-cache.json
 
-blender -b /path/Fire_Sequence.blend --python-exit-code 1 \
+blender -b /path/Fire_Sequence_Gradual_and_Rapid.blend --python-exit-code 1 \
   --python integrations/blender-study/fire-sequence/verify_fire_sequence.py
 
-blender -b /path/Fire_Sequence.blend --python-exit-code 1 \
+blender -b /path/Fire_Sequence_Gradual_and_Rapid.blend --python-exit-code 1 \
   --python integrations/blender-study/fire-sequence/render_fire_sequence.py -- \
-  --mode gradual --still 64 --output /path/preview.png
+  --mode gradual --still 78 --output /path/preview.png
 
-blender -b /path/Fire_Sequence.blend --python-exit-code 1 \
-  --python integrations/blender-study/fire-sequence/render_fire_sequence.py -- \
-  --mode gradual --output /path/Gradual_Fire_Sequence.mp4
+blender -b /path/Fire_Sequence_Gradual_and_Rapid.blend --python-exit-code 1 \
+  --python integrations/blender-study/fire-sequence/render_delivery.py -- \
+  --output-directory /path/new-version-folder
 ```
 
-Repeat the last command with `--mode rapid` and a distinct output path. The
-renderer writes its resolution, frame count, wall time and interpretation in a
-sidecar JSON. Both modes use EEVEE at 720p; `--samples` controls temporal
-antialiasing samples. A representative still should be timed before the full
-render. Open the `.blend` and use its scene dropdown to edit either mode.
+`render_delivery.py` renders both complete 720p EEVEE films and eight native
+chapter stills per mode. `verify_movies.py <folder>` reads MP4 sample tables and
+requires 864 H.264 frames, exactly 36 seconds, 1280 × 720, 24 fps for both files.
+`create_contact_sheet.py <folder>` arranges the sixteen native stills.
+`package_render_assets.py <folder>` copies verified films into the app and
+records exact hashes, without touching a frozen prior-version delivery.
 
-For the complete delivery, `render_delivery.py -- --output-directory <folder>`
-renders both films and eight chapter stills per mode. `verify_movies.py <folder>`
-independently reads encoded MP4 sample count, duration, dimensions and codec;
-it requires both movies to contain 864 H.264 frames over exactly 36 seconds.
-`create_contact_sheet.py <folder>` uses Pillow to assemble the sixteen native
-Blender stills without altering their content. The app's copies are in
-`public/renders`; editable scenes and the full cache accompany the release.
+The Blender verifier checks complete timelines, underreamed/folded placement,
+rapid inversion, source mass, hose samples, crack onset, untouched gradual
+soil, all three contact ledger residuals, the 70% appearance gate, packed images
+and input hashes. These are numerical and geometry checks, not evidence of
+physical validation. Independent visual review ratings belong in the delivery's
+review evidence and never substitute for model validation.

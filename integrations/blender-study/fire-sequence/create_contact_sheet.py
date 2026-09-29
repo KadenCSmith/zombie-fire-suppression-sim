@@ -9,8 +9,8 @@ font_path='/System/Library/Fonts/Supplemental/Arial.ttf'
 font=ImageFont.truetype(font_path,24);small=ImageFont.truetype(font_path,19)
 chapters=[('01-Ignition',5),('02-Peat-Growth',21),('03-Excavator',30),('04-Dry-Ice',44),('05-Buried-Plate',53),('06-Pressure-Release',55.3),('07-Water-Paths',77),('08-Review',88)]
 sheet=Image.new('RGB',(1328,3312),'#142124');draw=ImageDraw.Draw(sheet)
-draw.text((20,18),'GRADUAL • accepted finite source',font=font,fill='#e4efed')
-draw.text((680,18),'RAPID • illustrative conversion',font=font,fill='#e4efed')
+draw.text((20,18),'GRADUAL • conserved contact source',font=font,fill='#e4efed')
+draw.text((680,18),'RAPID • illustrative release',font=font,fill='#e4efed')
 draw.text((20,55),'Both full films: 36 s • 720p • 24 fps. Stage time and solver time are separate.',font=small,fill='#a5c1bc')
 for row,(chapter,t) in enumerate(chapters):
     for col,mode in enumerate(('gradual','rapid')):

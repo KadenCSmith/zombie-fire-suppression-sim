@@ -19,9 +19,12 @@ from mathutils import Vector
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[2]
 STORY=json.loads((HERE/'storyboard.json').read_text())
-G=STORY['geometry']
+CONTRACT=json.loads((ROOT/'public/fire-sequence-contract.json').read_text())
+G=CONTRACT['geometry'];STORY['geometry']=G
+CONTACT=json.loads((ROOT/'public/contact-cooling.json').read_text())
 sys.path.insert(0,str(HERE))
 from visual_assets import dense_grass,compact_excavator,smooth_peat_outline
+from contact_assets import segmented_dome,hose_and_wetting,contact_shading
 from rupture_geometry import soil_prisms,animate_shape,debris,cell_for,move_detail,offset as rupture_offset
 APPEARANCE=json.loads((ROOT/'public/fire-appearance.json').read_text())
 parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);parser.add_argument('--cache',type=Path)
@@ -29,6 +32,9 @@ args=parser.parse_args(sys.argv[sys.argv.index('--')+1:])
 if args.output.name in ('Dry_Ice_Peat_Study.blend','Materials_Thermal_Stage_2.blend'):raise ValueError('Output must be a new derivative')
 SOURCE=HERE.parent/'Dry_Ice_Peat_Study.blend'
 SOURCE_HASH=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
+USER_ORIGINAL=Path('/Users/kadensmith/.codex/.chatgpt-projects/g-p-6ab74cc545008191a50ed1528f722d46/simulation-integration/docs/review/material-stage2/Materials_Thermal_Stage_2.blend')
+USER_ORIGINAL_HASH=hashlib.sha256(USER_ORIGINAL.read_bytes()).hexdigest() if USER_ORIGINAL.exists() else None
+if USER_ORIGINAL_HASH:assert USER_ORIGINAL_HASH=='e537ea14a6a75f83329675418bc565f1a4aa672da53011ec168581aa7531a638'
 CACHE=json.loads(args.cache.read_text()) if args.cache else None
 FRAMES=([state for state in CACHE['frames'] if state.get('phase')=='treatment'] if CACHE and CACHE.get('kind')=='surface-ignition-protocol' else CACHE['runs']['coupled']['frames'] if CACHE else [])
 FPS=24;COUNT=864;DURATION=90;RNG=random.Random(67027)
@@ -112,9 +118,9 @@ def char_material(name):
     ramp.color_ramp.elements[0].position=.25;ramp.color_ramp.elements[0].color=(.004,.002,.001,1)
     ramp.color_ramp.elements[1].position=.78;ramp.color_ramp.elements[1].color=(.18,.022,.003,1)
     midpoint=ramp.color_ramp.elements.new(.59);midpoint.color=(.027,.007,.003,1)
-    mask=nodes.new('ShaderNodeValToRGB');mask.color_ramp.elements[0].position=.64;mask.color_ramp.elements[0].color=(0,0,0,1)
-    mask.color_ramp.elements[1].position=.8;mask.color_ramp.elements[1].color=(.9,.9,.9,1)
-    shader.inputs['Emission Color'].default_value=(1,.075,.004,1)
+    mask=nodes.new('ShaderNodeValToRGB');mask.color_ramp.elements[0].position=.59;mask.color_ramp.elements[0].color=(0,0,0,1)
+    mask.color_ramp.elements[1].position=.78;mask.color_ramp.elements[1].color=(.82,.82,.82,1)
+    shader.inputs['Emission Color'].default_value=(.85,.023,.002,1)
     links.new(texture.outputs['Fac'],mask.inputs['Fac']);links.new(mask.outputs['Color'],shader.inputs['Emission Strength'])
     return material
 
@@ -123,7 +129,7 @@ static=bpy.data.collections.new('NATURAL SET • common illustrative geometry')
 soil_mats=[mat('Organic surface',(.026,.043,.013),noise=20),mat('Organic loam',(.145,.088,.033),noise=14),mat('Warm mineral subsoil',(.26,.17,.083),noise=11),mat('Sandy parent material',(.43,.37,.24),noise=16)]
 peat_mat=mat('Buried organic peat',(.037,.018,.009),noise=22)
 bark=mat('Supplemental root bark',(.13,.074,.03),noise=24)
-metal=mat('Dark brushed steel plate',(.13,.18,.19),rough=.62,metal=.76,noise=9)
+metal=mat('Dark brushed steel plate',(.055,.075,.082),rough=.68,metal=.74,noise=9)
 blue=mat('Liquid water • illustrative paths',(.05,.46,.68),rough=.2,metal=.05,emission=.18,alpha=.8)
 cyan=mat('CO2 subtle tracer wisps • real gas is invisible',(.15,.42,.44),rough=1,emission=.025,alpha=.026)
 ice=mat('Finite dry ice frost',(.69,.88,.97),rough=.65,noise=35)
@@ -169,7 +175,8 @@ rv=[];rf=[];rmi=[]
 for index in range(520):
     front=index<460;x=RNG.uniform(-3.96,3.96);y=.006 if front else RNG.uniform(.1,3.9);z=RNG.uniform(-3.13,-.03) if front else RNG.uniform(.005,.035)
     # Keep the drilling visualization readable; decorative stones do not occupy its bore.
-    if abs(x-.4)<G['boreRadiusM']+.03 and (front and z> -1.4 or not front and y<G['boreRadiusM']+.03):continue
+    if front and ((abs(x-.4)<G['boreRadiusM']+.03 and z>-1.4) or ((x-.4)/G['cavityRadiusM'])**2+((z-G['cavityCenterY'])/G['cavityHalfHeightM'])**2<1.15):continue
+    if not front and (x-.4)**2+y*y<(G['boreRadiusM']+.03)**2:continue
     radius=(.014+RNG.random()**2*.095)*(1 if front else .45);scale=(radius*RNG.uniform(.6,1.5),radius*(.22 if front else .8),radius*(.75 if front else .32));start=len(rv)
     rv.extend((x+v[0]*scale[0],y+v[1]*scale[1]-(.008 if front else 0),z+v[2]*scale[2]) for v in base_verts)
     rf.extend(tuple(start+v for v in f) for f in base_faces);rmi.extend([RNG.randrange(4)]*len(base_faces))
@@ -184,7 +191,7 @@ for obj in context_objects:static.objects.unlink(obj)
 
 def build_mode(mode):
     print('BUILD_MODE '+mode,flush=True);RNG.seed(15027)
-    scene=bpy.data.scenes.new('GRADUAL • accepted source' if mode=='gradual' else 'RAPID • illustrative conversion');scenesettings(scene);bpy.context.window.scene=scene;scene.collection.children.link(static)
+    scene=bpy.data.scenes.new('GRADUAL • conserved contact' if mode=='gradual' else 'RAPID • illustrative release');scenesettings(scene);bpy.context.window.scene=scene;scene.collection.children.link(static)
     actors=bpy.data.collections.new(mode+' staged operations');scene.collection.children.link(actors)
     captions=bpy.data.collections.new(mode+' readable scientific captions');scene.collection.children.link(captions)
     scene['Source mode']=mode
@@ -206,7 +213,13 @@ def build_mode(mode):
     for t in [0,23.9]+list(range(24,32))+[90]:
         depth=min(1.385,max(0,2.95*ease(t,24,31)-1.55));cutter.location=(.4,0,.01-max(.001,depth)/2);cutter.scale=(1,1,max(.001,depth)/2)
         cutter.keyframe_insert('location',frame=frame(t));cutter.keyframe_insert('scale',frame=frame(t))
-    soil_prisms(globals(),mode,actors,cutter)
+    pocket=uv(mode+' authored underreamed pocket cutter',(.4,0,G['cavityCenterY']),(1,1,1),actors,soil_mats[1],48,24);pocket.hide_render=True;pocket.display_type='WIRE'
+    pocket.data.attributes.new('rest_depth',type='FLOAT',domain='POINT').data.foreach_set('value',[-(G['cavityCenterY']+v.co.z*G['cavityHalfHeightM'])/3.2 for v in pocket.data.vertices])
+    cutter.data.attributes.new('rest_depth',type='FLOAT',domain='POINT').data.foreach_set('value',[.28 for v in cutter.data.vertices])
+    for pose in CONTRACT['poseFrames']:
+        if pose['timeS'] in (0,90) or 31<=pose['timeS']<=33:
+            p=max(.001,pose[mode]['underream']);pocket.scale=(G['cavityRadiusM']*p,G['cavityRadiusM']*p,G['cavityHalfHeightM']*p);pocket.keyframe_insert('scale',frame=frame(pose['timeS']))
+    soil_prisms(globals(),mode,actors,cutter,pocket)
     if mode=='rapid':
         for obj in decorative:
             group_size=8 if obj.get('blade_count') else len(base_verts);assignments=[]
@@ -259,6 +272,14 @@ def build_mode(mode):
     for t in [0,24]+[24+i*.25 for i in range(29)]+[90]:
         hole_depth.outputs[0].default_value=min(1.385,max(0,2.95*ease(t,24,31)-1.55));hole_depth.outputs[0].keyframe_insert('default_value',frame=frame(t))
     within_depth=math_node('LESS_THAN',math_node('MULTIPLY',separate.outputs['Z'],-1),hole_depth.outputs[0]);alpha=math_node('SUBTRACT',1,math_node('MULTIPLY',radial,within_depth));links.new(alpha,shader.inputs['Alpha'])
+    pocket_size=nodes.new('ShaderNodeValue')
+    for pose in CONTRACT['poseFrames']:
+        if pose['timeS'] in (0,90) or 31<=pose['timeS']<=33:
+            pocket_size.outputs[0].default_value=pose[mode]['underream']**2;pocket_size.outputs[0].keyframe_insert('default_value',frame=frame(pose['timeS']))
+    zz=math_node('DIVIDE',math_node('SUBTRACT',separate.outputs['Z'],G['cavityCenterY']),G['cavityHalfHeightM'])
+    pocket_radius=math_node('ADD',math_node('DIVIDE',rr,G['cavityRadiusM']**2),math_node('MULTIPLY',zz,zz))
+    pocket_mask=math_node('LESS_THAN',pocket_radius,pocket_size.outputs[0]);final_alpha=math_node('MULTIPLY',alpha,math_node('SUBTRACT',1,pocket_mask));links.new(final_alpha,shader.inputs['Alpha'])
+    contact_shading(globals(),mode,peat_display,CONTACT)
     if mode=='rapid':animate_shape(globals(),burning,peat_assignments)
     entry_path=[(1.72,-.065,.04),(1.74,-.065,-.2),(1.67,-.065,-.44),(1.65,-.065,-.72),(1.58,-.065,-1.06)]
     char_path=curve(mode+' scorched entry channel',entry_path,.063,actors,char_material(mode+' scorched entry char'))
@@ -268,13 +289,21 @@ def build_mode(mode):
         ob.data.bevel_factor_end=0;ob.data.keyframe_insert('bevel_factor_end',frame=frame(8));ob.data.bevel_factor_end=1;ob.data.keyframe_insert('bevel_factor_end',frame=frame(12))
     for i,index in enumerate(RNG.sample(eligible,min(160,len(eligible)))):
         row,column=divmod(index,nx);x=APPEARANCE['minX']+(column+.5)*dx;z=APPEARANCE['minY']+(row+.5)*dz
-        if abs(x-.4)<G['boreRadiusM']+.05 and z>-1.43:continue
+        if (abs(x-.4)<G['boreRadiusM']+.05 and z>-1.43) or ((x-.4)/G['cavityRadiusM'])**2+((z-G['cavityCenterY'])/G['cavityHalfHeightM'])**2<1.10:continue
         lo,hi=12.,24.
         for _ in range(30):
             mid=(lo+hi)/2
             if .7*ease(mid,12,24)<APPEARANCE['arrival'][index]:lo=mid
             else:hi=mid
         ob=curve(mode+' peat ember '+str(i),[(x-.018,-.087,z),(x,-.088,z+.008),(x+.027,-.087,z-.003)],.0028,actors,ember);visible(ob,hi)
+        # Ember intensity follows the nearest reduced contact footprint, never a forced global fade.
+        local=ember.copy();local.name=mode+' ember contact '+str(i);ob.data.materials[0]=local;strength=local.node_tree.nodes.get('Principled BSDF').inputs['Emission Strength']
+        for state in CONTACT['modes'][mode]:
+            reduction=0
+            for p in state['patches']:
+                f=max(0,min(1,(math.hypot(x-p['xM'],z-p['yM'])/p['radiusM']-.30)/.83));influence=1-f*f*(3-2*f)
+                glow=max(0,min(1,(p['temperatureK']-550)/max(1,state['initialTemperatureK']-550)))**1.7;reduction=max(reduction,influence*(1-glow))
+            strength.default_value=2.5*(1-reduction);strength.keyframe_insert('default_value',frame=frame(state['storyTimeS']))
         if mode=='rapid':move_detail(globals(),ob,(x,-.087,z))
     # Small surface ignition with gently irregular flame geometry and continuous flicker.
     for i in range(18):
@@ -301,33 +330,17 @@ def build_mode(mode):
     # Finite source geometry. Rapid mode is prescribed conversion and not a solver result.
     source=uv(mode+' dry ice source',(.4,0,2.2),(1,1,1),actors,ice,32,20);visible(source,39)
     key(source,'location',[(t,(.4,0,2.2-3.5*phase(t,39,44)**2)) for t in [37,39,40,41,42,43,44,90]])
-    r0=(3*4/(4*math.pi*1560))**(1/3);source_scale=[(0,(r0,)*3),(55,(r0,)*3)]
-    if mode=='gradual' and FRAMES:
-        first=FRAMES[0]['timeS'];end=max(1e-9,FRAMES[-1]['timeS']-first)
-        for state in FRAMES:
-            t=55+30*(state['timeS']-first)/end;radius=(3*max(0,state['dryIceKg'])/(4*math.pi*1560))**(1/3);source_scale.append((t,(radius,)*3))
-        source_scale.append((90,source_scale[-1][1]))
-    elif mode=='rapid':source_scale.extend([(55.45,(0,0,0)),(90,(0,0,0))])
-    else:source_scale.append((90,(r0,)*3))
+    source_scale=[]
+    for state in CONTACT['modes'][mode]:
+        radius=(3*max(0,state['ledger']['dryIceRemainingKg'])/(4*math.pi*1560))**(1/3)
+        source_scale.append((state['storyTimeS'],(radius,)*3))
     key(source,'scale',source_scale)
-    # Buried concave-up plate clears the source; rapid mode inverts upward.
-    verts=[];faces=[];rings=16;segments=64
-    for ring in range(rings+1):
-        r=ring/rings
-        for angle in range(segments):a=angle*math.tau/segments;verts.append((G['capRadiusM']*r*math.cos(a),G['capRadiusM']*r*math.sin(a),-G['capRiseM']*(1-r*r)))
-    for ring in range(rings):
-        for angle in range(segments):n=(angle+1)%segments;faces.append((ring*segments+angle,ring*segments+n,(ring+1)*segments+n,(ring+1)*segments+angle))
-    cap=mesh(mode+' metal dome • schematic bend',verts,faces,actors,metal);cap.location=(.4,0,2.5)
-    for p in cap.data.polygons:p.use_smooth=True
-    solid=cap.modifiers.new('Visible plate thickness','SOLIDIFY');solid.thickness=.009
-    cap.shape_key_add(name='Basis');bend=cap.shape_key_add(name='Illustrated deflection, not a failure calculation')
-    for vertex in bend.data:
-        r=min(1,math.hypot(vertex.co.x,vertex.co.y)/G['capRadiusM']);vertex.co.z+=.22*(1-r*r)
-    for t in [0,55]+[55+i*.025 for i in range(27)]+[90]:
-        bend.value=ease(t,55,55.65) if mode=='rapid' else 0;bend.keyframe_insert('value',frame=frame(t))
-    key(cap,'location',[(47,(.4,0,2.5)),(48,(.4,0,2.5)),(53,(.4,0,-1.05)),(90,(.4,0,-1.05))]);visible(cap,47)
-    cap['scientific_role']='Buried downward bowl; rapid-only prescribed inversion, not solved pressure response'
-    rim=curve(mode+' plate copper rim',[(G['capRadiusM']*math.cos(i*math.tau/64),G['capRadiusM']*math.sin(i*math.tau/64),.002)for i in range(65)],.003,actors,mat(mode+' copper edge',(.22,.09,.029),rough=.48,metal=.72));rim.parent=cap;visible(rim,47)
+    if mode=='rapid':
+        for fc in source.animation_data.action.fcurves:
+            if fc.data_path=='scale':
+                for point in fc.keyframe_points:point.interpolation='CONSTANT'
+    source['scientific_role']='Finite mass from separate conserved hot-patch contact calculation; accepted field cache remains a separate case'
+    cap=segmented_dome(globals(),mode,actors,CONTRACT)
     # Separated low-opacity wisps are a visibility convention; real CO2 is invisible.
     gas_rng=random.Random(550152)
     for i in range(19):
@@ -336,36 +349,24 @@ def build_mode(mode):
         start=55+i*(.16 if mode=='rapid' else .55);size=gas_rng.uniform(.036,.078)
         puff.rotation_euler.y=gas_rng.uniform(-.6,.6)
         key(puff,'scale',[(0,(0,0,0)),(start,(0,0,0)),(start+2,(size*1.3,.012,size*.42)),(85,(size*1.5,.012,size*.5)),(90,(size*1.5,.012,size*.5))])
-    # Assumed fracture paths and water paths have no constitutive or hydraulic solver role.
-    paths=[[(.4,-.08,-.12),(.17,-.08,-.45),(-.24,-.08,-.7),(-.68,-.08,-1.05),(-1.2,-.08,-1.48),(-1.65,-.08,-1.82)],
-           [(.4,-.08,-.4),(.83,-.08,-.75),(1.14,-.08,-1.11),(1.7,-.08,-1.43),(2.12,-.08,-1.92)],
-           [(-.62,-.08,-1.02),(-1.19,-.08,-.88),(-1.77,-.08,-1.1),(-2.38,-.08,-1.42)],
-           [(.4,-.08,-1.36),(.17,-.08,-1.82),(-.25,-.08,-2.12),(-.5,-.08,-2.65)]]
-    for i,points in enumerate(paths):
-        crack=curve(mode+' assumed opening '+str(i),points,.026,actors,crack_mat)
-        crack.data.bevel_depth=.021 if mode=='rapid' else .007
-        crack.data.bevel_factor_end=0;crack.data.keyframe_insert('bevel_factor_end',frame=frame(55 if mode=='rapid' else 69));crack.data.bevel_factor_end=1;crack.data.keyframe_insert('bevel_factor_end',frame=frame(55.65 if mode=='rapid' else 70))
-        water=curve(mode+' illustrative water path '+str(i),[(x,y-.018,z) for x,y,z in points],.017,actors,blue)
-        water.data.bevel_factor_end=0;water.data.keyframe_insert('bevel_factor_end',frame=frame(70+i));water.data.bevel_factor_end=1;water.data.keyframe_insert('bevel_factor_end',frame=frame(83+i*.6))
-    hose=curve(mode+' water hose',[(-1.4,.8,2.8),(-.4,.6,2.5),(.66,.05,1.2),(.66,0,.5)],.052,actors,mat(mode+' hose rubber',(.055,.08,.07)));visible(hose,69)
-    pour=curve(mode+' water inlet around rim',[(.66,-.025,.50),(.65,-.025,.12),(.62,-.025,-.05),(.62,-.025,-1.15),(.4,-.025,-1.36)],.010,actors,blue);visible(pour,70,85)
+    hose_and_wetting(globals(),mode,actors,CONTRACT,CONTACT)
     # Wide stable camera preserves stage context and allows clear comparisons.
     cam_data=bpy.data.cameras.new(mode+' camera');camera=bpy.data.objects.new(mode+' camera',cam_data);scene.collection.objects.link(camera)
     camera.location=(8.4,-15.5,7.5);camera.rotation_euler=(Vector((-.15,1,-.15))-camera.location).to_track_quat('-Z','Y').to_euler();cam_data.type='ORTHO';cam_data.ortho_scale=16.4;scene.camera=camera
     for name,location,energy,size in [('Key',(-3,-5,9),1400,7),('Fill',(6,-2,5),750,6),('Rim',(-2,5,7),1700,5)]:
         data=bpy.data.lights.new(mode+' '+name,'AREA');data.energy=energy;data.shape='DISK';data.size=size
         obj=bpy.data.objects.new(data.name,data);scene.collection.objects.link(obj);obj.location=location;obj.rotation_euler=(Vector((0,1,-.3))-obj.location).to_track_quat('-Z','Y').to_euler()
-    title='GRADUAL / FINITE SOURCE' if mode=='gradual' else 'RAPID / ILLUSTRATIVE CONVERSION'
+    title='GRADUAL / FINITE CONTACT SOURCE' if mode=='gradual' else 'RAPID / ILLUSTRATIVE RELEASE'
     label(mode+' title',title,camera,captions,white,-5.9,3.0,.22)
     label(mode+' subtitle','FIRE TO SUBSURFACE TREATMENT  /  EDITABLE STORY STUDY',camera,captions,muted,-5.9,2.66,.105)
     involvement=label(mode+' treatment trigger','ILLUSTRATED PEAT INVOLVEMENT 70% / TREATMENT TRIGGER',camera,captions,muted,-5.9,1.98,.098);visible(involvement,24)
-    label(mode+' scope','Setup 2.8x / event 1x. Excavation, buried plate inversion, cracks and water are staged.',camera,captions,muted,-5.9,-3.14,.104)
+    label(mode+' scope','Geometry and wetting are authored. Contact heat is a separate reduced balance; no field validation.',camera,captions,muted,-5.9,-3.14,.104)
     for stage in STORY['stages']:
-        stage_title='Finite source / calculated mass' if mode=='gradual' and stage['id']=='treatment' else stage['title']
+        stage_title='Finite source / local contact cooling' if mode=='gradual' and stage['id']=='treatment' else stage['title']
         title_obj=label(mode+' chapter '+stage['id'],stage_title.upper(),camera,captions,white,-5.9,-2.57,.19);visible(title_obj,stage['start'],stage['end']-.13 if stage['end']<90 else 90)
         evidence=stage['evidence']
         if stage['id']=='underground':evidence='Illustrated underground spread; the numerical front remains unresolved.'
-        if mode=='gradual' and stage['id']=='treatment':evidence='Finite source mass follows accepted states. The plate and ground remain intact.'
+        if mode=='gradual' and stage['id']=='treatment':evidence='Finite contact source and local heat removal. The plate and ground remain intact.'
         if mode=='rapid' and stage['id']=='treatment':evidence='Prescribed pressure release and soil rupture. CO₂ does not burn; fracture is not calculated.'
         line=label(mode+' evidence '+stage['id'],evidence,camera,captions,muted,-5.9,-2.87,.108);visible(line,stage['start'],stage['end']-.13 if stage['end']<90 else 90)
         scene.timeline_markers.new(stage['title'],frame=frame(stage['start']))
@@ -376,8 +377,8 @@ def build_mode(mode):
         first=FRAMES[0]['timeS'];end=max(1e-9,FRAMES[-1]['timeS']-first)
         for i,state in enumerate(FRAMES):
             start=55+30*(state['timeS']-first)/end;stop=55+30*(FRAMES[i+1]['timeS']-first)/end-.13 if i+1<len(FRAMES) else 90
-            text=f'ACCEPTED SOLVER  {state["timeS"]:.3g} s  |  treatment +{state["timeS"]-first:.3g} s  |  dry ice {state["dryIceKg"]:.6g} kg'
-            if mode=='rapid':text='RAPID CONVERSION: prescribed / no accepted gas calculation'
+            text=f'ACCEPTED SOLVER  {state["timeS"]:.3g} s  |  treatment +{state["timeS"]-first:.3g} s  |  field-case dry ice {state["dryIceKg"]:.6g} kg'
+            if mode=='rapid':text='RAPID RELEASE: prescribed / no accepted gas calculation'
             readout=label(mode+' accepted readout '+str(i),text,camera,captions,white,-5.9,2.40,.102);visible(readout,start,max(start,stop))
             if mode=='gradual':
                 info=f'ACCEPTED GAS  min O2 {100*min(state["oxygen"]):.3g}% / max CO2 {100*max(state["co2"]):.3g}% mol/mol'
@@ -435,32 +436,50 @@ def build_mode(mode):
                 else:
                     ob.location.x=ob.location.x*.74+(-5.88-1.96*.74)*ratio;ob.location.y-=1.15*ratio;ob.data.size*=.86
         bpy.data.objects[mode+' accepted-field title'].data.body='ACCEPTED TEMPERATURE / K'
+    contact_title=label(mode+' contact ledger title','CONTACT BALANCE / ASSUMED HOT PATCHES',camera,captions,white,-5.88,-.66,.098);visible(contact_title,44)
+    contact_scope=label(mode+' contact ledger scope','Separate case / finite energy / wet arrival assumed',camera,captions,muted,-5.88,-.85,.086);visible(contact_scope,44)
+    for state in CONTACT['modes'][mode]:
+        t=state['storyTimeS']
+        if t<44 or abs(t-round(t))>.001:continue
+        ledger=state['ledger'];temperatures=[p['temperatureK']-273.15 for p in state['patches']]
+        entries=[f'Contact peat {min(temperatures):.0f}–{max(temperatures):.0f} °C',f'Dry ice {ledger["dryIceRemainingKg"]:.3f} kg / water {ledger["waterSuppliedKg"]:.2f} kg',f'Heat removed {(ledger["heatToDryIceJ"]+ledger["heatToWaterJ"])/1000:.1f} kJ']
+        for index,body in enumerate(entries):
+            ob=label(mode+' contact '+str(t)+' '+str(index),body,camera,captions,muted,-5.88,-1.07-index*.19,.090);visible(ob,t,min(90,t+.89))
     scene.frame_set(frame(64));print('MODE_COMPLETE '+mode,flush=True);return scene
 
 scenes=[build_mode(mode) for mode in ('gradual','rapid')]
 bpy.context.window.scene=scenes[0]
-manifest={'storyboard':STORY,'fps':FPS,'frames_per_mode':COUNT,'video_seconds_per_mode':COUNT/FPS,'source_blend_sha256':SOURCE_HASH,'source_repository_commit':'596bf84a32ed92d7dcddd7ba15001cb2fe258b0c','cache_sha256':hashlib.sha256(args.cache.read_bytes()).hexdigest() if args.cache else None,'cache_provenance':CACHE.get('provenance') if CACHE else None,'accepted_checkpoint_count':len(FRAMES),'scientific_scope':'Full staged narrative. Gradual source radius/readout uses accepted history where supplied. Rapid conversion, drilling, enlarged cap bending, fracture paths and liquid infiltration are explicitly illustrative and do not alter solver data. No extinguishment or field validation claim.','render':'720p EEVEE,24 samples,24fps; full sequence for both modes, original source never saved.'}
+manifest={'storyboard':STORY,'fps':FPS,'frames_per_mode':COUNT,'video_seconds_per_mode':COUNT/FPS,'source_blend_sha256':SOURCE_HASH,'preserved_0_15_commit':'223eda6f7a8e29291ebb5844fc2aa3f655f5d1cb','cache_sha256':hashlib.sha256(args.cache.read_bytes()).hexdigest() if args.cache else None,'cache_provenance':CACHE.get('provenance') if CACHE else None,'accepted_checkpoint_count':len(FRAMES),'scientific_scope':'Full staged narrative. Natural source radius and local cooling use a separate conserved reduced contact balance; inset alone uses accepted field history. Rapid release, drilling, enlarged cap bending, fracture paths and liquid infiltration are explicitly illustrative and do not alter solver data. No extinguishment or field validation claim.','render':'720p EEVEE,24 samples,24fps; full sequence for both modes, original source never saved.'}
+manifest['preserved_user_original_sha256']=USER_ORIGINAL_HASH
+manifest['contact_model_sha256']=hashlib.sha256((ROOT/'public/contact-cooling.json').read_bytes()).hexdigest()
+manifest['sequence_contract_sha256']=hashlib.sha256((ROOT/'public/fire-sequence-contract.json').read_bytes()).hexdigest()
+manifest['contact_scope']='Finite mass and energy ledger for prescribed hot patches with assumed contact times; no infiltration, oxidation, fracture, tool-design or treatment-validation claim.'
+manifest['hose_scope']='Procedural woven ivory jacket with original authored weave; no stock textures copied. Smooth flexible surface centerline lowered through a plate service passage.'
 manifest['appearance_sha256']=hashlib.sha256((ROOT/'public/fire-appearance.json').read_bytes()).hexdigest()
 manifest['appearance_scope']='Perimeter-only display smoothing; shared 200x80 seeded connected arrival ranks; 70% sampled peat area before treatment, not solved propagation.'
 manifest['rupture_scope']='Rapid-only authored pressure-release pulse, 504 irregular prisms, persistent gaps and decorative ballistic fragments; no CO2 detonation or fracture-solver claim.'
 manifest['presentation_clock']={'story_seconds':90,'playback_seconds':36,'normal_speed_story_interval':[55,61],'other_speed_multiplier':2.8,'mapping':'t/2.8 to55;55/2.8+t-55 to61;55/2.8+6+(t-61)/2.8 afterwards'}
-manifest['buried_plate']={'rim_elevation_m':-1.05,'initial_center_elevation_m':-G['capDepthM']-G['capRiseM'],'rapid_final_center_elevation_m':-G['capDepthM']-G['capRiseM']+.22,'radius_m':G['capRadiusM'],'bore_radius_m':G['boreRadiusM'],'deformation':'prescribed rapid-only inversion; gradual remains unchanged'}
+manifest['buried_plate']={'rim_elevation_m':-G['capDepthM'],'initial_center_elevation_m':-G['capDepthM']-G['capRiseM'],'rapid_final_center_elevation_m':-G['capDepthM']-G['capRiseM']+G['capInversionM'],'radius_m':G['capRadiusM'],'bore_radius_m':G['boreRadiusM'],'folded_radius_m':G['capFoldedRadiusM'],'pocket_radius_m':G['cavityRadiusM'],'wedge_radius_m':G['capWedgeRadiusM'],'deformation':'folded articulated insertion then deployment in visibly underreamed pocket; prescribed rapid-only inversion and shoulder wedging'}
 manifest['illustrated_peat_involvement']={'trigger_fraction':.7,'time_story_s':24,'geometry':'Shared irregular mask and connected arrival ranks; 70% sampled 2D peat area, not numerical fuel consumption'}
 manifest['embedded_cache_encoding']='base64(gzip(JSON)), stored in ACCEPTED_FIRE_CACHE.json.gz.b64'
 if CACHE and CACHE.get('kind')=='surface-ignition-protocol':
     manifest['cache_provenance']={key:CACHE.get(key) for key in ('kind','generatedAt','sourceHashes','config','ignitionSource','treatmentSource','treatmentStartS','propagationResolved','status','stopReason')}
-    manifest['field_inset']='Held accepted temperature cross-section through middle-y cells. Rapid mode holds the pre-treatment state; no rapid-conversion field is supplied.'
+    manifest['field_inset']='Held accepted temperature cross-section through middle-y cells. Rapid mode holds the pre-treatment state; no rapid-release field is supplied.'
     manifest['initial_treatment_mass_kg']=FRAMES[0]['dryIceKg'] if FRAMES else None
     manifest['final_treatment_mass_kg']=FRAMES[-1]['dryIceKg'] if FRAMES else None
 text=bpy.data.texts.new('FIRE_SEQUENCE_MANIFEST.json');text.write(json.dumps(manifest,indent=2))
 if CACHE:
     payload=base64.b64encode(gzip.compress(json.dumps(CACHE,separators=(',',':')).encode(),mtime=0)).decode()
     bpy.data.texts.new('ACCEPTED_FIRE_CACHE.json.gz.b64').write('\n'.join(payload[i:i+76] for i in range(0,len(payload),76)))
+print('EMBED_CONTACT',flush=True)
+bpy.data.texts.new('CONTACT_COOLING.json').write(json.dumps(CONTACT,indent=0))
+bpy.data.texts.new('FIRE_SEQUENCE_CONTRACT.json').write(json.dumps(CONTRACT,indent=0))
 bpy.data.texts.new('ILLUSTRATED_FIRE_APPEARANCE.json').write(json.dumps(APPEARANCE,separators=(',',':')))
-bpy.data.texts.new('START HERE').write('Use the scene dropdown to select GRADUAL or RAPID. Both are full staged narratives. Timeline is 90 presentation seconds in 36 playback seconds: setup 2.8x, event story55–61 at1x. Numerical readouts have their own clock. Gradual source mass follows accepted cache; rapid conversion and all excavation/water/fracture actions are illustrative. The buried plate is a downward bowl, inverted upward only in rapid mode. Native geometry and animation are editable. Original study is byte-preserved. Embedded accepted cache is base64(gzip(JSON)) with newlines; use gzip.decompress(base64.b64decode(text)) to recover it, or open the adjacent Accepted-Fire-Cache.json.\n')
+bpy.data.texts.new('START HERE').write('Use the scene dropdown to select GRADUAL or RAPID. Both are full staged narratives. Timeline is 90 presentation seconds in 36 playback seconds: setup 2.8x, event story55–61 at1x. Numerical readouts have their own clock. Natural source mass and heat use the embedded separate contact balance. Accepted field inset is unchanged and not the same hot-patch case. Rapid removal, excavation, wetting paths and fracture are illustrative. The buried plate is a downward bowl, inverted upward only in rapid mode. Native geometry and animation are editable. Original study is byte-preserved. Embedded accepted cache is base64(gzip(JSON)) with newlines; use gzip.decompress(base64.b64decode(text)) to recover it, or open the adjacent Accepted-Fire-Cache.json.\n')
 for image in bpy.data.images:
     if image.source=='FILE' and not image.packed_file and image.has_data:image.pack()
 args.output.parent.mkdir(parents=True,exist_ok=True);bpy.context.preferences.filepaths.save_version=0;print('SAVING_SCENES',flush=True);bpy.ops.wm.save_as_mainfile(filepath=str(args.output.resolve()),compress=True)
 args.output.with_suffix('.manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 assert hashlib.sha256(SOURCE.read_bytes()).hexdigest()==SOURCE_HASH
+if USER_ORIGINAL_HASH:assert hashlib.sha256(USER_ORIGINAL.read_bytes()).hexdigest()==USER_ORIGINAL_HASH
 print('FIRE_STORY_BUILT '+json.dumps({'output':str(args.output),'objects':len(bpy.data.objects),'frames':COUNT,'cache_frames':len(FRAMES)}),flush=True)

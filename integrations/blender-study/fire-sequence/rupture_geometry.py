@@ -59,7 +59,7 @@ def animate_shape(api,obj,assignments=None):
         pulse.keyframe_insert('value',frame=frame(t));damage.keyframe_insert('value',frame=frame(t))
     obj['scientific_role']='Prescribed rapid pressure-release displacement and permanent gaps; not calculated fracture'
 
-def soil_prisms(api,mode,collection,cutter):
+def soil_prisms(api,mode,collection,cutter,pocket):
     vertices=[];faces=[];assigned=[];cut_parts=[]
     for cell_index,cell in enumerate(CELLS):
         polygon=cell['polygon'];n=len(polygon)
@@ -68,7 +68,7 @@ def soil_prisms(api,mode,collection,cutter):
             local_vertices=[(x,y,z)for y in (near,far)for x,z in polygon]
             local_faces=[tuple(reversed(range(n))),tuple(n+i for i in range(n))]
             for i in range(n):j=(i+1)%n;local_faces.append((i,j,n+j,n+i))
-            if band==0 and min(p[0]for p in polygon)<.64 and max(p[0]for p in polygon)>.16 and max(p[1]for p in polygon)>-1.39:
+            if band==0 and min(p[0]for p in polygon)<1.1 and max(p[0]for p in polygon)>-.3 and max(p[1]for p in polygon)>-1.39:
                 cut_parts.append((cell_index,local_vertices,local_faces));continue
             start=len(vertices);vertices.extend(local_vertices);assigned.extend([(cell_index,band)]*n*2);faces.extend(tuple(start+i for i in f)for f in local_faces)
     material=api['mat']('Soil strata attached to irregular prisms '+mode,(.25,.17,.08),noise=16)
@@ -89,6 +89,7 @@ def soil_prisms(api,mode,collection,cutter):
         part.data.attributes.new('rest_depth',type='FLOAT',domain='POINT').data.foreach_set('value',[-p[2]/3.2 for p in verts])
         if mode=='rapid':animate_shape(api,part,[(cell_index,0)]*len(verts))
         boolean=part.modifiers.new('Cylindrical excavation only','BOOLEAN');boolean.operation='DIFFERENCE';boolean.object=cutter;boolean.solver='EXACT'
+        hollow=part.modifiers.new('Authored underreamed pocket excavation','BOOLEAN');hollow.operation='DIFFERENCE';hollow.object=pocket;hollow.solver='EXACT'
     obj['prism_count']=len(CELLS)*6;return obj
 
 def move_detail(api,obj,center):

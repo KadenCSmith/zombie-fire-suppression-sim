@@ -8,6 +8,7 @@ if(process.platform!=='darwin'){app.commandLine.appendSwitch('use-angle','swifts
 const timeout=setTimeout(()=>{console.error('FIRE_SMOKE_TIMEOUT');app.exit(1)},300000);
 app.on('browser-window-created',(_event,win)=>{
   win.webContents.on('render-process-gone',(_event,details)=>{console.error(details);app.exit(1)});
+  win.webContents.on('console-message',event=>{if(event.message.includes('THREE.WebGLProgram: Shader Error')){console.error('FIRE_SHADER_FAILURE: '+event.message);app.exit(1)}});
   win.webContents.once('did-finish-load',async()=>{
     try{
       const result=await win.webContents.executeJavaScript(`(async()=>{

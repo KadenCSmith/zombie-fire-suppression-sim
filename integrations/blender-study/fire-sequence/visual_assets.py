@@ -1,4 +1,4 @@
-"""Native editable visual assets for the 0.15 presentation, not solver geometry."""
+"""Native editable visual assets for the 0.16 presentation, not solver geometry."""
 import math
 import random
 import bpy
@@ -80,7 +80,7 @@ def compact_excavator(api,mode,collection,geometry):
     part(bevel(cube(mode+' step',(.34,-.47,.76),(.17,.10,.022),collection,steel),.014))
     for i in (-1,1):part(bevel(cube(mode+' work light '+str(i),(.61,i*.23,1.72),(.035,.045,.04),collection,mat(mode+' lamp '+str(i),(.55,.62,.57),rough=.3,emission=.3)),.015))
     for obj in parts:visible(obj,24,40)
-    tip=lambda t:1.55-2.95*ease(t,24,31)*(1-ease(t,31,36))
+    tip=lambda t:1.55-2.95*ease(t,24,31)*(1-ease(t,34,36.5))
     pivot=lambda t:(-1.33+offset(t),1.26,.91)
     elbow=lambda t:(-.82+offset(t),.70,2.18+.13*tip(t))
     head=lambda t:(.4+offset(t),0,tip(t)+1.78)
@@ -110,6 +110,18 @@ def compact_excavator(api,mode,collection,geometry):
     tip_obj=api['uv'](mode+' tapered auger tip',(0,0,.045),(.08,.08,.105),collection,steel,16,10);tip_obj.parent=rotor;visible(tip_obj,24,40)
     motor=bevel(cube(mode+' stationary drill motor',(0,0,1.76),(.14,.13,.14),collection,frame_mat),.032);motor.parent=assembly;visible(motor,24,40)
     collar=cylinder(mode+' drive coupling',(0,0,1.57),.073,.13,collection,yellow);collar.parent=assembly;visible(collar,24,40)
+    # Fold-out underream cutter opens the displayed pocket before the shell arrives.
+    # Its motion is shared with the live presentation, not an excavation solver.
+    for side in (-1,1):
+        arm=cube(mode+' folding underream arm '+str(side),(0,0,.45),(.1,.045,.025),collection,steel);arm.parent=assembly;visible(arm,31,34)
+        tooth=cube(mode+' underream cutting shoe '+str(side),(0,0,.45),(.035,.06,.11),collection,frame_mat);tooth.parent=assembly;visible(tooth,31,34)
+        for pose in api['CONTRACT']['poseFrames']:
+            t=pose['timeS']
+            if 31<=t<=34:
+                extension=pose[mode]['cutterExtension'];length=.07+extension*(geometry['cavityRadiusM']-.07)
+                arm.location=(side*length/2,0,.45);arm.scale=(length/.2,1,1);tooth.location=(side*length,0,.45)
+                for ob in (arm,tooth):ob.keyframe_insert('location',frame=frame(t))
+                arm.keyframe_insert('scale',frame=frame(t))
     rig['scientific_role']='Articulated authored equipment; not a solved excavation or vehicle dynamics model'
     return rig
 

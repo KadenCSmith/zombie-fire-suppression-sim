@@ -117,15 +117,19 @@ function Tree({time,mode}:{time:number;mode:FireSourceMode}){
   const group=useRef<THREE.Group>(null),texture=useMemo(createSoilTexture,[]),uniform=useMemo(()=>({value:0}),[]),cavityUniform=useMemo(()=>({value:0}),[]),invalidate=useThree(state=>state.invalidate)
   useEffect(()=>()=>texture.dispose(),[texture])
   useLayoutEffect(()=>{
+    const originals=new Map<THREE.MeshStandardMaterial,{compile:THREE.MeshStandardMaterial['onBeforeCompile'];cache:THREE.MeshStandardMaterial['customProgramCacheKey']}>()
     group.current?.traverse(object=>{if(!(object instanceof THREE.Mesh)||object instanceof THREE.InstancedMesh)return
       const material=object.material as THREE.MeshStandardMaterial,key=material.customProgramCacheKey()
-      if(!key.startsWith('oak-bark-true'))return
+      if(!key.startsWith('oak-bark-true')||originals.has(material))return
       const original=material.onBeforeCompile
+      originals.set(material,{compile:original,cache:material.customProgramCacheKey})
       material.onBeforeCompile=(shader,renderer)=>{original.call(material,shader,renderer);shader.uniforms.uStoryBoreDepth=uniform;shader.uniforms.uStoryCavity=cavityUniform;shader.fragmentShader='uniform float uStoryBoreDepth,uStoryCavity;\n'+shader.fragmentShader;shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
 if(length(vec2(vOak.x-${SOURCE_X},vOak.z))<${G.boreRadiusM}&&vOak.y>-uStoryBoreDepth&&uStoryBoreDepth>.005)discard;
 if(uStoryCavity>.005&&pow(length(vec2(vOak.x-${SOURCE_X},vOak.z))/(${G.cavityRadiusM}*uStoryCavity),2.0)+pow((vOak.y-(${G.cavityCenterY}))/${G.cavityHalfHeightM},2.0)<1.0)discard;`)}
       material.customProgramCacheKey=()=>key+'-story-excavation';material.needsUpdate=true
     })
+    // React effect replay and natural/scientific remounts must not stack hooks.
+    return()=>{for(const [material,original] of originals){material.onBeforeCompile=original.compile;material.customProgramCacheKey=original.cache;material.needsUpdate=true}}
   },[uniform,cavityUniform])
   useLayoutEffect(()=>{cavityUniform.value=fireSequencePose(time,'gradual').underream;uniform.value=fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),data=texture.image.data as Float32Array;for(let j=0;j<25;j++)for(let i=0;i<49;i++){const o=storyRuptureOffset(-4+i/48*8,-3.2+j/24*3.2,0,r.pulse,r.damage),id=(j*49+i)*4;data[id]=o[0];data[id+1]=o[1]}texture.needsUpdate=true;invalidate()},[time,mode,texture,uniform,cavityUniform,invalidate])
   return <group ref={group}><OakTree soilTexture={texture} natural/></group>
