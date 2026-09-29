@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone conservative geometry package (2026-09-29)
+
+Integrated the user-supplied Agent D geometry source and tests as 14 new, hash-verified paths under `src/physics-next/geometry/` and `tests/physics-next/geometry/`. The package has no imports from the active simulation or UI. All 86 new tests and the complete 219-test suite passed, as did typecheck, lint and production build. The separate Blender edit remains untouched. [Integration review and activation limits](GEOMETRY_INTEGRATION.md).
+
 ## Published 0.11.0 delivery (2026-09-27)
 
 [Release 0.11.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) is published as latest. All **17 uploaded assets** match local byte sizes and GitHub's SHA-256 digests: six desktop archives, full source snapshot, validation evidence, standalone model/validation/installation guides, native development screenshot, source/release/verification manifests and checksums. The total is 1,211,208,798 bytes. [Upload verification](../examples/coupledReleaseVerification.json).

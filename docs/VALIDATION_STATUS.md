@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Standalone conservative geometry package (2026-09-29)
+
+The 14 supplied geometry source/test payloads match their manifest hashes. Actual repository checks passed: 86 new tests, 219 tests overall, TypeScript 7.0.2 typecheck, lint and production build. The modules are not imported by the existing physics, workers, UI or installed app, so no changed simulation behavior or physical validation is claimed. The handoff baseline differs from this 0.11 checkout, including an absent referenced remap file. [Scope, verification and activation prerequisites](GEOMETRY_INTEGRATION.md).
+
 ## Published 0.11.0 delivery (2026-09-27)
 
 [Release 0.11.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) is published as latest. All **17 uploaded assets** match local byte sizes and GitHub's SHA-256 digests: six desktop archives, full source snapshot, validation evidence, standalone model/validation/installation guides, native development screenshot, source/release/verification manifests and checksums. The total is 1,211,208,798 bytes. [Upload verification](../examples/coupledReleaseVerification.json).
