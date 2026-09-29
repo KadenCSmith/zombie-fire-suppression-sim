@@ -9,6 +9,12 @@
 - Baseline scope: 326 tracked files. Git dependencies, build output, local caches, credentials and untracked artifacts are excluded.
 - Reproduce: clone/fetch the repository, checkout the full SHA in detached state, then run `shasum -a 256 -c docs/llm-workpacks/BASELINE_SOURCE_MANIFEST.sha256` from the checkout root.
 
+## Offline source attachment
+
+The authoring agents must receive `zombie-fire-suppression-sim-baseline-4caaba3.zip` as an attachment beside their selected workpack. The archive is a complete `git archive` of the 326 tracked baseline files, uses internal root `zombie-fire-suppression-sim-baseline-4caaba3/`, and has SHA-256 `4554f980bdd2658d764927487ce2a8799eb18bdaee074479b0d85197f35ed1a2`. It was tested as a ZIP and every contained file was verified against `BASELINE_SOURCE_MANIFEST.sha256`.
+
+GitHub is identity/reference metadata only for these prompts. The agents are instructed to use the attached archive, avoid private-repository connector calls, never substitute moving `main`, and ask only for reattachment of the exact ZIP if the attachment is unavailable.
+
 The baseline includes the tested version-comparison workspace and all physics code through the current 0.16 candidate. It passed typecheck, lint, production build and 199 tests in 33 files. Those are software checks, not experimental validation.
 
 ## Prioritized 10-item physics backlog

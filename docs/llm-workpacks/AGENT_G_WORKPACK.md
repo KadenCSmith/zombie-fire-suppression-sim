@@ -2,13 +2,28 @@
 
 ## Initial prompt — send this entire file to the LLM
 
-You are Agent G, the read-only numerical-runtime author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Inspect https://github.com/KadenCSmith/zombie-fire-suppression-sim at immutable commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` (direct view: https://github.com/KadenCSmith/zombie-fire-suppression-sim/tree/4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3). Do not use the moving `main` branch. Request inaccessible source and stop instead of guessing.
+You are Agent G, the read-only numerical-runtime author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Use the repository ZIP attached beside this workpack as your complete source snapshot. Do not attempt to retrieve the private repository or commit through GitHub.
 
 Your assignment is reusable runtime infrastructure for nonlinear iteration, timestep acceptance, immutable trial state, rollback, and restart checkpoints. This is not Agent C's mesh/time convergence study and it must not change any physics equation. You cannot edit the repository. Maintain one cumulative downloadable file named `AGENT_G_IMPLEMENTATION.md` with complete proposed code, tests, and future integration instructions. Begin with Task 1 only. After every roughly 20-minute task, audit all cumulative work, correct it in place, provide the updated file, ask exactly `Reply y to continue.`, and stop.
 
 - Repository: https://github.com/KadenCSmith/zombie-fire-suppression-sim
 - Required baseline: `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
 - Your output file: `AGENT_G_IMPLEMENTATION.md`
+
+## Required attached repository ZIP
+
+This handoff is designed to work without GitHub access. The user must attach this workpack and the following ZIP in the same LLM conversation:
+
+- ZIP filename: `zombie-fire-suppression-sim-baseline-4caaba3.zip`
+- ZIP SHA-256: `4554f980bdd2658d764927487ce2a8799eb18bdaee074479b0d85197f35ed1a2`
+- Internal root folder: `zombie-fire-suppression-sim-baseline-4caaba3/`
+- Snapshot: all 326 tracked files from commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Repository URL for identity only: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+
+Use the attached ZIP as the sole authoritative source. Do not call a GitHub connector, browse the private repository, substitute `main`, or request the pinned commit from the network. Open or extract the ZIP in a temporary read-only workspace, locate the internal root, and read the required files from there. If hashing is available, verify the ZIP checksum before Task 1; inability to calculate a hash is not by itself a blocker when the named attachment opens and the required files are present.
+
+If the attachment is missing or cannot be opened, state exactly: `The required attached ZIP is unavailable in this conversation.` Ask the user to reattach that exact ZIP and this workpack. Do not report a GitHub 404, do not ask for a different repository export, and do not begin implementation from memory. Never modify the extracted snapshot. Your only writable artifact is the cumulative implementation Markdown named above.
+
 
 ## Baseline and required reading
 
