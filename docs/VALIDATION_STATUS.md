@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Transport exchange contract (2026-09-29)
+
+The older Agent B contract's 25 manufactured cases passed under Vitest; the 1,702-test full suite, typecheck, lint and build passed. No active solver exchange plan or experimental result was checked. [Details](TRANSPORT_PACKAGE_INTEGRATION.md).
+
 ## Local mechanics kernels (2026-09-29)
 
 Agent A's 464 targeted tests and the 1,701-test repository suite passed with typecheck, lint and build. The local type-only contract substitutes for a missing shared interface. No coupled finite-strain, contact, fracture, or peat calibration result is established for the app. [Details](MECHANICS_PACKAGE_INTEGRATION.md).

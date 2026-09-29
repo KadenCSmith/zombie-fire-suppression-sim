@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Conservative transport exchange contract (2026-09-29)
+
+Added the complementary Agent B exchange contract and its 25-case fixture under repository Vitest. The full **1,702-test suite**, typecheck, lint and build passed. It is a standalone staging boundary and does not activate transport. [Details](TRANSPORT_PACKAGE_INTEGRATION.md).
+
 ## Standalone mechanics kernels (2026-09-29)
 
 Integrated Agent A's eleven source/test files plus one local type-only shape needed by the absent shared contract. All 464 new tests and the full **1,701-test suite** passed, with typecheck, lint and production build. No active global solver uses these kernels. [Scope and adaptation](MECHANICS_PACKAGE_INTEGRATION.md).
