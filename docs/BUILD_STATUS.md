@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone transport and thermochemistry (2026-09-29)
+
+Integrated 11 hash-verified Agent B source/test files. All 130 new tests and the full **1,237-test suite** passed with typecheck, lint and build. The active solver does not yet call these modules. [Scope and adoption gates](TRANSPORT_PACKAGE_INTEGRATION.md).
+
 ## Standalone intervention schedules and ledgers (2026-09-29)
 
 Integrated 14 hash-verified Agent E source/test files. All 170 new tests and the full **1,107-test suite** passed, with typecheck, lint and production build. The package is not connected to the live solver or UI. [Scope and activation gates](INTERVENTION_PACKAGE_INTEGRATION.md).
