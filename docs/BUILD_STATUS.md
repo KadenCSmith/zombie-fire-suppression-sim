@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone verification package (2026-09-29)
+
+Integrated 15 hash-verified Agent C core files for independent conservation, convergence, manufactured fixtures, validation status, and reports. The two contract-dependent adapters await a shared interface. All 99 new tests and the full **772-test suite** passed, as did typecheck, lint and production build. No active solver imports this package. [Integration scope](VERIFICATION_PACKAGE_INTEGRATION.md).
+
 ## Standalone numerical runtime controls (2026-09-29)
 
 Integrated the user-supplied Agent G norms, iteration, timestep, transaction, diagnostic and checkpoint helpers as 14 new hash-verified source/test files. No active solver imports them. All **160 new tests** and **673 tests in 54 files** overall passed, alongside typecheck, lint and production build. [Verification and solver-adoption boundary](NUMERICS_INTEGRATION.md).

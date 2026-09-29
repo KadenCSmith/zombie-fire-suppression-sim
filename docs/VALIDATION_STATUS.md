@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Independent verification package (2026-09-29)
+
+Agent C's 15 core files passed 99 targeted tests and all 772 repository tests; typecheck, lint and build passed. They are not connected to the active solver and no new experimental validation is claimed. Two shared-contract adapters remain deferred. [Details](VERIFICATION_PACKAGE_INTEGRATION.md).
+
 ## Standalone numerical runtime controls (2026-09-29)
 
 Agent G's 14 source/test payloads matched their SHA-256 manifest. In the merged 0.16 checkout, 160 new numerics tests and **673 full-suite tests** passed; TypeScript 7.0.2 typecheck, lint and production build also passed. Lint reported five non-failing warnings in the supplied numerics files. The package is not connected to a solver; no existing rollback defect, runtime convergence or scientific validation is claimed repaired. [Exact limits and prerequisites](NUMERICS_INTEGRATION.md).

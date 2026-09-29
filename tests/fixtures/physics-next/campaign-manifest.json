@@ -1,0 +1,285 @@
+{
+  "schema": "agent-c-verification-campaign-v1",
+  "purpose": "Planning and integration inventory; not evidence that a campaign ran.",
+  "baseline": {
+    "commit": "4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3",
+    "archive": "zombie-fire-suppression-sim-baseline-4caaba3.zip",
+    "archiveSha256": "4554f980bdd2658d764927487ce2a8799eb18bdaee074479b0d85197f35ed1a2",
+    "root": "zombie-fire-suppression-sim-baseline-4caaba3/",
+    "trackedArchiveMembers": 326
+  },
+  "integrationStages": {
+    "core": {
+      "targetPaths": [
+        "src/physics-next/verification/conservation.ts",
+        "src/physics-next/verification/convergence.ts",
+        "src/physics-next/verification/index.ts",
+        "src/physics-next/verification/manufactured.ts",
+        "src/physics-next/verification/report.ts",
+        "src/physics-next/verification/validation.ts",
+        "tests/fixtures/physics-next/baselineAdapters.ts",
+        "tests/fixtures/physics-next/campaign-manifest.json",
+        "tests/fixtures/physics-next/conservationFixtures.ts",
+        "tests/fixtures/physics-next/validationFixtures.ts",
+        "tests/physics-next/verification/conservation.test.ts",
+        "tests/physics-next/verification/convergence.test.ts",
+        "tests/physics-next/verification/manufactured.test.ts",
+        "tests/physics-next/verification/report.test.ts",
+        "tests/physics-next/verification/validation.test.ts"
+      ],
+      "requires": [
+        "Matching archive identity",
+        "Authorized integration checkpoint",
+        "Project's provisioned pinned toolchain"
+      ],
+      "testPaths": [
+        "tests/physics-next/verification/conservation.test.ts",
+        "tests/physics-next/verification/convergence.test.ts",
+        "tests/physics-next/verification/manufactured.test.ts",
+        "tests/physics-next/verification/report.test.ts",
+        "tests/physics-next/verification/validation.test.ts"
+      ],
+      "authorEvidence": {
+        "execution": "author-check",
+        "compiler": "TypeScript 5.8.3",
+        "node": "22.16.0",
+        "assertionRunner": "limited synchronous Vitest-shaped shim; not Vitest",
+        "passedTestBodies": 99,
+        "reconstructionRechecked": true
+      }
+    },
+    "contract": {
+      "targetPaths": [
+        "tests/fixtures/physics-next/contractAdapters.test.ts",
+        "tests/fixtures/physics-next/contractAdapters.ts"
+      ],
+      "requires": [
+        "Core stage",
+        "Actual integrator-owned src/physics-next/contracts.ts",
+        "Frozen workpack shape/units/ownership review"
+      ],
+      "testPaths": [
+        "tests/fixtures/physics-next/contractAdapters.test.ts"
+      ],
+      "authorEvidence": {
+        "execution": "author-check",
+        "passedAdditionalTestBodies": 9,
+        "limitations": [
+          "Virtual frozen-workpack type transcription, not an installed contract",
+          "Synthetic mechanical callback, not Agent A/B implementation"
+        ],
+        "reviewCorrection": "One-entry-per-cell plastic/history shapes enforced; approved vector layouts would require an explicit contract and adapter revision."
+      }
+    }
+  },
+  "fixtures": [
+    {
+      "id": "conservation.baseline-inventories",
+      "kind": "conservation",
+      "testPath": "tests/physics-next/verification/conservation.test.ts",
+      "canRunAfter": "core",
+      "input": "conservationFixtures.ts and actual coupled baseline classes",
+      "coverage": [
+        "closed box",
+        "heater",
+        "atmospheric boundary",
+        "reaction",
+        "sublimation",
+        "equal-time insertion",
+        "independent kg/mol/J sums",
+        "reported-residual forgery",
+        "net/gross correction disclosure"
+      ],
+      "evidenceLimit": "Controlled accounting only, not general convergence or experiments."
+    },
+    {
+      "id": "rollback.baseline-deterministic",
+      "kind": "ownership-and-rollback",
+      "testPath": "tests/physics-next/verification/conservation.test.ts",
+      "canRunAfter": "core",
+      "coverage": [
+        "transport throw after source update",
+        "mechanics throw after transport",
+        "existing fracture-energy gate",
+        "30 Picard trial exhaustion"
+      ],
+      "evidenceLimit": "Captured physical state/replay, not byte identity for recomputable caches or attempted-iteration counters."
+    },
+    {
+      "id": "convergence.analytic-sequences",
+      "kind": "convergence",
+      "testPath": "tests/physics-next/verification/convergence.test.ts",
+      "canRunAfter": "core",
+      "evidenceLimit": "Estimator self-tests; no real four-level long-fire study bundled."
+    },
+    {
+      "id": "heat.dirichlet-mode",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterState": "not-run",
+      "requiredSolverInputs": [
+        "Isolated constant-property conduction",
+        "Declared Dirichlet/initial eigenmode",
+        "Common-time Float64 samples"
+      ]
+    },
+    {
+      "id": "gas.periodic-diffusion",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterState": "not-run",
+      "requiredSolverInputs": [
+        "Passive periodic scalar",
+        "Fixed geometry and carrier state",
+        "No reaction/source/clipping"
+      ]
+    },
+    {
+      "id": "gas.periodic-advection-diffusion",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterState": "not-run",
+      "requiredSolverInputs": [
+        "Passive periodic scalar",
+        "Prescribed velocity/diffusivity",
+        "No reaction/source/clipping"
+      ]
+    },
+    {
+      "id": "darcy.hydrostatic",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterState": "not-run",
+      "requiredSolverInputs": [
+        "Constant-density single-phase pressure/head balance",
+        "Downward-positive depth",
+        "Consistent hydrostatic boundaries"
+      ]
+    },
+    {
+      "id": "mechanics.confined-one-element",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterPath": "tests/fixtures/physics-next/baselineAdapters.ts",
+      "actualSolverFamily": "Coupled PoroMechanics; static confined patch only",
+      "sourceManifestSha256": "4989231de6a0683164f0f47196a7e3b73b98c8ac2ed3d6a445614a44674f985c",
+      "sourceFiles": [
+        {
+          "path": "src/coupled/linear.ts",
+          "sha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd"
+        },
+        {
+          "path": "src/coupled/mechanics.ts",
+          "sha256": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3"
+        },
+        {
+          "path": "src/coupled/sparse.ts",
+          "sha256": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2"
+        }
+      ],
+      "authorSolverCheck": "Actual baseline methods executed in isolated in-memory checks; native Vitest not run."
+    },
+    {
+      "id": "source.closed-box",
+      "kind": "manufactured",
+      "testPath": "tests/physics-next/verification/manufactured.test.ts",
+      "oracleTestCanRunAfter": "core",
+      "solverAdapterState": "not-run",
+      "requiredSolverInputs": [
+        "Owner-approved prescribed source update",
+        "Signed deltas",
+        "Complete extensive inventory"
+      ],
+      "evidenceLimit": "Synthetic bookkeeping construction, not calibrated peat kinetics."
+    },
+    {
+      "id": "validation.synthetic-contracts",
+      "kind": "validation",
+      "testPath": "tests/physics-next/verification/validation.test.ts",
+      "fixturePath": "tests/fixtures/physics-next/validationFixtures.ts",
+      "canRunAfter": "core",
+      "validationStatus": "not-run",
+      "evidenceLimit": "Mock observations/dates/hashes exercise gates, not experiments."
+    },
+    {
+      "id": "report.sensitivity-uq",
+      "kind": "report",
+      "testPath": "tests/physics-next/verification/report.test.ts",
+      "canRunAfter": "core",
+      "coverage": [
+        "sorted JSON/Markdown",
+        "missing evidence/states",
+        "local central sensitivity",
+        "complete empirical ensembles",
+        "nonfinite disclosure"
+      ],
+      "evidenceLimit": "Reporting/statistical arithmetic; no physical distributions measured."
+    },
+    {
+      "id": "contracts.frozen-shape",
+      "kind": "ownership-and-inventory",
+      "testPath": "tests/fixtures/physics-next/contractAdapters.test.ts",
+      "canRunAfter": "contract",
+      "integrationState": "blocked-until-real-contract",
+      "evidenceLimit": "Actual A/B callbacks, complete supplemental inventories and approved history semantics still required."
+    }
+  ],
+  "requiredCampaignOrder": [
+    "Native core tests and provisioned-toolchain regressions",
+    "Actual available manufactured adapters; unavailable backends stay not-run",
+    "Closed/open/source conservation and deterministic rollback after coupling changes",
+    "At least four spatial levels at controlled fine dt, then four temporal levels at controlled fine mesh",
+    "Separate equilibrium, work, fracture mesh-energy and applicability gates",
+    "Long-duration fire space/time convergence only after isolated/coupled prerequisites",
+    "Preregistered provenance-bound calibration and untouched holdout",
+    "Local sensitivity, justified distributions/dependence, complete ensembles, numerical-error allocation and scoped final report"
+  ],
+  "externalCampaignStatus": {
+    "fullRefinement": "not-run",
+    "longDurationFireConvergence": "not-run",
+    "actualABRegression": "not-run",
+    "experimentalValidation": "not-run",
+    "fieldTreatmentValidation": "not-run",
+    "missingInputs": [
+      "Actual solver/dependency/scenario hashes and full ledgers",
+      "Isolated numerical hooks for unsupported manufactured cases",
+      "Actual shared contract and implemented A/B outputs",
+      "Accessible experimental data, uncertainty, independent groups and locked holdout plan",
+      "Justified input distributions/dependence and complete replayable sample sets"
+    ]
+  },
+  "gatePolicy": {
+    "thresholdChangesAuthorized": false,
+    "calibrationMayServeAsHoldout": false,
+    "numericalPassImpliesValidation": false,
+    "allowIncompleteEnsemblePercentiles": false,
+    "allowUnknownTermAsZero": false,
+    "allowLossyPresentationFramesForInventory": false
+  },
+  "runtimeBudgetGuidance": {
+    "measurementStatus": "Unmeasured suggested CI ceilings, not performance estimates or promises.",
+    "core": {
+      "wallTimeCapS": 300,
+      "maxParallelProcesses": 1,
+      "memoryCapGiB": 2
+    },
+    "regression": {
+      "wallTimeCapS": 1800,
+      "maxParallelProcesses": 1,
+      "memoryCapGiB": 8
+    },
+    "campaign": {
+      "pilotRequired": true,
+      "maxParallelProcesses": 1,
+      "memoryCapGiB": 16,
+      "wallTimeCapS": null,
+      "reason": "Choose and record an explicit per-case cap after a representative retained pilot."
+    },
+    "onBudgetExhaustion": "Preserve manifests/checkpoint and mark unfinished work not-run/inconclusive; never relax thresholds or discard failed draws."
+  }
+}
