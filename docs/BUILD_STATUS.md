@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Standalone numerical runtime controls (2026-09-29)
+
+Integrated the user-supplied Agent G norms, iteration, timestep, transaction, diagnostic and checkpoint helpers as 14 new hash-verified source/test files. No active solver imports them. All **160 new tests** and **673 tests in 54 files** overall passed, alongside typecheck, lint and production build. [Verification and solver-adoption boundary](NUMERICS_INTEGRATION.md).
+
 ## Standalone material evidence library (2026-09-29)
 
 Integrated the user-supplied Agent F units, provenance, registry, distribution metadata and guarded projection code as 14 new, hash-verified source/test files. The library has no live consumers. All 228 new tests, the existing 20 material tests and the complete **513-test suite** passed, with typecheck, lint and production build also passing. [Scope and remaining contract requirements](MATERIAL_REGISTRY_INTEGRATION.md).

@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Standalone numerical runtime controls (2026-09-29)
+
+Agent G's 14 source/test payloads matched their SHA-256 manifest. In the merged 0.16 checkout, 160 new numerics tests and **673 full-suite tests** passed; TypeScript 7.0.2 typecheck, lint and production build also passed. Lint reported five non-failing warnings in the supplied numerics files. The package is not connected to a solver; no existing rollback defect, runtime convergence or scientific validation is claimed repaired. [Exact limits and prerequisites](NUMERICS_INTEGRATION.md).
+
 ## Standalone material evidence library (2026-09-29)
 
 Agent F's 14 source/test files match the supplied hashes. Actual Vitest checks passed: 228 new material tests, 20 pre-existing material tests and **513 tests in 47 files** overall. TypeScript 7.0.2 typecheck, lint and production build passed; lint emitted two non-failing style warnings in the supplied files. The package is not imported by the active physics, workers or UI and has no experimentally verified material dataset. [Integration and binding limits](MATERIAL_REGISTRY_INTEGRATION.md).
