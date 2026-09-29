@@ -103,9 +103,9 @@ app.on('browser-window-created', (_event, win) => {
         [...document.querySelectorAll('.version-panel button')].find(b => b.textContent.includes('0.5')).click();
         await waitFor(() => document.querySelector('.study-concept-badge')?.textContent.includes('0.5'), 'scientific menu opens older studio');
         const chooseModel = async value => {
-          const select=document.querySelector('select[aria-label="Physics model"]');
+          const select=document.querySelector('select[aria-label="App view"]');
           select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));
-          await waitFor(()=>document.querySelector('select[aria-label="Physics model"]')?.value===value,'model '+value);
+          await waitFor(()=>document.querySelector('select[aria-label="App view"]')?.value===value,'model '+value);
         };
         const setRange = (label,value) => {
           const input=document.querySelector('input[aria-label="'+label+'"]');

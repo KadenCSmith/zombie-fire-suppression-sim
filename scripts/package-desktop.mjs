@@ -106,7 +106,7 @@ export async function packageDesktop(platform, arch) {
       await mkdir(volume);
       await exec('ditto', ['--norsrc', '--noextattr', '--noqtn', app, path.join(volume, `${appName}.app`)]);
       await symlink('/Applications', path.join(volume, 'Applications'));
-      await writeFile(path.join(volume, 'START HERE.txt'), 'Drag Zombie Fire Suppression Sim to Applications.\nRequires macOS 13 or later. Choose the archive matching your processor; this package was built for the architecture in its filename.\nThe app is locally signed, not Apple notarized. If macOS blocks it, follow System Settings > Privacy & Security > Open Anyway for this app.\nThe app opens the full fire sequence and both rendered films. Choose the Physics model selector for the coupled continuum, demonstration, porous gas/heat, or mechanics benchmark. Models remain unvalidated.\n');
+      await writeFile(path.join(volume, 'START HERE.txt'), 'Drag Zombie Fire Suppression Sim to Applications.\nRequires macOS 13 or later. Choose the archive matching your processor; this package was built for the architecture in its filename.\nThe app is locally signed, not Apple notarized. If macOS blocks it, follow System Settings > Privacy & Security > Open Anyway for this app.\nThe app opens the full fire sequence and both rendered films. Use the App view selector to switch between animation workspaces and the coupled continuum, porous gas/heat, or mechanics simulations. Models remain unvalidated.\n');
       const dmg = path.join(releaseDir, `${base}.dmg`);
       await exec('hdiutil', ['create', '-ov', '-volname', 'Zombie Fire Sim', '-srcfolder', volume, '-format', 'UDZO', '-fs', 'HFS+', dmg], {maxBuffer: 4 * 1024 * 1024});
       await exec('hdiutil', ['verify', dmg]);
