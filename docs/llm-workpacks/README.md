@@ -33,6 +33,11 @@ Feature implementation and validation are separate. A conservation pass does not
 - **Agent A:** only proposals for `src/physics-next/mechanics/**` and `tests/physics-next/mechanics/**`.
 - **Agent B:** only proposals for `src/physics-next/transport/**` and `tests/physics-next/transport/**`.
 - **Agent C:** only proposals for `src/physics-next/verification/**`, `tests/physics-next/verification/**`, and fixture data under `tests/fixtures/physics-next/**`.
+- **Agent D:** only proposals for `src/physics-next/geometry/**` and `tests/physics-next/geometry/**`.
+- **Agent E:** only proposals for `src/physics-next/interventions/**` and `tests/physics-next/interventions/**`.
+- **Agent F:** only proposals for `src/physics-next/materials/**` and `tests/physics-next/materials/**`.
+- **Agent G:** only proposals for `src/physics-next/numerics/**` and `tests/physics-next/numerics/**`.
+- **Agent H:** only proposals for `src/physics-next/io/**` and `tests/physics-next/io/**`.
 - No author may propose direct replacements for `src/coupled/**`, `src/sim/**`, `src/mechanics/**`, UI files, worker files, package manifests, CI, or another author's target paths.
 - The later integrator exclusively owns `src/physics-next/contracts.ts`, `src/physics-next/integrator.ts`, exports, workers, UI/schema wiring, existing-file adapters and dependency/package changes. Authors record requested wiring in their implementation document.
 
@@ -40,14 +45,16 @@ Each workpack repeats the same proposed coupling contract, units, indexing, sign
 
 ## Future integration order
 
-The later integration agent must read the latest `AGENT_A_IMPLEMENTATION.md`, `AGENT_B_IMPLEMENTATION.md` and `AGENT_C_IMPLEMENTATION.md` in full. Confirm that each declares baseline `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`, then compare that baseline with the current repository. Reconcile requested changes to the integrator-owned shared contract before applying code. Preserve newer repository work and never overwrite a newer file with an older complete replacement.
+The later integration agent must read the latest `AGENT_A_IMPLEMENTATION.md` through `AGENT_H_IMPLEMENTATION.md` in full. Confirm that each declares baseline `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`, then compare that baseline with the current repository. Reconcile requested changes to the integrator-owned shared contract before applying code. Preserve newer repository work and never overwrite a newer file with an older complete replacement.
 
 Integrate on a new branch in this order:
 
-1. Create the shared contracts and minimal adapters requested by all three documents.
-2. Integrate A and B behind opt-in feature flags, resolving only contract-level differences in shared wiring.
-3. Integrate C's independent diagnostics and fixtures after A/B compile, then use C's gates to assess them.
-4. Run targeted tests, typecheck, lint, the full test suite, production build and applicable UI/worker smoke checks. Record failures without weakening thresholds merely to obtain a pass.
-5. Merge only reviewed, actually tested changes. The author documents are proposals, not verified repository changes and not evidence of physical validation.
+1. Create the shared contracts and minimal adapters requested by all eight documents.
+2. Integrate F's material registry, D's geometry, and E's intervention commands because A/B consume those through integrator-owned adapters.
+3. Integrate A and B behind opt-in feature flags, resolving only contract-level differences in shared wiring.
+4. Integrate G's runtime controls around trial/commit boundaries, then H's accepted-state serialization without changing physics results.
+5. Integrate C's independent diagnostics and fixtures after A/B compile, then use C's gates to assess them.
+6. Run targeted tests, typecheck, lint, the full test suite, production build and applicable UI/worker smoke checks. Record failures without weakening thresholds merely to obtain a pass.
+7. Merge only reviewed, actually tested changes. The author documents are proposals, not verified repository changes and not evidence of physical validation.
 
-The three future authors are not launched by this preparation. Their `y` checkpoints authorize only continued writing of their own external implementation Markdown documents.
+The eight future authors are not launched by this preparation. Their `y` checkpoints authorize only continued writing of their own external implementation Markdown documents.
