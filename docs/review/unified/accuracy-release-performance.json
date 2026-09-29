@@ -1,0 +1,726 @@
+{
+  "date": "2026-09-27T10:19:50.454Z",
+  "reviewer": "physics_audit",
+  "reviewRound": 2,
+  "frozenReferenceCommit": "1ec0710",
+  "frozenReferenceVersion": "0.12.0",
+  "candidateVersion": "0.13.0",
+  "scope": "Same reduced physics; only precision timestep caps and default mechanical backend changed. Shared-host CPU observations, not controlled release-wide performance.",
+  "numericSourceHashChangesAgainst012": [
+    "model"
+  ],
+  "newMatchedSourceHashes": true,
+  "acceptance": {
+    "massResidualKg": 1e-7,
+    "energyResidualJ": 0.0001,
+    "forceResidualN": 0.0001
+  },
+  "allNewBenchmarkGatesPassed": true,
+  "comparisons": [
+    {
+      "fidelity": "precision2560",
+      "reference012": {
+        "runs": 3,
+        "simulatedS": 2,
+        "steps": 4,
+        "maxStepS": null,
+        "medianSetupMs": 583.310375,
+        "medianSolveMs": 4529.060542000001,
+        "medianTotalMs": 5112.370917000001,
+        "maxAbsMassResidualKg": 1.4551915228366852e-10,
+        "maxAbsEnergyResidualJ": 0.0000057220458984375,
+        "maxForceResidualN": 2.629385231767145e-8,
+        "maxSampledRssBytes": 347062272
+      },
+      "reference013": {
+        "runs": 3,
+        "simulatedS": 2,
+        "steps": 16,
+        "maxStepS": 0.125,
+        "medianSetupMs": 662.5589579999978,
+        "medianSolveMs": 16003.166540999999,
+        "medianTotalMs": 16686.978916,
+        "maxAbsMassResidualKg": 8.731149137020111e-11,
+        "maxAbsEnergyResidualJ": 0.00000667572021484375,
+        "maxForceResidualN": 3.6532908920250406e-9,
+        "maxSampledRssBytes": 303857664
+      },
+      "optimized013": {
+        "runs": 3,
+        "simulatedS": 2,
+        "steps": 16,
+        "maxStepS": 0.125,
+        "medianSetupMs": 424.62316699999997,
+        "medianSolveMs": 8406.117084,
+        "medianTotalMs": 8822.364751000001,
+        "maxAbsMassResidualKg": 8.731149137020111e-11,
+        "maxAbsEnergyResidualJ": 0.000007152557373046875,
+        "maxForceResidualN": 8.219857083879845e-8,
+        "maxSampledRssBytes": 330858496
+      },
+      "matchedBackendSolveSpeedup": 1.9037525151130763,
+      "defaultTotalCostRatio013over012": 1.7256894881518237,
+      "maxMatchedDryIceDifferenceKg": 4.440892098500626e-16,
+      "maxMatchedFloat32PeakPressureDifferencePa": 0,
+      "oldRemainingDryIceKg": 3.9998472006103998,
+      "newRemainingDryIceKg": 3.99984593594006,
+      "oldPeakPressurePa": 101332.3515625,
+      "newPeakPressurePa": 101332.6640625
+    },
+    {
+      "fidelity": "precision20480",
+      "reference012": {
+        "runs": 1,
+        "simulatedS": 0.25,
+        "steps": 1,
+        "maxStepS": null,
+        "medianSetupMs": 4726.394042000001,
+        "medianSolveMs": 15390.482124999999,
+        "medianTotalMs": 20116.876167,
+        "maxAbsMassResidualKg": 1.4551915228366852e-10,
+        "maxAbsEnergyResidualJ": 0.0000152587890625,
+        "maxForceResidualN": 2.7798538875680834e-8,
+        "maxSampledRssBytes": 406175744
+      },
+      "reference013": {
+        "runs": 1,
+        "simulatedS": 0.25,
+        "steps": 2,
+        "maxStepS": 0.125,
+        "medianSetupMs": 5120.572875000001,
+        "medianSolveMs": 30876.093750000004,
+        "medianTotalMs": 35996.666625000005,
+        "maxAbsMassResidualKg": 2.939486876130104e-9,
+        "maxAbsEnergyResidualJ": 0.00000476837158203125,
+        "maxForceResidualN": 1.105424204711665e-8,
+        "maxSampledRssBytes": 421625856
+      },
+      "optimized013": {
+        "runs": 1,
+        "simulatedS": 0.25,
+        "steps": 2,
+        "maxStepS": 0.125,
+        "medianSetupMs": 2395.273375,
+        "medianSolveMs": 16186.834208,
+        "medianTotalMs": 18582.107583,
+        "maxAbsMassResidualKg": 2.939486876130104e-9,
+        "maxAbsEnergyResidualJ": 0.000004291534423828125,
+        "maxForceResidualN": 9.535813786316648e-8,
+        "maxSampledRssBytes": 502661120
+      },
+      "matchedBackendSolveSpeedup": 1.9074819296499712,
+      "defaultTotalCostRatio013over012": 0.9237074100740524,
+      "maxMatchedDryIceDifferenceKg": 0,
+      "maxMatchedFloat32PeakPressureDifferencePa": 0,
+      "oldRemainingDryIceKg": 3.9999797868345337,
+      "newRemainingDryIceKg": 3.9999797535578994,
+      "oldPeakPressurePa": 101335.9921875,
+      "newPeakPressurePa": 101337.3046875
+    }
+  ],
+  "reports": [
+    {
+      "file": "work/verification/accuracy-013-reference.json",
+      "date": "2026-09-27T10:15:28.210Z",
+      "host": {
+        "cpu": "Apple M3 Pro",
+        "memory": 38654705664,
+        "node": "v26.8.2"
+      },
+      "scope": "Serial worker-equivalent CPU solve including final snapshot; excludes browser/render/GPU/shared memory. Cold source-only case.",
+      "sourceHashes": {
+        "model": "49d74169cb7e1415a8b0bcb4d1f571a58c13c5614ee6ccf32484b23eaf1e572c",
+        "engine": "52c6b51983adcab884656da3749373aec279dce84de0fb37d3ca8cd95728fc1f",
+        "mechanics": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3",
+        "sparse": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2",
+        "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+        "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+        "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+        "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+        "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
+      },
+      "acceptance": {
+        "massResidualKg": 1e-7,
+        "energyResidualJ": 0.0001,
+        "forceResidualN": 0.0001
+      },
+      "records": [
+        {
+          "fidelity": "precision2560",
+          "backend": "reference",
+          "repeat": 0,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "reference"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 647.9072920000001,
+          "solveMs": 16358.435083999999,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.00000667572021484375,
+          "forceResidualN": 3.6532908920250406e-9,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.9998459359400598,
+          "memory": {
+            "rss": 269647872,
+            "heapTotal": 108265472,
+            "heapUsed": 53719264,
+            "external": 16423689,
+            "arrayBuffers": 10699990
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        },
+        {
+          "fidelity": "precision2560",
+          "backend": "reference",
+          "repeat": 1,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "reference"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 662.5589579999978,
+          "solveMs": 15869.317000000003,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.00000667572021484375,
+          "forceResidualN": 3.6532908920250406e-9,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.9998459359400598,
+          "memory": {
+            "rss": 303857664,
+            "heapTotal": 108527616,
+            "heapUsed": 45728584,
+            "external": 12560916,
+            "arrayBuffers": 6847786
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        },
+        {
+          "fidelity": "precision2560",
+          "backend": "reference",
+          "repeat": 2,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "reference"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 683.8123750000013,
+          "solveMs": 16003.166540999999,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.00000667572021484375,
+          "forceResidualN": 3.6532908920250406e-9,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.9998459359400598,
+          "memory": {
+            "rss": 301187072,
+            "heapTotal": 104333312,
+            "heapUsed": 48443112,
+            "external": 11146204,
+            "arrayBuffers": 5433074
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "work/verification/accuracy-013-optimized.json",
+      "date": "2026-09-27T10:16:26.207Z",
+      "host": {
+        "cpu": "Apple M3 Pro",
+        "memory": 38654705664,
+        "node": "v26.8.2"
+      },
+      "scope": "Serial worker-equivalent CPU solve including final snapshot; excludes browser/render/GPU/shared memory. Cold source-only case.",
+      "sourceHashes": {
+        "model": "49d74169cb7e1415a8b0bcb4d1f571a58c13c5614ee6ccf32484b23eaf1e572c",
+        "engine": "52c6b51983adcab884656da3749373aec279dce84de0fb37d3ca8cd95728fc1f",
+        "mechanics": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3",
+        "sparse": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2",
+        "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+        "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+        "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+        "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+        "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
+      },
+      "acceptance": {
+        "massResidualKg": 1e-7,
+        "energyResidualJ": 0.0001,
+        "forceResidualN": 0.0001
+      },
+      "records": [
+        {
+          "fidelity": "precision2560",
+          "backend": "optimized",
+          "repeat": 0,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "optimized"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 424.62316699999997,
+          "solveMs": 8434.077667000001,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.000007152557373046875,
+          "forceResidualN": 8.219857083879845e-8,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.99984593594006,
+          "memory": {
+            "rss": 277544960,
+            "heapTotal": 122781696,
+            "heapUsed": 65911264,
+            "external": 70430477,
+            "arrayBuffers": 64706778
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        },
+        {
+          "fidelity": "precision2560",
+          "backend": "optimized",
+          "repeat": 1,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "optimized"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 416.24766700000146,
+          "solveMs": 8406.117084,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.000007152557373046875,
+          "forceResidualN": 8.219857083879845e-8,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.99984593594006,
+          "memory": {
+            "rss": 299417600,
+            "heapTotal": 129761280,
+            "heapUsed": 85865232,
+            "external": 75252302,
+            "arrayBuffers": 69528563
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        },
+        {
+          "fidelity": "precision2560",
+          "backend": "optimized",
+          "repeat": 2,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "optimized"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 448.9411250000012,
+          "solveMs": 8371.895250000001,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -8.731149137020111e-11,
+          "energyResidualJ": 0.000007152557373046875,
+          "forceResidualN": 8.219857083879845e-8,
+          "maxPressurePa": 101332.6640625,
+          "dryIceKg": 3.99984593594006,
+          "memory": {
+            "rss": 330858496,
+            "heapTotal": 157089792,
+            "heapUsed": 107731648,
+            "external": 87495110,
+            "arrayBuffers": 81771371
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "work/verification/accuracy-013-research-reference.json",
+      "date": "2026-09-27T10:17:09.193Z",
+      "host": {
+        "cpu": "Apple M3 Pro",
+        "memory": 38654705664,
+        "node": "v26.8.2"
+      },
+      "scope": "Serial worker-equivalent CPU solve including final snapshot; excludes browser/render/GPU/shared memory. Cold source-only case.",
+      "sourceHashes": {
+        "model": "49d74169cb7e1415a8b0bcb4d1f571a58c13c5614ee6ccf32484b23eaf1e572c",
+        "engine": "52c6b51983adcab884656da3749373aec279dce84de0fb37d3ca8cd95728fc1f",
+        "mechanics": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3",
+        "sparse": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2",
+        "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+        "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+        "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+        "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+        "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
+      },
+      "acceptance": {
+        "massResidualKg": 1e-7,
+        "energyResidualJ": 0.0001,
+        "forceResidualN": 0.0001
+      },
+      "records": [
+        {
+          "fidelity": "precision20480",
+          "backend": "reference",
+          "repeat": 0,
+          "inputs": {
+            "fidelity": "precision20480",
+            "durationS": 0.25,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "reference"
+          },
+          "cells": 20480,
+          "maxStepS": 0.125,
+          "setupMs": 5120.572875000001,
+          "solveMs": 30876.093750000004,
+          "simulatedS": 0.25,
+          "steps": 2,
+          "rejectedSteps": 0,
+          "massResidualKg": -2.939486876130104e-9,
+          "energyResidualJ": -0.00000476837158203125,
+          "forceResidualN": 1.105424204711665e-8,
+          "maxPressurePa": 101337.3046875,
+          "dryIceKg": 3.9999797535578994,
+          "memory": {
+            "rss": 421625856,
+            "heapTotal": 254066688,
+            "heapUsed": 164758176,
+            "external": 61432615,
+            "arrayBuffers": 55708916
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "work/verification/accuracy-013-research-optimized.json",
+      "date": "2026-09-27T10:17:54.483Z",
+      "host": {
+        "cpu": "Apple M3 Pro",
+        "memory": 38654705664,
+        "node": "v26.8.2"
+      },
+      "scope": "Serial worker-equivalent CPU solve including final snapshot; excludes browser/render/GPU/shared memory.",
+      "benchmarkCase": "cold-source",
+      "sourceHashes": {
+        "model": "49d74169cb7e1415a8b0bcb4d1f571a58c13c5614ee6ccf32484b23eaf1e572c",
+        "engine": "52c6b51983adcab884656da3749373aec279dce84de0fb37d3ca8cd95728fc1f",
+        "mechanics": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3",
+        "sparse": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2",
+        "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+        "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+        "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+        "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+        "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
+      },
+      "acceptance": {
+        "massResidualKg": 1e-7,
+        "energyResidualJ": 0.0001,
+        "forceResidualN": 0.0001
+      },
+      "records": [
+        {
+          "fidelity": "precision20480",
+          "backend": "optimized",
+          "benchmarkCase": "cold-source",
+          "repeat": 0,
+          "inputs": {
+            "fidelity": "precision20480",
+            "durationS": 0.25,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": false,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "optimized"
+          },
+          "cells": 20480,
+          "maxStepS": 0.125,
+          "setupMs": 2395.273375,
+          "solveMs": 16186.834208,
+          "simulatedS": 0.25,
+          "steps": 2,
+          "rejectedSteps": 0,
+          "massResidualKg": -2.939486876130104e-9,
+          "energyResidualJ": -0.000004291534423828125,
+          "forceResidualN": 9.535813786316648e-8,
+          "maxPressurePa": 101337.3046875,
+          "maxTemperatureK": 283.1000061035156,
+          "dryIceKg": 3.9999797535578994,
+          "reactionEnergyJ": 0,
+          "preparedWaterRemovedKg": 0,
+          "mechanicalWorkBalanceJ": -2.4095034870721063e-12,
+          "memory": {
+            "rss": 502661120,
+            "heapTotal": 243433472,
+            "heapUsed": 141177568,
+            "external": 102276875,
+            "arrayBuffers": 96553176
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        }
+      ]
+    },
+    {
+      "file": "work/verification/accuracy-013-prepared-smoldering.json",
+      "date": "2026-09-27T10:18:40.256Z",
+      "host": {
+        "cpu": "Apple M3 Pro",
+        "memory": 38654705664,
+        "node": "v26.8.2"
+      },
+      "scope": "Serial worker-equivalent CPU solve including final snapshot; excludes browser/render/GPU/shared memory.",
+      "benchmarkCase": "prepared-dry-smoldering",
+      "sourceHashes": {
+        "model": "49d74169cb7e1415a8b0bcb4d1f571a58c13c5614ee6ccf32484b23eaf1e572c",
+        "engine": "52c6b51983adcab884656da3749373aec279dce84de0fb37d3ca8cd95728fc1f",
+        "mechanics": "72ad40c79e9d5fcfa29e8248a56ff420051b766596b29e60b534ba2d461596d3",
+        "sparse": "af2f54c5528f4d489782f1550ed0779109c4c90b33c72adb4124c730fe2d76c2",
+        "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+        "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+        "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+        "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+        "cap": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc"
+      },
+      "acceptance": {
+        "massResidualKg": 1e-7,
+        "energyResidualJ": 0.0001,
+        "forceResidualN": 0.0001
+      },
+      "records": [
+        {
+          "fidelity": "precision2560",
+          "backend": "optimized",
+          "benchmarkCase": "prepared-dry-smoldering",
+          "repeat": 0,
+          "inputs": {
+            "fidelity": "precision2560",
+            "durationS": 2,
+            "dryIceKg": 4,
+            "heaterW": 0,
+            "moisture": 0.2,
+            "permeabilityM2": 8e-12,
+            "reaction": true,
+            "mechanics": true,
+            "fracture": false,
+            "roots": true,
+            "cap": true,
+            "capRadiusM": 0.475,
+            "capRiseM": 0.1,
+            "capThicknessM": 0.005,
+            "youngsPa": 1000000,
+            "fractureEnergyJm2": 5,
+            "lengthScaleM": 1,
+            "terrain": "rooted-peat",
+            "mechanicalBackend": "optimized"
+          },
+          "cells": 2560,
+          "maxStepS": 0.125,
+          "setupMs": 432.02650000000006,
+          "solveMs": 14806.781125,
+          "simulatedS": 2,
+          "steps": 16,
+          "rejectedSteps": 0,
+          "massResidualKg": -2.3283064365386963e-10,
+          "energyResidualJ": -4.76837158203125e-7,
+          "forceResidualN": 9.704028336443571e-8,
+          "maxPressurePa": 102447.0078125,
+          "maxTemperatureK": 543.1707153320312,
+          "dryIceKg": 3.9998788510840977,
+          "reactionEnergyJ": 16428.947678563756,
+          "preparedWaterRemovedKg": 9136.345584906629,
+          "mechanicalWorkBalanceJ": 1.7137896392039742e-7,
+          "memory": {
+            "rss": 276840448,
+            "heapTotal": 114294784,
+            "heapUsed": 56181320,
+            "external": 35100797,
+            "arrayBuffers": 29377098
+          },
+          "gates": {
+            "massResidualKg": true,
+            "energyResidualJ": true,
+            "forceResidualN": true
+          }
+        }
+      ]
+    }
+  ],
+  "priorBaselineEvidence": "docs/review/unified/optimization-benchmarks.json"
+}

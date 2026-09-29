@@ -53,6 +53,8 @@ async function addNotices(packagedDir, resourcesDir, platform) {
 }
 
 export async function packageDesktop(platform, arch) {
+  const {stdout: changedFiles} = await exec('git', ['status', '--porcelain'], {cwd: projectDir});
+  if (changedFiles.trim()) throw new Error('Commit release inputs before packaging so the manifest identifies the exact source.');
   // This release tool uses the Mac host's archive/signing utilities. The resulting
   // Windows and Linux apps contain the official Electron binaries for each OS.
   if (process.platform !== 'darwin') throw new Error('Run this release packaging tool on macOS.');
@@ -65,6 +67,7 @@ export async function packageDesktop(platform, arch) {
     const source = path.join(temporary, 'source');
     await cp(path.join(projectDir, 'dist'), path.join(source, 'dist'), {recursive: true});
     await cp(path.join(projectDir, 'electron', 'main.cjs'), path.join(source, 'main.cjs'));
+    await cp(path.join(projectDir, 'electron', 'http-range.cjs'), path.join(source, 'http-range.cjs'));
     await writeFile(path.join(source, 'package.json'), JSON.stringify({name: manifest.name, productName: appName, version: manifest.version, main: 'main.cjs'}));
     const [packagedDir] = await packager({
       dir: source, name: appName, platform, arch, electronVersion,
@@ -103,7 +106,7 @@ export async function packageDesktop(platform, arch) {
       await mkdir(volume);
       await exec('ditto', ['--norsrc', '--noextattr', '--noqtn', app, path.join(volume, `${appName}.app`)]);
       await symlink('/Applications', path.join(volume, 'Applications'));
-      await writeFile(path.join(volume, 'START HERE.txt'), 'Drag Zombie Fire Suppression Sim to Applications.\nRequires macOS 13 or later. This app supports Apple Silicon and Intel.\nThe app is locally signed, not Apple notarized. If macOS blocks it, follow System Settings > Privacy & Security > Open Anyway for this app.\nChoose the Physics model selector for the coupled continuum, demonstration, porous gas/heat, or mechanics benchmark. Models remain unvalidated.\n');
+      await writeFile(path.join(volume, 'START HERE.txt'), 'Drag Zombie Fire Suppression Sim to Applications.\nRequires macOS 13 or later. Choose the archive matching your processor; this package was built for the architecture in its filename.\nThe app is locally signed, not Apple notarized. If macOS blocks it, follow System Settings > Privacy & Security > Open Anyway for this app.\nThe app opens the full fire sequence and both rendered films. Use the App view selector to switch between animation workspaces and the coupled continuum, porous gas/heat, or mechanics simulations. Models remain unvalidated.\n');
       const dmg = path.join(releaseDir, `${base}.dmg`);
       await exec('hdiutil', ['create', '-ov', '-volname', 'Zombie Fire Sim', '-srcfolder', volume, '-format', 'UDZO', '-fs', 'HFS+', dmg], {maxBuffer: 4 * 1024 * 1024});
       await exec('hdiutil', ['verify', dmg]);
@@ -114,7 +117,7 @@ export async function packageDesktop(platform, arch) {
       const kind = (await exec('file', ['-b', executable])).stdout.trim();
       const pattern = platform === 'win32' ? (arch === 'x64' ? /x86-64/ : /Aarch64|ARM64/i) : (arch === 'x64' ? /x86-64/ : /aarch64|ARM64/i);
       if (!pattern.test(kind)) throw new Error(`Unexpected ${platform}/${arch} binary: ${kind}`);
-      for (const [title, flag] of [['Open coupled continuum', '--coupled'], ['Open simulation', '--simulation'], ['Open scene studio', '--studio'], ['Open mechanics', '--mechanics']]) {
+      for (const [title, flag] of [['Open fire sequence', '--sequence'], ['Open coupled continuum', '--coupled'], ['Open simulation', '--simulation'], ['Open scene studio', '--studio'], ['Open mechanics', '--mechanics']]) {
         const filename = path.join(packagedDir, `${title}.${platform === 'win32' ? 'cmd' : 'sh'}`);
         const command = platform === 'win32'
           ? `@echo off\r\nstart "" "%~dp0${appName}.exe" ${flag}\r\n`

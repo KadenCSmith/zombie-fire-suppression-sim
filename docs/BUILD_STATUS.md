@@ -2,7 +2,30 @@
 
 ## Standalone conservative geometry package (2026-09-29)
 
-Integrated the user-supplied Agent D geometry source and tests as 14 new, hash-verified paths under `src/physics-next/geometry/` and `tests/physics-next/geometry/`. The package has no imports from the active simulation or UI. All 86 new tests and the complete 219-test suite passed, as did typecheck, lint and production build. The separate Blender edit remains untouched. [Integration review and activation limits](GEOMETRY_INTEGRATION.md).
+Integrated the user-supplied Agent D geometry source and tests as 14 new, hash-verified paths under `src/physics-next/geometry/` and `tests/physics-next/geometry/`. The package has no imports from the active simulation or UI. All 86 new tests and the complete **285-test suite** on the merged 0.16 main branch passed, as did typecheck, lint and production build. The separate Blender edit remains untouched. [Integration review and activation limits](GEOMETRY_INTEGRATION.md).
+
+## Version comparison and interchangeable interface layouts — current 0.16 candidate
+
+The app now has a version-comparison workspace covering every catalog entry from 0.8.0 through 0.16.0. Preserved replays are selectable for 0.8, 0.9, 0.14, 0.15 and the current 0.16 candidate. Versions 0.10–0.13 remain visible but disabled because the current repository does not contain immutable replay bundles for them; their source history remains available at the recorded commits. A shared clock aligns recorded event markers within compatible scene families and explicitly labels duration-normalized fallback across unlike families. Every replay card reports version, Animation Mode, presentation time and playback rate, and states that physical simulation time is unavailable for an animation replay.
+
+A persistent interface bar makes Animation Mode and Physics Simulation Mode explicit and keeps validation status separate. Refined, Instrument and Technical layouts use the same React controls and state; changing layout does not remount a workspace or duplicate model logic. The Instrument layout uses an original white/black modular treatment with oversized type, square controls and an orange accent inspired by the visual language of Teenage Engineering's website.
+
+Local verification passed typecheck, lint, production build and **199 tests in 33 files**. The browser UI smoke selected three concurrent replays, scrubbed the shared clock to 10.0 s, confirmed 45.0 s duration-normalized fallback on v0.14, switched layouts without losing selection or time, and confirmed the Physics Simulation Mode disclosure. The Electron comparison harness is included in CI; its local run was blocked by the current desktop single-instance/runtime environment and is not claimed as a local pass.
+
+## Hose and contact cooling — 0.16 development
+
+The successor adds woven-hose placement, a separate finite contact calorimeter, local assumed wetting and a larger folded/deployed dome in an explicitly excavated chamber. The accepted field cache is unchanged. Initial local verification passed: **193 tests in 32 files**, typecheck, lint and production build. These checks verify implementation and reduced-model balances, not experimental performance. [Acceptance criteria](HOSE_COOLING_IMPLEMENTATION.md) and [contact equations, assumptions and measured balances](CONTACT_COOLING.md) define the scope. Final visual review, complete films, final-source CI and package/native results remain pending at this implementation milestone.
+
+## Visual revision — 0.15
+
+The dark teal/copper cutaway now includes dense fine grass, a compact articulated tracked excavator, a 0.48 m illustrative bore, connected heterogeneous peat appearance and a rapid pressure-release illustration with persistent separated pieces. Treatment still waits for 70% illustrated involvement; growth precedes all equipment. Scientific calculations and the accepted cache are unchanged. Both complete Blender films are rebuilt from the shared appearance contract. Independent realism review is recorded separately before delivery.
+
+## Current unified fire workflow — 0.14
+
+The current app adds a complete interactive fire/treatment story, both gradual and illustrative rapid Blender films, and a cold-start numerical experiment with retained initial moisture. The accepted baseline covers24h plus30s finite-source treatment; source-generation checkpoint `a47721f` freezes the exact cache and source hashes. It sustains surface oxidation but does not resolve underground combustion propagation. The source loses1.7885g during treatment and continuing oxidation remains present. No suppression success is inferred.
+
+Drilling, enlarged dome bending, created fractures and water pathways are staged. Scientific views exclude these shapes and expose only accepted values; rapid mode holds pre-treatment fields. The physics lab retains2560/20480-cell meshes and matched sparse/reference backends. [Fire protocol](FIRE_PROTOCOL.md), [sequence scope](FIRE_SEQUENCE.md), [native release record](review/unified/native.md) and [implementation milestones](UNIFIED_IMPLEMENTATION.md) distinguish current evidence from the historical records below.
+
 
 ## Published 0.11.0 delivery (2026-09-27)
 
@@ -239,3 +262,11 @@ Status reviewed against source on 2026-09-25. “Implemented” means code exist
 ## Next agent task
 
 The immediate physics dependencies are measured peat/root material and source-contact properties, a dry-gas effective-stress/storage formulation with a conservative interface to the FEM mesh, and a matched peat-column benchmark. Then add independently checked liquid/ice and multistep char chemistry only within measured validity ranges. Check the remaining pace/replay settings, imports and exports, and sustained performance separately. Do not interpret the six coarse-grid comparisons as field suppression predictions.
+
+## 2026-09-27 unified physics milestone
+
+A separate checkout preserves the user's original Blender edit. Adds exactly 10× mesh options, common conservative material/source initialization, a finite CO₂ heat/mass-transfer source and an opt-in float64 sparse elastic operator. Existing reference backend remains default during the comparison audit. Typecheck, lint, 148 tests in 25 files, and production build passed together on this integration. UI natural-cutaway polish and final Blender cache are still in progress; this entry is not a release-completion claim.
+
+## Unified reference completion — 27 September 2026
+
+Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.

@@ -1,4 +1,5 @@
 import {pcg,dot} from './linear'
+import {SparseBrickOperator} from './sparse'
 export interface BrickMaterial {youngsPa:number;poisson:number;densityKgM3:number;biot:number;fractureEnergyJm2:number}
 export interface MechanicalState {u:Float64Array;strain:Float64Array;stress:Float64Array;damage:Float64Array;elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}
 const NODES=[[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,0,1],[1,0,1],[1,1,1],[0,1,1]]
@@ -31,9 +32,10 @@ export class PoroMechanics {
   readonly u:Float64Array;readonly damage:Float64Array;readonly history:Float64Array;readonly fixed:Uint8Array
   readonly elements:Element[]=[];readonly B:Float64Array[]=[];readonly diagonal:Float64Array
   private preloading=false
+  private sparse:SparseBrickOperator|null=null
   geostaticResidualN=0
   private roots:{a:number;b:number;direction:number[];stiffness:number}[]=[]
-  constructor(readonly nx:number,readonly ny:number,readonly nz:number,readonly width:number,readonly length:number,readonly depth:number,materials:BrickMaterial[],readonly ell:number,reinforce=false,readonly initialTopForce?:Float64Array){
+  constructor(readonly nx:number,readonly ny:number,readonly nz:number,readonly width:number,readonly length:number,readonly depth:number,materials:BrickMaterial[],readonly ell:number,reinforce=false,readonly initialTopForce?:Float64Array,readonly backend:'reference'|'optimized'='reference'){
     this.n=nx*ny*nz;this.nodeCount=(nx+1)*(ny+1)*(nz+1);this.dx=width/nx;this.dy=length/ny;this.dz=depth/nz;this.volume=this.dx*this.dy*this.dz
     if(materials.length!==this.n||materials.some(m=>m.poisson<0||m.poisson>=0.45||m.youngsPa<=0||m.fractureEnergyJm2<=0)||ell<=0)throw new Error('Invalid poromechanical material/grid.')
     this.u=new Float64Array(3*this.nodeCount);this.fixed=new Uint8Array(this.u.length);this.damage=new Float64Array(this.n);this.history=new Float64Array(this.n);this.diagonal=new Float64Array(this.u.length)
@@ -62,6 +64,7 @@ export class PoroMechanics {
       for(let r=0;r<8;r++){const angle=r*Math.PI/4+0.13*Math.sin(r*7),i=Math.max(1,Math.min(nx-1,Math.round(nx*(0.27+0.23*Math.cos(angle))))),j=Math.max(1,Math.min(ny-1,Math.round(ny*(0.5+0.24*Math.sin(angle))))),k=Math.max(1,Math.round(nz*(0.35+0.3*(r%3)/2))),b=this.node(i,j,k),aPos=this.position(center),bPos=this.position(b),vec=bPos.map((v,c)=>v-aPos[c]),l=Math.hypot(...vec)
         this.roots.push({a:center,b,direction:vec.map(v=>v/l),stiffness:1e8*Math.PI*0.012**2/l})}
     }
+    if(backend==='optimized')this.sparse=new SparseBrickOperator(nx,ny,nz,this.fixed,this.elements)
     // Resolve heterogeneous gravity with this actual FE operator and supports.
     this.preloading=true
     const preload=this.solve(new Float64Array(this.n));this.geostaticResidualN=preload.residualN
@@ -75,7 +78,8 @@ export class PoroMechanics {
   private multiply(x:Float64Array,y:Float64Array){
     y.fill(0)
     const local=new Float64Array(24)
-    this.elements.forEach((e,id)=>{const scale=this.stiffnessScale(id);for(let b=0;b<24;b++)local[b]=this.fixed[e.dofs[b]]?0:x[e.dofs[b]]
+    if(this.sparse&&!this.damage.some(d=>d>0))this.sparse.apply(x,y)
+    else this.elements.forEach((e,id)=>{const scale=this.stiffnessScale(id);for(let b=0;b<24;b++)local[b]=this.fixed[e.dofs[b]]?0:x[e.dofs[b]]
       for(let a=0;a<24;a++){const ga=e.dofs[a];if(this.fixed[ga])continue;let sum=0;for(let b=0;b<24;b++)sum+=e.stiffness[a*24+b]*local[b];y[ga]+=scale*sum}})
     for(const r of this.roots){let extension=0;for(let c=0;c<3;c++)extension+=(x[r.b*3+c]-x[r.a*3+c])*r.direction[c];for(let c=0;c<3;c++){const f=r.stiffness*extension*r.direction[c];if(!this.fixed[r.a*3+c])y[r.a*3+c]-=f;if(!this.fixed[r.b*3+c])y[r.b*3+c]+=f}}
     for(let i=0;i<y.length;i++)if(this.fixed[i])y[i]=x[i]
@@ -120,7 +124,20 @@ export class PoroMechanics {
     if(extraForce)for(let i=0;i<force.length;i++)force[i]+=extraForce[i]
     let iterations=0,residualN=0
     try{
-      for(let outer=0;outer<(fracture?80:1);outer++){
+      if(this.backend==='optimized'&&!fracture&&!this.damage.some(d=>d>0)){
+        // Undamaged linear elasticity has an exact quadratic potential: one PCG
+        // solve is sufficient; no nonlinear Gauss-point line search is needed.
+        this.diagonal.fill(0)
+        for(const e of this.elements)for(let a=0;a<24;a++)this.diagonal[e.dofs[a]]+=e.stiffness[a*24+a]
+        for(const r of this.roots)for(let c=0;c<3;c++){
+          this.diagonal[r.a*3+c]+=r.stiffness*r.direction[c]**2
+          this.diagonal[r.b*3+c]+=r.stiffness*r.direction[c]**2
+        }
+        const rhs=force.slice()
+        for(let i=0;i<this.u.length;i++)if(this.fixed[i]){rhs[i]=0;this.u[i]=0;this.diagonal[i]=1}
+        const result=pcg((x,y)=>this.multiply(x,y),rhs,this.diagonal,this.u,1e-7)
+        iterations=result.iterations
+      }else for(let outer=0;outer<(fracture?80:1);outer++){
         this.diagonal.fill(0);this.elements.forEach((e,id)=>{for(let a=0;a<24;a++)this.diagonal[e.dofs[a]]+=this.stiffnessScale(id)*e.stiffness[a*24+a]})
         for(const r of this.roots)for(let c=0;c<3;c++){this.diagonal[r.a*3+c]+=r.stiffness*r.direction[c]**2;this.diagonal[r.b*3+c]+=r.stiffness*r.direction[c]**2}for(let i=0;i<this.u.length;i++)if(this.fixed[i])this.diagonal[i]=1
         for(let iter=0;iter<200;iter++){

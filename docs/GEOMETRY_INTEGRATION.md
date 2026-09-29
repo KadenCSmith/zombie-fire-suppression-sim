@@ -10,16 +10,16 @@ The package under `src/physics-next/geometry/` provides a validated SI grid, sig
 | --- | --- |
 | Manifest and path preflight | 14 unique new paths; all payload hashes matched; no overwrites |
 | New Vitest files | 7 files, 86 tests passed |
-| Full Vitest suite | 29 files, 219 tests passed |
+| Full Vitest suite after merging current main | 40 files, 285 tests passed |
 | Typecheck | Passed with repository TypeScript 7.0.2 |
 | Lint | Passed with repository oxlint |
 | Production build | Passed with Vite 7.3.6; existing Lucide directive and bundle-size warnings |
 
-Checks were run with Node 26.8.2, npm 11.19.1 and Vitest 5.0.2. These establish software integration of the geometry package, not physical or experimental validation. There was no installed-app visual check because the package is unused by the running application.
+Checks were run with Node 26.8.2, npm 11.19.1 and Vitest 5.0.2. The first pre-merge checkout also passed 219 tests in 29 files. These establish software integration of the geometry package, not physical or experimental validation. There was no installed-app visual check because the package is unused by the running application.
 
 ## Review and activation boundary
 
-The handoff baseline commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` is not available in this checkout; the current repository is version 0.11.0 and its coupled implementation has changed. For example, the handoff references `src/coupled/remap.ts`, which is absent here. The new paths had no collisions, and the current locked-toolchain tests passed, so this integration keeps the package separate rather than applying stale adaptation steps to the current solver.
+The handoff baseline commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` is now available as an ancestor of the fetched 0.16 main branch. The first local integration check ran against an older 0.11 checkout; the later GitHub merge added the 0.16 implementation, including `src/coupled/remap.ts`. The new geometry paths had no collisions. They remain separate from the active 0.16 solver: adaptation still requires review against the current interfaces and physical inputs.
 
 The geometric signs, units and priorities are explicit, but curved volumes are bounded estimates; interface coverage depends on supplied patches; area clipping is quadrature, and `topologyValidated` remains false. The package does not calculate face apertures, transport fluxes, stress, contact, removed inventory, gas/energy budgets, root reinforcement or suppression outcomes. No shape or dimension is inferred from the rendered scene.
 

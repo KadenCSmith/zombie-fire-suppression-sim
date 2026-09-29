@@ -22,9 +22,10 @@ describe('bonded soil cross-section', () => {
     expect(high.frames.every(Number.isFinite)).toBe(true)
     expect(high.frames.every(value => Math.abs(value) < 1)).toBe(true)
     expect(high.cap.every(value => Number.isFinite(value) && value < 0.3)).toBe(true)
-    for (let n = 0; n < high.count; n++) {
-      for (let frame = 1; frame < high.frameCount; frame++) expect(high.damage[frame * high.count + n]).toBeGreaterThanOrEqual(high.damage[(frame - 1) * high.count + n])
-    }
+    // Check every frame/particle pair without allocating a matcher per value.
+    // The repeated matcher overhead exceeded 5 s on the Windows CI host.
+    const monotonic = high.damage.every((value, index) => index < high.count || value >= high.damage[index - high.count])
+    expect(monotonic).toBe(true)
   })
   it('produces finite irreversible bond damage, surface uplift and repeatable playback', () => {
     const replay = buildSoilReplay()

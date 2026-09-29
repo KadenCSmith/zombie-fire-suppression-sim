@@ -1,3 +1,5 @@
+import type { FireSequenceSession } from './ui/FireSequenceWorkspace'
+import { version as applicationVersion } from '../package.json'
 import type { CoupledSession } from './ui/CoupledWorkspace'
 import type { TensileSession } from './ui/PeatTensionLab'
 import { ModelSelector, type PhysicsWorkspace } from './ui/ModelSelector'
@@ -6,6 +8,7 @@ import type { CameraMemory } from './ui/MechanicsScene'
 import type { StudySession } from './ui/StudyWorkspace'
 import { StudyVersions } from './ui/StudyVersions'
 import type { StudyVersion } from './ui/studyModel'
+import { AppChrome, readLayout, type LayoutMode } from './ui/AppChrome'
 import DeveloperTools from './ui/DeveloperTools'
 import { resolveMaterials } from './sim/materials'
 import { ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -46,9 +49,11 @@ type Tab = 'setup' | 'simulation' | 'results' | 'event' | 'developer'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
+const FireSequenceWorkspace = lazy(() => import('./ui/FireSequenceWorkspace'))
 const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
 const MechanicsWorkspace = lazy(() => import('./ui/MechanicsWorkspace'))
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
+const SimulationComparisonWorkspace = lazy(() => import('./ui/SimulationComparisonWorkspace'))
 
 const DAY = 86400
 const OVERLAYS: Overlay[] = ['temperature', 'activity', 'material', 'oxygen', 'co2', 'pressure', 'moisture', 'fuel', 'porosity', 'permeability', 'effective-permeability', 'mobility']
@@ -185,7 +190,12 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 
 function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
-  const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => new URLSearchParams(window.location.search).get('workspace') === 'coupled' ? 'coupled' : new URLSearchParams(window.location.search).get('workspace') === 'mechanics' ? 'mechanics' : new URLSearchParams(window.location.search).get('workspace') === 'simulation' ? 'simulation' : new URLSearchParams(window.location.search).get('workspace') === 'study' ? 'study' : 'coupled')
+  const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => {
+    const requested = new URLSearchParams(window.location.search).get('workspace')
+    return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' ? requested : 'sequence'
+  })
+  const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-layout')))
+  const fireSequenceSession = useRef<FireSequenceSession | undefined>(undefined)
   const coupledSession = useRef<CoupledSession | undefined>(undefined)
   const tensileSession = useRef<TensileSession | undefined>(undefined)
   const mechanicsSession = useRef<MechanicsSession | undefined>(undefined)
@@ -269,6 +279,7 @@ function App() {
   useEffect(() => { atmosphereRef.current = scenario.atmosphere.pressurePa }, [scenario.atmosphere.pressurePa])
   useEffect(() => { ambientTemperatureRef.current = scenario.atmosphere.temperatureC + 273.15 }, [scenario.atmosphere.temperatureC])
   useEffect(() => { durationRef.current = durationDays }, [durationDays])
+  useEffect(() => { window.localStorage.setItem('zombie-fire-layout', layout) }, [layout])
 
   useEffect(() => {
     const client = createSimulationClient({
@@ -648,7 +659,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled') return
+      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -661,16 +672,19 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
-  if (workspace === 'coupled') return <Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense>
-  if (workspace === 'mechanics') return <Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense>
+  const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} />
+  if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
+  if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} /></Suspense></>
+  if (workspace === 'coupled') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense></>
+  if (workspace === 'mechanics') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense></>
 
-  if (workspace === 'study') return <Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
+  if (workspace === 'study') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening scene studio…</div>}>
     <StudyWorkspace key={studyVersion} version={studyVersion} onVersionChange={next => { studySession.current=undefined; setStudyVersion(next) }} onOpenSimulation={() => changeWorkspace('simulation')} onWorkspace={changeWorkspace} session={studySession} />
-  </Suspense>
+  </Suspense></>
 
-  return <div className="app-shell">
+  return <>{chrome}<div className="app-shell">
     <header className="topbar">
-      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v0.10</span></small></div></div>
+      <div className="brand"><span className="brand-mark"><Waves size={21} strokeWidth={2.1} /></span><div><strong>ZOMBIE FIRE</strong><small>SUPPRESSION SIM <span>v{applicationVersion}</span></small></div></div>
       <div className="topbar-center"><ModelSelector value="simulation" onChange={changeWorkspace} /></div>
       <div className="topbar-actions"><StudyVersions version={studyVersion} onSelect={next => { studySession.current=undefined; setStudyVersion(next); openStudy() }} /><button className="secondary-btn" type="button" onClick={openStudy}><Layers3 size={15} /> Scene studio</button><span className="session-time"><Clock3 size={15} /> {formatClock(time)}</span><IconButton title="Model information" onClick={() => setShowInfo(true)}><BookOpen size={18} /></IconButton></div>
     </header>
@@ -898,7 +912,7 @@ function App() {
 
     {(tab === 'simulation' || tab === 'results') && <footer className="timeline"><div className="transport"><button className="play-btn" type="button" onClick={playing ? pause : start} disabled={!validation.valid} aria-label={playing ? 'Pause solver' : 'Run solver'}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><IconButton title="One physical solver step" onClick={() => clientRef.current?.step()} disabled={!validation.valid || playing}><StepForward size={17} /></IconButton><IconButton title="Reset physical run" onClick={reset}><RotateCcw size={17} /></IconButton><IconButton title="Fast forward at up to 3600 simulated seconds per real second; physical solver steps remain stable" onClick={() => { setPlayback(false); setComputeRate(3600); clientRef.current?.setComputeRate(3600); setPlaying(true); clientRef.current?.runTo(durationDays * DAY) }} disabled={!validation.valid}><SkipForward size={17} /></IconButton></div><div className="timeline-main"><div className="timeline-head"><span>PHYSICAL SOLVER TIME <strong>{formatClock(time)}</strong></span><span>{progress.toFixed(0)}% of {durationDays}-day window</span></div><input className="timeline-range" type="range" min={0} max={Math.max(1, history.length - 1)} step={1} value={playback ? playbackIndex : Math.max(0, history.length - 1)} onChange={(e) => { pause(); setPlayback(true); setPlaybackIndex(Number(e.target.value)) }} aria-label="Recorded run playback scrubber" /><div className="timeline-ticks"><span>0</span><span>1d</span><span>{durationDays}d</span></div></div><div className="timeline-options"><div className="compute-rate"><label>SOLVER PACE</label><select aria-label="Target simulated seconds per wall second" value={computeRate} onChange={(e) => setComputeRate(Number(e.target.value))} title="Requested pace; actual throughput may be lower"><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div><div className="duration-pills">{[1, 3, 7].map((d) => <button key={d} type="button" className={durationDays === d ? 'active' : ''} onClick={() => setDurationDays(d)}>{d}d</button>)}</div><div className="run-to"><label>RUN TO</label><input type="number" min={0} max={durationDays * 24} step={1} value={runToHour} onChange={(e) => setRunToHour(Number(e.target.value))} /><span>h</span><button type="button" onClick={() => { setPlayback(false); setPlaying(true); clientRef.current?.runTo(Math.min(durationDays * DAY, runToHour * 3600)) }} disabled={!validation.valid}>Go</button></div><div className="throughput">{throughput > 0 ? `${throughput.toFixed(0)} sim s / wall s` : 'Throughput measured during run'}</div></div><div className="playback-controls"><span>RECORDED PLAYBACK</span><button type="button" onClick={() => { pause(); setPlayback((v) => !v) }} disabled={history.length < 2}>{playback ? 'Pause' : 'Play'}</button><select aria-label="Recorded playback speed" value={playbackSpeed} onChange={(e) => setPlaybackSpeed(Number(e.target.value))}><option value={30}>30 sim s / real s</option><option value={120}>120 sim s / real s</option><option value={600}>600 sim s / real s</option><option value={3600}>3600 sim s / real s</option></select></div></footer>}
     {showInfo && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowInfo(false)}><div className="info-modal" role="dialog" aria-modal="true" aria-label="Model information" onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" onClick={() => setShowInfo(false)} aria-label="Close model information">×</button><span className="eyebrow">MODEL SCOPE · VERSION 0.6</span><h2>Exploratory animation</h2><p>The 3D computational field uses a reduced porous-flow, heat, moisture, oxygen, CO₂, fuel, and dry-ice source model. It is not calibrated to a site or validated against field suppression outcomes.</p><div className="status-list"><div><StatusChip kind="reduced">IMPLEMENTED REDUCED MODEL</StatusChip><span>Conservation-based coarse 3D fields and finite source inventory.</span></div><div><StatusChip kind="illustrative">ILLUSTRATIVE ONLY</StatusChip><span>Manual soil-piece motion and radial shell damage; event displacement is calculated separately.</span></div><div><StatusChip kind="missing">NOT MODELED</StatusChip><span>Blast, rupture surfaces, horizontal geomechanics, char and ash generation.</span></div></div><p>See <strong>docs/PHYSICS_MODEL.md</strong>, <strong>docs/SOURCES.md</strong>, and <strong>docs/VALIDATION_STATUS.md</strong> in the local repository for equations, sources, and limits.</p></div></div>}
-  </div>
+  </div></>
 }
 
 export default App

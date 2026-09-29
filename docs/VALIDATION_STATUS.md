@@ -2,7 +2,30 @@
 
 ## Standalone conservative geometry package (2026-09-29)
 
-The 14 supplied geometry source/test payloads match their manifest hashes. Actual repository checks passed: 86 new tests, 219 tests overall, TypeScript 7.0.2 typecheck, lint and production build. The modules are not imported by the existing physics, workers, UI or installed app, so no changed simulation behavior or physical validation is claimed. The handoff baseline differs from this 0.11 checkout, including an absent referenced remap file. [Scope, verification and activation prerequisites](GEOMETRY_INTEGRATION.md).
+The 14 supplied geometry source/test payloads match their manifest hashes. Actual checks on merged 0.16 main passed: 86 new tests, **285 tests overall**, TypeScript 7.0.2 typecheck, lint and production build. The modules are not imported by the existing physics, workers, UI or installed app, so no changed simulation behavior or physical validation is claimed. The handoff baseline is available as an ancestor, but current solver interfaces and physical inputs still need review before activation. [Scope, verification and activation prerequisites](GEOMETRY_INTEGRATION.md).
+
+## Version-comparison presentation scope — current 0.16 candidate
+
+The version comparison is a presentation and provenance feature. It does not create a new physical solver, make historical solvers comparable by accuracy, or convert authored animation time into physical simulation time. Recorded event alignment is used only when both selected replays publish the same event-marker family. Cross-family playback uses duration normalization and labels that fallback on each affected card.
+
+Available replay status is evidence-based: v0.8 and v0.9 use preserved interactive scene definitions; v0.14 and v0.15 use exact bundled films from their versioned histories; v0.16 uses the current interactive candidate. V0.10–v0.13 are listed as unavailable because no immutable replay assets are bundled in the current source tree. Their absence is not filled with the current solver or an invented reconstruction. Layout switching changes presentation only and preserves the same model controls and in-memory state.
+
+Software checks cover semantic-version ordering, catalog boundaries, unavailable-status handling, event alignment, fallback mapping, explicit mode classification, layout parsing and state-preserving browser interaction. These checks do not establish field validation, calibrated fidelity or equivalence between releases.
+
+## Hose and contact cooling — 0.16 development
+
+The successor adds woven-hose placement, a separate finite contact calorimeter, local assumed wetting and a larger folded/deployed dome in an explicitly excavated chamber. The accepted field cache is unchanged. Initial local verification passed: **193 tests in 32 files**, typecheck, lint and production build. These checks verify implementation and reduced-model balances, not experimental performance. [Acceptance criteria](HOSE_COOLING_IMPLEMENTATION.md) and [contact equations, assumptions and measured balances](CONTACT_COOLING.md) define the scope. Final visual review, complete films, final-source CI and package/native results remain pending at this implementation milestone.
+
+## Visual refinement — 0.15
+
+The 0.15 presentation changes do not modify numerical solvers or the accepted fire cache. It adds a connected randomized appearance atlas and rapid-only prescribed soil-piece motion. The user-requested visual realism gate uses a separate agent review and is **not** a physics-validation score. [Realism review](review/unified/realism-015.md) records the two review cycles; [code review](review/unified/visual-code-015.md) records animation corrections and remaining display limits. All 175 tests in 31 files, typecheck, lint and build pass locally. Native/package and final cross-platform checks are recorded with the release.
+
+## Current unified fire workflow — 0.14
+
+The current app adds a complete interactive fire/treatment story, both gradual and illustrative rapid Blender films, and a cold-start numerical experiment with retained initial moisture. The accepted baseline covers24h plus30s finite-source treatment; source-generation checkpoint `a47721f` freezes the exact cache and source hashes. It sustains surface oxidation but does not resolve underground combustion propagation. The source loses1.7885g during treatment and continuing oxidation remains present. No suppression success is inferred.
+
+Drilling, enlarged dome bending, created fractures and water pathways are staged. Scientific views exclude these shapes and expose only accepted values; rapid mode holds pre-treatment fields. The physics lab retains2560/20480-cell meshes and matched sparse/reference backends. [Fire protocol](FIRE_PROTOCOL.md), [sequence scope](FIRE_SEQUENCE.md), [native release record](review/unified/native.md) and [implementation milestones](UNIFIED_IMPLEMENTATION.md) distinguish current evidence from the historical records below.
+
 
 ## Published 0.11.0 delivery (2026-09-27)
 
@@ -341,3 +364,13 @@ Selected declared tolerances: short-run source energy residual <10⁻⁶ J; clos
 ## Experimental validation needed
 
 Compare temperature, oxygen, CO₂, moisture, pressure, emissions, fuel/char, and rebound histories against controlled experiments using measured geometry and properties. A comparison to the 30 cm moss-peat column in Huang and Rein (S6) would require reproducing its material, moisture basis, reactor boundaries, ignition, and kinetics; this app does not presently do so. Details of that study and all other sources are in `SOURCES.md`.
+
+## Unified physics integration — 27 September 2026
+
+148 tests / 25 files passed; typecheck, lint and build passed. New tests check invariant extensive inventories and source support across mesh choices, film-source limits and timestep refinement, and matched elastic/coupled trajectories between reference and optional sparse operators. Initialization independently reviewed in three rounds (frozen); source independently reviewed in two rounds. See `docs/review/unified/initialization.md`, `docs/review/unified-source-review.md`, and `docs/CO2_SOURCE_MODEL.md`.
+
+Cold source-only is the new lab default. Prepared hot specimens explicitly disclose removed initial water and remain assumed cases. No experimental/field validation, resolved excavation or mobile liquid infiltration is claimed. Equal initial totals do not establish solution convergence. Final performance, natural-cutaway UI and Blender visual review are pending at this milestone.
+
+## Unified reference completion — 27 September 2026
+
+Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.
