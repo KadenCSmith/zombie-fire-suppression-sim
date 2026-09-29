@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "verified_checkpoints": 5,
+  "checks": [
+    "Exactly one visible accepted field mesh at each timeline frame",
+    "FACE field data agree with embedded accepted solver cache",
+    "Source radius agrees with finite mass / source density",
+    "Checkpoint times and cell IDs persist after save/reopen",
+    "Reference and physics remain separate scenes",
+    "Natural presentation scene retains exactly identical accepted node positions"
+  ],
+  "scenes": [
+    "NATURAL \u2022 accepted geometry",
+    "PHYSICS \u2022 accepted checkpoints",
+    "REFERENCE \u2022 prescribed illustration"
+  ],
+  "records": [
+    {
+      "checkpoint": 1,
+      "time_s": 0,
+      "field_faces": 736,
+      "visible_source_kg": 4
+    },
+    {
+      "checkpoint": 2,
+      "time_s": 0.5,
+      "field_faces": 736,
+      "visible_source_kg": 3.99996022818897
+    },
+    {
+      "checkpoint": 3,
+      "time_s": 1,
+      "field_faces": 736,
+      "visible_source_kg": 3.9999216614145503
+    },
+    {
+      "checkpoint": 4,
+      "time_s": 1.5,
+      "field_faces": 736,
+      "visible_source_kg": 3.9998840390497437
+    },
+    {
+      "checkpoint": 5,
+      "time_s": 2,
+      "field_faces": 736,
+      "visible_source_kg": 3.9998472006103998
+    }
+  ]
+}

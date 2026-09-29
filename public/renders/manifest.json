@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "kind": "zombie-fire-sequence-render-assets",
+  "movies": [
+    {
+      "mode": "gradual",
+      "sourceFilename": "Fire_Sequence_Gradual.mp4",
+      "url": "/renders/peat-fire-gradual.mp4",
+      "durationSeconds": 36.0,
+      "fps": 24.0,
+      "width": 1280,
+      "height": 720,
+      "encodedFrames": 864,
+      "sha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "bytes": 7486873
+    },
+    {
+      "mode": "rapid",
+      "sourceFilename": "Fire_Sequence_Rapid.mp4",
+      "url": "/renders/peat-fire-rapid.mp4",
+      "durationSeconds": 36.0,
+      "fps": 24.0,
+      "width": 1280,
+      "height": 720,
+      "encodedFrames": 864,
+      "sha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "bytes": 8198562
+    }
+  ],
+  "posterUrl": "/renders/Fire_Sequence_Poster.png",
+  "contactSheetUrl": "/renders/Fire_Sequence_Contact_Sheet.png",
+  "cacheSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+  "originalStudySha256": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+  "appearanceSha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+  "appearanceScope": "Perimeter-only display smoothing; shared 200x80 seeded connected arrival ranks; 70% sampled peat area before treatment, not solved propagation.",
+  "ruptureScope": "Rapid-only authored pressure-release pulse, 504 irregular prisms, persistent gaps and decorative ballistic fragments; no CO2 detonation or fracture-solver claim.",
+  "editableScene": {
+    "filename": "Fire_Sequence_Gradual_and_Rapid.blend",
+    "sha256": "8657e694971bbd84279979247e2bf7dc01d0cb2efd8ce93ac8530c8aaf6fb3fd",
+    "bytes": 26077227,
+    "texturesPacked": true
+  },
+  "presentationClock": {
+    "story_seconds": 90,
+    "playback_seconds": 36,
+    "normal_speed_story_interval": [
+      55,
+      61
+    ],
+    "other_speed_multiplier": 2.8,
+    "mapping": "t/2.8 to55;55/2.8+t-55 to61;55/2.8+6+(t-61)/2.8 afterwards"
+  },
+  "buriedPlate": {
+    "rim_elevation_m": -1.05,
+    "initial_center_elevation_m": -1.105,
+    "rapid_final_center_elevation_m": -0.885,
+    "radius_m": 0.2,
+    "bore_radius_m": 0.24,
+    "deformation": "prescribed rapid-only inversion; gradual remains unchanged"
+  },
+  "illustratedPeatInvolvement": {
+    "trigger_fraction": 0.7,
+    "time_story_s": 24,
+    "geometry": "Shared irregular mask and connected arrival ranks; 70% sampled 2D peat area, not numerical fuel consumption"
+  },
+  "scope": "Full staged narrative. Gradual source radius/readout uses accepted history where supplied. Rapid conversion, drilling, enlarged cap bending, fracture paths and liquid infiltration are explicitly illustrative and do not alter solver data. No extinguishment or field validation claim.",
+  "acceptedFieldScope": "Held accepted temperature cross-section through middle-y cells. Rapid mode holds the pre-treatment state; no rapid-conversion field is supplied.",
+  "undergroundCaption": "Illustrated underground spread; the numerical front remains unresolved.",
+  "sourceFilesSha256": {
+    "integrations/blender-study/fire-sequence/README.md": "8e544d9ec675bbfdc61f49a0c7f8021ced496be86f3c8fc97b87da6e906b00a9",
+    "integrations/blender-study/fire-sequence/build_fire_sequence.py": "39c50be598e755ab2588a136526a6ec498acb4886614c03d3864ea4e9bd9390c",
+    "integrations/blender-study/fire-sequence/create_contact_sheet.py": "d81a4d938ea6e41bd9e40c4df4b5864ea5bfb46f2d6d109cf13e7e1400fff040",
+    "integrations/blender-study/fire-sequence/package_render_assets.py": "35e2ab9c79b7acaf81e3f162bb381c9d2d4153fb09e8f770bb8317fe4319d156",
+    "integrations/blender-study/fire-sequence/render_delivery.py": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+    "integrations/blender-study/fire-sequence/render_fire_sequence.py": "7de14c991013f197fd8658281096ca8b77650e700c797b3ee9e01be2a9c484ab",
+    "integrations/blender-study/fire-sequence/rupture_geometry.py": "9f6da99c2561ccaa7ff4ee4f28ff34aaee68998060ca1a1a488ceea0d74c5c77",
+    "integrations/blender-study/fire-sequence/storyboard.json": "63b75256c6849fb6ea9b12f740061d2249d2f9d7b6731ad3ae015a15cc09636e",
+    "integrations/blender-study/fire-sequence/verify_fire_sequence.py": "8cb9333806779b9687b6d718333598e4ccc81bd3f279f869bc84e0326ac862ca",
+    "integrations/blender-study/fire-sequence/verify_movies.py": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+    "integrations/blender-study/fire-sequence/visual_assets.py": "3f8f338ea9a0192e58d95900fa6bf0caffb9b0e4b871b2f0b3fe8ad122d35403"
+  },
+  "ready": true,
+  "films": {
+    "gradual": {
+      "file": "peat-fire-gradual.mp4",
+      "sha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "durationS": 36.0,
+      "durationSeconds": 36.0,
+      "frames": 864
+    },
+    "rapid": {
+      "file": "peat-fire-rapid.mp4",
+      "sha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "durationS": 36.0,
+      "durationSeconds": 36.0,
+      "frames": 864
+    }
+  }
+}

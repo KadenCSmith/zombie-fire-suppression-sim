@@ -3,12 +3,20 @@ import { Simulation } from '../sim/solver'
 import { createDefaultScenario } from '../sim/scenario'
 import type { Scenario } from '../sim/types'
 import { pcg } from './linear'
-import { R,T0,MOLAR,gasU,gasH,co2SolidU,CO2_SUB_T,CO2_SUB_H,CO2_SOLID_CP,equilibrate,saturationPressure,LF } from './thermodynamics'
+import {conservativeRemap} from './remap'
+import {advanceDryIceSource} from './source'
+import { R,T0,MOLAR,gasU,gasH,co2SolidU,equilibrate,saturationPressure,LF } from './thermodynamics'
 
-export type Fidelity = 'preview'|'engineering'|'research'
-export const PRESETS = {preview:{nx:8,ny:8,nz:4,maxStepS:2},engineering:{nx:12,ny:12,nz:6,maxStepS:1},research:{nx:16,ny:16,nz:8,maxStepS:0.5}} as const
-export interface CoupledInputs {fidelity:Fidelity;durationS:number;dryIceKg:number;heaterW:number;moisture:number;permeabilityM2:number;reaction:boolean;mechanics:boolean;fracture:boolean;roots:boolean;cap:boolean;capRadiusM:number;capRiseM:number;capThicknessM:number;youngsPa:number;fractureEnergyJm2:number;lengthScaleM:number}
+export type Fidelity = 'preview'|'engineering'|'research'|'precision2560'|'precision20480'
+export const PRESETS = {preview:{nx:8,ny:8,nz:4,maxStepS:2},engineering:{nx:12,ny:12,nz:6,maxStepS:1},research:{nx:16,ny:16,nz:8,maxStepS:0.5},precision2560:{nx:16,ny:16,nz:10,maxStepS:0.125},precision20480:{nx:32,ny:32,nz:20,maxStepS:0.125}} as const
+export const TERRAIN_CASES = {
+ 'rooted-peat':{label:'Rooted peat',description:'An assumed organic lens with eight bonded axial root trusses.'},
+ layered:{label:'Layered peat / mineral',description:'An assumed horizontal peat layer above mineral soil; no root reinforcement.'},
+ rocky:{label:'Rocky subsurface',description:'An assumed denser, less permeable basal mineral layer; intact continuum, no discrete rock contacts.'},
+} as const
+export interface CoupledInputs {terrain?:keyof typeof TERRAIN_CASES;initialization?:'conservative'|'legacy';mechanicalBackend?:'reference'|'optimized';fidelity:Fidelity;durationS:number;dryIceKg:number;heaterW:number;moisture:number;permeabilityM2:number;reaction:boolean;mechanics:boolean;fracture:boolean;roots:boolean;cap:boolean;capRadiusM:number;capRiseM:number;capThicknessM:number;youngsPa:number;fractureEnergyJm2:number;lengthScaleM:number}
 export const DEFAULT_COUPLED:CoupledInputs={fidelity:'preview',durationS:120,dryIceKg:4,heaterW:0,moisture:0.2,permeabilityM2:8e-12,reaction:true,mechanics:true,fracture:false,roots:true,cap:true,capRadiusM:0.475,capRiseM:0.1,capThicknessM:0.005,youngsPa:1e6,fractureEnergyJm2:5,lengthScaleM:1}
+export const LAB_DEFAULT_COUPLED:CoupledInputs={...DEFAULT_COUPLED,fidelity:'precision2560',durationS:10,terrain:'rooted-peat',reaction:false,mechanicalBackend:'optimized'}
 export function coupledScenario(input:CoupledInputs):Scenario {
   const s=createDefaultScenario(),p=PRESETS[input.fidelity]
   s.name='Coupled oak-site continuum';s.domain={widthM:8,lengthM:8,depthM:3.2,nx:p.nx,ny:p.ny,nz:p.nz}
@@ -17,12 +25,16 @@ export function coupledScenario(input:CoupledInputs):Scenario {
   Object.assign(s.hotRegions[0],{centerXM:3,centerYM:4,centerDepthM:1.9,sizeXM:2.4,sizeYM:2.4,thicknessM:1.2})
   Object.assign(s.source,{centerXM:4.4,centerYM:4,centerDepthM:1.3,initialMassKg:input.dryIceKg,enabled:input.heaterW>0,heatGenerationWm3:input.heaterW/(4/3*Math.PI*s.source.supportRadiusM**3)})
   s.soil.intrinsicPermeabilityVerticalM2=input.permeabilityM2;s.soil.intrinsicPermeabilityHorizontalM2=3*input.permeabilityM2
-  s.model.maxStepS=p.maxStepS;if(!input.reaction)s.model.smolderRateS=0
+  s.model.maxStepS=p.maxStepS;if(!input.reaction){s.model.smolderRateS=0;s.hotRegions=[]}
+  if(input.terrain==='layered')Object.assign(s.peatRegions[0],{shape:'slab',centerDepthM:1.6,thicknessM:1.6,sizeXM:8,sizeYM:8,rotationDeg:0})
+  if(input.terrain==='rocky')s.soilLayers=[s.soilLayers[0],{...s.soilLayers[1],thicknessM:1.6},{id:'rocky-base',thicknessM:0.8,dryDensityMultiplier:1.6,porosityOffset:-0.2,moistureSaturationOffset:0,permeabilityMultiplier:0.05,thermalConductivityMultiplier:3}]
+  if(input.terrain&&input.terrain!=='rooted-peat')s.root.amountKgM3=0
+  s.description='Assumed parameter scenario, not a measured terrain. '+(TERRAIN_CASES[input.terrain??'rooted-peat'].description)
   return s
 }
 export interface Face {a:number;b:number;axis:number;area:number;distance:number;g:number;diff:number;thermal:number;gravity:number;capFraction:number;ventGap:number;ventRadius:number}
-export interface Ledger {energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;gravityWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
-export interface CoupledFrame {timeS:number;temperatureK:Float32Array;pressurePa:Float32Array;oxygen:Float32Array;co2:Float32Array;iceKg:Float32Array;liquidKg:Float32Array;fuelKg:Float32Array;porosity:Float32Array;damage:Float32Array;displacementM:Float32Array;dryIceKg:number;dryIceTemperatureK:number;ledger:Ledger;cap?:CapState;mechanical?:{elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}}
+export interface Ledger {sourceDepositionLimited?:boolean;externalSolidMassInKg?:number;externalSolidEnergyInJ?:number;insertionWorkJ?:number;energyResidualJ:number;massResidualKg:number;speciesResidualMol:number[];boundaryEnergyOutJ:number;heaterJ:number;pressureWorkJ:number;gravityWorkJ:number;reactionJ:number;boundaryMassOutKg:number;maxPoreRe:number;maxMach:number;pressureResidualMol:number;steps:number;rejectedSteps:number}
+export interface CoupledFrame {materialPeatFraction?:Float32Array;initialization?:{method:string;preparedWaterRemovedKg:number;atlasCells:number};timeS:number;temperatureK:Float32Array;pressurePa:Float32Array;oxygen:Float32Array;co2:Float32Array;iceKg:Float32Array;liquidKg:Float32Array;fuelKg:Float32Array;porosity:Float32Array;damage:Float32Array;displacementM:Float32Array;dryIceKg:number;dryIceTemperatureK:number;ledger:Ledger;cap?:CapState;mechanical?:{elasticJ:number;fractureJ:number;residualN:number;maxStrain:number;iterations:number;maxDamage:number;pressureWorkJ:number}}
 const harmonic=(a:number,b:number)=>a+b>0?2*a*b/(a+b):0
 const sum=(v:ArrayLike<number>)=>{let s=0;for(let i=0;i<v.length;i++)s+=v[i];return s}
 const FUEL_MOLAR=6*MOLAR[1]+5*MOLAR[3]-6*MOLAR[0]
@@ -32,9 +44,10 @@ export class CoupledTransport {
   readonly temperature:Float64Array;readonly pressure:Float64Array;readonly liquid:Float64Array;readonly ice:Float64Array;readonly gasVolume:Float64Array
   readonly porosity0:Float64Array;readonly pore:Float64Array;readonly kh:Float64Array;readonly kv:Float64Array;readonly conductivity:Float64Array;readonly peat:Float64Array
   readonly faces:Face[]=[];readonly sourceWeights:{i:number;w:number}[]=[]
+  preparedWaterRemovedKg=0;initializationMethod='cell-center legacy';atlasCells=0
   time=0;dryIce:number;dryIceT:number;ledger:Ledger={energyResidualJ:0,massResidualKg:0,speciesResidualMol:[0,0,0,0],boundaryEnergyOutJ:0,heaterJ:0,pressureWorkJ:0,gravityWorkJ:0,reactionJ:0,boundaryMassOutKg:0,maxPoreRe:0,maxMach:0,pressureResidualMol:0,steps:0,rejectedSteps:0}
   private initialEnergy=0;private initialMass=0;private initialSpecies:number[]=[];private boundarySpecies=[0,0,0,0];private sources=[0,0,0,0]
-  constructor(scenario:Scenario) {
+  constructor(scenario:Scenario,conservativeInitialization=false,preparedDryHalo=false) {
     this.scenario=structuredClone(scenario);const original=new Simulation(scenario,{phaseStateOwnedExternally:true}),a=original.serialize().arrays
     this.n=original.cellCount;this.volume=original.cellVolume;this.dx=original.dx;this.dy=original.dy;this.dz=original.dz
     const take=(key:string)=>Float64Array.from(a[key]),zero=()=>new Float64Array(this.n)
@@ -51,7 +64,15 @@ export class CoupledTransport {
     const weights=this.sourceWeights.reduce((v,p)=>v+p.w,0);for(const p of this.sourceWeights)p.w/=weights
     for(let i=0;i<this.n;i++){
       // Prepared initial hot region is dry; superheated liquid at atmospheric pressure is not a realizable initial state.
-      const t=this.temperature[i];if(t>373.15)this.water[i]=0
+      const t=this.temperature[i]
+      // Explicit preparation assumption: hot specimens have a fixed dry buffer
+      // extending one legacy cell beyond the heater region's bounding box. This
+      // avoids instant unresolved mixing of 270 C solids and wet pore water when
+      // projecting onto coarse cells. The removed water is initial preparation,
+      // not evaporation during the run. Same physical halo at every resolution.
+      const x=(i%grid.nx+0.5)*this.dx,y=(Math.floor(i/grid.nx)%grid.ny+0.5)*this.dy,z=(Math.floor(i/(grid.nx*grid.ny))+0.5)*this.dz
+      const dryHalo=preparedDryHalo&&scenario.hotRegions.some(h=>Math.abs(x-h.centerXM)<=h.sizeXM/2+1&&Math.abs(y-h.centerYM)<=h.sizeYM/2+1&&Math.abs(z-h.centerDepthM)<=h.thicknessM/2+0.8)
+      if(t>373.15||dryHalo){this.preparedWaterRemovedKg+=this.water[i];this.water[i]=0}
       const volume=this.availablePore(i)-this.water[i]/(t<T0?917:1000),pa=scenario.atmosphere.pressurePa
       const vaporPressure=this.water[i]>0?Math.min(pa*0.95,saturationPressure(t)):scenario.atmosphere.waterVaporMoleFraction*pa
       const dryTotal=this.gas[0][i]+this.gas[1][i]+this.gas[2][i]
@@ -60,6 +81,25 @@ export class CoupledTransport {
       this.energy[i]=this.dryCapacity(i)*(t-T0)+this.water[i]*(t<T0?2100*(t-T0)-LF:4186*(t-T0))
       for(let s=0;s<4;s++)this.energy[i]+=this.gas[s][i]*gasU(s,t)
       this.water[i]+=this.gas[3][i]*MOLAR[3]
+    }
+    if(conservativeInitialization){
+      // One immutable physical voxel atlas for ALL fidelity choices. Project inventories,
+      // not temperatures. This removes resolution-dependent fuel/water/ignition changes.
+      const canonicalScenario=structuredClone(scenario);Object.assign(canonicalScenario.domain,{nx:32,ny:32,nz:20})
+      const canonical=new CoupledTransport(canonicalScenario,false,true),from=canonicalScenario.domain,to=scenario.domain
+      this.initializationMethod='conservative fixed material atlas';this.atlasCells=canonical.n;this.preparedWaterRemovedKg=canonical.preparedWaterRemovedKg
+      const extensive=(v:Float64Array)=>conservativeRemap(v,from,to)
+      const sourcePartition=new Float64Array(canonical.n)
+      for(const point of canonical.sourceWeights)sourcePartition[point.i]=point.w
+      const partition=extensive(sourcePartition),partitionTotal=sum(partition)
+      this.sourceWeights.length=0
+      for(let i=0;i<this.n;i++)if(partition[i]>0)this.sourceWeights.push({i,w:partition[i]/partitionTotal})
+      const intensive=(v:Float64Array)=>Float64Array.from(extensive(Float64Array.from(v,x=>x*canonical.volume)),x=>x/this.volume)
+      for(let species=0;species<4;species++)this.gas[species].set(extensive(canonical.gas[species]))
+      for(const key of ['water','fuel','mineral','energy','pore'] as const)this[key].set(extensive(canonical[key]))
+      const capacity=extensive(Float64Array.from(canonical.solidCp,(cp,i)=>cp*(canonical.fuel[i]+canonical.mineral[i])))
+      for(let i=0;i<this.n;i++)this.solidCp[i]=capacity[i]/Math.max(1e-30,this.fuel[i]+this.mineral[i])
+      for(const key of ['porosity0','kh','kv','conductivity','peat'] as const)this[key].set(intensive(canonical[key]))
     }
     this.resolve();this.buildFaces();this.initialEnergy=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT);this.initialMass=this.totalMass();this.initialSpecies=this.speciesTotals()
   }
@@ -73,7 +113,7 @@ export class CoupledTransport {
       if(!(phase.gasVolume>1e-6*this.volume))throw new Error('Gas pore space exhausted: liquid flow/ice heave required.')
       this.temperature[i]=phase.temperature;this.liquid[i]=phase.liquid;this.ice[i]=phase.ice;this.gas[3][i]=phase.vapor/MOLAR[3];this.gasVolume[i]=phase.gasVolume
       this.pressure[i]=this.totalGas(i)*R*phase.temperature/phase.gasVolume
-      if(!Number.isFinite(this.pressure[i])||this.pressure[i]<1000||this.pressure[i]>3e5)throw new Error('Pore pressure outside 1–300 kPa ideal-gas/Darcy scope.')
+      if(!Number.isFinite(this.pressure[i])||this.pressure[i]<1000||this.pressure[i]>3e5)throw new Error(`Pore pressure ${this.pressure[i].toFixed(1)} Pa at cell ${i} outside 1–300 kPa ideal-gas/Darcy scope.`)
     }
   }
   totalGas(i:number){return this.gas[0][i]+this.gas[1][i]+this.gas[2][i]+this.gas[3][i]}
@@ -108,20 +148,15 @@ export class CoupledTransport {
     const s=this.scenario.source,heater=s.enabled&&this.time>=s.startTimeS&&this.time<s.startTimeS+s.durationS?s.heatGenerationWm3*4/3*Math.PI*s.supportRadiusM**3*dt:0
     this.ledger.heaterJ+=heater
     if(this.dryIce>0){
-      const radius=Math.cbrt(3*this.dryIce/(4*Math.PI*s.densityKgM3)),area=4*Math.PI*radius*radius
-      let q=heater,p=0
-      for(const w of this.sourceWeights){const heat=s.contactConductanceWm2K*area*w.w*(t[w.i]-this.dryIceT)*dt;delta[w.i]-=heat;q+=heat;p+=w.w*this.pressure[w.i]}
-      // Clausius–Clapeyron solid/vapor curve with constant latent enthalpy.
-      const ts=1/(1/CO2_SUB_T-R/(CO2_SUB_H*MOLAR[1])*Math.log(p/101325))
-      if(ts>=216.58)throw new Error('CO₂ triple-point limit: a liquid CO₂ equation of state is required.')
-      const sensible=this.dryIce*CO2_SOLID_CP*(ts-this.dryIceT)
-      if(q<=sensible){this.dryIceT+=q/(this.dryIce*CO2_SOLID_CP)}else{
-        const oldU=this.dryIce*co2SolidU(this.dryIceT),latentU=gasU(1,ts)/MOLAR[1]-co2SolidU(ts)
-        const mass=Math.min(this.dryIce,(q-sensible)/latentU);this.dryIce-=mass;this.dryIceT=ts
-        const excess=oldU+q-this.dryIce*co2SolidU(ts)-mass*gasU(1,ts)/MOLAR[1]
-        for(const w of this.sourceWeights){this.gas[1][w.i]+=mass*w.w/MOLAR[1];delta[w.i]+=w.w*(mass*gasU(1,ts)/MOLAR[1]+excess)}
-        this.sources[1]+=mass/MOLAR[1]
+      let ambientTemperatureK=0,ambientPressurePa=0,partialCO2Pa=0
+      for(const w of this.sourceWeights){ambientTemperatureK+=w.w*t[w.i];ambientPressurePa+=w.w*this.pressure[w.i];partialCO2Pa+=w.w*this.pressure[w.i]*this.gas[1][w.i]/this.totalGas(w.i)}
+      const source=advanceDryIceSource({massKg:this.dryIce,temperatureK:this.dryIceT,densityKgM3:s.densityKgM3,dtS:dt,heaterJ:heater,ambientTemperatureK,ambientPressurePa,ambientCO2MoleFraction:partialCO2Pa/ambientPressurePa,contactConductanceWm2K:s.contactConductanceWm2K,effectiveDiffusivityM2S:this.scenario.soil.gasDiffusivityM2S/this.scenario.soil.tortuosity})
+      for(const w of this.sourceWeights){
+        const contact=s.contactConductanceWm2K*source.surfaceAreaM2*w.w*(t[w.i]-source.temperatureK)*dt
+        this.gas[1][w.i]+=source.emittedKg*w.w/MOLAR[1];delta[w.i]+=w.w*source.emittedEnergyJ-contact
       }
+      this.dryIce=source.massKg;this.dryIceT=source.temperatureK;this.sources[1]+=source.emittedKg/MOLAR[1]
+      if(source.depositionSuppressed)this.ledger.sourceDepositionLimited=true
     }else for(const w of this.sourceWeights)delta[w.i]+=heater*w.w
     const m=this.scenario.model
     for(let i=0;i<this.n;i++){
@@ -208,8 +243,8 @@ export class CoupledTransport {
     }
     this.resolve();this.updateLedger()
   }
-  checkpoint(){return{arrays:this.arrays().map(a=>a.slice()),ledger:structuredClone(this.ledger),boundary:this.boundarySpecies.slice(),sources:this.sources.slice(),time:this.time,dryIce:this.dryIce,dryIceT:this.dryIceT}}
-  restore(checkpoint:ReturnType<CoupledTransport['checkpoint']>){this.arrays().forEach((a,i)=>a.set(checkpoint.arrays[i]));this.ledger=structuredClone(checkpoint.ledger);this.boundarySpecies=checkpoint.boundary.slice();this.sources=checkpoint.sources.slice();this.time=checkpoint.time;this.dryIce=checkpoint.dryIce;this.dryIceT=checkpoint.dryIceT;this.resolve()}
+  checkpoint(){return{arrays:this.arrays().map(a=>a.slice()),ledger:structuredClone(this.ledger),boundary:this.boundarySpecies.slice(),sources:this.sources.slice(),sourceWeights:this.sourceWeights.map(p=>({...p})),sourceCenter:{xM:this.scenario.source.centerXM,yM:this.scenario.source.centerYM,depthM:this.scenario.source.centerDepthM},time:this.time,dryIce:this.dryIce,dryIceT:this.dryIceT}}
+  restore(checkpoint:ReturnType<CoupledTransport['checkpoint']>){this.arrays().forEach((a,i)=>a.set(checkpoint.arrays[i]));this.ledger=structuredClone(checkpoint.ledger);this.boundarySpecies=checkpoint.boundary.slice();this.sources=checkpoint.sources.slice();this.sourceWeights.splice(0,this.sourceWeights.length,...checkpoint.sourceWeights.map(p=>({...p})));Object.assign(this.scenario.source,{centerXM:checkpoint.sourceCenter.xM,centerYM:checkpoint.sourceCenter.yM,centerDepthM:checkpoint.sourceCenter.depthM});this.time=checkpoint.time;this.dryIce=checkpoint.dryIce;this.dryIceT=checkpoint.dryIceT;this.resolve()}
   private arrays(){return[...this.gas,this.water,this.fuel,this.energy,this.pore]}
   step(requested:number){
     if(!Number.isFinite(requested)||requested<=0)throw new Error('Positive finite timestep required.')
@@ -229,14 +264,68 @@ export class CoupledTransport {
     throw new Error('Adaptive timestep exhausted.')
   }
   advance(seconds:number){const target=this.time+seconds;while(this.time<target-1e-9)this.step(target-this.time);return this.frame()}
+  /** Import a finite solid inventory into existing pores without resetting the fire
+   * history or its conservation baseline. This is NOT an excavation/contact solve.
+   * External placement supplies reversible pressure-volume work; impact is omitted.
+   */
+  insertDryIce(massKg:number,temperatureK:number,center:{xM:number;yM:number;depthM:number}){
+    const source=this.scenario.source,d=this.scenario.domain
+    if(!Number.isFinite(massKg)||massKg<=0||massKg>20||!Number.isFinite(temperatureK)||temperatureK<150||temperatureK>216.58)throw new Error('Solid insertion requires 0–20 kg and 150–216.58 K within the source model scope.')
+    if(this.dryIce>1e-12)throw new Error('Remove or exhaust the existing source before inserting another solid inventory.')
+    if(source.enabled&&this.time<source.startTimeS+source.durationS)throw new Error('Finish or disable surface ignition before relocating the source.')
+    const radius=Math.cbrt(3*massKg/(4*Math.PI*source.densityKgM3))
+    const positions=[center.xM,center.yM,center.depthM],sizes=[d.widthM,d.lengthM,d.depthM]
+    if(positions.some((v,i)=>!Number.isFinite(v)||v<radius||v>sizes[i]-radius))throw new Error('Inserted sphere must remain inside the domain.')
+    const saved=this.checkpoint(),oldWeights=this.sourceWeights.map(w=>({...w})),oldCenter=[source.centerXM,source.centerYM,source.centerDepthM]
+    // The same fixed physical atlas used by initialization defines placement support.
+    const atlas={...d,nx:32,ny:32,nz:20},partition=new Float64Array(32*32*20)
+    const coordinates=positions.map((v,i)=>v/sizes[i]*[32,32,20][i]-0.5)
+    for(let z=Math.floor(coordinates[2]);z<=Math.floor(coordinates[2])+1;z++)for(let y=Math.floor(coordinates[1]);y<=Math.floor(coordinates[1])+1;y++)for(let x=Math.floor(coordinates[0]);x<=Math.floor(coordinates[0])+1;x++){
+      if(x<0||x>=32||y<0||y>=32||z<0||z>=20)continue
+      const w=(1-Math.abs(x-coordinates[0]))*(1-Math.abs(y-coordinates[1]))*(1-Math.abs(z-coordinates[2]))
+      if(w>0)partition[(z*32+y)*32+x]=w
+    }
+    const projected=conservativeRemap(partition,atlas,d),weightSum=sum(projected),oldPressure=this.pressure.slice()
+    try{
+      this.sourceWeights.length=0
+      for(let i=0;i<this.n;i++)if(projected[i]>0)this.sourceWeights.push({i,w:projected[i]/weightSum})
+      source.centerXM=center.xM;source.centerYM=center.yM;source.centerDepthM=center.depthM
+      this.dryIce=massKg;this.dryIceT=temperatureK
+      let totalWork=0
+      for(const point of this.sourceWeights){
+        const i=point.i,oldEnergy=this.energy[i],volumeRemoved=point.w*massKg/source.densityKgM3,gas=[this.gas[0][i],this.gas[1][i],this.gas[2][i]]
+        let pressure=oldPressure[i],work=0,converged=false
+        for(let iteration=0;iteration<40;iteration++){
+          work=0.5*(oldPressure[i]+pressure)*volumeRemoved
+          const phase=equilibrate(oldEnergy+work,this.water[i],this.availablePore(i),this.dryCapacity(i),gas)
+          if(phase.gasVolume<=1e-6*this.volume)throw new Error('Insertion exhausts gas pore space; resolved excavation is required.')
+          const next=(gas[0]+gas[1]+gas[2]+phase.vapor/MOLAR[3])*R*phase.temperature/phase.gasVolume
+          if(Math.abs(next-pressure)<1e-7){converged=true;break}
+          pressure=next
+        }
+        if(!converged)throw new Error('Insertion pressure-work iteration did not converge.')
+        this.energy[i]=oldEnergy+work;totalWork+=work
+      }
+      this.ledger.externalSolidMassInKg=(this.ledger.externalSolidMassInKg??0)+massKg
+      this.ledger.externalSolidEnergyInJ=(this.ledger.externalSolidEnergyInJ??0)+massKg*co2SolidU(temperatureK)
+      this.ledger.insertionWorkJ=(this.ledger.insertionWorkJ??0)+totalWork
+      this.ledger.pressureWorkJ-=totalWork
+      this.resolve();this.updateLedger()
+    }catch(error){
+      this.sourceWeights.splice(0,this.sourceWeights.length,...oldWeights)
+      ;[source.centerXM,source.centerYM,source.centerDepthM]=oldCenter
+      this.restore(saved);throw error
+    }
+  }
   sealInitialState(){
     if(this.time!==0)throw new Error('Initial conditions can only be sealed at t = 0.')
+    if(this.ledger.externalSolidMassInKg)throw new Error('Cannot erase the conservation baseline after source insertion.')
     this.resolve();this.initialEnergy=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT);this.initialMass=this.totalMass();this.initialSpecies=this.speciesTotals();this.updateLedger()
   }
   updateLedger(){
-    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.ledger.gravityWorkJ-this.initialEnergy
-    this.ledger.massResidualKg=this.totalMass()+this.ledger.boundaryMassOutKg-this.initialMass
+    this.ledger.energyResidualJ=sum(this.energy)+this.dryIce*co2SolidU(this.dryIceT)+this.ledger.boundaryEnergyOutJ+this.ledger.pressureWorkJ-this.ledger.heaterJ-this.ledger.reactionJ-this.ledger.gravityWorkJ-(this.ledger.externalSolidEnergyInJ??0)-this.initialEnergy
+    this.ledger.massResidualKg=this.totalMass()+this.ledger.boundaryMassOutKg-(this.ledger.externalSolidMassInKg??0)-this.initialMass
     const totals=this.speciesTotals();this.ledger.speciesResidualMol=totals.map((v,s)=>v+this.boundarySpecies[s]-this.sources[s]-this.initialSpecies[s])
   }
-  frame():CoupledFrame{return{timeS:this.time,temperatureK:Float32Array.from(this.temperature),pressurePa:Float32Array.from(this.pressure),oxygen:Float32Array.from(this.gas[0],(v,i)=>v/this.totalGas(i)),co2:Float32Array.from(this.gas[1],(v,i)=>v/this.totalGas(i)),iceKg:Float32Array.from(this.ice),liquidKg:Float32Array.from(this.liquid),fuelKg:Float32Array.from(this.fuel),porosity:Float32Array.from(this.pore,v=>v/this.volume),damage:new Float32Array(this.n),displacementM:new Float32Array((this.scenario.domain.nx+1)*(this.scenario.domain.ny+1)*(this.scenario.domain.nz+1)*3),dryIceKg:this.dryIce,dryIceTemperatureK:this.dryIceT,ledger:structuredClone(this.ledger)}}
+  frame():CoupledFrame{return{materialPeatFraction:Float32Array.from(this.peat),initialization:{method:this.initializationMethod,preparedWaterRemovedKg:this.preparedWaterRemovedKg,atlasCells:this.atlasCells},timeS:this.time,temperatureK:Float32Array.from(this.temperature),pressurePa:Float32Array.from(this.pressure),oxygen:Float32Array.from(this.gas[0],(v,i)=>v/this.totalGas(i)),co2:Float32Array.from(this.gas[1],(v,i)=>v/this.totalGas(i)),iceKg:Float32Array.from(this.ice),liquidKg:Float32Array.from(this.liquid),fuelKg:Float32Array.from(this.fuel),porosity:Float32Array.from(this.pore,v=>v/this.volume),damage:new Float32Array(this.n),displacementM:new Float32Array((this.scenario.domain.nx+1)*(this.scenario.domain.ny+1)*(this.scenario.domain.nz+1)*3),dryIceKg:this.dryIce,dryIceTemperatureK:this.dryIceT,ledger:structuredClone(this.ledger)}}
 }

@@ -1,0 +1,54 @@
+{
+  "source_repository": "https://github.com/KadenCSmith/dry-ice-peat-study",
+  "source_commit": "596bf84a32ed92d7dcddd7ba15001cb2fe258b0c",
+  "source": "integrations/blender-study/Dry_Ice_Peat_Study.blend",
+  "source_sha256": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+  "asset": "public/models/dry-ice-reference-animation.glb",
+  "asset_sha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+  "bytes": 10345524,
+  "objects": 54,
+  "source_objects": 1215,
+  "static_material_groups": 17,
+  "animation_duration_s": 9.9,
+  "coordinate_mapping": "Blender (x,y,z) -> glTF (x,z,-y); meters; Y-up",
+  "fps": 30,
+  "first_frame": 1,
+  "last_frame": 300,
+  "source_duration_s": 9.966666666666667,
+  "recommended_camera": [
+    8,
+    6,
+    10
+  ],
+  "recommended_target": [
+    0,
+    -0.3,
+    0
+  ],
+  "blender_bounds_at_frame_66": [
+    [
+      -4.0,
+      4.0
+    ],
+    [
+      -1.4034271240234375,
+      4.0
+    ],
+    [
+      -3.200000047683716,
+      3.2780587673187256
+    ]
+  ],
+  "source_sphere": {
+    "diameter_m": 0.5,
+    "rest_position_blender_m": [
+      -1.4,
+      0,
+      -2.19
+    ],
+    "mass_kg_at_density_1560": 102.10176124166827
+  },
+  "scope": "Conceptual prescribed animation, not accepted solver output. Timeline phase may be compared, never equated to solver seconds. Source placement/mass and peat geometry differ from coupled model.",
+  "conversion": "Surface PBR colors simplify procedural shading. CO2 volumes become transparent geometric visibility proxies. Shader-only density/combustion changes, flames, smoke and pressure graphics are not exported. Object transforms sampled every 3 frames.",
+  "license": "Original authored-geometry licensing unchanged; no project license selected."
+}

@@ -1,14 +1,24 @@
-# Zombie Fire Suppression Sim
+# Zombie Fire Unified Physics Lab
 
-**A coupled research simulator with preserved demonstration and benchmark workspaces.**
+An integrated Mac research app combining the coupled simulator with the editable dry-ice Blender study. It opens on a complete fire-first sequence: surface ignition, underground peat illustration, an excavator drilling, dry ice, a buried inverted metal plate, gas displacement cues and water along assumed fractures. The natural cutaway has grass and irregular seeded aggregates, with separate accepted numerical fields and two full Blender films.
 
-Version 0.11 opens in **Coupled continuum**: a canonical 3D gas, heat, water-phase and initialized soil-mechanics calculation. Finite dry ice, oxygen-limited oxidation, conservative pressure work, embedded root bars and a reduced cap shell/contact model share the same evolving state. Compute in a worker, compare the same scenario with rigid pores, inspect fields, replay stored results and export the calculation. Physical edits invalidate prior results; camera and replay controls do not change the solution.
+**Physics first, with explicit limits.** The new 2,560 and 20,480 cell options are exactly 10× the former preview and research sizes. A shared material atlas conserves initial inventories across meshes. The finite CO₂ source now couples heat transfer, sensible energy and concentration-dependent mass transfer. The original float64 mechanics reference remains available alongside a measured sparse optimization. More elements do not establish experimental accuracy.
 
-**Numerically verified within stated bounds; experimentally unvalidated.** The optional spatial-fracture model fails its current mesh-energy and coupled-energy acceptance gates. Those failures are reported and rejected, not hidden. No completed terrain rupture or field-suppression claim is made. [Equations and parameter evidence](docs/COUPLED_MODEL.md) · [Measured validation, speed, memory and exact gaps](docs/COUPLED_VALIDATION.md) · [Resumable implementation record](docs/COUPLED_IMPLEMENTATION.md).
+- [Start here](docs/UNIFIED_QUICKSTART.md)
+- [Full fire sequence and both source modes](docs/FIRE_SEQUENCE.md)
+- [Separate contact-cooling model and conservation scope](docs/CONTACT_COOLING.md)
+- [Cold-start fire experiment and exact limitations](docs/FIRE_PROTOCOL.md)
+- [Implementation and assumptions](docs/UNIFIED_IMPLEMENTATION.md)
+- [Measured optimization](docs/review/unified/optimization.md)
+- [Blender assets, import and provenance](docs/UNIFIED_BLENDER.md)
+- [Evidence register](docs/UNIFIED_EVIDENCE_REGISTER.json) and [bibliography](docs/UNIFIED_BIBLIOGRAPHY.md)
+- [Validation status](docs/VALIDATION_STATUS.md)
+- [Physics comparison workbook](docs/physics-comparison.xlsx) and [scope note](docs/PHYSICS_COMPARISON.md)
+- [Parallel read-only LLM workpacks](docs/llm-workpacks/README.md)
 
-The Physics model selector retains the fast scene demonstration, original porous gas/heat model and mechanics/tensile benchmarks. Earlier scenes remain available in the demonstration's version menu. The oak anatomy and borehole in the coupled view are explicitly illustrative context. [Scene studio guide](docs/SCENE_STUDIO.md).
+The original Blender animation remains an explicitly staged comparison. Natural aggregate detail and oak anatomy are presentation geometry; visible solver deformation is driven by accepted nodal states. CO₂ is invisible, and no visible mist is presented as calculated gas.
 
-Private repository: [KadenCSmith/zombie-fire-suppression-sim](https://github.com/KadenCSmith/zombie-fire-suppression-sim).
+No matched experimental validation, mobile liquid-water infiltration, resolved excavation or accepted terrain rupture is claimed. Fracture remains a gated research capability. The app reports uncertainty as unassessed rather than inventing an accuracy percentage. Old workspaces, releases and upstream Blender sources are retained.
 
 ## Model selection and mechanics comparison — 0.10
 
@@ -40,17 +50,21 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-[**Download version 0.11.0**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) — choose **macOS universal DMG** for either Apple Silicon or Intel, or a Windows/Linux archive for your processor. GitHub access is required because this repository is private. The app works offline after downloading.
+[**Download the 0.16.0 hose and contact-cooling release**](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) — choose the **macOS arm64 DMG** or ZIP for Apple Silicon. This unified release is not a universal Mac build. GitHub access is required while the repository is private; the packaged app works offline.
 
-[Installation and terminal commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md)
+The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 
-On this Mac, open the new coupled release directly (the earlier 0.10 app is preserved separately):
+Open the versioned fire-sequence installation:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --coupled
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.16.app" --args --sequence
 ```
 
-Mac requires macOS 13+. The app is locally signed, not Apple notarized; Windows and Linux packages are portable archives. See the installation guide for first launch and whole-bundle replacement instructions.
+From this checkout, `npm run mac -- --coupled` finds the installed minor version matching `package.json`. It checks the bundle version and preserves older installations. Mac requires macOS 13 or later; the app is ad-hoc signed and not Apple notarized.
+
+The startup screen offers a 90-second interactive story, two 36-second Blender films, and a separate cold-start fire experiment. The 24-hour baseline retains initial moisture and sustains surface oxidation but does not resolve an underground combustion front. Drilling, dome bending, fracture and wetting paths remain illustrative. A separate finite contact calorimeter supplies local cooling and natural-scene source mass; its ledgers are not added to the accepted field experiment. In the physics lab, start with the cold source-only case and 2,560 cells. Calculate, then switch between Natural cutaway, Scientific fields and synchronized Compare views. Terrain changes require a new calculation; presentation controls preserve accepted states. The historical Blender comparison retains its distinct mass, geometry and normalized timing. [Current controls and model limits](docs/UNIFIED_QUICKSTART.md).
+
+[Earlier 0.11.0 platform downloads](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) remain available for Intel Mac, Windows and Linux. They contain the earlier application, not the unified 0.12 features. New platform support is determined by the assets and validation records of each release.
 
 Version 0.5 improves surface/contact thermal stability, consistent reaction yields and current-mass transfer from the flow mesh to mechanics. It retains historical reaction yields for older imported files. The model remains experimentally unvalidated. [Equations and limitations](docs/PHYSICS_MODEL.md).
 
@@ -64,11 +78,11 @@ npm test
 npm run dev:mac
 ```
 
-`npm run dev` starts the browser development server. On macOS, `npm run package:all` builds all desktop archives into `work/releases/v0.11.0/`; `npm run package:mac` builds only the universal Mac DMG and ZIP. Dependency versions are pinned in `package.json` and `package-lock.json`.
+`npm run dev` starts the browser development server. On macOS, `MAC_ARCH=arm64 npm run package:mac` builds a versioned Apple Silicon Mac DMG and ZIP. New unified releases target macOS; old platform downloads remain available. Dependency versions are pinned in `package.json` and `package-lock.json`.
 
 ## Example scenarios
 
-All examples use the same 6.096 m square domain and an explicitly assumed property set. They are demonstration inputs, not measured field cases or tuned proof of suppression.
+These preserved porous gas/heat examples use the same 6.096 m square domain and an explicitly assumed property set. They are demonstration inputs, not measured field cases or tuned proof of suppression.
 
 | Scenario | Change from the heated-source demonstration |
 | --- | --- |
@@ -82,11 +96,13 @@ For a meaningful A/B comparison, keep the same initial hot region, random seed, 
 
 The linked JSON files can be selected through **Import**. They carry the schema version, model identity, unit metadata, seed, and input provenance used for repeatable runs.
 
-## Controls
+## Preserved workspace controls
+
+For the current coupled interface, see the [unified quick start](docs/UNIFIED_QUICKSTART.md). The controls below describe retained earlier workspaces.
 
 - **Scene studio:** select one of four views, drag to orbit, scroll to zoom, toggle labels or reset the camera. Play/pause, restart, scrub, select a chapter, set 0.5×/1×/2× speed or loop the 20-second illustration. Changing views preserves its current time. Scrubbing pauses playback; backgrounding the app pauses it. **Open simulation** enters the scientific workspace; its **Scene studio** button returns to the illustration and pauses the scientific run while retaining its current in-memory scenario and history. Studio motion does not modify the solver.
 
-The following controls belong to the **scientific workspace**:
+The following controls belong to the **earlier porous gas/heat workspace**:
 
 - **Setup:** choose a demonstration scenario, then use **Edit part of scenario** to show one group at a time: Dry ice and heater, Soil and peat, Smoldering and pathways, Air and boundaries, or Advanced model. Diameter and density set the initial dry-ice mass; there is no separate mass entry. Scenario edits restart the physical run after a short debounce, while heater on/off is recorded as a live operational event. **Reset settings to defaults** restores the demonstration scenario and interface settings, then starts a fresh physical run.
 - **Scene:** choose 3D orbit, top, X section, or Y section; drag to orbit and scroll to zoom. The 3D orbit shows geometry without a full-height field sheet. Top and X/Y section views show quantitative colored cells; move their slice with the clipping slider, select a field, and choose fixed or adaptive color scaling. Toggle modeled flow arrows and visible roots. Click a colored cell to place the virtual sensor.

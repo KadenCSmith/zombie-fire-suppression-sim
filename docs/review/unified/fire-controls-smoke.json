@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-09-27T10:52:31.029Z",
+  "sourceHashes": {
+    "fireProtocol": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+    "fireProtocolRunner": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+    "model": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+    "source": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+    "thermodynamics": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+    "linear": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+    "remap": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045"
+  },
+  "initializationHashes": {
+    "solver": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+    "scenario": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+    "materials": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb"
+  },
+  "generatorHash": "496f2fe6a2768dc9dbc4c09b6fc2f28a49c86503b7f9c87d5ea03275e020bedb",
+  "provenance": {
+    "mode": "offline",
+    "applicationVersion": "0.14.0"
+  },
+  "config": {
+    "durationS": 3600,
+    "ignitionDurationS": 900,
+    "ignitionPowerW": 500,
+    "moistureDryBasis": 0.1,
+    "maxStepS": 20,
+    "captureEveryS": 1800,
+    "surfaceExchangeVelocityMS": 0.0016
+  },
+  "status": "completed",
+  "stopReason": null,
+  "elapsedS": 13.479477999999999,
+  "treatmentStartS": 3600,
+  "treatmentDurationS": 30,
+  "scope": "Independent shared-driver run with the same numerical inputs as the UI CI experiment. This does not by itself test browser worker messaging or native video playback.",
+  "physicalEndS": 3630,
+  "frames": 20,
+  "finalMetrics": {
+    "maxTemperatureK": 294.0240617663169,
+    "reactedFuelKg": 0,
+    "reactingCellDepthM": 0,
+    "heatedCellDepthM": 0
+  },
+  "maximumCapturedTemperatureK": 296.43828619767646,
+  "ignitionCutoffS": 900,
+  "cutoffCaptureIntroducesNoNumericalChange": true,
+  "comparison": "All 19 formerly captured complete field/ledger states exactly equal the pre-cutoff-capture run; one extra accepted cutoff frame is recorded.",
+  "finalLedger": {
+    "energyResidualJ": -5.245208740234375e-06,
+    "massResidualKg": -1.3096723705530167e-10,
+    "speciesResidualMol": [
+      1.6370904631912708e-11,
+      1.7363888105137448e-13,
+      -2.928572939708829e-10,
+      -7.392372936010361e-09
+    ],
+    "boundaryEnergyOutJ": 1496226.3855665724,
+    "heaterJ": 450000,
+    "pressureWorkJ": -260.8940970766966,
+    "gravityWorkJ": -0.053311107003471414,
+    "reactionJ": 0,
+    "boundaryMassOutKg": 0.5581215463215479,
+    "maxPoreRe": 0.009343085420823665,
+    "maxMach": 1.285766284188418e-05,
+    "pressureResidualMol": 2.714690690124033e-11,
+    "steps": 420,
+    "rejectedSteps": 0,
+    "externalSolidMassInKg": 4,
+    "externalSolidEnergyInJ": -2351484.631604898,
+    "insertionWorkJ": 260.8940970766966
+  },
+  "maximumRecordedMassResidualKg": 1.6007106751203537e-10,
+  "maximumRecordedEnergyResidualJ": 7.62939453125e-06,
+  "within180SecondBudget": true,
+  "allRecordedGatesPass": true,
+  "sourceFinalKg": 3.998210560249329
+}

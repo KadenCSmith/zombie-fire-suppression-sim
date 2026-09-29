@@ -7,14 +7,14 @@ export class CoupledEngine {
   readonly transport:CoupledTransport;readonly mechanics:PoroMechanics|null;readonly referencePressure:Float64Array;readonly cap:CapShell|null;capState:CapState|null=null
   mechanical:MechanicalState|null=null;couplingIterations=0;mechanicalBalanceJ=0;referenceBoundaryWorkJ=0
   constructor(readonly inputs:CoupledInputs,scenario?:Scenario){
-    this.transport=new CoupledTransport(scenario??coupledScenario(inputs));const t=this.transport,d=t.scenario.domain
+    this.transport=new CoupledTransport(scenario??coupledScenario(inputs),!scenario&&inputs.initialization!=='legacy');const t=this.transport,d=t.scenario.domain
     this.referencePressure=t.pressure.slice()
     this.cap=inputs.cap?new CapShell(d.nx,d.ny,d.nz,d.widthM,d.lengthM,t.scenario.source.centerXM,t.scenario.source.centerYM,{...DEFAULT_CAP,radiusM:inputs.capRadiusM,riseM:inputs.capRiseM,thicknessM:inputs.capThicknessM}):null
     if(this.cap)this.capState=this.cap.evaluate(new Float64Array(t.n)).state
     if(this.cap)for(const f of t.faces)if(f.b<0&&f.axis===2){f.capFraction=Math.min(1,this.cap.covered[f.a]/f.area);f.ventRadius=this.cap.parameters.radiusM}
     this.mechanics=inputs.mechanics?new PoroMechanics(d.nx,d.ny,d.nz,d.widthM,d.lengthM,d.depthM,Array.from({length:t.n},(_,i)=>({
-      youngsPa:inputs.youngsPa*(t.peat[i]?1:10),poisson:0.25,densityKgM3:(t.fuel[i]+t.mineral[i]+t.water[i])/t.volume,biot:0.8,fractureEnergyJm2:inputs.fractureEnergyJm2*(t.peat[i]?1:4)
-    })),inputs.lengthScaleM,inputs.roots,this.cap?.preload()):null
+      youngsPa:inputs.youngsPa*(10-9*t.peat[i]),poisson:0.25,densityKgM3:(t.fuel[i]+t.mineral[i]+t.water[i])/t.volume,biot:0.8,fractureEnergyJm2:inputs.fractureEnergyJm2*(4-3*t.peat[i])
+    })),inputs.lengthScaleM,inputs.roots&&(inputs.terrain===undefined||inputs.terrain==='rooted-peat'),this.cap?.preload(),inputs.mechanicalBackend??'reference'):null
   }
   step(requested:number){
     const t=this.transport,m=this.mechanics,before=t.checkpoint(),oldPressure=t.pressure.slice(),oldPore=t.pore.slice()

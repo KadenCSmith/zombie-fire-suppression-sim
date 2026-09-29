@@ -1,6 +1,8 @@
 const { app, BrowserWindow, session, shell } = require('electron');
 const { createServer } = require('node:http');
-const { readFile, stat } = require('node:fs/promises');
+const { stat } = require('node:fs/promises');
+const { createReadStream } = require('node:fs');
+const { parseByteRange } = require('./http-range.cjs');
 const path = require('node:path');
 
 const contentTypes = {
@@ -18,6 +20,8 @@ const contentTypes = {
   '.ico': 'image/x-icon',
   '.wasm': 'application/wasm',
   '.glb': 'model/gltf-binary',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
 };
 
 let server;
@@ -27,6 +31,7 @@ let requestedWorkspace = workspaceFromArguments(process.argv);
 // Keep installed minor releases independent so a preserved version may stay open.
 if (app.isPackaged) app.setPath('userData', path.join(app.getPath('appData'), `Zombie Fire Suppression Sim ${app.getVersion().split('.').slice(0, 2).join('.')}`));
 function workspaceFromArguments(args) {
+  if (args.includes('--sequence')) return 'sequence';
   if (args.includes('--coupled')) return 'coupled';
   if (args.includes('--mechanics')) return 'mechanics';
   if (args.includes('--simulation')) return 'simulation';
@@ -35,8 +40,8 @@ function workspaceFromArguments(args) {
 }
 function sendWorkspaceRequest() {
   if (!requestedWorkspace || !mainWindow || mainWindow.isDestroyed()) return;
-  // Only these four fixed values can reach the renderer, never arbitrary CLI text.
-  const target = requestedWorkspace === 'coupled' ? 'coupled' : requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
+  // Only these five fixed values can reach the renderer, never arbitrary CLI text.
+  const target = requestedWorkspace === 'sequence' ? 'sequence' : requestedWorkspace === 'coupled' ? 'coupled' : requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
   mainWindow.webContents.executeJavaScript(`window.dispatchEvent(new CustomEvent('workspace-request', {detail: '${target}'}))`).catch(console.error);
 }
 
@@ -63,17 +68,31 @@ function serveBuiltApp(distDir) {
     }
 
     try {
-      if (!(await stat(filePath)).isFile()) throw new Error('Not a file');
+      const info = await stat(filePath);
+      if (!info.isFile()) throw new Error('Not a file');
       const headers = {
         'Content-Type': contentTypes[path.extname(filePath).toLowerCase()] || 'application/octet-stream',
         'Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
+        'Accept-Ranges': 'bytes',
+        'Content-Length': info.size,
         'Content-Security-Policy': "default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob:; worker-src 'self' blob:",
       };
+      let range;
+      try { range = parseByteRange(request.headers.range, info.size); }
+      catch { response.writeHead(416, {'Content-Range': `bytes */${info.size}`}).end(); return; }
+      if (range) {
+        headers['Content-Range'] = `bytes ${range.start}-${range.end}/${info.size}`;
+        headers['Content-Length'] = range.length;
+      }
+      response.writeHead(range ? 206 : 200, headers);
       if (request.method === 'HEAD') {
-        response.writeHead(200, headers).end();
+        response.end();
       } else {
-        response.writeHead(200, headers).end(await readFile(filePath));
+        const stream = createReadStream(filePath, range ? {start: range.start, end: range.end} : {});
+        stream.on('error', () => response.destroy());
+        response.on('close', () => stream.destroy());
+        stream.pipe(response);
       }
     } catch {
       response.writeHead(404).end();
@@ -97,8 +116,9 @@ async function createWindow() {
 
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   session.defaultSession.setPermissionCheckHandler(() => false);
+  const windowTitle = `Zombie Fire Suppression Sim ${app.getVersion()}`;
   mainWindow = new BrowserWindow({
-    title: 'Zombie Fire Suppression Sim',
+    title: windowTitle,
     width: 1600,
     height: 1000,
     minWidth: 1180,
@@ -111,6 +131,10 @@ async function createWindow() {
       sandbox: true,
       webSecurity: true,
     },
+  });
+  mainWindow.on('page-title-updated', event => {
+    event.preventDefault();
+    mainWindow.setTitle(windowTitle);
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

@@ -1,0 +1,27 @@
+{
+  "repository": "https://github.com/KadenCSmith/dry-ice-peat-study",
+  "commit": "596bf84a32ed92d7dcddd7ba15001cb2fe258b0c",
+  "license": "No original-code or authored-geometry license was selected upstream; unchanged. Bundled asset source credits are CC0 Poly Haven.",
+  "source_blend_sha256": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+  "preserved_files": {
+    "Dry_Ice_Peat_Study.blend": "0fbed01f1f3120dd700c5f6e569eb448851634182581d07a33aabbc1fd729edd",
+    "ORIGINAL_IMPLEMENTATION_NOTES.md": "2232b9d8c23c1b31a1a9e69d33d0d7c83a0738c768abd4e95e8aa0b5c3602733",
+    "ORIGINAL_README.md": "d22941c27905aa06f94246a57763766118e50367446e0570392266ec73d09fa0",
+    "ORIGINAL_SHA256SUMS.txt": "82ee09d8eae490e024c9a61914ec8ff037604335525aa38822a96961e1b1a7c4",
+    "texture-sources.json": "178b0035a01beb1cffe736581cae5b391694ce467494817803552d2d797a0fbd",
+    "original-source/03_gas_and_pulse.py": "37514193ca1ac5ace30d09e666ccf7973cafd628ad51275124041394b4adcb4b",
+    "original-source/07_final_refinement.py": "70cea7a130a6bf40843adabedc990c1089fad2fc241bca227188cd08a073fbf2",
+    "original-source/02_peat_and_sphere.py": "525a8b5acc9288cb6bc5b427fe621a2c496271743e883b6e73ddd3b64460be8d",
+    "original-source/01_terrain.py": "e4d1989fd02847c8807bb2c987f7a645ea10fe43ea016d8a83b423241f8e5ea7",
+    "original-source/08_pack_texture_assets.py": "946b112336b3d3d3904fba66720aeeb593a1ee5d3903323a6fa31f5754ef559b",
+    "original-source/05_realism_refinement.py": "fbf95cd3223a385a122126fb15b0722f641da617688da2ac6e44c5072b3fe67c",
+    "original-source/06_buried_peat_tree.py": "42803d0ed02ce104c708b7cf8fd55ae4731745f8aadcbf89fdf559ad9be206d1",
+    "original-source/04_render_review.py": "a34c9c70d0199d51413d626691ebaefcad8b0222487a805137ac3ebac661d9bc",
+    "original-source/validate_and_package.py": "910949cf0178bea20bb79db77d05d19c86c53e1d8d5218a39ec8b3fe839b5d81"
+  },
+  "omissions": [
+    "Original review renders predate the final scene and remain available in upstream commit.",
+    "Optional textures not used by original scene; same CC0 assets already embedded in main app GLB."
+  ],
+  "scope": "Authored animation. No dynamics, gas, thermal or suppression prediction is solved by this scene."
+}

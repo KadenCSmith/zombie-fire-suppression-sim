@@ -1,97 +1,115 @@
-# Download and open Zombie Fire Suppression Sim 0.11.0
+# Install Zombie Fire Unified Physics Lab
 
-## Version 0.11 coupled continuum
+The unified releases target **Apple Silicon Macs running macOS 13 or later**.
+Version **0.16.0** adds a woven fire hose, local cooling from a separate finite contact model, progressive assumed wetting and a larger folded/deployed dome, with both complete Blender films. Earlier 0.15 installations and assets remain preserved. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
+accuracy-workflow successor: it retains the same physics and acceptance gates,
+with a verified sparse mechanics backend. No version claims experimental
+accuracy or validated field suppression.
 
-The app now opens the coupled continuum by default. Use **Calculate coupled scenario** for the default 120 s run, inspect fields/probes, and replay accepted frames. Select an earlier model from Physics model. `--coupled`, `--simulation`, `--mechanics`, and `--studio` select workspaces. Windows/Linux archives include matching launchers.
+[Fire-sequence release 0.16.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
-On this Mac, version 0.11 is installed as `~/Applications/Zombie Fire Suppression Sim 0.11.app`; the existing `~/Applications/Zombie Fire Suppression Sim.app` remains version 0.10 and is preserved. Launch the new bundle directly. Packaged minor versions use separate application-data directories so preserved versions may remain open.
+Download assets only from a published release. GitHub access is required while
+the repository is private. The packaged app runs offline without Node.js,
+Python, Blender, or an API key. Blender is needed only to create or edit the
+optional Blender derivatives. There is no automatic updater.
 
-For reproducible source: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`. `node scripts/validate-coupled.mjs`, `node scripts/validate-coupled-sensitivity.mjs` and `node scripts/validate-spatial-fracture.mjs` reproduce physics studies. `node scripts/compare-coupled-optimization.mjs` compares the committed reference. Native kernel experiment: `clang++ -O3 -ffp-contract=off src/coupled/kernels/benchmark.cpp -o work/coupled-validation/brick-native`, then `node scripts/benchmark-native.mjs` (create that work folder first). Packaging: `npm run package:all` on macOS. No CUDA dependency.
+## Choose the matching download
 
-See `COUPLED_MODEL.md` and `COUPLED_VALIDATION.md` for supported physics and failed/unresolved validation gates. Cap behavior is a shallow-shell/contact approximation. Diffuse fracture is experimental and can fail the explicit energy gate; the default coupled model keeps fracture disabled. No experimentally validated field-suppression prediction is claimed.
-
-[Download release 0.11.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
-
-This repository is private. Sign into a GitHub account with access before downloading. The application runs locally without Node.js, Python, Blender, an API key, or an internet connection after download. No automatic updater is included; download a newer release to update.
-
-## Choose your download
-
-| Computer | File | Install |
+| Release | Apple Silicon disk image | Alternative archive |
 | --- | --- | --- |
-| Mac, Apple Silicon **or** Intel | `Zombie-Fire-Sim-0.11.0-macOS-universal.dmg` | Open the disk image and drag the app to Applications. |
-| Mac, alternative archive | `Zombie-Fire-Sim-0.11.0-macOS-universal.zip` | Extract and move the whole app into Applications. |
-| Windows, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.11.0-Windows-x64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Windows, ARM64 | `Zombie-Fire-Sim-0.11.0-Windows-arm64.zip` | Extract the whole folder, then open the application `.exe`. |
-| Linux, Intel/AMD 64-bit | `Zombie-Fire-Sim-0.11.0-Linux-x64.tar.gz` | Extract, then run `Open coupled continuum.sh`. |
-| Linux, ARM64 | `Zombie-Fire-Sim-0.11.0-Linux-arm64.tar.gz` | Extract, then run the same launch scripts. |
+| 0.16 full fire sequence | `Zombie-Fire-Sim-0.16.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.16.0-macOS-arm64.zip` |
+| 0.12 reference | `Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.12.0-macOS-arm64.zip` |
+| 0.13 accuracy workflow | `Zombie-Fire-Sim-0.13.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.13.0-macOS-arm64.zip` |
 
-Windows and Linux downloads are portable applications, not system installers. Keep all extracted files together. The included runtime is Electron 44.3.0. Mac requires **macOS 13 or later**, and all packages are 64-bit, consistent with [Electron 44 platform support](https://www.electronjs.org/blog/electron-44-0). Windows requires a supported 64-bit Windows installation. Linux requires a graphical desktop, Electron's system libraries, and an available Chromium sandbox (for example a distribution permitting unprivileged user namespaces). Linux distribution compatibility and Windows/Intel/ARM native execution are not certified merely by creating an archive. See [verification status](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/VALIDATION_STATUS.md) for actual tested scope.
+Open the DMG and drag the complete application to Applications, or extract the
+ZIP and move the whole `.app`. These new packages are **arm64**, not universal
+Mac builds. Earlier Intel Mac, Windows and Linux packages remain in the
+[0.11.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0).
+They contain the earlier application and do not include the unified 0.12–0.16
+features. Availability of an archive does not establish native testing on that
+platform; consult [validation status](VALIDATION_STATUS.md).
 
-## Open on this Mac
+The app is ad-hoc signed and integrity checked, but not Apple notarized. If
+macOS blocks a downloaded copy and you choose to trust it, use
+[Apple's Open Anyway instructions](https://support.apple.com/102445). No
+system-wide security settings need changing.
 
-The working installation is in `~/Applications`. Copy either command into Terminal:
+## Preserve and launch versioned installations
 
-**Coupled continuum**
+Keep the earlier applications when comparing results. The local convention is
+`~/Applications/Zombie Fire Suppression Sim 0.12.app` and
+`~/Applications/Zombie Fire Suppression Sim 0.16.app`; their minor versions use
+separate application-data directories. The DMG itself contains the generic
+application name. Rename a copied bundle to the versioned name before placing
+it beside an existing generic bundle.
 
-```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --coupled
-```
-
-**Preserved porous gas/heat simulation**
-
-```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --simulation
-```
-
-**Mechanics comparison**
-
-```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --mechanics
-```
-
-**Animated scene studio**
+Open the reference release:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.11.app" --args --studio
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.12.app" --args --coupled
 ```
 
-If installed by dragging from the DMG into the system Applications folder, use `/Applications/Zombie Fire Suppression Sim.app` instead. Opening the icon starts Coupled continuum. The **Physics model** selector switches among coupled continuum, demonstration, porous gas/heat and the soil-deformation benchmark. Reopening with these commands switches the existing app and pauses numerical playback without discarding the current run. The `-n` flag delivers the requested workspace to the existing single-instance application; it does not create a second solver window.
-
-### First launch and updates
-
-The Mac application is ad-hoc signed and integrity checked, but **not Apple notarized**. A downloaded copy may be blocked by Gatekeeper. If you trust this release and choose to open it, follow [Apple's instructions](https://support.apple.com/102445) for **System Settings → Privacy & Security → Open Anyway** after attempting to open the app. No system-wide security settings need changing. Windows downloads are unsigned and may show an unknown-publisher notice.
-
-Before updating, export any scenario/checkpoint you want to keep and quit the app. Replace the entire old application or extracted folder; do not merge its contents. Keep a copy of the old version if you need to reproduce an earlier run. Release 0.5 preserves historical reaction yields in imported scenarios that lack `numericalRevision: 2`.
-
-## Windows and Linux commands
-
-From the extracted Windows folder in PowerShell:
-
-```powershell
-& '.\Zombie Fire Suppression Sim.exe' --coupled
-& '.\Zombie Fire Suppression Sim.exe' --simulation
-& '.\Zombie Fire Suppression Sim.exe' --studio
-& '.\Zombie Fire Suppression Sim.exe' --mechanics
-```
-
-From the extracted Linux folder:
+Open the current fire-sequence release after installing it:
 
 ```sh
-./'Open coupled continuum.sh'
-./'Open simulation.sh'
-./'Open scene studio.sh'
-./'Open mechanics.sh'
+open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.16.app" --args --sequence
 ```
 
-## Verify a download
+For an unrenamed app in system Applications, use
+`/Applications/Zombie Fire Suppression Sim.app`. Other workspace flags are
+`--simulation` (earlier porous gas/heat model), `--mechanics` (mechanics
+benchmarks) and `--studio` (authored scene studio). Opening the 0.16 icon enters the
+complete fire sequence (`--sequence`); `--coupled` opens the lab, and **Physics model** switches workspaces. Export results before
+quitting or replacing a bundle. Replace complete applications, never merge
+bundle contents.
 
-Download `SHA256SUMS.txt` beside the files. On Mac, from that folder, run:
+From a source checkout, `npm run mac -- --coupled` reads the minor version from
+`package.json`, finds the matching versioned or generic installed bundle, and
+checks its actual bundle version. It will not silently open a preserved older
+version. This command does not build or install the app.
+
+## Start the complete sequence
+
+Play or scrub the 90-second interactive story, choose Gradual or Rapid, and use Rendered film for the complete 36-second films. Temperature/Oxygen/CO₂ switch to accepted numerical fields. Fire experiment recalculates a cold, wet assumed peat specimen; the bundled baseline resolves sustained surface oxidation, not a verified underground front. Drilling, dome deformation, fractures and mobile water remain illustrated. See the [sequence guide](FIRE_SEQUENCE.md).
+
+## Start a laboratory calculation
+
+1. Begin with the cold source-only case and **2,560 cells**. Click **Calculate**
+   and wait for accepted states. The 20,480-cell option solves ten times the old
+   research cell count and takes longer; higher count alone is not validation.
+2. Use **Natural cutaway**, **Scientific fields**, or **Compare views**. Natural
+   layers, detailed oak and seeded aggregate appearance provide visual context;
+   accepted nodal displacement supplies calculated terrain motion. Scientific
+   fields retain physical units and cell values.
+3. In comparison, select the scientific view or historical Blender reference.
+   Cameras are synchronized. The Blender reference has different mass, geometry
+   and normalized timing, so it is explicitly labeled a concept animation.
+4. Scrub accepted checkpoints, adjust replay speed or inspect a cell. Camera,
+   field and presentation changes do not rerun the solver. Physical input and
+   terrain changes require recalculation; the previous result can be restored.
+5. **Export calculation** saves version-2 JSON with exact grid/source metadata,
+   states, ledgers and initialization diagnostics. The
+   [Blender guide](UNIFIED_BLENDER.md) describes the accepted-checkpoint importer.
+
+Prepared smoldering is an opt-in assumed dry specimen with a documented initial
+moisture removal, not a reconstructed natural fire. Fracture remains a gated
+research model. Mobile water infiltration, resolved excavation, calibrated root
+pullout and accepted terrain rupture remain incomplete. Read the
+[quick start](UNIFIED_QUICKSTART.md), [implementation record](UNIFIED_IMPLEMENTATION.md)
+and [validation status](VALIDATION_STATUS.md) before interpreting a result.
+
+## Verify the download
+
+Download the release's `SHA256SUMS.txt`. For the reference DMG:
 
 ```sh
-shasum -a 256 Zombie-Fire-Sim-0.11.0-macOS-universal.dmg
+shasum -a 256 Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg
 ```
 
-Compare the displayed hash with the matching entry in `SHA256SUMS.txt`. Linux uses `sha256sum`; Windows PowerShell uses `Get-FileHash -Algorithm SHA256`. `release-manifest.json` records the source commit, Electron version, file sizes, architectures and hashes.
+Compare the result with the matching checksum. Use the matching version filename and its own
+checksum file for that release. `release-manifest.json` records source commit,
+architecture, Electron version, file sizes and hashes. Keep these records with
+exported results when comparing versions.
 
 ## Build from source
 
@@ -103,23 +121,22 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
+npm run dev:mac
 ```
 
-On a Mac:
+To package the current source version for Apple Silicon:
 
 ```sh
-npm run dev:mac       # Live development window
-npm run mac -- --simulation  # Installed application
-npm run package:mac  # Universal Mac DMG and ZIP
-npm run package:all  # Mac + Windows + Linux, x64 and ARM64
+MAC_ARCH=arm64 npm run package:mac
 ```
 
-Release packaging runs on macOS and uses the official Electron binaries for each target. Files are written under `work/releases/v0.11.0/`, excluded from Git. A supplied `ELECTRON_ZIP_DIR` must contain official Electron archives and their `SHASUMS256.txt`; cached inputs are checked against that manifest before use. Otherwise Packager downloads the pinned Electron release. No native Windows/Linux execution is implied by cross-packaging on a Mac.
+Outputs go to `work/releases/v<package-version>/`, outside tracked source.
+The cross-platform packaging scripts remain available for development; their
+presence does not mean equivalent new Windows, Linux or Intel packages have
+been built or tested. Use actual release manifests for supported artifacts.
 
-## Model scope
-
-The scene studio is an illustration. The scientific workspace contains reduced, unvalidated heat/gas/reaction and mechanics models. Twelve study-derived material profiles distinguish measurements, estimates and assumptions; the Developer tab exposes the adjustable physical constraints. The [material evidence document with ASCE citations](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/MATERIAL_EVIDENCE_ASCE.md) and [physics model](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/PHYSICS_MODEL.md) describe their scope. No release certifies field suppression, fracture, blast, or safe treatment design.
-
-The new mechanics fixture compares identical load/unload stages under explicit linear elasticity and frictional plasticity. It shows incremental stress only, is uncoupled from gas/fire, and is not a peat material calibration. [Workbench scope and controls](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/MODEL_WORKBENCH.md). Preserve a copy of the previous application before replacing it.
-
-The mechanics workspace also contains **Peat tensile fracture lab**: a calculated force/opening and energy response for a prescribed specimen plane, with documented Krimpen strength ranges and CSV measurements comparison. Fracture energy and stiffness are assumptions pending matched measurements. [Tensile model and evidence](https://github.com/KadenCSmith/zombie-fire-suppression-sim/blob/main/docs/PEAT_TENSILE_FAILURE.md).
+The original element-by-element float64 mechanics implementation remains the
+0.12 reference. The 0.13 optimized sparse backend uses the same inputs and
+acceptance criteria; its numerical agreement and measured timings are recorded
+in [the optimization report](review/unified/optimization.md). Fracture keeps its
+original research path. Both new precision meshes use 0.125 s maximum steps in 0.13. The additional steps reduce observed short-case temporal differences but can increase total runtime; matched backend speedups must not be confused with a release-to-release speedup. See the accuracy-release performance and convergence reports. No CUDA dependency is required.
