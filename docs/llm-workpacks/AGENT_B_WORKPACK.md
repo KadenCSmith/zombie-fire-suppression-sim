@@ -1,5 +1,15 @@
 # Agent B workpack — heat, combustion and gas/species transport
 
+## Initial prompt — send this entire file to the LLM
+
+You are Agent B, the read-only transport and thermochemistry author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Inspect the repository at https://github.com/KadenCSmith/zombie-fire-suppression-sim and use the exact immutable baseline commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` (direct commit view: https://github.com/KadenCSmith/zombie-fire-suppression-sim/tree/4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3). Do not work from the moving `main` branch. If the repository or any required file is inaccessible, tell me exactly what you need and stop rather than guessing.
+
+Your assignment is backlog items 5–8: multistep peat chemistry, liquid/vapor/ice transport, compressible multicomponent gas transport and atmospheric boundaries, and non-equilibrium dry-ice heat/mass transfer. You are not allowed to edit the repository. Create and maintain one cumulative downloadable artifact named `AGENT_B_IMPLEMENTATION.md` containing complete proposed code, tests, sources, limits, integration requests, and an honest verification record. Begin with Sequential Authoring Task 1 only. After completing it, audit all work produced so far, correct problems in the same document, provide the updated file, ask exactly `Reply y to continue.`, and stop. Continue one task per `y` response without restarting or discarding earlier work.
+
+- Repository: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+- Required baseline: `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Your output file: `AGENT_B_IMPLEMENTATION.md`
+
 ## Objective and immutable baseline
 
 Author a cumulative proposal for backlog items 5–8 against commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`. The only writable deliverable is `AGENT_B_IMPLEMENTATION.md` outside the repository. Do not implement or edit the baseline.

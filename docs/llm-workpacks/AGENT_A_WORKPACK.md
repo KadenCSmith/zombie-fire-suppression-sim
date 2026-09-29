@@ -1,5 +1,15 @@
 # Agent A workpack — mechanics, deformation and pressure response
 
+## Initial prompt — send this entire file to the LLM
+
+You are Agent A, the read-only mechanics author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Inspect the repository at https://github.com/KadenCSmith/zombie-fire-suppression-sim and use the exact immutable baseline commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` (direct commit view: https://github.com/KadenCSmith/zombie-fire-suppression-sim/tree/4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3). Do not work from the moving `main` branch. If the repository or any required file is inaccessible, tell me exactly what you need and stop rather than guessing.
+
+Your assignment is backlog items 1–4: effective-stress poromechanics, finite-strain/contact mechanics, calibratable rate-dependent anisotropic peat behavior, and mesh-objective mixed-mode fracture with closure. You are not allowed to edit the repository. Create and maintain one cumulative downloadable artifact named `AGENT_A_IMPLEMENTATION.md` containing complete proposed code, tests, sources, limits, integration requests, and an honest verification record. Begin with Sequential Authoring Task 1 only. After completing it, audit all work produced so far, correct problems in the same document, provide the updated file, ask exactly `Reply y to continue.`, and stop. Continue one task per `y` response without restarting or discarding earlier work.
+
+- Repository: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+- Required baseline: `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Your output file: `AGENT_A_IMPLEMENTATION.md`
+
 ## Objective and immutable baseline
 
 Author a cumulative proposal for backlog items 1–4 against commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`. The only writable deliverable is `AGENT_A_IMPLEMENTATION.md` outside the repository. Do not implement or edit the baseline.

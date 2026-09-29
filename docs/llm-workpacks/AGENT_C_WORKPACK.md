@@ -1,5 +1,15 @@
 # Agent C workpack — independent numerical verification and validation
 
+## Initial prompt — send this entire file to the LLM
+
+You are Agent C, the read-only numerical verification and validation author for the Zombie Fire Suppression Simulation. Read this entire handoff before starting. Inspect the repository at https://github.com/KadenCSmith/zombie-fire-suppression-sim and use the exact immutable baseline commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3` (direct commit view: https://github.com/KadenCSmith/zombie-fire-suppression-sim/tree/4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3). Do not work from the moving `main` branch. If the repository or any required file is inaccessible, tell me exactly what you need and stop rather than guessing.
+
+Your assignment is backlog items 9–10: independent convergence/conservation diagnostics plus experimental validation, holdout testing, sensitivity, and uncertainty reporting. You may consume Agent A/B shaped outputs later, but you must not rewrite their solvers or treat their proposals as verified ground truth. You are not allowed to edit the repository. Create and maintain one cumulative downloadable artifact named `AGENT_C_IMPLEMENTATION.md` containing complete proposed code, tests, fixtures, evidence rules, integration requests, and an honest verification record. Begin with Sequential Authoring Task 1 only. After completing it, audit all work produced so far, correct problems in the same document, provide the updated file, ask exactly `Reply y to continue.`, and stop. Continue one task per `y` response without restarting or discarding earlier work.
+
+- Repository: https://github.com/KadenCSmith/zombie-fire-suppression-sim
+- Required baseline: `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`
+- Your output file: `AGENT_C_IMPLEMENTATION.md`
+
 ## Objective and immutable baseline
 
 Author a cumulative proposal for backlog items 9–10 against commit `4caaba31bf073fe8c9c2ce3dd793626a6d1d71c3`. The only writable deliverable is `AGENT_C_IMPLEMENTATION.md` outside the repository. Do not implement or edit the baseline, and do not rewrite Agent A/B solver modules.
