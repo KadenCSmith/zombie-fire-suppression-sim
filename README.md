@@ -13,6 +13,8 @@ An integrated Mac research app combining the coupled simulator with the editable
 - [Blender assets, import and provenance](docs/UNIFIED_BLENDER.md)
 - [Evidence register](docs/UNIFIED_EVIDENCE_REGISTER.json) and [bibliography](docs/UNIFIED_BIBLIOGRAPHY.md)
 - [Validation status](docs/VALIDATION_STATUS.md)
+- [Physics comparison workbook](docs/physics-comparison.xlsx) and [scope note](docs/PHYSICS_COMPARISON.md)
+- [Parallel read-only LLM workpacks](docs/llm-workpacks/README.md)
 
 The original Blender animation remains an explicitly staged comparison. Natural aggregate detail and oak anatomy are presentation geometry; visible solver deformation is driven by accepted nodal states. CO₂ is invisible, and no visible mist is presented as calculated gas.
 
