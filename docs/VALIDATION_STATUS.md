@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Physical-state persistence package (2026-09-29)
+
+Agent H's 165 targeted tests and the 937-test repository suite passed with typecheck, lint and build. These verify the standalone serialization contract against the installed D/F/G packages. Live solver restart and installed-app behavior are not established. [Details](PERSISTENCE_PACKAGE_INTEGRATION.md).
+
 ## Independent verification package (2026-09-29)
 
 Agent C's 15 core files passed 99 targeted tests and all 772 repository tests; typecheck, lint and build passed. They are not connected to the active solver and no new experimental validation is claimed. Two shared-contract adapters remain deferred. [Details](VERIFICATION_PACKAGE_INTEGRATION.md).
