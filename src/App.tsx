@@ -200,7 +200,7 @@ function App() {
     const available = availableVersions().map(version => version.id)
     try {
       const saved = JSON.parse(window.localStorage.getItem('zombie-fire-gallery-selection') ?? 'null')
-      if (Array.isArray(saved)) return saved.filter((id): id is string => typeof id === 'string' && available.includes(id as typeof available[number]))
+      if (Array.isArray(saved)) return [...new Set(saved.map(id => id === '0.17.0' ? '0.17.1' : id).filter((id): id is string => typeof id === 'string' && available.includes(id as typeof available[number])))]
     } catch { /* Use every playable animation for a new gallery. */ }
     return available
   })

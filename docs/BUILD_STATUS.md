@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Visible interactive playback — 0.17.1 (2026-09-29)
+
+The main sequence now opens on the interactive 3D scene. A large Play button is visible over the initial frame, and a persistent play/pause button sits above the scene. The earlier rendered-film toggle has been removed from the main sequence. Preserved films remain available in the Simulations gallery, including simultaneous multi-view playback. The package version and current gallery entry are 0.17.1. Typecheck, lint, production build and all 1,706 tests in 85 files passed. Native packaging and installation status are recorded separately below.
+
 ## Single app and multi-view gallery — 0.17 local update (2026-09-29)
 
 Starting from the latest `origin/main`, the current app has one three-dot menu with **Simulations** and **Interface** tabs. Simulations controls the same persistent selection as the multi-view gallery, which arranges selected replays as simultaneous camera tiles under a shared presentation clock. The gallery includes the preserved 0.8 and 0.9 interactive scenes, the exact 2.5-second Blender checkpoint review from 0.12, archived 0.14 and 0.15 films, and the 0.16/0.17 interactive scene. The 0.12 clip contains five held checkpoints, not continuous calculated motion. Versions 0.10, 0.11 and 0.13 are physics releases without a preserved Blender render and remain labeled as such. Interface offers three distinct presentations: dark cinematic, bright editorial, and green scientific console. Switching style or workspace keeps the selection and does not change solver state.

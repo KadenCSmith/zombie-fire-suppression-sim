@@ -3,7 +3,7 @@ import { FRACTURE_STUDY_PHASES, STUDY_DURATION } from './studyModel'
 
 export type SimulationMode = 'animation' | 'physics'
 export type ReplayKind = 'study-scene' | 'film' | 'fire-scene' | 'unavailable'
-export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0' | '0.17.0'
+export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0' | '0.17.1'
 
 export interface SimulationVersion {
   id: SimulationVersionId
@@ -34,7 +34,7 @@ export const SIMULATION_CATALOG: readonly SimulationVersion[] = [
   { id: '0.14.0', commit: 'f97d28ac260164d4812483f9670957ec431dd2fb', title: 'Complete peat-fire films', summary: 'Versioned gradual and rapid complete-sequence rendered films.', mode: 'animation', available: true, replay: 'film', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', assetBase: 'history/v0.14', limitation: 'Exact archived film; it is an authored presentation and carries no live solver clock.' },
   { id: '0.15.0', commit: '223eda6f7a8e29291ebb5844fc2aa3f655f5d1cb', title: 'Verified complete bundle', summary: 'Verified complete films with accepted evidence bundled in the app.', mode: 'animation', available: true, replay: 'film', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', assetBase: 'renders', limitation: 'Exact archived film; it is an authored presentation and carries no live solver clock.' },
   { id: '0.16.0', commit: 'b9588aa', title: 'Contact cooling & deployable dome', summary: 'Finite contact cooling, woven hose, and deployable buried dome.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Preserved interactive scene from v0.16. Final replacement films were not published.' },
-  { id: '0.17.0', commit: 'current', title: 'Unified animation gallery', summary: 'The current app combines preserved replays and three interface styles.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Current interactive scene. The gallery changes presentation, not the physical calculation.' },
+  { id: '0.17.1', commit: 'current', title: 'Unified interactive sequence', summary: 'The current scene has visible playback controls, preserved replays, and three interface styles.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Current interactive scene. The gallery changes presentation, not the physical calculation.' },
 ] as const
 
 export function parseSemver(version: string): [number, number, number] {

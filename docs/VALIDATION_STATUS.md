@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Visible interactive playback (2026-09-29)
+
+The 0.17.1 source puts play/pause controls above the interactive scene and a large initial Play button over it, and removes the older film option from the main sequence. The gallery retains archived films. Typecheck, lint, production build and 1,706 tests in 85 files passed. The in-app browser denied local-preview access, so no visual UI interaction is claimed. This presentation change does not modify the physical calculation or validate suppression performance.
+
 ## One-app gallery and interface controls (2026-09-29)
 
 The 0.17 gallery and two-tab three-dot menu passed TypeScript typecheck, lint, production build, the focused catalog checks, and the complete **1,706-test suite in 85 files**. The bundled 0.12 checkpoint movie is byte-for-byte equal to its preserved Blender source (SHA-256 `e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988`). It contains five 0.5-second held frames; no continuous physical motion is inferred. The 0.8/0.9 and 0.16/0.17 entries are interactive authored scenes, while 0.14/0.15 are exact archived films. Physics-only 0.10/0.11/0.13 have no preserved Blender render in the app.

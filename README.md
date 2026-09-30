@@ -50,7 +50,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-The current local **0.17.0** app is one installation at `~/Applications/Zombie Fire Suppression Sim.app`. Its three-dot menu has **Simulations**, where preserved animations from 0.8 onward can play side by side, and **Interface**, where Refined, Instrument and Technical appearances can be selected. The current [published 0.16.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) remains available for archival reference. The packaged app works offline.
+The **0.17.1** app combines the interactive scene and preserved animations in one package. Its main sequence has a visible play/pause control above the scene and a large play button at the start. The three-dot menu has **Simulations**, where preserved animations from 0.8 onward can play side by side, and **Interface**, where Refined, Instrument and Technical appearances can be selected. Older rendered films are available in the gallery. The current [published 0.16.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) remains available for archival reference. The packaged app works offline.
 
 The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 
