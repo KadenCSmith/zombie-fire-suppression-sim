@@ -1,12 +1,12 @@
 # Install Zombie Fire Unified Physics Lab
 
 The unified releases target **Apple Silicon Macs running macOS 13 or later**.
-The **0.17.1** app is packaged for a single installation at `~/Applications/Zombie Fire Suppression Sim.app`. The three-dot menu opens one gallery for preserved animation sources from 0.8 onward and a second tab with three interface styles. The 0.12 Blender clip is a 2.5-second checkpoint review; it is not continuous motion. Versions 0.10, 0.11 and 0.13 have no preserved Blender movie in the bundle and are listed accordingly. Version **0.16.0** added a woven fire hose, local cooling from a separate finite contact model, progressive assumed wetting and a larger folded/deployed dome, with both complete Blender films. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
+The **0.18.0** app is packaged for a single installation at `~/Applications/Zombie Fire Suppression Sim.app`. **Previous simulations · v0.8+** is visible above the main scene and in the top bar; the three-dot menu has a simulation-selection tab and a second tab with three interface styles. The 0.12 Blender clip is a 2.5-second checkpoint review; it is not continuous motion. Versions 0.10, 0.11 and 0.13 have no preserved Blender movie in the bundle and are listed accordingly. The current scene uses a straight bore and modest pocket; its concave cap flattens with bounded radial growth and local soil lift. The earlier exaggerated dome remains in the gallery. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
 accuracy-workflow successor: it retains the same physics and acceptance gates,
 with a verified sparse mechanics backend. No version claims experimental
 accuracy or validated field suppression.
 
-[Fire-sequence release 0.16.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.16.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
+[Latest published film release 0.15.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.15.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0) · [All releases](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases)
 
 Download assets only from a published release. GitHub access is required while
 the repository is private. The packaged app runs offline without Node.js,
@@ -17,7 +17,7 @@ optional Blender derivatives. There is no automatic updater.
 
 | Release | Apple Silicon disk image | Alternative archive |
 | --- | --- | --- |
-| 0.16 full fire sequence | `Zombie-Fire-Sim-0.16.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.16.0-macOS-arm64.zip` |
+| 0.15 published film release | `Zombie-Fire-Sim-0.15.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.15.0-macOS-arm64.zip` |
 | 0.12 reference | `Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.12.0-macOS-arm64.zip` |
 | 0.13 accuracy workflow | `Zombie-Fire-Sim-0.13.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.13.0-macOS-arm64.zip` |
 
@@ -25,7 +25,7 @@ Open the DMG and drag the complete application to Applications, or extract the
 ZIP and move the whole `.app`. These new packages are **arm64**, not universal
 Mac builds. Earlier Intel Mac, Windows and Linux packages remain in the
 [0.11.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0).
-They contain the earlier application and do not include the unified 0.12–0.16
+They contain the earlier application and do not include the unified 0.12–0.18
 features. Availability of an archive does not establish native testing on that
 platform; consult [validation status](VALIDATION_STATUS.md).
 
@@ -56,7 +56,7 @@ version. This command does not build or install the app.
 
 ## Start the complete sequence
 
-Play or scrub the 90-second interactive story using the visible play button above or over the scene, then choose Gradual or Rapid. Open the Simulations gallery for archived films and simultaneous playback. Temperature/Oxygen/CO₂ switch to accepted numerical fields. Fire experiment recalculates a cold, wet assumed peat specimen; the bundled baseline resolves sustained surface oxidation, not a verified underground front. Drilling, dome deformation, fractures and mobile water remain illustrated. See the [sequence guide](FIRE_SEQUENCE.md).
+Play or scrub the 90-second interactive story using the visible play button above or over the scene, then choose Gradual or Rapid. Open **Previous simulations · v0.8+** for archived scenes, films and simultaneous playback. Temperature/Oxygen/CO₂ switch to accepted numerical fields. Fire experiment recalculates a cold, wet assumed peat specimen; the bundled baseline resolves sustained surface oxidation, not a verified underground front. The bore, cap flattening, local soil lift and water-filled fractures remain illustrated, without a calculated pressure or validated suppression outcome. See the [sequence guide](FIRE_SEQUENCE.md).
 
 ## Start a laboratory calculation
 

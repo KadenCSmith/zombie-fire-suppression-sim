@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, constrainedSoilLiftAt, constrainedWettingProgress, CONSTRAINED_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
 
 describe('story and accepted-state separation', () => {
   const frames = [
@@ -54,6 +54,29 @@ describe('story and accepted-state separation', () => {
     expect(drop.drillVisible).toBe(false)
     expect(drop.sourceVisible).toBe(true)
     expect(drop.drillDepth).toBeCloseTo(1.385)
+  })
+})
+
+describe('constrained current cap and water illustration',()=>{
+  it('starts concave, then flattens with a bounded diameter increase',()=>{
+    const before=constrainedCapShape(54,'rapid'),after=constrainedCapShape(58,'rapid')
+    expect(before.depthM).toBeCloseTo(.22)
+    expect(after.depthM).toBe(0)
+    expect(before.radiusM).toBeCloseTo(.49)
+    expect(after.radiusM).toBeCloseTo(before.meridianLengthM)
+    expect(after.radiusM).toBeGreaterThan(before.radiusM)
+    expect(after.radiusM).toBeLessThan(G.cavityRadiusM*.92)
+    expect(constrainedCapShape(90,'gradual').depthM).toBeCloseTo(.22)
+  })
+  it('lifts only nearby overburden and finishes wetting short branches after the hose enters',()=>{
+    expect(constrainedSoilLiftAt(G.sourceX,0,0,58,'rapid')).toBeCloseTo(.04)
+    expect(constrainedSoilLiftAt(3,0,0,58,'rapid')).toBe(0)
+    expect(constrainedSoilLiftAt(G.sourceX,0,0,58,'gradual')).toBe(0)
+    expect(CONSTRAINED_CRACK_PATHS).toHaveLength(3)
+    for(let i=0;i<CONSTRAINED_CRACK_PATHS.length;i++){
+      expect(constrainedWettingProgress(71,i)).toBe(0)
+      expect(constrainedWettingProgress(90,i)).toBe(1)
+    }
   })
 })
 

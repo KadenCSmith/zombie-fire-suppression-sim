@@ -56,7 +56,7 @@ export function AppChrome({ workspace, layout, onLayout, onWorkspace, selectedVe
   return <header className="app-chrome" data-mode={mode}>
     <div className="app-chrome-mode"><span>{mode === 'animation' ? 'ANIMATION MODE' : 'PHYSICS SIMULATION MODE'}</span><strong>{mode === 'animation' ? 'Authored presentation' : 'Research calculation'}</strong><small>{mode === 'animation' ? 'Solver clocks remain separate or unavailable' : 'Validation status is reported separately'}</small></div>
     <div className="app-chrome-actions" ref={menuRef}>
-      <button className="app-chrome-gallery" type="button" onClick={() => onWorkspace('comparison')}>Watch together <span>{selectedVersions.length}</span></button>
+      <button className="app-chrome-gallery" type="button" onClick={() => onWorkspace('comparison')}>Previous simulations <span>{selectedVersions.length}</span></button>
       <button className="app-chrome-more" type="button" aria-label="More options" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(value => !value)}><MoreHorizontal size={24} /></button>
       {open && <div className="app-options" role="dialog" aria-label="App options">
         <div className="app-options-tabs" role="tablist" aria-label="Options tabs">

@@ -1,5 +1,11 @@
 # Build status and handoff
 
+## Single 0.18.0 app and bounded intervention scene (2026-09-30)
+
+The current interactive sequence is the 0.18.0 gallery entry. A visible **Previous simulations · v0.8+** control opens the multi-view gallery; the three-dot menu retains simulation selection and three interface layouts. The current rapid scene uses a straight access bore and a modest cutter-made pocket. The cutter retracts before the excavator rises. A concave cap opens in the pocket, then flattens during the authored pressure event: its projected radius grows from 0.49 m to the shallow shell's initial meridian length, while soil immediately above it lifts by at most 0.04 m. A hose then reaches three short illustrated fractures; water progresses along them and darkens the reached embers. Earlier dome and film presentations remain selectable as historical replays.
+
+Typecheck, lint (existing warnings only), all **1,709 tests in 85 files**, production build, and whitespace checks passed. Native packaging and installed-bundle verification are recorded after completion. These code and geometry checks are not a visual inspection or scientific validation.
+
 ## Visible interactive playback — 0.17.1 (2026-09-29)
 
 The main sequence now opens on the interactive 3D scene. A large Play button is visible over the initial frame, and a persistent play/pause button sits above the scene. The earlier rendered-film toggle has been removed from the main sequence. Preserved films remain available in the Simulations gallery, including simultaneous multi-view playback. The package version and current gallery entry are 0.17.1. Typecheck, lint, production build and all 1,706 tests in 85 files passed. The arm64 ZIP extracts to exactly one 0.17.1 app and passes strict deep signature verification (SHA-256 `77d45992013ace7b8f0c26b37d7eef65ca5aaf5006d3ce546caecedb4b8bc9bf`). The DMG step failed with `hdiutil: create failed - Device not configured` in this environment. This session cannot replace the installed app under `~/Applications`; its verified version remains 0.17.0. The 0.17.1 ZIP is delivered for replacement of that single installation.

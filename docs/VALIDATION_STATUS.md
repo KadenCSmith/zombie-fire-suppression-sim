@@ -1,5 +1,11 @@
 # Verification and validation status
 
+## Current scene and single-app delivery (2026-09-30)
+
+For version 0.18.0, source checks passed: TypeScript typecheck, lint (existing warnings only), production build and all **1,709 tests in 85 files**. New checks bound the cap's concave-to-flat radius change, confine soil uplift to the overburden, and restrict water arrival to short branches after hose insertion. The cutter and pocket now complete before drill withdrawal. The gallery still includes available replays from 0.8 onward, with 0.10/0.11/0.13 honestly marked unavailable because no preserved movie exists. Native package and installed-app checks are reported after they run.
+
+Cap pressure, metal strain, excavation forces, soil fracture, liquid infiltration and peat-fire extinction are not solved or experimentally validated by these scene tests. The accepted numerical field and separate finite contact model are unchanged. The in-app browser denied access to a local preview, so no visual UI interaction is claimed.
+
 ## Visible interactive playback (2026-09-29)
 
 The 0.17.1 source puts play/pause controls above the interactive scene and a large initial Play button over it, and removes the older film option from the main sequence. The gallery retains archived films. Typecheck, lint, production build and 1,706 tests in 85 files passed. The ZIP extracts to exactly one app, reports version 0.17.1 and passes strict deep signature verification. The DMG build failed because `hdiutil` could not access a disk device, and the installed copy remains 0.17.0 because this session has no write access to `~/Applications`. The in-app browser denied local-preview access, so no visual UI interaction is claimed. This presentation change does not modify the physical calculation or validate suppression performance.

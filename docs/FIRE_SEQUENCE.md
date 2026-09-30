@@ -1,8 +1,14 @@
-# Fire-first workflow, hose and contact cooling — 0.16
+# Fire-first workflow and visual evidence boundaries
 
-The application opens with surface ignition, connected irregular underground peat involvement, a tracked hydraulic excavator drilling and underreaming, dry-ice placement, a folded steel dome opening underground, rapid-only inversion and fracture, and a flexible woven hose feeding progressive local wetting. The dark teal/copper cutaway, fine grass, oak/root context and 70% illustrated treatment gate remain. The 70% threshold is an authored sampled-area measure, not numerical fuel consumption or a measured burned volume.
+## Current 0.18 scene
 
-## Shared geometry and coherent placement
+The main interactive scene shows a straight 0.48 m diameter auger shaft, a smaller underreamed pocket, finite source proxy, concave segmented cap and woven hose. In rapid mode the cap flattens instead of inverting; its projected radius increases only up to the initial meridian length, and localized soil above it lifts by at most 0.04 m. Short illustrated fractures receive water after hose insertion, and embers dim where the assumed wetting arrives. The scene omits the older global burst debris and visible CO₂. The geometry, deformation and wetting are staged, not measured construction performance or a validated peat-fire treatment. The accepted numerical fields and separate contact budget are unchanged. The older authored sequence remains selectable under **Previous simulations · v0.8+**. Manufacturer descriptions document [excavator augers](https://www.poinmachinery.com/product/pa-3000-excavator-mounted-hydraulic-earth-auger) and [retractable underreamers](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling/borehole-enlargement/underreamers/drilling-type-underreamer); neither establishes this site's soil stability, cap deformation or treatment efficacy.
+
+## Historical 0.16 presentation
+
+The 0.16 presentation opened with surface ignition, connected irregular underground peat involvement, a tracked hydraulic excavator drilling and underreaming, dry-ice placement, a folded steel dome opening underground, rapid-only inversion and fracture, and a flexible woven hose feeding progressive local wetting. The dark teal/copper cutaway, fine grass, oak/root context and 70% illustrated treatment gate remain. The 70% threshold is an authored sampled-area measure, not numerical fuel consumption or a measured burned volume.
+
+## Historical shared geometry and coherent placement
 
 The illustrative shaft remains 0.48 m in diameter. A folding cutter opens an explicitly shown wider chamber at depth before withdrawing. The segmented dome enters folded, deploys inside that chamber and leaves a service opening for the hose. Its rapid-only upward inversion and radial wedge engagement share the pressure-release timing; fractures begin at story 55 s. Neither the underreaming operation nor the shell/soil motion is a verified field installation or a calculated failure result. Canonical dimensions are in `src/story/fireSequence.ts` and the generated `public/fire-sequence-contract.json`.
 
@@ -24,7 +30,7 @@ The interactive story lasts 90 presentation seconds. Default playback and both c
 
 A shared seeded connected arrival graph on the 200 × 80 appearance atlas drives peat involvement. The front reaches 70% of its 4,141 display samples before equipment starts, leaving an unburnt margin. The arrival map is a display construction, not a transport/combustion solution. Boundary smoothing does not alter that threshold. Hot peat uses embers and char rather than a buried flame sheet.
 
-Rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. CO₂ is nonflammable and invisible; gas wisps are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
+In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The current 0.18.0 scene instead uses a bounded cap flattening and local soil lift. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
 
 ## Reproducibility and limits
 

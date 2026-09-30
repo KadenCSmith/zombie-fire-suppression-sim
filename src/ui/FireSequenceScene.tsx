@@ -9,18 +9,18 @@ import { OakTree } from './OakTree'
 import { createSoilTexture } from './FractureStudy'
 import { SequenceExcavator, SequenceGrass } from './FireSequenceEquipment'
 import { NaturalAggregates } from './CoupledNaturalContext'
-import { Chamber, Underreamer, SegmentedDome, CrackAndWaterPaths } from './FireInterventionEquipment'
+import { Chamber, Underreamer, SegmentedDome, CrackAndWaterPaths, ConstrainedCap, ConstrainedCrackAndWaterPaths } from './FireInterventionEquipment'
 import { createFireGroundGeometry } from './FireGroundGeometry'
 import { buildPeatAppearance, buildStoryWettingGrid, storyRupture, storyRuptureOffset, STORY_RUPTURE_GLSL } from '../story/fireAppearance'
-import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, eased, illustratedPeatCoverage, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, constrainedCapShape, constrainedSoilLiftAt, eased, illustratedPeatCoverage, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
 
 export interface FireFieldSnapshot { timeS: number; nx: number; ny: number; nz: number; temperatureK: ArrayLike<number>; oxygen: ArrayLike<number>; co2: ArrayLike<number>; dryIceKg?: number }
 export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolean; anatomy: boolean }
-interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number }
+interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean }
 const SOURCE_X = G.sourceX
 const random = (n: number) => { const v = Math.sin(n * 91.713 + 7.157) * 43758.5453; return v - Math.floor(v) }
 
-function Ground({ time, mode, view, frame, fire, water }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean }) {
+function Ground({ time, mode, view, frame, fire, water, realistic }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean; realistic: boolean }) {
   const invalidate = useThree(state => state.invalidate)
   const texture = useMemo(() => {
     const width = frame ? frame.nx * frame.ny : 2, height = frame?.nz ?? 2, data = new Float32Array(width * height * 4)
@@ -30,17 +30,17 @@ function Ground({ time, mode, view, frame, fire, water }: { time: number; mode: 
     }
     const value = new THREE.DataTexture(data,width,height,THREE.RGBAFormat,THREE.FloatType); value.minFilter = value.magFilter = THREE.NearestFilter; value.needsUpdate = true; return value
   }, [frame])
-  const wetTexture=useMemo(()=>{const field=buildStoryWettingGrid(time),tex=new THREE.DataTexture(field.data,field.width,field.height,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.LinearFilter;tex.needsUpdate=true;return tex},[time])
+  const wetTexture=useMemo(()=>{const field=buildStoryWettingGrid(time,realistic,mode),tex=new THREE.DataTexture(field.data,field.width,field.height,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.LinearFilter;tex.needsUpdate=true;return tex},[time,realistic,mode])
   useEffect(()=>()=>wetTexture.dispose(),[wetTexture])
   const groundGeometry = useMemo(createFireGroundGeometry, [])
   const peatTexture = useMemo(() => { const field=buildPeatAppearance(), data=new Float32Array(field.nx*field.ny*4);for(let i=0;i<field.arrival.length;i++){data[i*4]=field.arrival[i];data[i*4+1]=field.mask[i];data[i*4+3]=1}const tex=new THREE.DataTexture(data,field.nx,field.ny,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.NearestFilter;tex.needsUpdate=true;return tex },[])
   useEffect(()=>()=>{groundGeometry.dispose();peatTexture.dispose()},[groundGeometry,peatTexture])
-  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uCapLift:{value:0},uRealistic:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
   const material = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({ roughness: .96, side: THREE.DoubleSide })
     m.onBeforeCompile = shader => {
       Object.assign(shader.uniforms,uniforms)
-      shader.vertexShader = STORY_RUPTURE_GLSL+'attribute vec3 displayCenter; attribute float displaySeed; uniform float uPulse,uDamage,uView; varying vec3 vGround;\n' + shader.vertexShader
+      shader.vertexShader = STORY_RUPTURE_GLSL+'attribute vec3 displayCenter; attribute float displaySeed; uniform float uPulse,uDamage,uView,uCapLift; varying vec3 vGround;\n' + shader.vertexShader
       shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
 vGround=position;
 if(uView<.5){
@@ -51,8 +51,11 @@ if(uView<.5){
  transformed.xy=displayCenter.xy+mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*local.xy*(1.0-shrink);
  transformed.z=displayCenter.z+local.z*(1.0-shrink);
  transformed+=storyRuptureOffset(displayCenter,uPulse,uDamage)*.75+storyRuptureOffset(position,uPulse,uDamage)*.25;
+ float radial=length(vec2(position.x-${SOURCE_X.toFixed(2)},position.z));
+ float overhead=(1.0-smoothstep(.20,.90,radial))*smoothstep(-1.16,-.25,position.y);
+ transformed.y+=uCapLift*overhead;
 }`)
-      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uShowWater; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
+      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uShowWater,uRealistic; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
 float grain(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,41.21)))*43758.5453);}
 vec3 palette(float a){return mix(mix(vec3(.05,.26,.35),vec3(.28,.67,.48),smoothstep(.0,.6,a)),vec3(1.0,.38,.075),smoothstep(.55,1.0,a));}
 // Same outline as insideIllustratedPeat; the sampled arrival graph stays unchanged.
@@ -87,18 +90,18 @@ vec3 emberTint=mix(vec3(.90,.065,.003),vec3(1.0,.39,.026),step(.94,grain(floor(p
 float localGlow=1.0;for(int i=0;i<13;i++){float footprint=1.0-smoothstep(.3,1.0,distance(p.xy,uContacts[i].xy)/uContacts[i].z);localGlow=min(localGlow,mix(1.0,uContacts[i].w,footprint));}
 float wetness=texture2D(uWet,vec2((p.x+4.0)/8.0,(p.y+3.2)/3.2)).r*uShowWater;
 vec3 peatEmission=vec3(0.0);
-if(uView<.5 && p.z>-.02){earth=mix(earth,vec3(.035,.017,.009),heat*(.72+.13*grit));earth=mix(earth,earth*.40,wetness*.8);peatEmission=heat*localGlow*(.035+.065*coarseHeat+ember*1.7)*emberTint;}
+if(uView<.5 && p.z>-.02){earth=mix(earth,vec3(.035,.017,.009),heat*(.72+.13*grit));earth=mix(earth,earth*.40,wetness*.8);float visibleEmber=uRealistic>.5?step(.94,grain(floor(p*vec3(18.0,23.0,17.0))))*.16:1.0;peatEmission=heat*localGlow*(.035+.065*coarseHeat+ember*1.7)*emberTint*visibleEmber*(uRealistic>.5?1.0-.98*wetness:1.0);}
 diffuseColor.rgb=earth;`)
       shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=peatEmission;')
     }
     return m
   },[uniforms])
-  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uUnderream.value=view==='natural'?fireSequencePose(time,mode).underream:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'?rupture.pulse:0;uniforms.uDamage.value=view==='natural'?rupture.damage:0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,uniforms,texture,wetTexture,invalidate])
+  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uUnderream.value=view==='natural'?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uCapLift.value=view==='natural'&&realistic?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,uniforms,texture,wetTexture,invalidate])
   useEffect(()=>()=>texture.dispose(),[texture]);useEffect(()=>()=>material.dispose(),[material])
   return <mesh geometry={groundGeometry} material={material} receiveShadow castShadow/>
 }
 
-function StoryAggregates({time,mode}:{time:number;mode:FireSourceMode}){
+function StoryAggregates({time,mode,realistic}:{time:number;mode:FireSourceMode;realistic:boolean}){
   const group=useRef<THREE.Group>(null),invalidate=useThree(state=>state.invalidate)
   const originals=useRef(new Map<THREE.InstancedMesh,THREE.Matrix4[]>())
   const uniform=useMemo(()=>({value:0}),[]),cavityUniform=useMemo(()=>({value:0}),[])
@@ -110,10 +113,10 @@ if(uCavity>.005&&pow(length(vec2(vAggregateWorld.x-${SOURCE_X},vAggregateWorld.z
       material.needsUpdate=true
     })
   },[uniform,cavityUniform])
-  useLayoutEffect(()=>{cavityUniform.value=fireSequencePose(time,'gradual').underream;uniform.value=fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,uniform,cavityUniform,invalidate])
+  useLayoutEffect(()=>{cavityUniform.value=realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;uniform.value=fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);if(realistic)position.y+=constrainedSoilLiftAt(position.x,position.y,position.z,time,mode);else position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,realistic,uniform,cavityUniform,invalidate])
   return <group ref={group}><NaturalAggregates fidelity="precision2560" cut/></group>
 }
-function Tree({time,mode}:{time:number;mode:FireSourceMode}){
+function Tree({time,mode,realistic}:{time:number;mode:FireSourceMode;realistic:boolean}){
   const group=useRef<THREE.Group>(null),texture=useMemo(createSoilTexture,[]),uniform=useMemo(()=>({value:0}),[]),cavityUniform=useMemo(()=>({value:0}),[]),invalidate=useThree(state=>state.invalidate)
   useEffect(()=>()=>texture.dispose(),[texture])
   useLayoutEffect(()=>{
@@ -131,14 +134,15 @@ if(uStoryCavity>.005&&pow(length(vec2(vOak.x-${SOURCE_X},vOak.z))/(${G.cavityRad
     // React effect replay and natural/scientific remounts must not stack hooks.
     return()=>{for(const [material,original] of originals){material.onBeforeCompile=original.compile;material.customProgramCacheKey=original.cache;material.needsUpdate=true}}
   },[uniform,cavityUniform])
-  useLayoutEffect(()=>{cavityUniform.value=fireSequencePose(time,'gradual').underream;uniform.value=fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),data=texture.image.data as Float32Array;for(let j=0;j<25;j++)for(let i=0;i<49;i++){const o=storyRuptureOffset(-4+i/48*8,-3.2+j/24*3.2,0,r.pulse,r.damage),id=(j*49+i)*4;data[id]=o[0];data[id+1]=o[1]}texture.needsUpdate=true;invalidate()},[time,mode,texture,uniform,cavityUniform,invalidate])
+  useLayoutEffect(()=>{cavityUniform.value=realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;uniform.value=fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),data=texture.image.data as Float32Array;for(let j=0;j<25;j++)for(let i=0;i<49;i++){const x=-4+i/48*8,y=-3.2+j/24*3.2,o=realistic?[0,constrainedSoilLiftAt(x,y,0,time,mode),0]:storyRuptureOffset(x,y,0,r.pulse,r.damage),id=(j*49+i)*4;data[id]=o[0];data[id+1]=o[1]}texture.needsUpdate=true;invalidate()},[time,mode,realistic,texture,uniform,cavityUniform,invalidate])
   return <group ref={group}><OakTree soilTexture={texture} natural/></group>
 }
-function SourceAndCap({time,mode}:{time:number;mode:FireSourceMode}){
+function SourceAndCap({time,mode,realistic}:{time:number;mode:FireSourceMode;realistic:boolean}){
   const pose=fireSequencePose(time,mode)
   const mass=contactCoolingState(time,mode).ledger.dryIceRemainingKg,radius=Math.cbrt(3*Math.max(0,mass)/(4*Math.PI*G.sourceDensityKgM3))
-  const wallSegments=pose.underream>.05?[[0,-G.cavityCenterY-G.cavityHalfHeightM],[-G.cavityCenterY+G.cavityHalfHeightM,pose.drillDepth]]:[[0,pose.drillDepth]]
-  return <>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}<Chamber time={time}/><Underreamer time={time}/><group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]}><mesh><sphereGeometry args={[Math.max(.001,radius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group><SegmentedDome time={time} mode={mode}/></>
+  const pocket=(realistic?eased(time,31,33):pose.underream)>.05
+  const wallSegments=pocket?[[0,-G.cavityCenterY-G.cavityHalfHeightM],[-G.cavityCenterY+G.cavityHalfHeightM,pose.drillDepth]]:[[0,pose.drillDepth]]
+  return <>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}<Chamber time={time} constrained={realistic}/><Underreamer time={time} constrained={realistic}/><group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]}><mesh><sphereGeometry args={[Math.max(.001,radius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group>{realistic?<ConstrainedCap time={time} mode={mode}/>:<SegmentedDome time={time} mode={mode}/>}</>
 }
 function SurfaceConnection({time,visible}:{time:number;visible:boolean}){
   const points=useMemo(()=>new THREE.CatmullRomCurve3([new THREE.Vector3(1.72,.035,-.28),new THREE.Vector3(1.72,.005,.035),new THREE.Vector3(1.78,-.38,.038),new THREE.Vector3(1.64,-.73,.04),new THREE.Vector3(1.6,-1.02,.04)]).getPoints(60),[])
@@ -150,7 +154,7 @@ function SurfaceFire({time,visible}:{time:number;visible:boolean}){
   const amount=Math.min(1,.15+eased(time,0,9))*(1-.82*eased(time,12,23)),startX=1.72
   return <group visible={visible&&time<27} position={[startX,.02,-.28]}>{Array.from({length:13},(_,i)=>{const angle=i*2.3999,r=.09+random(i)*.24,h=(.2+random(i+12)*.5)*(1+.12*Math.sin(time*7+i));return <mesh key={i} position={[Math.cos(angle)*r,h*amount*.46,Math.sin(angle)*r*.55]} scale={[.05+random(i+37)*.075,h*amount,.06+random(i+89)*.04]} rotation={[0,angle,Math.sin(time*4+i)*.12]}><coneGeometry args={[1,1,7]}/><meshBasicMaterial color={i%3===0?'#ffe3a0':i%3===1?'#ef742c':'#bf3a18'} transparent opacity={.86}/></mesh>})}<pointLight color="#ff9d50" intensity={amount*1.8} distance={2.5}/></group>
 }
-function Tracers({time,mode,layers}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers}){
+function Tracers({time,mode,layers,realistic}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers;realistic:boolean}){
   const gas=useRef<THREE.InstancedMesh>(null),smoke=useRef<THREE.InstancedMesh>(null),cuttings=useRef<THREE.InstancedMesh>(null),invalidate=useThree(state=>state.invalidate)
   const geometry=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[])
   useEffect(()=>()=>geometry.dispose(),[geometry])
@@ -158,7 +162,7 @@ function Tracers({time,mode,layers}:{time:number;mode:FireSourceMode;layers:Fire
     const object=new THREE.Object3D(),pose=fireSequencePose(time,mode)
     for(let i=0;i<170;i++){
       const age=(time*.11+random(i+200))%1,angle=random(i+201)*Math.PI*2,reach=pose.gas*(.3+2.1*age),vertical=(random(i+300)-.45)*1.1
-      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(layers.gas&&time>=55?.013+pose.gas*.018*(1-age):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
+      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(!realistic&&layers.gas&&time>=55?.013+pose.gas*.018*(1-age):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<65;i++){
       const age=(time*.25+random(i+33))%1,active=time<31?1-eased(time,20,31):0
@@ -169,7 +173,7 @@ function Tracers({time,mode,layers}:{time:number;mode:FireSourceMode;layers:Fire
       object.position.set(SOURCE_X+Math.cos(angle)*age*.7,.05+Math.sin(age*Math.PI)*.4,-.06+Math.sin(angle)*age*.4);object.rotation.set(i,time+i,i*.7);object.scale.setScalar(active?.012+random(i+101)*.025:0);object.updateMatrix();cuttings.current?.setMatrixAt(i,object.matrix)
     }
     for(const ref of[gas,smoke,cuttings])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
-  },[time,mode,layers,geometry,invalidate])
+  },[time,mode,layers,realistic,geometry,invalidate])
   return <><instancedMesh ref={gas} args={[geometry,undefined,170]} raycast={()=>null}><meshBasicMaterial color="#7cd0d6" transparent opacity={.38} depthWrite={false}/></instancedMesh><instancedMesh ref={smoke} args={[geometry,undefined,65]} raycast={()=>null}><meshBasicMaterial color="#a9aaa0" transparent opacity={.11} depthWrite={false}/></instancedMesh><instancedMesh ref={cuttings} args={[geometry,undefined,100]} raycast={()=>null}><meshStandardMaterial color="#8a6845" roughness={1}/></instancedMesh></>
 }
 function PressureBurst({time,mode}:{time:number;mode:FireSourceMode}){
@@ -197,5 +201,22 @@ function Camera({resetToken}:{resetToken:number}){
   return <OrbitControls ref={controls} makeDefault target={[0,-.05,-1.1]} minDistance={5} maxDistance={19} maxPolarAngle={Math.PI*.75} enableDamping={false}/>
 }
 export function FireSequenceScene(props:SceneProps){
-  return <Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4.0,12.3],fov:38,near:.05,far:60}}><color attach="background" args={['#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/><directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-bias={-.0002}/><Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water}/>{props.view==='natural'&&<><StoryAggregates time={props.time} mode={props.mode}/><SequenceGrass time={props.time} mode={props.mode}/>{props.layers.anatomy&&<Tree time={props.time} mode={props.mode}/>}<SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/><SequenceExcavator time={props.time}/><SourceAndCap time={props.time} mode={props.mode}/><Tracers time={props.time} mode={props.mode} layers={props.layers}/><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}<mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh><Camera resetToken={props.resetToken}/></Canvas>
+  const realistic=props.realistic??false
+  return <Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4.0,12.3],fov:38,near:.05,far:60}}>
+    <color attach="background" args={['#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
+    <directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-bias={-.0002}/>
+    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic}/>
+    {props.view==='natural'&&<>
+      <StoryAggregates time={props.time} mode={props.mode} realistic={realistic}/>
+      <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic}/>
+      {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic}/>}
+      <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
+      <SequenceExcavator time={props.time}/><SourceAndCap time={props.time} mode={props.mode} realistic={realistic}/>
+      <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic}/>
+      {!realistic&&<><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}
+      {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/>}
+    </>}
+    <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>
+    <Camera resetToken={props.resetToken}/>
+  </Canvas>
 }
