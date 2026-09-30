@@ -2,7 +2,7 @@
 
 ## Visible interactive playback (2026-09-29)
 
-The 0.17.1 source puts play/pause controls above the interactive scene and a large initial Play button over it, and removes the older film option from the main sequence. The gallery retains archived films. Typecheck, lint, production build and 1,706 tests in 85 files passed. The in-app browser denied local-preview access, so no visual UI interaction is claimed. This presentation change does not modify the physical calculation or validate suppression performance.
+The 0.17.1 source puts play/pause controls above the interactive scene and a large initial Play button over it, and removes the older film option from the main sequence. The gallery retains archived films. Typecheck, lint, production build and 1,706 tests in 85 files passed. The ZIP extracts to exactly one app, reports version 0.17.1 and passes strict deep signature verification. The DMG build failed because `hdiutil` could not access a disk device, and the installed copy remains 0.17.0 because this session has no write access to `~/Applications`. The in-app browser denied local-preview access, so no visual UI interaction is claimed. This presentation change does not modify the physical calculation or validate suppression performance.
 
 ## One-app gallery and interface controls (2026-09-29)
 

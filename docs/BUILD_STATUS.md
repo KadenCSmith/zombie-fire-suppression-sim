@@ -2,7 +2,7 @@
 
 ## Visible interactive playback — 0.17.1 (2026-09-29)
 
-The main sequence now opens on the interactive 3D scene. A large Play button is visible over the initial frame, and a persistent play/pause button sits above the scene. The earlier rendered-film toggle has been removed from the main sequence. Preserved films remain available in the Simulations gallery, including simultaneous multi-view playback. The package version and current gallery entry are 0.17.1. Typecheck, lint, production build and all 1,706 tests in 85 files passed. Native packaging and installation status are recorded separately below.
+The main sequence now opens on the interactive 3D scene. A large Play button is visible over the initial frame, and a persistent play/pause button sits above the scene. The earlier rendered-film toggle has been removed from the main sequence. Preserved films remain available in the Simulations gallery, including simultaneous multi-view playback. The package version and current gallery entry are 0.17.1. Typecheck, lint, production build and all 1,706 tests in 85 files passed. The arm64 ZIP extracts to exactly one 0.17.1 app and passes strict deep signature verification (SHA-256 `77d45992013ace7b8f0c26b37d7eef65ca5aaf5006d3ce546caecedb4b8bc9bf`). The DMG step failed with `hdiutil: create failed - Device not configured` in this environment. This session cannot replace the installed app under `~/Applications`; its verified version remains 0.17.0. The 0.17.1 ZIP is delivered for replacement of that single installation.
 
 ## Single app and multi-view gallery — 0.17 local update (2026-09-29)
 
