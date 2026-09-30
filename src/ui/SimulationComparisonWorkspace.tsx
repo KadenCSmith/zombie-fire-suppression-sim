@@ -28,7 +28,7 @@ function ArchivedFilm({ version, mode, timeS }: { version: SimulationVersion; mo
 function Replay({ version, timeS, mode }: { version: SimulationVersion; timeS: number; mode: FireSourceMode }) {
   if (version.replay === 'study-scene') return <StudyScene view="cutaway" time={timeS} labels={false} cage={DEFAULT_STUDY_CAGE} resetToken={0} version={version.id === '0.8.0' ? 'fracture' : 'rupture'} soilOptions={SOIL_PARTICLE_DEFAULTS} />
   if (version.replay === 'film') return <ArchivedFilm version={version} mode={mode} timeS={timeS} />
-  if (version.replay === 'fire-scene') return <FireSequenceScene time={timeS} mode={mode} view="natural" layers={FIRE_LAYERS} resetToken={0} realistic={version.id==='0.18.0'} />
+  if (version.replay === 'fire-scene') return <FireSequenceScene time={timeS} mode={mode} view="natural" layers={FIRE_LAYERS} resetToken={0} realistic={version.id==='0.18.0'||version.id==='0.18.1'} openPit={version.id==='0.18.1'} />
   return null
 }
 

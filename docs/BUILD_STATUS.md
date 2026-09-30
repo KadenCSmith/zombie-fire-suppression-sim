@@ -1,5 +1,9 @@
 # Build status and handoff
 
+## Open-pit revision — 0.18.1 (2026-09-30)
+
+The 0.18.0 widening cutter remained visually implausible. The current 0.18.1 scene replaces it with a fixed-width excavator bucket and a visible open pit. Source and cap placement occur before staged backfill; the concave cap flattens under the later illustrated pressure event. The prior 0.18.0 scene remains labeled as an older replay in the gallery. The solver and accepted fields are unchanged. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. Native package and installed-app results are recorded after completion.
+
 ## Single 0.18.0 app and bounded intervention scene (2026-09-30)
 
 The current interactive sequence is the 0.18.0 gallery entry. A visible **Previous simulations · v0.8+** control opens the multi-view gallery; the three-dot menu retains simulation selection and three interface layouts. The current rapid scene uses a straight access bore and a modest cutter-made pocket. The cutter retracts before the excavator rises. A concave cap opens in the pocket, then flattens during the authored pressure event: its projected radius grows from 0.49 m to the shallow shell's initial meridian length, while soil immediately above it lifts by at most 0.04 m. A hose then reaches three short illustrated fractures; water progresses along them and darkens the reached embers. Earlier dome and film presentations remain selectable as historical replays.

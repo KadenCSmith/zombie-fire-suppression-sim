@@ -161,10 +161,10 @@ function augerFlight() {
   for (let i = 0; i < count; i++) { const j = i * 2; indices.push(j, j + 2, j + 1, j + 1, j + 2, j + 3) }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); g.setIndex(indices); g.computeVertexNormals(); return g
 }
-function Vehicle({time, travel}: {time: number; travel: number}) {
+function Vehicle({time, travel, openPit=false}: {time: number; travel: number; openPit?:boolean}) {
   const m = useMemo(createPalette, []), flight = useMemo(augerFlight, []), pose = fireSequencePose(time, 'gradual')
   useEffect(() => () => { Object.values(m).forEach(value => value.dispose()); flight.dispose() }, [m, flight])
-  const a: Point = [BODY[0] + .53, 1.08, BODY[2] - .25], c: Point = [G.sourceX, pose.drillY + 2.3, -.02]
+  const a: Point = [BODY[0] + .53, 1.08, BODY[2] - .25], c: Point = [G.sourceX, pose.drillY + (openPit?.65:2.3), -.02]
   const delta = new THREE.Vector3(c[0] - a[0], 0, c[2] - a[2]), h = delta.length(), horizontal = delta.normalize(), axis = new THREE.Vector3(-horizontal.z, 0, horizontal.x)
   // Fixed lengths keep the attachment connected without scaling either arm segment.
   const l1 = 2.5, l2 = 2.2, dy = c[1] - a[1], reach = Math.hypot(h, dy), angle = Math.atan2(dy, h) + Math.acos(THREE.MathUtils.clamp((l1 * l1 + reach * reach - l2 * l2) / (2 * l1 * reach), -1, 1))
@@ -179,19 +179,26 @@ function Vehicle({time, travel}: {time: number; travel: number}) {
     <Hoses material={m.black} points={[offset(a, axis, .18), offset(lerp(a, b, .35), axis, .21), [hoseTop[0], hoseTop[1] + .16, hoseTop[2]], offset(lerp(b, c, .6), axis, .2), [head[0] + .13, head[1] + .05, head[2] + .15], [head[0] + .09, head[1] - .13, head[2] + .06]]}/>
     <Hoses material={m.black} points={[offset(a, axis, .23), offset(lerp(a, b, .38), axis, .25), [hoseTop[0], hoseTop[1] + .22, hoseTop[2] + .065], offset(lerp(b, c, .63), axis, .24), [head[0] + .2, head[1] + .1, head[2] + .2], [head[0] + .13, head[1] - .13, head[2] + .06]]}/>
     <Box at={[c[0], c[1] - .12, c[2]]} size={[.24, .21, .24]} material={m.black}/>
-    <mesh position={[G.sourceX, pose.drillY + 2.14, -.02]} material={m.paint}><cylinderGeometry args={[.12, .12, .19, 16]}/></mesh>
+    {openPit?<group position={[G.sourceX,pose.drillY,-.02]} rotation={[0,0,-.15*eased(time,29,33)]} userData={{scientificRole:'fixed-width excavation bucket; no radial cutter motion'}}>
+      <Rod a={[0,.55,0]} b={[0,.16,0]} radius={.07} material={m.steel}/>
+      <Box at={[0,-.02,-.18]} size={[.64,.34,.12]} material={m.steel}/>
+      <Box at={[-.29,-.06,.02]} size={[.07,.30,.42]} material={m.steel}/>
+      <Box at={[.29,-.06,.02]} size={[.07,.30,.42]} material={m.steel}/>
+      <Box at={[0,-.19,.02]} size={[.64,.06,.42]} material={m.steel}/>
+      {[-.25,-.12,.01,.14,.27].map(x=><Box key={x} at={[x,-.25,.21]} size={[.055,.11,.12]} material={m.chrome}/>)}
+    </group>:<><mesh position={[G.sourceX, pose.drillY + 2.14, -.02]} material={m.paint}><cylinderGeometry args={[.12, .12, .19, 16]}/></mesh>
     <mesh position={[G.sourceX, pose.drillY + 2.015, -.02]} material={m.steel}><cylinderGeometry args={[.072, .072, .075, 12]}/></mesh>
     <group position={[G.sourceX, pose.drillY, -.02]} rotation={[0, pose.drillVisible ? time * 6.5 : 0, 0]}>
       <mesh position={[0, 1.07, 0]} material={m.steel}><cylinderGeometry args={[.041, .044, 2.12, 16]}/></mesh>
       <mesh geometry={flight}><meshStandardMaterial color="#697971" metalness={.82} roughness={.43} side={THREE.DoubleSide}/></mesh>
       <mesh position={[0, .08, 0]} rotation={[0, 0, Math.PI]} material={m.steel}><coneGeometry args={[Math.min(.085, G.augerRadiusM * .42), .16, 12]}/></mesh>
       {[0, Math.PI].map(a => <Box key={a} at={[Math.cos(a) * G.augerRadiusM * .68, .15, Math.sin(a) * G.augerRadiusM * .68]} size={[G.augerRadiusM * .55, .028, .075]} rotation={[0, -a, -.14]} material={m.chrome}/>)}
-    </group>
+    </group></>}
   </group>
 }
 /** The treatment gate is presentation-only; no numerical burn fraction drives it. */
-export function SequenceExcavator({time}: {time: number}) {
+export function SequenceExcavator({time,openPit=false}: {time: number;openPit?:boolean}) {
   if (time < 24 || time >= 40 || illustratedPeatCoverage(time) < .7) return null
   const travel = -6 * (1 - eased(time, 24, 27)) - 6 * eased(time, 36.5, 40)
-  return <Vehicle time={time} travel={travel}/>
+  return <Vehicle time={time} travel={travel} openPit={openPit}/>
 }

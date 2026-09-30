@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Open excavation and backfill revision (2026-09-30)
+
+The current 0.18.1 presentation replaces the widening underreamer with a fixed-width bucket and a staged open pit that is backfilled before the cap event. The cap and local water paths retain their bounded visual timing; accepted numerical states and the separate contact budget are unchanged. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. Excavation stability, root effects, compaction, cap pressure and suppression remain unvalidated. Native package, CI and installed-app checks are recorded after they run.
+
 ## Current scene and single-app delivery (2026-09-30)
 
 For version 0.18.0, source checks passed: TypeScript typecheck, lint (existing warnings only), production build and all **1,709 tests in 85 files**. New checks bound the cap's concave-to-flat radius change, confine soil uplift to the overburden, and restrict water arrival to short branches after hose insertion. The cutter and pocket now complete before drill withdrawal. The gallery still includes available replays from 0.8 onward, with 0.10/0.11/0.13 honestly marked unavailable because no preserved movie exists. The arm64 package passed strict deep signing, extracted-ZIP and DMG verification, and all release checksums. Its installed bundle reports version 0.18.0, passes strict deep signature verification, and launched from `~/Applications`. One active bundle remains in the scanned Applications, Desktop, Downloads and Documents/Codex locations; older bundles and the earlier ZIP were moved to Trash. The native computer-control request was denied, so the window was not visually inspected.

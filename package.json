@@ -1,7 +1,7 @@
 {
   "name": "zombie-fire-suppression-sim",
   "private": true,
-  "version": "0.18.0",
+  "version": "0.18.1",
   "type": "module",
   "scripts": {
     "mac": "./run-mac.command",

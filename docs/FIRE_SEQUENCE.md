@@ -1,8 +1,8 @@
 # Fire-first workflow and visual evidence boundaries
 
-## Current 0.18 scene
+## Current 0.18.1 scene
 
-The main interactive scene shows a straight 0.48 m diameter auger shaft, a smaller underreamed pocket, finite source proxy, concave segmented cap and woven hose. In rapid mode the cap flattens instead of inverting; its projected radius increases only up to the initial meridian length, and localized soil above it lifts by at most 0.04 m. Short illustrated fractures receive water after hose insertion, and embers dim where the assumed wetting arrives. The scene omits the older global burst debris and visible CO₂. The geometry, deformation and wetting are staged, not measured construction performance or a validated peat-fire treatment. The accepted numerical fields and separate contact budget are unchanged. The older authored sequence remains selectable under **Previous simulations · v0.8+**. Manufacturer descriptions document [excavator augers](https://www.poinmachinery.com/product/pa-3000-excavator-mounted-hydraulic-earth-auger) and [retractable underreamers](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling/borehole-enlargement/underreamers/drilling-type-underreamer); neither establishes this site's soil stability, cap deformation or treatment efficacy.
+The main interactive scene shows a fixed-width excavator bucket opening a pit with sloped sides. A finite source proxy and shallow concave metal cap are placed while the pit remains open. The pit is then backfilled above the cap. In rapid mode the cap flattens instead of inverting; its projected radius increases only up to the initial meridian length, and soil directly above it lifts by at most 0.04 m. Short illustrated fractures receive water after hose insertion, and embers dim where assumed wetting arrives. The scene omits the prior widening cutter, global burst debris and visible CO₂. The excavation, backfill, deformation and wetting are staged, not measured construction performance or a validated peat-fire treatment. Root damage and excavation support are not calculated. The accepted numerical fields and separate contact budget are unchanged. The earlier 0.18.0 underreamed pocket remains selectable under **Previous simulations · v0.8+**.
 
 ## Historical 0.16 presentation
 
@@ -30,7 +30,7 @@ The interactive story lasts 90 presentation seconds. Default playback and both c
 
 A shared seeded connected arrival graph on the 200 × 80 appearance atlas drives peat involvement. The front reaches 70% of its 4,141 display samples before equipment starts, leaving an unburnt margin. The arrival map is a display construction, not a transport/combustion solution. Boundary smoothing does not alter that threshold. Hot peat uses embers and char rather than a buried flame sheet.
 
-In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The current 0.18.0 scene instead uses a bounded cap flattening and local soil lift. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
+In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The current 0.18.1 scene instead uses open excavation and backfill, bounded cap flattening and local soil lift. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
 
 ## Reproducibility and limits
 

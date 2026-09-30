@@ -202,7 +202,8 @@ function App() {
       const saved = JSON.parse(window.localStorage.getItem('zombie-fire-gallery-selection') ?? 'null')
       if (Array.isArray(saved)) {
         const versions=[...new Set(saved.map(id => id === '0.17.0' ? '0.17.1' : id).filter((id): id is string => typeof id === 'string' && available.includes(id as typeof available[number])))]
-        if (versions.length===available.length-1 && versions.includes('0.17.1') && !versions.includes('0.18.0')) versions.push('0.18.0')
+        if (versions.length===available.length-2 && versions.includes('0.17.1') && !versions.includes('0.18.0')) versions.push('0.18.0','0.18.1')
+        if (versions.length===available.length-1 && versions.includes('0.18.0') && !versions.includes('0.18.1')) versions.push('0.18.1')
         return versions
       }
     } catch { /* Use every playable animation for a new gallery. */ }
