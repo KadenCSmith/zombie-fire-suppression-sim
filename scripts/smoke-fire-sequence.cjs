@@ -8,7 +8,7 @@ if(process.platform!=='darwin'){app.commandLine.appendSwitch('use-angle','swifts
 const timeout=setTimeout(()=>{console.error('FIRE_SMOKE_TIMEOUT');app.exit(1)},300000);
 app.on('browser-window-created',(_event,win)=>{
   win.webContents.on('render-process-gone',(_event,details)=>{console.error(details);app.exit(1)});
-  win.webContents.on('console-message',event=>{if(event.message.includes('THREE.WebGLProgram: Shader Error')){console.error('FIRE_SHADER_FAILURE: '+event.message);app.exit(1)}});
+  win.webContents.on('console-message',event=>{if(event.message.startsWith('FIRE_SMOKE:'))console.log(event.message);if(event.message.includes('THREE.WebGLProgram: Shader Error')){console.error('FIRE_SHADER_FAILURE: '+event.message);app.exit(1)}});
   win.webContents.once('did-finish-load',async()=>{
     try{
       const result=await win.webContents.executeJavaScript(`(async()=>{
@@ -52,7 +52,10 @@ app.on('browser-window-created',(_event,win)=>{
         button('Restore bundled result').click();
         await wait(()=>document.body.textContent.includes('Bundled accepted history restored'),'bundled restore');
         button('Previous simulations · v0.8+').click();
-        await wait(()=>document.querySelector('.comparison-shell')&&document.querySelectorAll('.comparison-card').length===9,'multi-view gallery with earlier replays');
+        await wait(()=>document.querySelector('.comparison-shell')&&document.querySelectorAll('.comparison-card').length===2,'multi-view gallery with earlier replays');
+        document.querySelector('input[aria-label="Select version 0.14.0"]').click();
+        document.querySelector('input[aria-label="Select version 0.15.0"]').click();
+        await wait(()=>document.querySelectorAll('.comparison-card').length===4,'two archived films added');
         await wait(()=>document.querySelector('.comparison-card[data-version="0.14.0"] video')?.readyState>=1&&document.querySelector('.comparison-card[data-version="0.15.0"] video')?.readyState>=1,'bundled film metadata');
         const video=document.querySelector('.comparison-card[data-version="0.15.0"] video');
         if(Math.abs(video.duration-36)>.1)throw new Error('Incomplete rendered film: '+video.duration);

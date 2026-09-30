@@ -198,16 +198,18 @@ function App() {
   const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-layout')))
   const [selectedVersions, setSelectedVersions] = useState<string[]>(() => {
     const available = availableVersions().map(version => version.id)
+    const initial = ['0.8.0','0.18.1']
     try {
       const saved = JSON.parse(window.localStorage.getItem('zombie-fire-gallery-selection') ?? 'null')
       if (Array.isArray(saved)) {
         const versions=[...new Set(saved.map(id => id === '0.17.0' ? '0.17.1' : id).filter((id): id is string => typeof id === 'string' && available.includes(id as typeof available[number])))]
-        if (versions.length===available.length-2 && versions.includes('0.17.1') && !versions.includes('0.18.0')) versions.push('0.18.0','0.18.1')
-        if (versions.length===available.length-1 && versions.includes('0.18.0') && !versions.includes('0.18.1')) versions.push('0.18.1')
+        // Earlier builds selected every replay automatically; start the new gallery with two views.
+        if (versions.length===available.length-2 && versions.includes('0.17.1') && !versions.includes('0.18.0')) return initial
+        if (versions.length===available.length-1 && versions.includes('0.18.0') && !versions.includes('0.18.1')) return initial
         return versions
       }
-    } catch { /* Use every playable animation for a new gallery. */ }
-    return available
+    } catch { /* Use the responsive two-view default. */ }
+    return initial
   })
   const fireSequenceSession = useRef<FireSequenceSession | undefined>(undefined)
   const coupledSession = useRef<CoupledSession | undefined>(undefined)
