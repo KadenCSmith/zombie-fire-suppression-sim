@@ -1,5 +1,11 @@
 # Build status and handoff
 
+## Single app and multi-view gallery — 0.17 local update (2026-09-29)
+
+Starting from the latest `origin/main`, the current app has one three-dot menu with **Simulations** and **Interface** tabs. Simulations controls the same persistent selection as the multi-view gallery, which arranges selected replays as simultaneous camera tiles under a shared presentation clock. The gallery includes the preserved 0.8 and 0.9 interactive scenes, the exact 2.5-second Blender checkpoint review from 0.12, archived 0.14 and 0.15 films, and the 0.16/0.17 interactive scene. The 0.12 clip contains five held checkpoints, not continuous calculated motion. Versions 0.10, 0.11 and 0.13 are physics releases without a preserved Blender render and remain labeled as such. Interface offers three distinct presentations: dark cinematic, bright editorial, and green scientific console. Switching style or workspace keeps the selection and does not change solver state.
+
+Typecheck, lint (existing warnings only), production build, and **1,706 tests in 85 files** passed locally. The in-app browser rejected access to the local preview URL, so a visual UI inspection is not claimed. A Mac package and installed-app verification are recorded separately after packaging.
+
 ## Provisional mechanics boundary (2026-09-29)
 
 Added Agent A's complementary D/F/G mechanics boundary and four repository integration tests. The full **1,706-test suite**, typecheck, lint and build passed. It has no live solver import. [Details](MECHANICS_PACKAGE_INTEGRATION.md).

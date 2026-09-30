@@ -1,5 +1,11 @@
 # Verification and validation status
 
+## One-app gallery and interface controls (2026-09-29)
+
+The 0.17 gallery and two-tab three-dot menu passed TypeScript typecheck, lint, production build, the focused catalog checks, and the complete **1,706-test suite in 85 files**. The bundled 0.12 checkpoint movie is byte-for-byte equal to its preserved Blender source (SHA-256 `e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988`). It contains five 0.5-second held frames; no continuous physical motion is inferred. The 0.8/0.9 and 0.16/0.17 entries are interactive authored scenes, while 0.14/0.15 are exact archived films. Physics-only 0.10/0.11/0.13 have no preserved Blender render in the app.
+
+The in-app browser denied access to the local preview URL, so visual browser interaction was not observed. These software checks do not validate a physical suppression outcome or establish equivalent scientific models across versions. Packaging and installed-app checks are recorded after they run.
+
 ## Provisional mechanics boundary (2026-09-29)
 
 Four new tests passed against installed D/G modules; the 1,706-test suite, typecheck, lint and build passed. This proves adapter behavior for synthetic cases, not global equilibrium or measured soil fracture. [Details](MECHANICS_PACKAGE_INTEGRATION.md).

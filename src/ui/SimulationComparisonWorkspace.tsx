@@ -12,19 +12,17 @@ import { alignedTime, availableVersions, SIMULATION_CATALOG, type SimulationVers
 import './simulation-comparison.css'
 
 const FIRE_LAYERS: FireSequenceLayers = { fire: true, gas: true, water: true, anatomy: true }
-const DEFAULT_SELECTION = ['0.8.0', '0.9.0']
-
 function ArchivedFilm({ version, mode, timeS }: { version: SimulationVersion; mode: FireSourceMode; timeS: number }) {
   const ref = useRef<HTMLVideoElement>(null)
+  const playbackTime = version.assetFile ? timeS : storyToPlayback(timeS)
   useEffect(() => {
     const video = ref.current
     if (!video || video.readyState < 1) return
-    const target = storyToPlayback(timeS)
-    if (Math.abs(video.currentTime - target) > 0.035) video.currentTime = target
-  }, [timeS, mode])
-  const seek = () => { if (ref.current) ref.current.currentTime = storyToPlayback(timeS) }
+    if (Math.abs(video.currentTime - playbackTime) > 0.035) video.currentTime = playbackTime
+  }, [playbackTime, mode])
+  const seek = () => { if (ref.current) ref.current.currentTime = playbackTime }
   return <video ref={ref} className="comparison-film" muted playsInline preload="metadata" onLoadedMetadata={seek}
-    src={`${import.meta.env.BASE_URL}${version.assetBase}/peat-fire-${mode}.mp4`} aria-label={`Version ${version.id} ${mode} film`} />
+    src={`${import.meta.env.BASE_URL}${version.assetBase}/${version.assetFile ?? `peat-fire-${mode}.mp4`}`} aria-label={`Version ${version.id} ${version.assetFile ? 'Blender checkpoint review' : `${mode} film`}`} />
 }
 
 function Replay({ version, timeS, mode }: { version: SimulationVersion; timeS: number; mode: FireSourceMode }) {
@@ -34,10 +32,13 @@ function Replay({ version, timeS, mode }: { version: SimulationVersion; timeS: n
   return null
 }
 
-export default function SimulationComparisonWorkspace({ onWorkspace }: { onWorkspace: (workspace: PhysicsWorkspace) => void }) {
+export default function SimulationComparisonWorkspace({ onWorkspace, selected, onSelected }: {
+  onWorkspace: (workspace: PhysicsWorkspace) => void
+  selected: string[]
+  onSelected: (versions: string[]) => void
+}) {
   const available = useMemo(availableVersions, [])
-  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTION)
-  const [referenceId, setReferenceId] = useState(DEFAULT_SELECTION[0])
+  const [referenceId, setReferenceId] = useState(selected[0] ?? available[0].id)
   const [referenceTime, setReferenceTime] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
@@ -65,14 +66,14 @@ export default function SimulationComparisonWorkspace({ onWorkspace }: { onWorks
 
   const toggle = (version: SimulationVersion) => {
     if (!version.available) return
-    setSelected(current => current.includes(version.id) ? current.filter(id => id !== version.id) : [...current, version.id])
+    onSelected(selected.includes(version.id) ? selected.filter(id => id !== version.id) : [...selected, version.id])
   }
   const seek = (next: number) => { setPlaying(false); timeRef.current = next; setReferenceTime(next) }
   const referenceDuration = reference.durationS ?? 1
 
   return <div className="comparison-shell">
     <header className="comparison-header">
-      <div><span>VERSION LAB · 0.8 AND ABOVE</span><h1>Run preserved simulations together</h1><p>One presentation clock coordinates selected replays. Recorded event markers align compatible versions; unlike timelines use a labeled duration-normalized fallback.</p></div>
+      <div><span>MULTI-VIEW GALLERY · 0.8 AND ABOVE</span><h1>Watch every selected animation together</h1><p>Choose any playable version from the left or the three-dot menu. One presentation clock coordinates the tiles; unrelated timelines use a labeled duration-normalized alignment.</p></div>
       <ModelSelector value="comparison" onChange={onWorkspace} />
     </header>
     <section className="comparison-controls" aria-label="Shared comparison controls">
@@ -85,10 +86,10 @@ export default function SimulationComparisonWorkspace({ onWorkspace }: { onWorks
     </section>
     <div className="comparison-body">
       <aside className="comparison-catalog" aria-label="Simulation versions">
-        <h2>Available history</h2><p>Select any combination with a preserved replay. Missing replay bundles stay listed and cannot be selected.</p>
+        <h2>Animation sources</h2><p>Select any combination to watch like simultaneous camera feeds. Physics-only versions without a Blender render are documented below.</p>
         {SIMULATION_CATALOG.map(version => <label key={version.id} className={!version.available ? 'is-unavailable' : ''} title={version.limitation}>
           <input type="checkbox" aria-label={`Select version ${version.id}`} checked={selected.includes(version.id)} disabled={!version.available} onChange={() => toggle(version)} />
-          <span><strong>v{version.id}</strong><small>{version.title}</small></span><em>{version.available ? 'READY' : 'UNAVAILABLE'}</em>
+          <span><strong>v{version.id}</strong><small>{version.title}</small></span><em>{version.available ? 'PLAYABLE' : 'NO RENDER'}</em>
         </label>)}
       </aside>
       <main className="comparison-stage">

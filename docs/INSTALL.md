@@ -1,7 +1,7 @@
 # Install Zombie Fire Unified Physics Lab
 
 The unified releases target **Apple Silicon Macs running macOS 13 or later**.
-Version **0.16.0** adds a woven fire hose, local cooling from a separate finite contact model, progressive assumed wetting and a larger folded/deployed dome, with both complete Blender films. Earlier 0.15 installations and assets remain preserved. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
+The current local **0.17.0** installation lives at `~/Applications/Zombie Fire Suppression Sim.app`. The three-dot menu opens one gallery for preserved animation sources from 0.8 onward and a second tab with three interface styles. The 0.12 Blender clip is a 2.5-second checkpoint review; it is not continuous motion. Versions 0.10, 0.11 and 0.13 have no preserved Blender movie in the bundle and are listed accordingly. Version **0.16.0** added a woven fire hose, local cooling from a separate finite contact model, progressive assumed wetting and a larger folded/deployed dome, with both complete Blender films. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
 accuracy-workflow successor: it retains the same physics and acceptance gates,
 with a verified sparse mechanics backend. No version claims experimental
 accuracy or validated field suppression.
@@ -34,38 +34,24 @@ macOS blocks a downloaded copy and you choose to trust it, use
 [Apple's Open Anyway instructions](https://support.apple.com/102445). No
 system-wide security settings need changing.
 
-## Preserve and launch versioned installations
+## Launch the single installed app
 
-Keep the earlier applications when comparing results. The local convention is
-`~/Applications/Zombie Fire Suppression Sim 0.12.app` and
-`~/Applications/Zombie Fire Suppression Sim 0.16.app`; their minor versions use
-separate application-data directories. The DMG itself contains the generic
-application name. Rename a copied bundle to the versioned name before placing
-it beside an existing generic bundle.
-
-Open the reference release:
+Open the current installation:
 
 ```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.12.app" --args --coupled
+open -na "$HOME/Applications/Zombie Fire Suppression Sim.app" --args --sequence
 ```
 
-Open the current fire-sequence release after installing it:
-
-```sh
-open -na "$HOME/Applications/Zombie Fire Suppression Sim 0.16.app" --args --sequence
-```
-
-For an unrenamed app in system Applications, use
+For an app in system Applications, use
 `/Applications/Zombie Fire Suppression Sim.app`. Other workspace flags are
 `--simulation` (earlier porous gas/heat model), `--mechanics` (mechanics
-benchmarks) and `--studio` (authored scene studio). Opening the 0.16 icon enters the
+benchmarks) and `--studio` (authored scene studio). Opening the current icon enters the
 complete fire sequence (`--sequence`); `--coupled` opens the lab, and **Physics model** switches workspaces. Export results before
 quitting or replacing a bundle. Replace complete applications, never merge
 bundle contents.
 
 From a source checkout, `npm run mac -- --coupled` reads the minor version from
-`package.json`, finds the matching versioned or generic installed bundle, and
-checks its actual bundle version. It will not silently open a preserved older
+`package.json`, finds the matching installed bundle, and checks its actual
 version. This command does not build or install the app.
 
 ## Start the complete sequence

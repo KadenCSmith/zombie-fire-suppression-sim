@@ -3,7 +3,7 @@ import { FRACTURE_STUDY_PHASES, STUDY_DURATION } from './studyModel'
 
 export type SimulationMode = 'animation' | 'physics'
 export type ReplayKind = 'study-scene' | 'film' | 'fire-scene' | 'unavailable'
-export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0'
+export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0' | '0.17.0'
 
 export interface SimulationVersion {
   id: SimulationVersionId
@@ -17,6 +17,7 @@ export interface SimulationVersion {
   markersS: readonly number[]
   alignmentGroup: 'cap-study' | 'fire-sequence' | null
   assetBase?: string
+  assetFile?: string
   limitation: string
 }
 
@@ -28,11 +29,12 @@ export const SIMULATION_CATALOG: readonly SimulationVersion[] = [
   { id: '0.9.0', commit: '3f48032c773a61611836e20f16c6d26c2d616244', title: 'Ground rupture & broad fire', summary: 'Irregular roots, separating ground, and a broader peat-fire illustration.', mode: 'animation', available: true, replay: 'study-scene', durationS: STUDY_DURATION, markersS: studyMarkers, alignmentGroup: 'cap-study', limitation: 'Preserved interactive animation; rupture and spread are authored.' },
   { id: '0.10.0', commit: 'ecc8daa557894b618c9fc1d18a2e6a37ce2a570d', title: 'Tensile coupon', summary: 'Energy-accounted peat tensile coupon and laboratory-data comparison.', mode: 'physics', available: false, replay: 'unavailable', durationS: null, markersS: [], alignmentGroup: null, limitation: 'No immutable replay bundle exists in the current app. Source history remains available at the tag.' },
   { id: '0.11.0', commit: '05d9c292476677068e9040f5843e70b8ec33ec32', title: 'Throughput verification', summary: 'Model-specific throughput and numerical status reporting.', mode: 'physics', available: false, replay: 'unavailable', durationS: null, markersS: [], alignmentGroup: null, limitation: 'No immutable replay bundle exists in the current app. Source history remains available at the tag.' },
-  { id: '0.12.0', commit: '1ec0710c4addc39f8aa1c06cf2a6b06840862d38', title: 'Unified natural cutaway', summary: 'Natural cutaway combined with model evidence and scope labels.', mode: 'animation', available: false, replay: 'unavailable', durationS: null, markersS: [], alignmentGroup: null, limitation: 'No immutable replay media was preserved in the current bundle.' },
+  { id: '0.12.0', commit: '1ec0710c4addc39f8aa1c06cf2a6b06840862d38', title: 'Accepted checkpoint review', summary: 'Five preserved Blender frames, each held for half a second.', mode: 'animation', available: true, replay: 'film', durationS: 2.5, markersS: [0, .5, 1, 1.5, 2, 2.5], alignmentGroup: null, assetBase: 'history/v0.12', assetFile: 'accepted-checkpoint-review.mp4', limitation: 'Exact 2.5-second Blender review clip from v0.12; sampled checkpoints are not continuous motion or a live solver.' },
   { id: '0.13.0', commit: '6ac5b404eb2f87894704e91c876a7a05887528d2', title: 'Finer precision timesteps', summary: 'Finer numerical timesteps and expanded accepted evidence.', mode: 'physics', available: false, replay: 'unavailable', durationS: null, markersS: [], alignmentGroup: null, limitation: 'No immutable replay bundle exists in the current app. Source history remains available at the tag.' },
   { id: '0.14.0', commit: 'f97d28ac260164d4812483f9670957ec431dd2fb', title: 'Complete peat-fire films', summary: 'Versioned gradual and rapid complete-sequence rendered films.', mode: 'animation', available: true, replay: 'film', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', assetBase: 'history/v0.14', limitation: 'Exact archived film; it is an authored presentation and carries no live solver clock.' },
   { id: '0.15.0', commit: '223eda6f7a8e29291ebb5844fc2aa3f655f5d1cb', title: 'Verified complete bundle', summary: 'Verified complete films with accepted evidence bundled in the app.', mode: 'animation', available: true, replay: 'film', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', assetBase: 'renders', limitation: 'Exact archived film; it is an authored presentation and carries no live solver clock.' },
-  { id: '0.16.0', commit: 'b9588aa', title: 'Contact cooling & deployable dome', summary: 'Current candidate with finite contact cooling, woven hose, and deployable buried dome.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Current interactive candidate. Final replacement films are not yet published.' },
+  { id: '0.16.0', commit: 'b9588aa', title: 'Contact cooling & deployable dome', summary: 'Finite contact cooling, woven hose, and deployable buried dome.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Preserved interactive scene from v0.16. Final replacement films were not published.' },
+  { id: '0.17.0', commit: 'current', title: 'Unified animation gallery', summary: 'The current app combines preserved replays and three interface styles.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Current interactive scene. The gallery changes presentation, not the physical calculation.' },
 ] as const
 
 export function parseSemver(version: string): [number, number, number] {

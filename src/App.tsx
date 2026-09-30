@@ -9,6 +9,7 @@ import type { StudySession } from './ui/StudyWorkspace'
 import { StudyVersions } from './ui/StudyVersions'
 import type { StudyVersion } from './ui/studyModel'
 import { AppChrome, readLayout, type LayoutMode } from './ui/AppChrome'
+import { availableVersions } from './ui/simulationCatalog'
 import DeveloperTools from './ui/DeveloperTools'
 import { resolveMaterials } from './sim/materials'
 import { ChangeEvent, ReactNode, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -195,6 +196,14 @@ function App() {
     return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' ? requested : 'sequence'
   })
   const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-layout')))
+  const [selectedVersions, setSelectedVersions] = useState<string[]>(() => {
+    const available = availableVersions().map(version => version.id)
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('zombie-fire-gallery-selection') ?? 'null')
+      if (Array.isArray(saved)) return saved.filter((id): id is string => typeof id === 'string' && available.includes(id as typeof available[number]))
+    } catch { /* Use every playable animation for a new gallery. */ }
+    return available
+  })
   const fireSequenceSession = useRef<FireSequenceSession | undefined>(undefined)
   const coupledSession = useRef<CoupledSession | undefined>(undefined)
   const tensileSession = useRef<TensileSession | undefined>(undefined)
@@ -280,6 +289,7 @@ function App() {
   useEffect(() => { ambientTemperatureRef.current = scenario.atmosphere.temperatureC + 273.15 }, [scenario.atmosphere.temperatureC])
   useEffect(() => { durationRef.current = durationDays }, [durationDays])
   useEffect(() => { window.localStorage.setItem('zombie-fire-layout', layout) }, [layout])
+  useEffect(() => { window.localStorage.setItem('zombie-fire-gallery-selection', JSON.stringify(selectedVersions)) }, [selectedVersions])
 
   useEffect(() => {
     const client = createSimulationClient({
@@ -672,9 +682,9 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
-  const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} />
+  const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
   if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
-  if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} /></Suspense></>
+  if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} selected={selectedVersions} onSelected={setSelectedVersions} /></Suspense></>
   if (workspace === 'coupled') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense></>
   if (workspace === 'mechanics') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense></>
 
