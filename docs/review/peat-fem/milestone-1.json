@@ -1,0 +1,27 @@
+{
+  "milestone": "M1 reduced fixture + navigation",
+  "baseMain": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "suite": {
+    "passed": 1739,
+    "files": 87,
+    "elapsedS": 6.01,
+    "preexistingTests": 1728,
+    "preexistingFiles": 86
+  },
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed with existing warnings",
+    "build": "passed with existing warnings",
+    "nativeFEM": "passed",
+    "nativeFireSequence": "passed,16s",
+    "nativeCoupled": "passed,4s",
+    "nativeDesktop": "passed,8s",
+    "nativeComparison": "passed"
+  },
+  "unrun": [
+    "visible 40 FPS gate",
+    "physical front convergence",
+    "matched measured experiment"
+  ],
+  "status": "intermediate dry-oxidation diffusion fixture; full reacting-flow scope being implemented"
+}

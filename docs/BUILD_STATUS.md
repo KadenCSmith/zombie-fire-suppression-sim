@@ -355,3 +355,8 @@ A separate checkout preserves the user's original Blender edit. Adds exactly 10Ã
 ## Unified reference completion â€” 27 September 2026
 
 Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.
+# Local peat FEM increment (2026-10-02)
+
+`feat/peat-fire-fem` adds the active Peat Fire FEM route with a genuine 3D Q1 reduced dry-oxidation fixture, worker stepping, accepted-state probes, sampled temperature grid and recorded replay. The main menu has Latest render, Peat Fire FEM and Previous simulations; historical identifiers and workspaces remain available. v20 main is published at `161e7a4a1f8c35765e1878c132db79977be1f5ea`, with all three hosted CI platforms passing.
+
+This first fixture is intermediate. The accepted follow-up requires full five-step chemistry and conservative Darcy mixture transport. See `docs/review/peat-fem/PROGRESS.md` for current gates and `docs/PEAT_FIRE_FEM_MODEL.md` for scope. Feature-branch milestone uploads are authorized; further main publication is not.

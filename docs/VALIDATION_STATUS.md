@@ -459,3 +459,6 @@ Cold source-only is the new lab default. Prepared hot specimens explicitly discl
 ## Unified reference completion — 27 September 2026
 
 Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.
+# Peat FEM evidence (2026-10-02)
+
+The new reduced fixture has element/basis, analytic diffusion, boundary, finite ignition, inventory and balance checks in `tests/peatfem.test.ts`. Numerical verification of this reduced fixture does not validate the full five-step smouldering model. Matched measured experiment, physical reaction-front convergence and 40 FPS acceptance are pending. Logs/results belong to `docs/review/peat-fem/`; the follow-up's expanding runtime must earn its own evidence after implementation.

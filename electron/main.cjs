@@ -31,6 +31,7 @@ let requestedWorkspace = workspaceFromArguments(process.argv);
 // Keep installed minor releases independent so a preserved version may stay open.
 if (app.isPackaged) app.setPath('userData', path.join(app.getPath('appData'), `Zombie Fire Suppression Sim ${app.getVersion().split('.').slice(0, 2).join('.')}`));
 function workspaceFromArguments(args) {
+  if (args.includes('--peat-fem')) return 'peat-fem';
   if (args.includes('--sequence')) return 'sequence';
   if (args.includes('--coupled')) return 'coupled';
   if (args.includes('--mechanics')) return 'mechanics';
@@ -40,8 +41,8 @@ function workspaceFromArguments(args) {
 }
 function sendWorkspaceRequest() {
   if (!requestedWorkspace || !mainWindow || mainWindow.isDestroyed()) return;
-  // Only these five fixed values can reach the renderer, never arbitrary CLI text.
-  const target = requestedWorkspace === 'sequence' ? 'sequence' : requestedWorkspace === 'coupled' ? 'coupled' : requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
+  // Only fixed workspace identifiers can reach the renderer, never arbitrary CLI text.
+  const target = requestedWorkspace === 'peat-fem' ? 'peat-fem' : requestedWorkspace === 'sequence' ? 'sequence' : requestedWorkspace === 'coupled' ? 'coupled' : requestedWorkspace === 'mechanics' ? 'mechanics' : requestedWorkspace === 'simulation' ? 'simulation' : 'study';
   mainWindow.webContents.executeJavaScript(`window.dispatchEvent(new CustomEvent('workspace-request', {detail: '${target}'}))`).catch(console.error);
 }
 
