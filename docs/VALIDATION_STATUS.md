@@ -1,5 +1,10 @@
 # Verification and validation status
 
+## Peat FEM refined-mesh residual correction (2026-10-02)
+
+A buried hot seed on the 8³ mesh stalled after 6.4 microseconds because a dimensional 1e-14 linear residual floor was too loose relative to nodal gas inventory. Tightening that floor to 1e-18 resolves the regression without relaxing the 1e-8 nonlinear target. The regression fails with the former floor and passes with the correction. All 1,759 tests in 90 files pass in 6.62 s; typecheck/lint/build pass. Current-code analysis is being rerun; prior hashes are not reused. Physical validation is incomplete.
+
+
 ## Peat FEM M2 reacting porous transport (2026-10-02)
 
 Feature branch `feat/peat-fire-fem` adds five conservative condensed inventories and four gas species, source-normalized drying/pyrolysis/peat and char oxidation, evolving material properties, compressible Darcy storage, species transport and gas sensible enthalpy. Pressure/species and heat iterate together; a new boundary regression exposed and corrected a 4.208 Pa thermal-expansion pressure drift. The active worker, scene, fields and schema-2 recordings use this solver. Main remains published v20.

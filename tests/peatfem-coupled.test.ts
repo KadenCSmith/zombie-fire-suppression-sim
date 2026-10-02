@@ -1,5 +1,6 @@
 import {describe,it,expect} from 'vitest'
 import {PeatSolver,DEFAULT_SETTINGS,totals} from '../src/peatfem/coupled'
+import {localInitial} from '../src/peatfem/chemistry'
 import {EMPTY_INTERVENTIONS} from '../src/peatfem/model'
 describe('active conservative reacting 3D FEM integration',()=>{
   it('has sealed no-source uniform identity and consistent EOS',()=>{
@@ -50,6 +51,21 @@ describe('active conservative reacting 3D FEM integration',()=>{
     expect(Array.from(a.frame.temperature)).toEqual(Array.from(restored.frame.temperature))
     saved.temperature[0]=999;expect(restored.frame.temperature[0]).not.toBe(999)
     expect(()=>restored.advance(.1,[{} as never])).toThrow('disabled')
+  })
+  it('advances a fine-mesh buried hot seed beyond the former gas residual-floor stall',()=>{
+    const s=new PeatSolver({...DEFAULT_SETTINGS,n:8,ignitionW:0,maxStepS:.005}),f=s.snapshot()
+    f.temperature.forEach((_,i)=>{
+      const [x,y,z]=s.mesh.coordinates.subarray(3*i,3*i+3),r2=((x-.05)**2+(y-.05)**2+(z-.05)**2)/.035**2,T=300+350*Math.max(0,1-r2)**2
+      const state=localInitial(123,.1*Math.max(0,Math.min(1,(373-T)/73)),T)
+      f.temperature[i]=T;f.water[i]=state.solid[0];f.gas.forEach((g,j)=>{g[i]=state.gas[j]})
+    })
+    f.peak={temperatureK:650,node:f.temperature.indexOf(650),timeS:0};s.restore(f)
+    const base=totals(s.mesh,s.frame)
+    while(s.frame.timeS<.0001-1e-12)s.advance()
+    const now=totals(s.mesh,s.frame)
+    expect(s.frame.nonlinearError).toBeLessThan(1e-8)
+    expect(Math.abs(now.componentsKg-base.componentsKg+s.frame.ledger.gasBoundaryKg.reduce((a,b)=>a+b,0))).toBeLessThan(1e-9)
+    expect(Math.abs(now.energyJ-base.energyJ-s.frame.ledger.reactionJ+s.frame.ledger.heatOutJ+s.frame.ledger.gasEnthalpyOutJ)).toBeLessThan(1e-4)
   })
   it('retains the last accepted state on a failed linear solve',()=>{
     const s=new PeatSolver({...DEFAULT_SETTINGS,n:2,initialK:410,maxIterations:0})

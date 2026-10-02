@@ -1,0 +1,17 @@
+{
+  "milestone": "M2.1 refined-mesh EOS residual-floor correction",
+  "coreChange": "Tighten dimensional linear absolute residual floors from 1e-14 to 1e-18; nonlinear gas/heat target 1e-8 and relative tolerances unchanged. No conservation or convergence check removed.",
+  "regression": "New n=8 buried 650 K seed stalls at 6.4 microseconds with old floor; same test passes with tightened floor. Before/after logs retained locally.",
+  "suite": {
+    "passed": 1759,
+    "failed": 0,
+    "files": 90,
+    "elapsedS": 6.62474755859375
+  },
+  "typecheck": "passed",
+  "lint": "passed existing warnings",
+  "build": "passed",
+  "native": "passed latest four-gas export/control/navigation check",
+  "analysis": "current-code profile and refined short-transport matrix being rerun; old hash results not reused",
+  "validation": "not established"
+}

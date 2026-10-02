@@ -37,7 +37,7 @@ export function solveSPD(matrix:Sparse,rhs:Float64Array,initial:Float64Array,dir
   }
   const A={...matrix,values},x=initial.slice();dirichlet.forEach((v,i)=>{x[i]=v})
   const ax=sparseAction(A,x),r=Float64Array.from(b,(v,i)=>v-ax[i]),z=Float64Array.from(r,(v,i)=>v/diagonal[i]),p=z.slice()
-  const rhsNorm=norm(b),tolerance=1e-14+relativeTolerance*rhsNorm
+  const rhsNorm=norm(b),tolerance=1e-18+relativeTolerance*rhsNorm
   let rz=dot(r,z),iterations=0
   while(norm(r)>tolerance&&iterations<maxIterations) {
     const ap=sparseAction(A,p),denominator=dot(p,ap)
@@ -70,9 +70,9 @@ export function solveMonotone(matrix:Sparse,rhs:Float64Array[],initial:Float64Ar
       const ax=sparseAction(matrix,fields[k]),res=Float64Array.from(rhs[k],(v,i)=>v-ax[i]),absolute=norm(res)
       relativeResidual=Math.max(relativeResidual,absolute/scale[k]);absoluteResidual=Math.max(absoluteResidual,absolute)
     }
-    if(relativeResidual<tolerance||absoluteResidual<1e-14)break
+    if(relativeResidual<tolerance||absoluteResidual<1e-18)break
   }
-  if(!Number.isFinite(relativeResidual)||(relativeResidual>tolerance&&absoluteResidual>1e-14))throw new Error(`Monotone solve did not converge: ${iterations}, residual ${relativeResidual}`)
+  if(!Number.isFinite(relativeResidual)||(relativeResidual>tolerance&&absoluteResidual>1e-18))throw new Error(`Monotone solve did not converge: ${iterations}, residual ${relativeResidual}`)
   return {fields,evidence:{iterations,relativeResidual,absoluteResidual}}
 }
 export interface Edge {i:number;j:number;ij:number;ji:number;conductance:number}
