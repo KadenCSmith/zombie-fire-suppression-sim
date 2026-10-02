@@ -45,8 +45,8 @@ export const CONSTRAINED_CRACK_PATHS: StoryPoint[][] = [
 /** Short contact fractures for the straight bore. One reaches the pale soil so onset is legible. */
 export const SOURCE_CONTACT_CRACK_PATHS: StoryPoint[][] = [
   [[.55,-1.27,.12],[.82,-.98,.085],[1.04,-.66,.055],[1.18,-.38,.048]],
-  [[.55,-1.27,.12],[.12,-1.41,.08],[-.36,-1.60,.05]],
-  [[.55,-1.27,.12],[.50,-1.67,.08],[.70,-2.18,.05]],
+  [[.55,-1.27,.12],[.08,-1.14,.13],[-.29,-.86,.13],[-.72,-.49,.13]],
+  [[.55,-1.27,.12],[.24,-1.68,.13],[-.11,-2.19,.13]],
 ]
 /** A shallow concave panel gains projected radius as it flattens; no pressure is inferred. */
 export function constrainedCapShape(time:number,mode:FireSourceMode) {

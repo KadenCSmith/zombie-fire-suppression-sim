@@ -96,7 +96,7 @@ export function buildStoryWettingGrid(time: number, constrained = false, mode: F
   if(time<=72||(constrained&&mode==='gradual'&&!sourceFracture))return {width,height,data}
   const paths=(sourceFracture?SOURCE_CONTACT_CRACK_PATHS:constrained?CONSTRAINED_CRACK_PATHS:STORY_CRACK_PATHS).map((path,branch)=>{
     const front=constrained?constrainedWettingProgress(time,branch):storyWettingProgress(time,branch)
-    return {front,points:Array.from({length:18},(_,i)=>pointAlongStoryPath(path,front*i/17)),radius:constrained?(sourceFracture?.12+.20*front:.045+.055*front):.028+.12*Math.sqrt(Math.max(0,Math.min(1,(time-72-branch*.65)/18)))}
+    return {front,points:Array.from({length:18},(_,i)=>pointAlongStoryPath(path,front*i/17)),radius:constrained?(sourceFracture?.105+.16*front:.045+.055*front):.028+.12*Math.sqrt(Math.max(0,Math.min(1,(time-72-branch*.65)/18)))}
   })
   for(let j=0;j<height;j++)for(let i=0;i<width;i++){
     const x=-4+(i+.5)*8/width,y=-3.2+(j+.5)*3.2/height
