@@ -51,6 +51,9 @@ app.on('browser-window-created',(_event,win)=>{
         if(!document.querySelector('.fire-experiment-displayed').textContent.includes('completed'))throw new Error('Accepted result missing');
         button('Restore bundled result').click();
         await wait(()=>document.body.textContent.includes('Bundled accepted history restored'),'bundled restore');
+        await wait(()=>Number(document.querySelector('input[aria-label="Fire sequence time"]')?.value)===0,'restore resets story clock');
+        change('Fire sequence time',63);
+        await wait(()=>document.querySelector('.fire-timeline-track strong')?.textContent.includes('63.0'),'seek before gallery navigation');
         button('Previous simulations · v0.8+').click();
         await wait(()=>document.querySelector('.comparison-shell')&&document.querySelectorAll('.comparison-card').length===2,'multi-view gallery with earlier replays');
         document.querySelector('input[aria-label="Select version 0.14.0"]').click();
