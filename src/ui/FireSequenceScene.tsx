@@ -16,11 +16,11 @@ import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, constrainedCapShape, con
 
 export interface FireFieldSnapshot { timeS: number; nx: number; ny: number; nz: number; temperatureK: ArrayLike<number>; oxygen: ArrayLike<number>; co2: ArrayLike<number>; dryIceKg?: number }
 export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolean; anatomy: boolean }
-interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean }
+interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean }
 const SOURCE_X = G.sourceX
 const random = (n: number) => { const v = Math.sin(n * 91.713 + 7.157) * 43758.5453; return v - Math.floor(v) }
 
-function Ground({ time, mode, view, frame, fire, water, realistic, openPit }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean; realistic: boolean; openPit: boolean }) {
+function Ground({ time, mode, view, frame, fire, water, realistic, openPit, straightBore }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean; realistic: boolean; openPit: boolean; straightBore: boolean }) {
   const invalidate = useThree(state => state.invalidate)
   const texture = useMemo(() => {
     const width = frame ? frame.nx * frame.ny : 2, height = frame?.nz ?? 2, data = new Float32Array(width * height * 4)
@@ -30,12 +30,12 @@ function Ground({ time, mode, view, frame, fire, water, realistic, openPit }: { 
     }
     const value = new THREE.DataTexture(data,width,height,THREE.RGBAFormat,THREE.FloatType); value.minFilter = value.magFilter = THREE.NearestFilter; value.needsUpdate = true; return value
   }, [frame])
-  const wetTexture=useMemo(()=>{const field=buildStoryWettingGrid(time,realistic,mode),tex=new THREE.DataTexture(field.data,field.width,field.height,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.LinearFilter;tex.needsUpdate=true;return tex},[time,realistic,mode])
+  const wetTexture=useMemo(()=>{const field=buildStoryWettingGrid(time,realistic,mode,straightBore),tex=new THREE.DataTexture(field.data,field.width,field.height,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.LinearFilter;tex.needsUpdate=true;return tex},[time,realistic,mode,straightBore])
   useEffect(()=>()=>wetTexture.dispose(),[wetTexture])
   const groundGeometry = useMemo(createFireGroundGeometry, [])
   const peatTexture = useMemo(() => { const field=buildPeatAppearance(), data=new Float32Array(field.nx*field.ny*4);for(let i=0;i<field.arrival.length;i++){data[i*4]=field.arrival[i];data[i*4+1]=field.mask[i];data[i*4+3]=1}const tex=new THREE.DataTexture(data,field.nx,field.ny,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.NearestFilter;tex.needsUpdate=true;return tex },[])
   useEffect(()=>()=>{groundGeometry.dispose();peatTexture.dispose()},[groundGeometry,peatTexture])
-  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uPitDepth:{value:0},uCapLift:{value:0},uRealistic:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uPitDepth:{value:0},uCapLift:{value:0},uRealistic:{value:0},uStraightBore:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
   const material = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({ roughness: .96, side: THREE.DoubleSide })
     m.onBeforeCompile = shader => {
@@ -55,7 +55,7 @@ if(uView<.5){
  float overhead=(1.0-smoothstep(.20,.90,radial))*smoothstep(-1.16,-.25,position.y);
  transformed.y+=uCapLift*overhead;
 }`)
-      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uPitDepth,uShowWater,uRealistic; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
+      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uPitDepth,uShowWater,uRealistic,uStraightBore; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
 float grain(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,41.21)))*43758.5453);}
 vec3 palette(float a){return mix(mix(vec3(.05,.26,.35),vec3(.28,.67,.48),smoothstep(.0,.6,a)),vec3(1.0,.38,.075),smoothstep(.55,1.0,a));}
 // Same outline as insideIllustratedPeat; the sampled arrival graph stays unchanged.
@@ -91,13 +91,24 @@ vec3 emberTint=mix(vec3(.90,.065,.003),vec3(1.0,.39,.026),step(.94,grain(floor(p
 float localGlow=1.0;for(int i=0;i<13;i++){float footprint=1.0-smoothstep(.3,1.0,distance(p.xy,uContacts[i].xy)/uContacts[i].z);localGlow=min(localGlow,mix(1.0,uContacts[i].w,footprint));}
 float wetness=texture2D(uWet,vec2((p.x+4.0)/8.0,(p.y+3.2)/3.2)).r*uShowWater;
 vec3 peatEmission=vec3(0.0);
-if(uView<.5 && p.z>-.02){earth=mix(earth,vec3(.035,.017,.009),heat*(.72+.13*grit));earth=mix(earth,earth*.40,wetness*.8);float visibleEmber=uRealistic>.5?step(.94,grain(floor(p*vec3(18.0,23.0,17.0))))*.16:1.0;peatEmission=heat*localGlow*(.035+.065*coarseHeat+ember*1.7)*emberTint*visibleEmber*(uRealistic>.5?1.0-.98*wetness:1.0);}
+if(uView<.5 && p.z>-.02){
+ earth=mix(earth,vec3(.035,.017,.009),heat*(.72+.13*grit));
+ float wetBlend=smoothstep(.08,.80,wetness);
+ if(uStraightBore>.5){
+  vec3 wetPeat=vec3(.040,.027,.020)*(.72+.42*grain(floor(p*vec3(61.0,69.0,53.0))));
+  earth=mix(earth,wetPeat,wetBlend*.94*peatMask);
+ }else earth=mix(earth,earth*.40,wetness*.8);
+ float sparse=step(.94,grain(floor(p*vec3(18.0,23.0,17.0))))*.16;
+ float visibleEmber=uStraightBore>.5?mix(1.0,sparse,wetBlend):(uRealistic>.5?sparse:1.0);
+ float wetGlow=uStraightBore>.5?1.0-.58*wetBlend:(uRealistic>.5?1.0-.98*wetness:1.0);
+ peatEmission=heat*localGlow*(.035+.065*coarseHeat+ember*1.7)*emberTint*visibleEmber*wetGlow;
+}
 diffuseColor.rgb=earth;`)
       shader.fragmentShader=shader.fragmentShader.replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=peatEmission;')
     }
     return m
   },[uniforms])
-  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,uniforms,texture,wetTexture,invalidate])
+  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uStraightBore.value=straightBore?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit&&!straightBore?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,straightBore,uniforms,texture,wetTexture,invalidate])
   useEffect(()=>()=>texture.dispose(),[texture]);useEffect(()=>()=>material.dispose(),[material])
   return <mesh geometry={groundGeometry} material={material} receiveShadow castShadow/>
 }
@@ -111,7 +122,7 @@ function OpenExcavation({time}:{time:number}){
   </group>
 }
 
-function StoryAggregates({time,mode,realistic,openPit}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean}){
+function StoryAggregates({time,mode,realistic,openPit,straightBore}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean;straightBore:boolean}){
   const group=useRef<THREE.Group>(null),invalidate=useThree(state=>state.invalidate)
   const originals=useRef(new Map<THREE.InstancedMesh,THREE.Matrix4[]>())
   const uniform=useMemo(()=>({value:0}),[]),cavityUniform=useMemo(()=>({value:0}),[]),pitUniform=useMemo(()=>({value:0}),[])
@@ -124,10 +135,10 @@ if(uCavity>.005&&pow(length(vec2(vAggregateWorld.x-${SOURCE_X},vAggregateWorld.z
       material.needsUpdate=true
     })
   },[uniform,cavityUniform,pitUniform])
-  useLayoutEffect(()=>{cavityUniform.value=openPit?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);if(realistic)position.y+=constrainedSoilLiftAt(position.x,position.y,position.z,time,mode);else position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,realistic,openPit,uniform,cavityUniform,pitUniform,invalidate])
+  useLayoutEffect(()=>{cavityUniform.value=openPit||straightBore?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);if(realistic&&!straightBore)position.y+=constrainedSoilLiftAt(position.x,position.y,position.z,time,mode);else if(!realistic)position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,realistic,openPit,straightBore,uniform,cavityUniform,pitUniform,invalidate])
   return <group ref={group}><NaturalAggregates fidelity="precision2560" cut/></group>
 }
-function Tree({time,mode,realistic,openPit}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean}){
+function Tree({time,mode,realistic,openPit,straightBore}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean;straightBore:boolean}){
   const group=useRef<THREE.Group>(null),texture=useMemo(createSoilTexture,[]),uniform=useMemo(()=>({value:0}),[]),cavityUniform=useMemo(()=>({value:0}),[]),pitUniform=useMemo(()=>({value:0}),[]),invalidate=useThree(state=>state.invalidate)
   useEffect(()=>()=>texture.dispose(),[texture])
   useLayoutEffect(()=>{
@@ -146,15 +157,15 @@ if(uStoryCavity>.005&&pow(length(vec2(vOak.x-${SOURCE_X},vOak.z))/(${G.cavityRad
     // React effect replay and natural/scientific remounts must not stack hooks.
     return()=>{for(const [material,original] of originals){material.onBeforeCompile=original.compile;material.customProgramCacheKey=original.cache;material.needsUpdate=true}}
   },[uniform,cavityUniform,pitUniform])
-  useLayoutEffect(()=>{cavityUniform.value=openPit?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),data=texture.image.data as Float32Array;for(let j=0;j<25;j++)for(let i=0;i<49;i++){const x=-4+i/48*8,y=-3.2+j/24*3.2,o=realistic?[0,constrainedSoilLiftAt(x,y,0,time,mode),0]:storyRuptureOffset(x,y,0,r.pulse,r.damage),id=(j*49+i)*4;data[id]=o[0];data[id+1]=o[1]}texture.needsUpdate=true;invalidate()},[time,mode,realistic,openPit,texture,uniform,cavityUniform,pitUniform,invalidate])
+  useLayoutEffect(()=>{cavityUniform.value=openPit||straightBore?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),data=texture.image.data as Float32Array;for(let j=0;j<25;j++)for(let i=0;i<49;i++){const x=-4+i/48*8,y=-3.2+j/24*3.2,o=realistic?[0,straightBore?0:constrainedSoilLiftAt(x,y,0,time,mode),0]:storyRuptureOffset(x,y,0,r.pulse,r.damage),id=(j*49+i)*4;data[id]=o[0];data[id+1]=o[1]}texture.needsUpdate=true;invalidate()},[time,mode,realistic,openPit,straightBore,texture,uniform,cavityUniform,pitUniform,invalidate])
   return <group ref={group}><OakTree soilTexture={texture} natural/></group>
 }
-function SourceAndCap({time,mode,realistic,openPit}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean}){
+function SourceAndCap({time,mode,realistic,openPit,straightBore}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean;straightBore:boolean}){
   const pose=fireSequencePose(time,mode)
   const mass=contactCoolingState(time,mode).ledger.dryIceRemainingKg,radius=Math.cbrt(3*Math.max(0,mass)/(4*Math.PI*G.sourceDensityKgM3))
-  const pocket=(realistic?eased(time,31,33):pose.underream)>.05
+  const pocket=!straightBore&&(realistic?eased(time,31,33):pose.underream)>.05
   const wallSegments=pocket?[[0,-G.cavityCenterY-G.cavityHalfHeightM],[-G.cavityCenterY+G.cavityHalfHeightM,pose.drillDepth]]:[[0,pose.drillDepth]]
-  return <>{!openPit&&<>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}<Chamber time={time} constrained={realistic}/><Underreamer time={time} constrained={realistic}/></>}<group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]}><mesh><sphereGeometry args={[Math.max(.001,radius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group>{realistic?<ConstrainedCap time={time} mode={mode}/>:<SegmentedDome time={time} mode={mode}/>}</>
+  return <>{!openPit&&<>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}{!straightBore&&<><Chamber time={time} constrained={realistic}/><Underreamer time={time} constrained={realistic}/></>}</>}<group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]}><mesh><sphereGeometry args={[Math.max(.001,radius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group>{realistic?<ConstrainedCap time={time} mode={mode} fixedSize={straightBore}/>:<SegmentedDome time={time} mode={mode}/>}</>
 }
 function SurfaceConnection({time,visible}:{time:number;visible:boolean}){
   const points=useMemo(()=>new THREE.CatmullRomCurve3([new THREE.Vector3(1.72,.035,-.28),new THREE.Vector3(1.72,.005,.035),new THREE.Vector3(1.78,-.38,.038),new THREE.Vector3(1.64,-.73,.04),new THREE.Vector3(1.6,-1.02,.04)]).getPoints(60),[])
@@ -215,20 +226,21 @@ function Camera({resetToken}:{resetToken:number}){
 export function FireSequenceScene(props:SceneProps){
   const realistic=props.realistic??false
   const openPit=props.openPit??false
+  const straightBore=props.straightBore??false
   return <Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4.0,12.3],fov:38,near:.05,far:60}}>
     <color attach="background" args={['#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
     <directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-bias={-.0002}/>
-    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit}/>
+    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
     {props.view==='natural'&&<>
-      <StoryAggregates time={props.time} mode={props.mode} realistic={realistic} openPit={openPit}/>
-      <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit}/>
-      {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic} openPit={openPit}/>}
+      <StoryAggregates time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+      <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+      {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
       <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
       {openPit&&<OpenExcavation time={props.time}/>}
-      <SequenceExcavator time={props.time} openPit={openPit}/><SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit}/>
+      <SequenceExcavator time={props.time} openPit={openPit}/><SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
       <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic}/>
       {!realistic&&<><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}
-      {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/>}
+      {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water} sourceFracture={straightBore}/>}
     </>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>
     <Camera resetToken={props.resetToken}/>

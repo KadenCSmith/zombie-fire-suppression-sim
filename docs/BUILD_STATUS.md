@@ -1,5 +1,11 @@
 # Build status and handoff
 
+## Straight-bore Chrome preview (2026-10-01)
+
+The working branch `codex/scene-mix-bore-fracture` updates the main interactive scene in the Chrome development preview. It combines the V16 tracked auger, V17.1 dense smoldering embers and woven hose, V9 straight bore and fixed-size descending metal cap, and V18.1-style dark peat with sparse embers in locally wetted areas. Contact fractures begin with dry-ice placement at story 44 s. The historical gallery replays remain preserved. The installed 0.18.2 Mac application has not been updated in this preview pass.
+
+Local typecheck, lint, all **1,713 tests in 85 files**, production build and the full Electron fire-sequence smoke passed. Lint retained its existing non-failing warnings. Chrome visual inspection checked the excavator at 30 s, dry-ice contact at 44.8–45.5 s, cap descent at 50–52 s, and hose/wet peat at 82 s. The smoke gate was corrected to seek back to 63 s after restoring the bundled experiment, which intentionally resets the story clock to 0. These checks establish authored scene behavior and navigation, not physical validation. Hosted CI has not yet run for this branch.
+
 ## Local 0.18.2 formula build and installation (2026-10-01)
 
 The 0.18.1 scene/gallery branch and the physical-formulas reference were integrated into a 0.18.2 local Mac build. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. The Apple Silicon ZIP passed a clean extraction and strict deep signature check; the DMG passed verification. The ZIP SHA-256 is `f665f956becf8f6994adc72094851e7877cb606ebc13025b90f270ed55da1a4d`. Version 0.18.2 was installed at `~/Applications/Zombie Fire Suppression Sim.app`, launched, and its **Physical formulas** page was opened in the native window. The previous 0.18.1 bundle was archived before replacement. This is a local build from the open development pull requests, not a published GitHub release. The referenced convergence graphs still use the archived cold-source study; no new physical validation is claimed.

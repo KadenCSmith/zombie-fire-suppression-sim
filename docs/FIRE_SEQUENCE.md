@@ -1,6 +1,12 @@
 # Fire-first workflow and visual evidence boundaries
 
-## Current 0.18.1 scene
+## Current Chrome development scene (after 0.18.2)
+
+The main interactive natural view now combines preserved visual elements: V16's tracked excavator and rotating auger, V17.1's dense orange smoldering embers and woven hose, V9's straight cylindrical bore and descending metal cap, and V18.1's dark peat with sparse residual embers after local water contact. The auger and bore stay at their original 0.20 m and 0.24 m radii; no underreamed chamber or open pit is made. The metal cap has a constant 0.2184 m radius and 0.055 m concavity during descent and afterward. Its center descends from the surface into the bore at story 48–51.5 s. Neither the cap nor the bore expands, and there is no cap flattening or soil uplift. These dimensions and motions are authored visualization geometry, not an installation or a mechanical calculation.
+
+Short fractures begin when the dry-ice proxy reaches its prescribed depth at story 44 s, before the cap descends. Three local branches are illustrated; the right upper branch reaches visible pale soil to make the onset legible. No failure stress or pressure is computed. The woven hose enters at 69–72 s. Water appearance begins along those branches at 72 s in either source mode; a local halo darkens peat and reduces ember density only where its assumed front reaches. Unreached peat stays bright. This is not a Darcy/Richards infiltration prediction or a field-scale extinguishment result. The accepted numerical fields and separate contact budget are unchanged. This is a browser development preview; the installed 0.18.2 Mac app still has the earlier scene.
+
+## Historical 0.18.1 scene
 
 The main interactive scene shows a fixed-width excavator bucket opening a pit with sloped sides. A finite source proxy and shallow concave metal cap are placed while the pit remains open. The pit is then backfilled above the cap. In rapid mode the cap flattens instead of inverting; its projected radius increases only up to the initial meridian length, and soil directly above it lifts by at most 0.04 m. Short illustrated fractures receive water after hose insertion, and embers dim where assumed wetting arrives. The scene omits the prior widening cutter, global burst debris and visible CO₂. The excavation, backfill, deformation and wetting are staged, not measured construction performance or a validated peat-fire treatment. Root damage and excavation support are not calculated. The accepted numerical fields and separate contact budget are unchanged. The earlier 0.18.0 underreamed pocket remains selectable under **Previous simulations · v0.8+**.
 
@@ -30,7 +36,7 @@ The interactive story lasts 90 presentation seconds. Default playback and both c
 
 A shared seeded connected arrival graph on the 200 × 80 appearance atlas drives peat involvement. The front reaches 70% of its 4,141 display samples before equipment starts, leaving an unburnt margin. The arrival map is a display construction, not a transport/combustion solution. Boundary smoothing does not alter that threshold. Hot peat uses embers and char rather than a buried flame sheet.
 
-In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The current 0.18.1 scene instead uses open excavation and backfill, bounded cap flattening and local soil lift. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
+In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The preserved 0.18.1 scene uses open excavation and backfill, bounded cap flattening and local soil lift. The current Chrome preview uses a straight bore, a fixed-size cap and a fracture timed to dry-ice contact. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
 
 ## Reproducibility and limits
 

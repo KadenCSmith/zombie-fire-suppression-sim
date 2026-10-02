@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## Straight-bore scene preview (2026-10-01)
+
+The Chrome development preview changes authored presentation geometry and appearance only. The bore radius is fixed at 0.24 m; the cap radius is a constant 0.2184 m through descent and treatment. Short fractures begin at story 44 s with dry-ice contact. Local prescribed wetting in either source mode turns reached peat dark with sparse residual embers; uncontacted peat retains the V17.1 bright ember field. The V16 excavator and V17.1 woven hose are reused. The accepted FVM fields, separate finite contact ledger, calibration status and convergence estimates have not changed. Neither the fracture path nor liquid-front timing is derived from solved soil failure or infiltration equations. Typecheck, lint, 1,713 local tests, production build and the Electron fire-sequence smoke passed; Chrome visual review covered the key intervention stages. Hosted cross-platform checks remain to be run for this branch.
+
 ## 0.18.2 integration and installed-app check (2026-10-01)
 
 The formula reference was combined with the 0.18.1 scene/gallery branch. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, and production build passed. The arm64 package passed code-signature, extracted-ZIP and DMG checks, and the installed bundle reports 0.18.2. Its native window opened the new formula page. These checks establish software packaging and navigation only; they do not add a matched experiment or a whole-model physical error percentage. The spatial and temporal graphs remain limited to the archived 2 s cold-source calculation.

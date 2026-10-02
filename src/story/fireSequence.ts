@@ -6,17 +6,17 @@ export const FIRE_SEQUENCE_GEOMETRY = { sourceX: 0.4, sourceDepthM: 1.3, sourceI
 export const FIRE_SEQUENCE_STAGES = [
   { id: 'surface', start: 0, end: 10, title: 'A small surface fire', short: 'Ignition', description: 'A localized ignition starts the story above organic ground.', evidence: 'Flames are a visual cue. The field view shows the numerical temperature state.' },
   { id: 'underground', start: 10, end: 24, title: 'The fire moves underground', short: 'Subsurface spread', description: 'The story illustrates a buried peat fire. A moving underground front is not resolved by this calculation.', evidence: 'Underground spread is prescribed in the natural story. Accepted numerical fields show heating and oxidation without a resolved moving subsurface front.' },
-  { id: 'drilling', start: 24, end: 37, title: 'Excavate an open pit', short: 'Open excavation', description: 'At 70% illustrated peat involvement, a tracked excavator uses a fixed-width bucket to open the pit. There is no widening drill.', evidence: 'Bucket motion and the sloped excavation are staged. Soil stability, root contact and excavation forces are not solved.' },
-  { id: 'source', start: 37, end: 47, title: 'Lower the dry ice', short: 'Dry ice', description: 'A finite dry-ice sphere is placed in the open excavation after the bucket leaves.', evidence: 'Placement is prescribed. Natural-view source mass follows the separate finite contact-model inventory; accepted experiment inventory is reported separately.' },
-  { id: 'dome', start: 47, end: 55, title: 'Place the concave cap and backfill', short: 'Cap & backfill', description: 'A shallow concave cap is positioned in the open pit, then soil is returned over it while leaving a hose route.', evidence: 'Placement, backfill and seal contact are staged geometry, not a verified field installation.' },
-  { id: 'treatment', start: 55, end: 69, title: 'Cap flattens under a pressure pulse', short: 'Cap response', description: 'In rapid mode the concave cap flattens, its projected diameter increases modestly, and soil directly above it lifts slightly.', evidence: 'The cap shape and local soil lift are constrained visual assumptions. No pressure or failure load is calculated; CO₂ is not explosive.' },
+  { id: 'drilling', start: 24, end: 37, title: 'Drill a straight bore', short: 'Straight bore', description: 'At 70% illustrated peat involvement, the tracked excavator turns a fixed-width auger into the peat.', evidence: 'Auger motion and the cylindrical bore are staged. Soil stability, root contact and excavation forces are not solved.' },
+  { id: 'source', start: 37, end: 47, title: 'Lower dry ice; fractures appear', short: 'Dry ice', description: 'Dry ice descends the straight bore. Short illustrated fractures appear at source contact.', evidence: 'Placement and fracture paths are authored. Natural-view source mass follows a separate finite contact-model inventory; no soil failure criterion is solved.' },
+  { id: 'dome', start: 47, end: 55, title: 'Lower the fixed-size metal cap', short: 'Metal cap', description: 'A small metal cap drops into the original bore. Its width and profile stay fixed.', evidence: 'The cap is staged geometry. Fit, sealing and structural loading have not been validated.' },
+  { id: 'treatment', start: 55, end: 69, title: 'Observe the buried source', short: 'Source interval', description: 'The cap remains in place while the separate contact model records gradual or rapid dry-ice behavior. No cap or bore expansion is shown.', evidence: 'The separate contact budget is an assumption-based local calculation. It does not predict a pressure pulse or field-scale suppression.' },
   { id: 'water', start: 69, end: 85, title: 'Water enters the fractures', short: 'Water stage', description: 'A woven hose enters through the cap gap. Water follows short illustrated fractures, and embers dim where the assumed wetting reaches them.', evidence: 'Wetting routes and visual ember extinction are authored. Local contact cooling has a separate finite budget; infiltration and field suppression are not predicted.' },
   { id: 'review', start: 85, end: 90, title: 'Inspect what remains', short: 'Review', description: 'Some peat can remain hot. Compare the visual narrative with the available solver evidence.', evidence: 'This is not a validated treatment procedure or a prediction of extinguishment.' },
 ] as const
 export function sequenceStage(time: number) { return FIRE_SEQUENCE_STAGES.find(stage => time >= stage.start && time < stage.end) ?? FIRE_SEQUENCE_STAGES[FIRE_SEQUENCE_STAGES.length - 1] }
 export const phase = (time: number, start: number, end: number) => Math.max(0, Math.min(1, (time - start) / (end - start)))
 export const eased = (time: number, start: number, end: number) => { const p = phase(time, start, end); return p * p * (3 - 2 * p) }
-/** Current open excavation is cut by a fixed-size bucket, then refilled over the cap. */
+/** Preserved v0.18.1 open-excavation replay. */
 export function openPitDepthAt(time:number){return FIRE_SEQUENCE_GEOMETRY.pitDepthM*eased(time,24,34)*(1-eased(time,54,55))}
 export function openPitRadiusAtY(y:number,depth:number){return FIRE_SEQUENCE_GEOMETRY.pitBottomRadiusM+(FIRE_SEQUENCE_GEOMETRY.pitTopRadiusM-FIRE_SEQUENCE_GEOMETRY.pitBottomRadiusM)*Math.max(0,Math.min(1,(y+depth)/Math.max(depth,1e-6)))}
 export function fireSequencePose(time: number, mode: FireSourceMode) {
@@ -42,6 +42,12 @@ export const CONSTRAINED_CRACK_PATHS: StoryPoint[][] = [
   [[.515,-1.265,.115],[.12,-1.42,.075],[-.38,-1.62,.045]],
   [[.515,-1.265,.115],[.52,-1.63,.08],[.72,-1.92,.045]],
 ]
+/** Short contact fractures for the straight bore. One reaches the pale soil so onset is legible. */
+export const SOURCE_CONTACT_CRACK_PATHS: StoryPoint[][] = [
+  [[.55,-1.27,.12],[.82,-.98,.085],[1.04,-.66,.055],[1.18,-.38,.048]],
+  [[.55,-1.27,.12],[.12,-1.41,.08],[-.36,-1.60,.05]],
+  [[.55,-1.27,.12],[.50,-1.67,.08],[.70,-2.18,.05]],
+]
 /** A shallow concave panel gains projected radius as it flattens; no pressure is inferred. */
 export function constrainedCapShape(time:number,mode:FireSourceMode) {
   const initialRadiusM=.49,initialDepthM=.22,flatten=mode==='rapid'?eased(time,55,58):0
@@ -54,6 +60,10 @@ export function constrainedSoilLiftAt(x:number,y:number,z:number,time:number,mod
   return constrainedCapShape(time,mode).soilLiftM*(1-smooth(.2,.9,Math.hypot(x-FIRE_SEQUENCE_GEOMETRY.sourceX,z)))*smooth(-1.16,-.25,y)
 }
 export function constrainedWettingProgress(time:number,branch:number){return eased(time,72+branch*.7,84)}
+/** Current straight-bore scene: a constant-size cap fits within the original shaft. */
+export function fixedBoreCapShape(){return {radiusM:FIRE_SEQUENCE_GEOMETRY.boreRadiusM*.91,depthM:.055}}
+/** Prescribed fracture onset coincides with dry-ice contact at story second 44. */
+export function sourceContactFracture(time:number){return eased(time,44,45.5)}
 export const STORY_HOSE_POINTS: StoryPoint[] = [[-4.4,.15,-.8],[-3.5,.16,-.4],[-2.7,.16,-.72],[-1.9,.16,-.32],[-1.1,.16,-.50],[-.20,.19,-.12],[.34,.32,.10],[.51,.15,.11],[.49,-.3,.09],[.52,-.85,.12],[.515,-1.265,.115]]
 export const STORY_WATER_START = 72
 export function storyHosePoints(time: number): StoryPoint[] {

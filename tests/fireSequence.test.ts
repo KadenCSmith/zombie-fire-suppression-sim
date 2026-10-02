@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
 
 describe('story and accepted-state separation', () => {
   const frames = [
@@ -86,6 +86,28 @@ describe('constrained current cap and water illustration',()=>{
       expect(constrainedWettingProgress(71,i)).toBe(0)
       expect(constrainedWettingProgress(90,i)).toBe(1)
     }
+  })
+})
+
+describe('straight-bore animation variant',()=>{
+  it('uses the original fixed bore and keeps the cap inside it throughout descent and treatment',()=>{
+    const cap=fixedBoreCapShape()
+    expect(G.augerRadiusM).toBeLessThan(G.boreRadiusM)
+    expect(cap.radiusM).toBeLessThan(G.boreRadiusM)
+    expect(cap.depthM).toBeGreaterThan(0)
+    for(const time of [47,48,50,51.5,55,65,90]){
+      expect(fixedBoreCapShape()).toEqual(cap)
+      expect(fireSequencePose(time,'rapid').drillDepth).toBeCloseTo(G.boreDepthM)
+    }
+    expect(fireSequencePose(48,'rapid').capY).toBeGreaterThan(fireSequencePose(51.5,'rapid').capY)
+  })
+  it('starts local fractures when dry ice reaches the bottom, before cap placement',()=>{
+    expect(fireSequencePose(44,'rapid').sourceY).toBeCloseTo(-G.sourceDepthM)
+    expect(sourceContactFracture(43.9)).toBe(0)
+    expect(sourceContactFracture(44.8)).toBeGreaterThan(0)
+    expect(sourceContactFracture(45.5)).toBe(1)
+    expect(SOURCE_CONTACT_CRACK_PATHS).toHaveLength(3)
+    expect(SOURCE_CONTACT_CRACK_PATHS[0].at(-1)![1]).toBeGreaterThan(-1)
   })
 })
 

@@ -57,4 +57,14 @@ describe('limited local soil wetting appearance',()=>{
     expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
     expect(count(buildStoryWettingGrid(90,true,'gradual').data)).toBe(0)
   })
+  it('shows local wetting after hose contact in both source modes of the straight-bore scene',()=>{
+    const count=(data:Float32Array)=>Array.from(data).filter((v,i)=>i%4===0&&v>.05).length
+    for(const mode of ['gradual','rapid'] as const){
+      expect(count(buildStoryWettingGrid(72,true,mode,true).data)).toBe(0)
+      const early=buildStoryWettingGrid(75,true,mode,true),late=buildStoryWettingGrid(90,true,mode,true)
+      expect(count(early.data)).toBeGreaterThan(0)
+      expect(count(late.data)).toBeGreaterThan(count(early.data))
+      expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
+    }
+  })
 })

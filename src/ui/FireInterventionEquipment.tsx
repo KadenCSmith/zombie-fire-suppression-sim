@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Line } from '@react-three/drei/core/Line.js'
 import * as THREE from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, fireSequencePose, storyCapShape, constrainedCapShape, storyHosePoints, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, eased, type FireSourceMode, type StoryPoint } from '../story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, fireSequencePose, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, storyHosePoints, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, eased, type FireSourceMode, type StoryPoint } from '../story/fireSequence'
 import { storyRupture, storyRuptureOffset } from '../story/fireAppearance'
 
 const UP = new THREE.Vector3(0,1,0)
@@ -38,23 +38,24 @@ export function SegmentedDome({time,mode}:{time:number;mode:FireSourceMode}) {
   return <group position={[G.sourceX,shape.rimY,0]} userData={{scientificRole:'authored segmented shell deployment, inversion and wedge engagement'}}><mesh geometry={geometry} castShadow><meshStandardMaterial color="#9caeb0" metalness={.84} roughness={.29} side={THREE.DoubleSide}/></mesh>{Array.from({length:10},(_,i)=>{const a=G.capGapCenterRad+G.capGapHalfAngleRad+(Math.PI*2-G.capGapHalfAngleRad*2)*(i+.5)/10,r=shape.radiusM*.97;return <group key={i} position={[Math.sin(a)*r,0,Math.cos(a)*r]} rotation={[0,a,0]}><mesh><boxGeometry args={[.063,.034,.075+.065*shape.damage]}/><meshStandardMaterial color="#626d6b" metalness={.9} roughness={.4}/></mesh><mesh position={[0,.021,0]}><sphereGeometry args={[.018,8,6]}/><meshStandardMaterial color="#d0d2c4" metalness={.9} roughness={.3}/></mesh></group>})}</group>
 }
 /** A constrained concave panel flattens without turning into an inflated dome. */
-export function ConstrainedCap({time,mode}:{time:number;mode:FireSourceMode}) {
-  const p=fireSequencePose(time,mode),shape=constrainedCapShape(time,mode)
+export function ConstrainedCap({time,mode,fixedSize=false}:{time:number;mode:FireSourceMode;fixedSize?:boolean}) {
+  const p=fireSequencePose(time,mode),shape=fixedSize?fixedBoreCapShape():constrainedCapShape(time,mode)
   const geometry=useMemo(()=>{
     const positions:number[]=[],normals:number[]=[],parts=10,rows=16,columns=7
     const gap=G.capGapHalfAngleRad*2,start=G.capGapCenterRad+G.capGapHalfAngleRad,sector=(Math.PI*2-gap)/parts
-    const radius=G.capFoldedRadiusM+(shape.radiusM-G.capFoldedRadiusM)*p.capDeployment
-    const at=(q:number,theta:number)=>new THREE.Vector3(Math.sin(theta)*radius*q,.38*(1-q)*(1-p.capDeployment)-shape.depthM*(1-q*q)*p.capDeployment,Math.cos(theta)*radius*q)
+    const deployment=fixedSize?1:p.capDeployment
+    const radius=fixedSize?shape.radiusM:G.capFoldedRadiusM+(shape.radiusM-G.capFoldedRadiusM)*deployment
+    const at=(q:number,theta:number)=>new THREE.Vector3(Math.sin(theta)*radius*q,.38*(1-q)*(1-deployment)-shape.depthM*(1-q*q)*deployment,Math.cos(theta)*radius*q)
     const tri=(a:THREE.Vector3,b:THREE.Vector3,c:THREE.Vector3)=>{const normal=b.clone().sub(a).cross(c.clone().sub(a)).normalize();for(const point of[a,b,c]){positions.push(...point.toArray());normals.push(...normal.toArray())}}
     for(let panel=0;panel<parts;panel++)for(let i=0;i<rows;i++)for(let j=0;j<columns;j++){
       const q=.04+i/rows*.96,qq=.04+(i+1)/rows*.96,a=start+panel*sector+.007+(sector-.014)*j/columns,b=start+panel*sector+.007+(sector-.014)*(j+1)/columns
       tri(at(q,a),at(qq,a),at(qq,b));tri(at(q,a),at(qq,b),at(q,b))
     }
     const result=new THREE.BufferGeometry();result.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));result.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));return result
-  },[shape.radiusM,shape.depthM,p.capDeployment])
+  },[shape.radiusM,shape.depthM,p.capDeployment,fixedSize])
   useEffect(()=>()=>geometry.dispose(),[geometry])
   if(!p.capVisible)return null
-  return <group position={[G.sourceX,p.capY,0]} userData={{scientificRole:'authored concave-to-flat panel with bounded projected-radius change; pressure and material strain not calculated'}}><mesh geometry={geometry} castShadow><meshStandardMaterial color="#899795" metalness={.72} roughness={.42} side={THREE.DoubleSide}/></mesh></group>
+  return <group position={[G.sourceX,p.capY,0]} userData={{scientificRole:fixedSize?'authored fixed-size metal cap descending the original cylindrical bore; fit and loading not calculated':'authored concave-to-flat panel with bounded projected-radius change; pressure and material strain not calculated'}}><mesh geometry={geometry} castShadow><meshStandardMaterial color="#899795" metalness={.72} roughness={.42} side={THREE.DoubleSide}/></mesh></group>
 }
 /** Original procedural woven canvas material; no stock pixels are used. */
 function hoseTexture() {
@@ -78,10 +79,11 @@ export function CrackAndWaterPaths({time,mode,showWater}:{time:number;mode:FireS
   const pose=fireSequencePose(time,mode),r=storyRupture(time,mode),offset=(p:StoryPoint):StoryPoint=>{const d=storyRuptureOffset(...p,r.pulse,r.damage);return[p[0]+d[0],p[1]+d[1],p[2]+d[2]]}
   return <>{mode==='rapid'&&pose.crack>0&&STORY_CRACK_PATHS.map((points,i)=><Line key={i} points={points.map(offset)} color="#0b0806" lineWidth={.6+pose.crack*1.8} transparent opacity={pose.crack*.85}/>)}{showWater&&time>=72&&STORY_CRACK_PATHS.map((points,i)=>{const front=storyWettingProgress(time,i),wet=Array.from({length:24},(_,j)=>offset(pointAlongStoryPath(points,front*j/23)));return <Line key={i} points={wet} color="#536e70" lineWidth={1.8} transparent opacity={.5*eased(time,72+i*.65,74+i*.65)}/>})}{showWater&&<FabricHose time={time}/>}</>
 }
-export function ConstrainedCrackAndWaterPaths({time,mode,showWater}:{time:number;mode:FireSourceMode;showWater:boolean}) {
-  const flatten=constrainedCapShape(time,mode).flatten
-  return <>{mode==='rapid'&&flatten>0&&CONSTRAINED_CRACK_PATHS.map((points,i)=><Line key={`fracture-${i}`} points={points} color="#17100d" lineWidth={.65+flatten*.8} transparent opacity={flatten*.7}/>)}
-    {mode==='rapid'&&showWater&&time>=72&&CONSTRAINED_CRACK_PATHS.map((points,i)=>{
+export function ConstrainedCrackAndWaterPaths({time,mode,showWater,sourceFracture=false}:{time:number;mode:FireSourceMode;showWater:boolean;sourceFracture?:boolean}) {
+  const fracture=sourceFracture?sourceContactFracture(time):constrainedCapShape(time,mode).flatten
+  const paths=sourceFracture?SOURCE_CONTACT_CRACK_PATHS:CONSTRAINED_CRACK_PATHS
+  return <>{(sourceFracture||mode==='rapid')&&fracture>0&&paths.map((points,i)=><group key={`fracture-${i}`}><Line points={points} color="#17100d" lineWidth={sourceFracture?1.1+fracture*1.4:.65+fracture*.8} transparent opacity={fracture*.9}/>{sourceFracture&&<Line points={points.map(([x,y,z])=>[x,y+.015,z+.004] as StoryPoint)} color="#a57e5d" lineWidth={.7} transparent opacity={fracture*.55}/>}</group>)}
+    {(sourceFracture||mode==='rapid')&&showWater&&time>=72&&paths.map((points,i)=>{
       const progress=constrainedWettingProgress(time,i)
       if(progress<=0)return null
       const wet=Array.from({length:24},(_,j)=>pointAlongStoryPath(points,progress*j/23))
