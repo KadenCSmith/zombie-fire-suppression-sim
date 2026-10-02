@@ -1,12 +1,12 @@
 # Install Zombie Fire Unified Physics Lab
 
 The unified releases target **Apple Silicon Macs running macOS 13 or later**.
-The **0.19.0** Mac app is packaged for a single installation at `~/Applications/Zombie Fire Suppression Sim.app`. It includes the **Physical formulas** reference view, current straight-bore scene and historical gallery. **Previous simulations · v0.8+** is visible above the main scene and in the top bar; the three-dot menu has a simulation-selection tab and a second tab with three interface styles. The 0.12 Blender clip is a 2.5-second checkpoint review; it is not continuous motion. Versions 0.10, 0.11 and 0.13 have no preserved Blender movie in the bundle and are listed accordingly. The current scene shows a fixed bore, enlarged display sphere, fixed-size falling cap, brief illustrated gas release and water that visibly starts at the hose and follows connected fractures. The earlier open-pit, widening-cutter and dome scenes remain labeled historical replays. Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
+The **0.20.0** Mac app is packaged for a single installation at `~/Applications/Zombie Fire Suppression Sim.app`. It includes the cinematic render, Simulation Version navigation, searchable Finder and 30%-width desktop Toolbox. Formula documentation is in Finder; all variables and retained extra tools are in Toolbox. Previous simulations retains the authored 0.19.0 scene and earlier scenes/films. The latest sequence overlaps drilling with continuous illustrated spread, then brings in a water truck and an attached unspooling hose before the established progressive water stage. [Current controls and timing](FIRE_PRESENTATION.md). Version **0.12.0** is the reference release. Version **0.13.0** is the optimized
 accuracy-workflow successor: it retains the same physics and acceptance gates,
 with a verified sparse mechanics backend. No version claims experimental
 accuracy or validated field suppression.
 
-[Current Mac release 0.19.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.19.0) · [Earlier film release 0.15.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.15.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0)
+[Current Mac release 0.20.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.20.0) · [Earlier film release 0.15.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.15.0) · [Reference release 0.12.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.12.0) · [Accuracy release 0.13.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.13.0)
 
 For published versions, download assets only from a published release. GitHub access is required while
 the repository is private. The packaged app runs offline without Node.js,
@@ -17,7 +17,7 @@ optional Blender derivatives. There is no automatic updater.
 
 | Release | Apple Silicon disk image | Alternative archive |
 | --- | --- | --- |
-| 0.19 current full app | `Zombie-Fire-Sim-0.19.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.19.0-macOS-arm64.zip` |
+| 0.20 current full app | `Zombie-Fire-Sim-0.20.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.20.0-macOS-arm64.zip` |
 | 0.15 published film release | `Zombie-Fire-Sim-0.15.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.15.0-macOS-arm64.zip` |
 | 0.12 reference | `Zombie-Fire-Sim-0.12.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.12.0-macOS-arm64.zip` |
 | 0.13 accuracy workflow | `Zombie-Fire-Sim-0.13.0-macOS-arm64.dmg` | `Zombie-Fire-Sim-0.13.0-macOS-arm64.zip` |
@@ -26,7 +26,7 @@ Open the DMG and drag the complete application to Applications, or extract the
 ZIP and move the whole `.app`. These new packages are **arm64**, not universal
 Mac builds. Earlier Intel Mac, Windows and Linux packages remain in the
 [0.11.0 release](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.11.0).
-They contain the earlier application and do not include the unified 0.12–0.19
+They contain the earlier application and do not include the unified 0.12–0.20
 features. Availability of an archive does not establish native testing on that
 platform; consult [validation status](VALIDATION_STATUS.md).
 

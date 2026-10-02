@@ -120,7 +120,7 @@ export function pointAlongStoryPath(points: StoryPoint[], fraction: number): Sto
 }
 
 /** Select stored states, preserving the zero-time dry-ice insertion discontinuity. */
-export function acceptedFireFrame<T extends { timeS: number; phase: string }>(frames: readonly T[], presentationTime: number, ignitionEndS?: number): T | undefined {
+export function acceptedFireFrame<T extends { timeS: number; phase: string }>(frames: readonly T[], presentationTime: number, ignitionEndS?: number, growthEndS = 24): T | undefined {
   const growth = frames.filter(frame => frame.phase !== 'treatment')
   const treatment = frames.filter(frame => frame.phase === 'treatment')
   const active = presentationTime >= 55 && treatment.length ? treatment : growth
@@ -133,8 +133,8 @@ export function acceptedFireFrame<T extends { timeS: number; phase: string }>(fr
     const ignitionEnd = Math.max(first, Math.min(last, ignitionEndS))
     requested = presentationTime <= 10
       ? first + phase(presentationTime, 0, 10) * (ignitionEnd - first)
-      : ignitionEnd + phase(presentationTime, 10, 24) * (last - ignitionEnd)
-  } else requested = first + phase(presentationTime, 0, 24) * (last - first)
+      : ignitionEnd + phase(presentationTime, 10, growthEndS) * (last - ignitionEnd)
+  } else requested = first + phase(presentationTime, 0, growthEndS) * (last - first)
   let index = 0
   for (let i = 1; i < active.length && active[i].timeS <= requested; i++) index = i
   return active[index]

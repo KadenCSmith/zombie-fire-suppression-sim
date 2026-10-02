@@ -14,13 +14,16 @@ import { createFireGroundGeometry } from './FireGroundGeometry'
 import { buildPeatAppearance, buildStoryWettingGrid, rapidSoilDisruptionAt, storyRupture, storyRuptureOffset, STORY_RUPTURE_GLSL, RAPID_SOIL_DISRUPTION_GLSL } from '../story/fireAppearance'
 import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, rapidGasPulse, rapidGasQuench, constrainedCapShape, constrainedSoilLiftAt, openPitDepthAt, eased, illustratedPeatCoverage, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
 
+import { currentPeatCoverage, currentEquipmentState } from '../story/firePresentation'
+import { FireWaterTruck } from './FireWaterTruck'
+
 export interface FireFieldSnapshot { timeS: number; nx: number; ny: number; nz: number; temperatureK: ArrayLike<number>; oxygen: ArrayLike<number>; co2: ArrayLike<number>; dryIceKg?: number }
 export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolean; anatomy: boolean }
-interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean }
+interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean; cinematic?: boolean; cameraDistance?: number; connectedSupply?: boolean }
 const SOURCE_X = G.sourceX
 const random = (n: number) => { const v = Math.sin(n * 91.713 + 7.157) * 43758.5453; return v - Math.floor(v) }
 
-function Ground({ time, mode, view, frame, fire, water, realistic, openPit, straightBore }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean; realistic: boolean; openPit: boolean; straightBore: boolean }) {
+function Ground({ time, mode, view, frame, fire, water, realistic, openPit, straightBore, connectedSupply }: { time: number; mode: FireSourceMode; view: FireSequenceView; frame?: FireFieldSnapshot; fire: boolean; water: boolean; realistic: boolean; openPit: boolean; straightBore: boolean; connectedSupply?: boolean }) {
   const invalidate = useThree(state => state.invalidate)
   const texture = useMemo(() => {
     const width = frame ? frame.nx * frame.ny : 2, height = frame?.nz ?? 2, data = new Float32Array(width * height * 4)
@@ -114,7 +117,7 @@ diffuseColor.rgb=earth;`)
     }
     return m
   },[uniforms])
-  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uStraightBore.value=straightBore?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit&&!straightBore?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uGasPulse.value=view==='natural'&&straightBore?rapidGasPulse(time)*(mode==='rapid'?1:0):0;uniforms.uGasQuench.value=view==='natural'&&straightBore&&mode==='rapid'?rapidGasQuench(time):0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,straightBore,uniforms,texture,wetTexture,invalidate])
+  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uStraightBore.value=straightBore?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit&&!straightBore?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=connectedSupply?currentPeatCoverage(time):illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uGasPulse.value=view==='natural'&&straightBore?rapidGasPulse(time)*(mode==='rapid'?1:0):0;uniforms.uGasQuench.value=view==='natural'&&straightBore&&mode==='rapid'?rapidGasQuench(time):0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,straightBore,connectedSupply,uniforms,texture,wetTexture,invalidate])
   useEffect(()=>()=>texture.dispose(),[texture]);useEffect(()=>()=>material.dispose(),[material])
   return <mesh geometry={groundGeometry} material={material} receiveShadow castShadow/>
 }
@@ -185,7 +188,7 @@ function SurfaceFire({time,visible}:{time:number;visible:boolean}){
   const amount=Math.min(1,.15+eased(time,0,9))*(1-.82*eased(time,12,23)),startX=1.72
   return <group visible={visible&&time<27} position={[startX,.02,-.28]}>{Array.from({length:13},(_,i)=>{const angle=i*2.3999,r=.09+random(i)*.24,h=(.2+random(i+12)*.5)*(1+.12*Math.sin(time*7+i));return <mesh key={i} position={[Math.cos(angle)*r,h*amount*.46,Math.sin(angle)*r*.55]} scale={[.05+random(i+37)*.075,h*amount,.06+random(i+89)*.04]} rotation={[0,angle,Math.sin(time*4+i)*.12]}><coneGeometry args={[1,1,7]}/><meshBasicMaterial color={i%3===0?'#ffe3a0':i%3===1?'#ef742c':'#bf3a18'} transparent opacity={.86}/></mesh>})}<pointLight color="#ff9d50" intensity={amount*1.8} distance={2.5}/></group>
 }
-function Tracers({time,mode,layers,realistic,straightBore}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers;realistic:boolean;straightBore:boolean}){
+function Tracers({time,mode,layers,realistic,straightBore,connectedSupply}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers;realistic:boolean;straightBore:boolean;connectedSupply?:boolean}){
   const gas=useRef<THREE.InstancedMesh>(null),smoke=useRef<THREE.InstancedMesh>(null),cuttings=useRef<THREE.InstancedMesh>(null),invalidate=useThree(state=>state.invalidate)
   const geometry=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[])
   useEffect(()=>()=>geometry.dispose(),[geometry])
@@ -201,11 +204,11 @@ function Tracers({time,mode,layers,realistic,straightBore}:{time:number;mode:Fir
       object.position.set(1.72+Math.sin(age*5+i)*age*.25,.2+age*1.9,-.3+age*.13);object.scale.setScalar(layers.fire?.04+age*.14*active:0);if(!active)object.scale.setScalar(0);object.updateMatrix();smoke.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<100;i++){
-      const age=(time*.65+random(i+14))%1,angle=random(i+55)*Math.PI*2,active=time<31&&pose.drillDepth>0
+      const age=(time*.65+random(i+14))%1,angle=random(i+55)*Math.PI*2,active=connectedSupply?currentEquipmentState(time).drilling:time<31&&pose.drillDepth>0
       object.position.set(SOURCE_X+Math.cos(angle)*age*.7,.05+Math.sin(age*Math.PI)*.4,-.06+Math.sin(angle)*age*.4);object.rotation.set(i,time+i,i*.7);object.scale.setScalar(active?.012+random(i+101)*.025:0);object.updateMatrix();cuttings.current?.setMatrixAt(i,object.matrix)
     }
     for(const ref of[gas,smoke,cuttings])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
-  },[time,mode,layers,realistic,straightBore,geometry,invalidate])
+  },[time,mode,layers,realistic,straightBore,connectedSupply,geometry,invalidate])
   return <><instancedMesh ref={gas} args={[geometry,undefined,170]} raycast={()=>null}><meshBasicMaterial color={straightBore?'#b8bdba':'#7cd0d6'} transparent opacity={straightBore?.25:.38} depthWrite={false}/></instancedMesh><instancedMesh ref={smoke} args={[geometry,undefined,65]} raycast={()=>null}><meshBasicMaterial color="#a9aaa0" transparent opacity={.11} depthWrite={false}/></instancedMesh><instancedMesh ref={cuttings} args={[geometry,undefined,100]} raycast={()=>null}><meshStandardMaterial color="#8a6845" roughness={1}/></instancedMesh></>
 }
 function PressureBurst({time,mode,local=false}:{time:number;mode:FireSourceMode;local?:boolean}){
@@ -229,32 +232,33 @@ function PressureBurst({time,mode,local=false}:{time:number;mode:FireSourceMode;
   },[time,mode,local,dustMaterial,invalidate])
   return <group userData={{scientificRole:'prescribed pressure-release dust and debris; no explosive yield calculation'}}><instancedMesh ref={dust} args={[undefined,dustMaterial,110]} raycast={()=>null}><icosahedronGeometry args={[1,1]}/></instancedMesh><instancedMesh ref={debris} args={[undefined,undefined,140]} raycast={()=>null} castShadow><icosahedronGeometry args={[1,0]}/><meshStandardMaterial color="#685539" roughness={1}/></instancedMesh></group>
 }
-function Camera({resetToken}:{resetToken:number}){
+function Camera({resetToken,cinematic,distance}:{resetToken:number;cinematic?:boolean;distance?:number}){
   const controls=useRef<OrbitControlsImpl>(null),{camera,invalidate}=useThree()
   useEffect(()=>{camera.position.set(7.2,4.0,12.3);controls.current?.target.set(0,-.05,-1.1);controls.current?.update();invalidate()},[resetToken,camera,invalidate])
-  return <OrbitControls ref={controls} makeDefault target={[0,-.05,-1.1]} minDistance={5} maxDistance={19} maxPolarAngle={Math.PI*.75} enableDamping={false}/>
+  useEffect(()=>{if(distance===undefined)return;const target=controls.current?.target??new THREE.Vector3(0,-.05,-1.1);camera.position.sub(target).setLength(distance).add(target);controls.current?.update();invalidate()},[distance,resetToken,camera,invalidate])
+  return <OrbitControls ref={controls} makeDefault target={[0,-.05,-1.1]} minDistance={5} maxDistance={19} maxPolarAngle={Math.PI*.75} enableDamping={false} enableZoom={!cinematic}/>
 }
 export function FireSequenceScene(props:SceneProps){
   const realistic=props.realistic??false
   const openPit=props.openPit??false
   const straightBore=props.straightBore??false
   return <Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4.0,12.3],fov:38,near:.05,far:60}}>
-    <color attach="background" args={['#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
+    <color attach="background" args={[props.cinematic?'#000000':'#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
     <directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-bias={-.0002}/>
-    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
     {props.view==='natural'&&<>
       <StoryAggregates time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
       <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
       {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
       <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
       {openPit&&<OpenExcavation time={props.time}/>}
-      <SequenceExcavator time={props.time} openPit={openPit}/><SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
-      <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic} straightBore={straightBore}/>
+      <SequenceExcavator time={props.time} openPit={openPit} connectedSupply={props.connectedSupply}/>{props.connectedSupply&&props.layers.water&&<FireWaterTruck time={props.time}/>}<SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+      <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
       {!realistic&&<><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}
       {realistic&&straightBore&&<PressureBurst time={props.time} mode={props.mode} local/>}
-      {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water} sourceFracture={straightBore}/>}
+      {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water} sourceFracture={straightBore} connectedSupply={props.connectedSupply}/>}
     </>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>
-    <Camera resetToken={props.resetToken}/>
+    <Camera resetToken={props.resetToken} cinematic={props.cinematic} distance={props.cameraDistance}/>
   </Canvas>
 }

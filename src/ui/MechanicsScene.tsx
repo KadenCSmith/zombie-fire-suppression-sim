@@ -81,7 +81,7 @@ export function MechanicsScene({ frames, n, field, range, amplification, mesh, v
   frames: Array<BenchmarkFrame | undefined>; n: number; field: MechanicsField; range: [number,number]; amplification: number; mesh: boolean; view: MechanicsCamera; memory: {current: CameraMemory | undefined}; onInspect: (element: number, value: number) => void
 }) {
   return <Canvas orthographic frameloop="demand" dpr={[1,1.75]} camera={{ position: [4,3,5], zoom: 100, near: 0.1, far: 100 }} gl={{ antialias: true }}>
-    <color attach="background" args={['#172222']} />
+    <color attach="background" args={['#000000']} />
     <ambientLight intensity={1.2} /><directionalLight position={[2,5,4]} intensity={2} /><directionalLight position={[-3,1,-2]} intensity={0.6} />
     <Camera view={view} comparison={frames.length>1} memory={memory} />
     {frames.map((frame,index) => <ElementBlock key={index} frame={frame} n={n} field={field} range={range} amplification={amplification} mesh={mesh} x={frames.length>1 ? (index===0 ? -1.6 : 1.6) : 0} onInspect={onInspect} />)}

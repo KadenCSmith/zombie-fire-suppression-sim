@@ -1,3 +1,4 @@
+import { ToolboxPortal } from './CinematicUI'
 import { ModelSelector, type PhysicsWorkspace } from './ModelSelector'
 import { ParameterSlider } from './ParameterSlider'
 import type { MutableRefObject } from 'react'
@@ -143,7 +144,7 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
   const progressStyle = { '--study-progress': `${time / DURATION * 100}%` } as CSSProperties
 
   return <div className="study-shell">
-    <header className="study-header">
+    <ToolboxPortal extra><header className="study-header">
       <div className="study-brand">
         <div className="study-brand-mark" aria-hidden="true"><Flame size={23} strokeWidth={1.6} /></div>
         <div><strong>ZOMBIE FIRE</strong><span>Soil &amp; suppression study</span></div>
@@ -153,14 +154,14 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
         <ModelSelector value="study" onChange={onWorkspace} />
         <StudyVersions version={version} onSelect={selectVersion} />
       </div>
-    </header>
+    </header></ToolboxPortal>
 
     <section className="study-heading" aria-labelledby="study-title">
       <div className="study-heading-copy"><p className="study-eyebrow">Rendering view / demonstration</p><h1 id="study-title">Terrain & subsurface operations.</h1></div>
       <p className="study-heading-note">Fast demonstration · prescribed load and staged fire. Physical field calculations are in the model selector.</p>
     </section>
 
-    <nav className="study-view-nav" aria-label="Study views">
+    <ToolboxPortal><nav className="study-view-nav" aria-label="Study views">
       {VIEWS.map(({ id, number, title, subtitle, icon: Icon }) => <button
         type="button" key={id} className={`study-view-button${view === id ? ' is-selected' : ''}`}
         aria-pressed={view === id} aria-controls="study-scene-panel" onClick={() => setView(id)}
@@ -169,16 +170,16 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
         <span className="study-view-copy"><strong>{title}</strong><small>{subtitle}</small></span>
         <span className="study-view-number">{number}</span>
       </button>)}
-    </nav>
+    </nav></ToolboxPortal>
 
     <main className="study-main">
       <section className="study-viewport" id="study-scene-panel" aria-label={`${selectedView.title} interactive 3D view`}>
         <div className="study-viewport-heading">
           <span className="study-view-label"><span className="study-live-dot" aria-hidden="true" />{selectedView.title}</span>
-          <div className="study-viewport-actions">
+          <ToolboxPortal><div className="study-viewport-actions">
             <button type="button" className={`study-tool-button${labels ? ' is-active' : ''}`} onClick={() => setLabels((current) => !current)} aria-pressed={labels} title="Toggle model labels"><Tags size={15} /><span>Labels</span></button>
             <button type="button" className="study-tool-button study-tool-icon" onClick={() => setResetToken((current) => current + 1)} aria-label="Reset camera to the selected view" title="Reset camera"><Focus size={17} /></button>
-          </div>
+          </div></ToolboxPortal>
         </div>
         <div className="study-canvas-wrap"><StudyScene view={view} time={time} labels={labels} cage={cage} resetToken={resetToken} version={version} launchSpeed={launchSpeed} soilOptions={soilOptions} /></div>
         <div className="study-viewport-footer">
@@ -187,7 +188,7 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
         </div>
       </section>
 
-      <aside className="study-notes" aria-label="View notes">
+      <ToolboxPortal><aside className="study-notes" aria-label="View notes">
         <div className="study-note-intro">
           <p className="study-eyebrow">In this view <span>{selectedView.number} / 04</span></p>
           <h2>{notes.title}</h2>
@@ -232,7 +233,7 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
         </section>}
         <div className="study-observation"><span className="study-observation-icon"><Focus size={16} /></span><p>{version === 'rupture' ? 'Watch the ground open across the section. The staged peat fire spreads below ground and reaches a small surface outlet.' : version === 'original' ? 'Original cooling and transport study, preserved for comparison. The source remains visible.' : notes.observation}</p></div>
         <p className="study-disclaimer">{(version === 'fracture' || version === 'rupture') ? 'Assumed restrained cap and lateral/upward pressure footprint. Particle bonds break under tension. No validated fracture, shell strength or gas containment prediction.' : version === 'dynamics' ? 'Calculated particle translation with assumed release. The source is held, then falls under gravity before landing at 4 s. Gas and thermal colors remain illustrative; no pressure, fracture or containment prediction.' : version === 'original' ? 'Earlier authored cooling and transport. No calculated temperature or treatment outcome.' : 'Earlier staged conversion and fragment motion. Gas tracers are illustrative; no pressure or fracture prediction.'}</p>
-      </aside>
+      </aside></ToolboxPortal>
     </main>
 
     <section className="study-playback" aria-label="Illustrative sequence playback">
@@ -259,7 +260,7 @@ export default function StudyWorkspace({ version = 'rupture', onVersionChange, o
           <button type="button" className={`study-loop-button${loop ? ' is-active' : ''}`} aria-pressed={loop} aria-label="Loop illustrative sequence" title="Loop sequence" onClick={() => setLoop((current) => !current)}><Repeat2 size={17} /></button>
         </div>
       </div>
-      <div className="study-chapters" aria-label="Sequence chapters">{PHASES.map((item, index) => <button type="button" key={item.start} className={`study-chapter${phaseIndex === index ? ' is-current' : ''}${time >= item.end ? ' is-complete' : ''}`} aria-current={phaseIndex === index ? 'step' : undefined} onClick={() => { setPlaying(false); seek(item.start) }}><span>{time >= item.end ? <Check size={11} /> : `0${index + 1}`}</span><strong>{item.short}</strong><small>{item.start}–{item.end}s</small>{index < PHASES.length - 1 && <ChevronRight size={13} aria-hidden="true" />}</button>)}</div>
+      <ToolboxPortal><div className="study-chapters" aria-label="Sequence chapters">{PHASES.map((item, index) => <button type="button" key={item.start} className={`study-chapter${phaseIndex === index ? ' is-current' : ''}${time >= item.end ? ' is-complete' : ''}`} aria-current={phaseIndex === index ? 'step' : undefined} onClick={() => { setPlaying(false); seek(item.start) }}><span>{time >= item.end ? <Check size={11} /> : `0${index + 1}`}</span><strong>{item.short}</strong><small>{item.start}–{item.end}s</small>{index < PHASES.length - 1 && <ChevronRight size={13} aria-hidden="true" />}</button>)}</div></ToolboxPortal>
       <p className="study-mobile-notice">Illustrative motion and colors · no calculated temperatures or treatment outcome.</p>
     </section>
   </div>

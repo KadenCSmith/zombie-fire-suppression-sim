@@ -1,5 +1,12 @@
 # Zombie Fire Unified Physics Lab
 
+
+## Current app — 0.20.0
+
+The cinematic black interface opens the latest cutaway. Scroll into the bottom playback bar to begin. **Simulation Version** selects rendering, FEA/FVM workspaces and previous-simulation comparison. **Finder** provides searchable guides, live values and the full cited physics documentation. The outlined **Toolbox** icon opens all editable controls and the retained import/export, results, probes, verification, tensile and appearance features.
+
+The current sequence smoothly slows for excavator arrival, drills while illustrated fire spread continues, and uses the former waiting interval for an attached water-truck/hose deployment. Water follows the existing progressive application after connection. [Timeline, controls and limitations](docs/FIRE_PRESENTATION.md) · [Download 0.20.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.20.0).
+
 An integrated Mac research app combining the coupled simulator with the editable dry-ice Blender study. It opens on a complete fire-first sequence: surface ignition, underground peat illustration, an excavator drilling, dry ice, a fixed-size concave metal cap, gas displacement cues and water along assumed fractures. The natural cutaway has grass and irregular seeded aggregates, with separate accepted numerical fields and two full Blender films.
 
 **Physics first, with explicit limits.** The new 2,560 and 20,480 cell options are exactly 10× the former preview and research sizes. A shared material atlas conserves initial inventories across meshes. The finite CO₂ source now couples heat transfer, sensible energy and concentration-dependent mass transfer. The original float64 mechanics reference remains available alongside a measured sparse optimization. More elements do not establish experimental accuracy.
@@ -51,7 +58,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-The **0.19.0** Mac app combines the interactive fire sequence, previous simulations, and a cited Physical formulas reference in one package. **Previous simulations · v0.8+** is visible above the scene and in the top bar; its gallery plays selected prior animations together. The three-dot menu also contains the simulation selection and three interface styles. The current natural scene uses the tracked auger, straight fixed-width bore, enlarged display sphere, and a concave cap that drops without changing size. A brief illustrated gas release opens fine peat fractures; visible water then advances along connected paths from the hose. Earlier excavation, widening-cutter and dome sequences remain labeled historical replays. The packaged app works offline. [Animation scope and cited physical limits](docs/FIRE_SEQUENCE.md).
+The earlier **0.19.0** Mac app combined the interactive fire sequence, previous simulations, and a cited Physical formulas reference in one package. **Previous simulations · v0.8+** is visible above the scene and in the top bar; its gallery plays selected prior animations together. The three-dot menu also contains the simulation selection and three interface styles. The current natural scene uses the tracked auger, straight fixed-width bore, enlarged display sphere, and a concave cap that drops without changing size. A brief illustrated gas release opens fine peat fractures; visible water then advances along connected paths from the hose. Earlier excavation, widening-cutter and dome sequences remain labeled historical replays. The packaged app works offline. [Animation scope and cited physical limits](docs/FIRE_SEQUENCE.md).
 
 The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 

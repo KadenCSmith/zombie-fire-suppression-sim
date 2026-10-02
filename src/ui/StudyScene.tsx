@@ -481,7 +481,7 @@ export function StudyScene({ view, time, labels, cage = DEFAULT_STUDY_CAGE, rese
     <SceneBoundary key={retry} onError={onError} onRetry={() => { useGLTF.clear(MODEL_URL); setReady(false); setFailed(false); setRetry(value => value + 1) }}>
       <Canvas orthographic frameloop="demand" dpr={[1, 1.65]} shadows={{ type: THREE.PCFShadowMap }} camera={{ position: [6.2, 4.4, 13.5], near: 0.1, far: 100, zoom: 58 }}
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}>
-        <color attach="background" args={['#152329']} />
+        <color attach="background" args={['#000000']} />
         <fog attach="fog" args={['#152329', 27, 60]} />
         <ambientLight intensity={0.85} color="#d5e7e1" />
         <hemisphereLight intensity={1.5} color="#dcece3" groundColor="#645340" />

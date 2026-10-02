@@ -4,6 +4,8 @@ import * as THREE from 'three'
 import { FIRE_SEQUENCE_GEOMETRY as G, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, fireSequencePose, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, rapidFractureProgress, rapidWettingProgress, storyHosePoints, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, eased, type FireSourceMode, type StoryPoint } from '../story/fireSequence'
 import { storyRupture, storyRuptureOffset } from '../story/fireAppearance'
 
+import { connectedHosePoints, currentEquipmentState } from '../story/firePresentation'
+
 const UP = new THREE.Vector3(0,1,0)
 function Rod({ a,b,radius,color }: {a:StoryPoint;b:StoryPoint;radius:number;color:string}) {
   const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),delta=bv.clone().sub(av)
@@ -67,19 +69,20 @@ function hoseTexture() {
   }
   const tex=new THREE.DataTexture(data,width,height);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(16,2);tex.colorSpace=THREE.SRGBColorSpace;tex.needsUpdate=true;return tex
 }
-export function FabricHose({time}:{time:number}) {
-  const texture=useMemo(hoseTexture,[]),curve=useMemo(()=>new THREE.CatmullRomCurve3(storyHosePoints(time).map(p=>new THREE.Vector3(...p)),false,'centripetal'),[time])
+export function FabricHose({time,connectedSupply=false}:{time:number;connectedSupply?:boolean}) {
+  const texture=useMemo(hoseTexture,[]),points=connectedSupply?connectedHosePoints(time):storyHosePoints(time)
+  const curve=useMemo(()=>new THREE.CatmullRomCurve3((points.length>=2?points:[[0,0,0],[0,.001,0]]).map(p=>new THREE.Vector3(...p)),false,'centripetal'),[time,connectedSupply])
   const geometry=useMemo(()=>{const g=new THREE.TubeGeometry(curve,180,G.hoseRadiusM,14,false),p=g.attributes.position;for(let i=0;i<p.count;i++){const section=Math.floor(i/15),center=curve.getPointAt(section/180);if(center.y>.035&&center.x<-.2)p.setY(i,center.y+(p.getY(i)-center.y)*.48)}g.computeVertexNormals();return g},[curve])
   useEffect(()=>()=>texture.dispose(),[texture]);useEffect(()=>()=>geometry.dispose(),[geometry])
   const seam=useMemo(()=>[1,-1].map(side=>curve.getPoints(140).map(p=>[p.x,p.y+.028,p.z+side*.033] as StoryPoint)),[curve])
-  if(time<69)return null
-  return <group userData={{scientificRole:'flexible woven fire hose, staged insertion through an open service sector'}}><mesh geometry={geometry} castShadow><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={.007} roughness={.96}/></mesh>{seam.map((p,i)=><Line key={i} points={p} color="#8e8a71" lineWidth={.7}/>)}<mesh position={[-4.34,.155,-.78]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.06,.06,.18,20]}/><meshStandardMaterial color="#788780" metalness={.85} roughness={.3}/></mesh></group>
+  if(connectedSupply?points.length<2:time<69)return null
+  return <group userData={{scientificRole:'flexible woven fire hose, staged insertion through an open service sector'}}><mesh geometry={geometry} castShadow><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={.007} roughness={.96}/></mesh>{seam.map((p,i)=><Line key={i} points={p} color="#8e8a71" lineWidth={.7}/>)}<mesh position={connectedSupply?currentEquipmentState(time).truckOutlet:[-4.34,.155,-.78]} rotation={connectedSupply?[Math.PI/2,0,0]:[0,0,Math.PI/2]}><cylinderGeometry args={[.06,.06,.18,20]}/><meshStandardMaterial color="#788780" metalness={.85} roughness={.3}/></mesh></group>
 }
 export function CrackAndWaterPaths({time,mode,showWater}:{time:number;mode:FireSourceMode;showWater:boolean}) {
   const pose=fireSequencePose(time,mode),r=storyRupture(time,mode),offset=(p:StoryPoint):StoryPoint=>{const d=storyRuptureOffset(...p,r.pulse,r.damage);return[p[0]+d[0],p[1]+d[1],p[2]+d[2]]}
   return <>{mode==='rapid'&&pose.crack>0&&STORY_CRACK_PATHS.map((points,i)=><Line key={i} points={points.map(offset)} color="#0b0806" lineWidth={.6+pose.crack*1.8} transparent opacity={pose.crack*.85}/>)}{showWater&&time>=72&&STORY_CRACK_PATHS.map((points,i)=>{const front=storyWettingProgress(time,i),wet=Array.from({length:24},(_,j)=>offset(pointAlongStoryPath(points,front*j/23)));return <Line key={i} points={wet} color="#536e70" lineWidth={1.8} transparent opacity={.5*eased(time,72+i*.65,74+i*.65)}/>})}{showWater&&<FabricHose time={time}/>}</>
 }
-export function ConstrainedCrackAndWaterPaths({time,mode,showWater,sourceFracture=false}:{time:number;mode:FireSourceMode;showWater:boolean;sourceFracture?:boolean}) {
+export function ConstrainedCrackAndWaterPaths({time,mode,showWater,sourceFracture=false,connectedSupply=false}:{time:number;mode:FireSourceMode;showWater:boolean;sourceFracture?:boolean;connectedSupply?:boolean}) {
   const rapidNetwork=sourceFracture&&mode==='rapid'
   const fracture=sourceFracture?sourceContactFracture(time):constrainedCapShape(time,mode).flatten
   const paths=rapidNetwork?RAPID_PEAT_CRACK_PATHS:sourceFracture?SOURCE_CONTACT_CRACK_PATHS:CONSTRAINED_CRACK_PATHS
@@ -89,12 +92,12 @@ export function ConstrainedCrackAndWaterPaths({time,mode,showWater,sourceFractur
       const visible=rapidNetwork?Array.from({length:24},(_,j)=>pointAlongStoryPath(points,progress*j/23)):points
       return <group key={`fracture-${i}`}><Line points={visible} color="#17100d" lineWidth={rapidNetwork?1.05:sourceFracture?1.1+progress*1.4:.65+progress*.8} transparent opacity={progress*.9}/>{sourceFracture&&<Line points={visible.map(([x,y,z])=>[x,y+.015,z+.004] as StoryPoint)} color="#a57e5d" lineWidth={rapidNetwork?.45:.7} transparent opacity={progress*.48}/>}</group>
     })}
-    {(sourceFracture||mode==='rapid')&&showWater&&time>=72&&paths.map((points,i)=>{
+    {(sourceFracture||mode==='rapid')&&showWater&&(connectedSupply?currentEquipmentState(time).waterOn:time>=72)&&paths.map((points,i)=>{
       const progress=rapidNetwork?rapidWettingProgress(time,i):constrainedWettingProgress(time,i)
       if(progress<=0)return null
       const wet=Array.from({length:24},(_,j)=>pointAlongStoryPath(points,progress*j/23))
       return <Line key={`water-${i}`} points={wet} color="#5b7c7a" lineWidth={rapidNetwork?1.7:1.2} transparent opacity={.72}/>
     })}
-    {showWater&&<FabricHose time={time}/>}
+    {showWater&&<FabricHose time={time} connectedSupply={connectedSupply}/>}
   </>
 }
