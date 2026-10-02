@@ -1,5 +1,9 @@
 # Verification and validation status
 
+## 0.18.2 integration and installed-app check (2026-10-01)
+
+The formula reference was combined with the 0.18.1 scene/gallery branch. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, and production build passed. The arm64 package passed code-signature, extracted-ZIP and DMG checks, and the installed bundle reports 0.18.2. Its native window opened the new formula page. These checks establish software packaging and navigation only; they do not add a matched experiment or a whole-model physical error percentage. The spatial and temporal graphs remain limited to the archived 2 s cold-source calculation.
+
 ## Equation/source audit and formula reference (2026-10-01)
 
 The new [physical formula audit](PHYSICS_FORMULA_AUDIT.md) maps active gas, heat, reaction, dry-ice, water-phase and FEM equations to implementation paths and peer-reviewed sources. The user-supplied An et al. *Fire* 8(1), 13 article concerns nonreactive coal-mine methane/air CFD; only its ideal-gas, Darcy/species-balance and finite-volume principles are relevant analogues. No numerical solver coefficient or equation was changed to imitate its unrelated turbulence/ventilation model. The app now has a **Physical formulas** workspace beside **Open physics lab**.
