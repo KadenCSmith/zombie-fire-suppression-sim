@@ -1,6 +1,6 @@
 # Peat FEM evidence and reproduction
 
-The feature branch is `feat/peat-fire-fem`, based on the reviewed/published v20 checkpoint `161e7a4a1f8c35765e1878c132db79977be1f5ea`. Initial v20 hosted CI passed macOS, Windows and Linux ([run 36992293227](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36992293227)). M1 `0902122`, M2 `f1ec195` and residual correction `240d267` were pushed and independently verified. GitHub subsequently merged PR10 outside this session as main `4b2088e`; this session performed no FEM merge to main. Further changes remain on the feature branch.
+The feature branch is `feat/peat-fire-fem`, based on the reviewed/published v20 checkpoint `161e7a4a1f8c35765e1878c132db79977be1f5ea`. Initial v20 hosted CI passed macOS, Windows and Linux ([run 36992293227](https://github.com/KadenCSmith/zombie-fire-suppression-sim/actions/runs/36992293227)). M1 `0902122`, M2 `f1ec195`, residual correction `240d267` and M3 `b53af63094fb5b50004ad0587bbf2a3a9ca5f531` were pushed and independently verified. GitHub subsequently merged PR10 outside this session as main `4b2088e`; this session performed no FEM merge to main. Further changes remain on the feature branch.
 
 ## Software checks
 

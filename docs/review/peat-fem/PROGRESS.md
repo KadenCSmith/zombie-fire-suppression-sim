@@ -1,6 +1,6 @@
 # Peat FEM resumable checkpoint
 
-Active checkout: `/Users/kadensmith/Documents/Codex/2026-10-02/ok/outputs/zombie-fire-suppression-sim`. Branch `feat/peat-fire-fem`, based on reviewed/published v20 `161e7a4a1f8c35765e1878c132db79977be1f5ea`. M1 `0902122`, M2 `f1ec195`, M2.1 `240d267` pushed and verified. M3 evidence/recording milestone ready for upload. GitHub merged PR10 outside this session as main `4b2088e926662aee357cde680f2b22c4fbf24f79`; no merge/rewrite by this session.
+Active checkout: `/Users/kadensmith/Documents/Codex/2026-10-02/ok/outputs/zombie-fire-suppression-sim`. Branch `feat/peat-fire-fem`, based on reviewed/published v20 `161e7a4a1f8c35765e1878c132db79977be1f5ea`. M1 `0902122`, M2 `f1ec195`, M2.1 `240d267` pushed and verified. M3 evidence/recording milestone `b53af63094fb5b50004ad0587bbf2a3a9ca5f531` uploaded; remote SHA independently verified. Tracked worktree clean at this checkpoint. GitHub merged PR10 outside this session as main `4b2088e926662aee357cde680f2b22c4fbf24f79`; no merge/rewrite by this session.
 
 Active core: genuine 3D Q1 `model.ts` assembly; five-step `chemistry.ts`; `operators.ts` pressure/species; `coupled.ts` gas/heat Picard and step doubling. Worker calls this core. Current UI/export/import/actual-node worked formulas use the same inventories. Source and model adaptations are explicit; no active suppression. Historical modes/routes retained.
 

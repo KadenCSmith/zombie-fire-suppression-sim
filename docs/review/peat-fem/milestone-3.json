@@ -120,5 +120,6 @@
     "Dependency install: unchanged manifest and lock",
     "Profile/short transport analysis: current relevant core/input/config hashes match",
     "Four historical native checks: reused after final FEM-only edits; relevant legacy code, routes, inputs and configuration unchanged"
-  ]
+  ],
+  "verifiedRemoteImplementationCommit": "b53af63094fb5b50004ad0587bbf2a3a9ca5f531"
 }
