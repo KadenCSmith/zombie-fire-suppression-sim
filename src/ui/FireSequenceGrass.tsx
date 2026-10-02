@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, eased, fireSequencePose, type FireSourceMode } from '../story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, constrainedCapShape, eased, fireSequencePose, type FireSourceMode } from '../story/fireSequence'
 import { STORY_RUPTURE_GLSL, storyRupture } from '../story/fireAppearance'
 
 const BLADE_COUNT = 30000
@@ -26,15 +26,15 @@ function bladeGeometry() {
  * has no material inventory or mechanics; the authored displacement moves each
  * grass root with its ground position rather than leaving it suspended.
  */
-export function SequenceGrass({time, mode = 'gradual'}: {time: number; mode?: FireSourceMode}) {
+export function SequenceGrass({time, mode = 'gradual', realistic = false, openPit = false}: {time: number; mode?: FireSourceMode; realistic?: boolean; openPit?:boolean}) {
   const ref = useRef<THREE.InstancedMesh>(null), invalidate = useThree(state => state.invalidate)
   const geometry = useMemo(bladeGeometry, [])
-  const uniforms = useMemo(() => ({ uGrassTime: {value: 0}, uGrassBurn: {value: 0}, uGrassBore: {value: 0}, uGrassPulse: {value: 0}, uGrassDamage: {value: 0} }), [])
+  const uniforms = useMemo(() => ({ uGrassTime: {value: 0}, uGrassBurn: {value: 0}, uGrassBore: {value: 0}, uGrassPit:{value:0}, uGrassLift: {value: 0}, uGrassPulse: {value: 0}, uGrassDamage: {value: 0} }), [])
   const material = useMemo(() => {
     const value = new THREE.MeshStandardMaterial({ roughness: .9, side: THREE.DoubleSide, vertexColors: true })
     value.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, uniforms)
-      shader.vertexShader = `uniform float uGrassTime,uGrassBurn,uGrassBore,uGrassPulse,uGrassDamage; varying float vGrassScorch; ${STORY_RUPTURE_GLSL}\n` + shader.vertexShader
+      shader.vertexShader = `uniform float uGrassTime,uGrassBurn,uGrassBore,uGrassPit,uGrassLift,uGrassPulse,uGrassDamage; varying float vGrassScorch; ${STORY_RUPTURE_GLSL}\n` + shader.vertexShader
       shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
 vec3 grassRoot=(modelMatrix*instanceMatrix*vec4(0.0,0.0,0.0,1.0)).xyz;
 float wind=sin(uGrassTime*.65+grassRoot.x*2.4+grassRoot.z*1.7)+.35*sin(uGrassTime*1.3-grassRoot.z*4.0);
@@ -45,9 +45,11 @@ float scorchRadius=.13+.38*uGrassBurn;
 vGrassScorch=(1.0-smoothstep(scorchRadius*.5,scorchRadius,scorchDistance))*uGrassBurn;
 transformed.y*=1.0-.91*vGrassScorch;
 transformed.xz*=1.0-.4*vGrassScorch;
+if(uGrassPit>.5&&length(vec2(grassRoot.x-${G.sourceX.toFixed(3)},grassRoot.z))<${G.pitTopRadiusM})transformed*=0.0;
 if(length(vec2(grassRoot.x-${G.sourceX.toFixed(3)},grassRoot.z))<${G.boreRadiusM.toFixed(3)}&&uGrassBore>.5)transformed*=0.0;`)
       shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `vec4 mvPosition=instanceMatrix*vec4(transformed,1.0);
 vec3 grassWorld=(modelMatrix*mvPosition).xyz+storyRuptureOffset(grassRoot,uGrassPulse,uGrassDamage);
+grassWorld.y+=uGrassLift*(1.0-smoothstep(.20,.90,length(vec2(grassRoot.x-${G.sourceX.toFixed(3)},grassRoot.z))));
 mvPosition=viewMatrix*vec4(grassWorld,1.0);
 gl_Position=projectionMatrix*mvPosition;`)
       shader.fragmentShader = 'varying float vGrassScorch;\n' + shader.fragmentShader
@@ -79,9 +81,11 @@ gl_Position=projectionMatrix*mvPosition;`)
   useLayoutEffect(() => {
     const rupture = storyRupture(time, mode)
     uniforms.uGrassTime.value = time; uniforms.uGrassBurn.value = eased(time, 1, 13)
-    uniforms.uGrassBore.value = fireSequencePose(time, 'gradual').drillDepth > 0 ? 1 : 0
+    uniforms.uGrassBore.value = !openPit&&fireSequencePose(time, 'gradual').drillDepth > 0 ? 1 : 0
+    uniforms.uGrassPit.value = openPit&&time>=24?1:0
+    uniforms.uGrassLift.value = realistic?constrainedCapShape(time,mode).soilLiftM:0
     uniforms.uGrassPulse.value = rupture.pulse; uniforms.uGrassDamage.value = rupture.damage
     invalidate()
-  }, [time, mode, uniforms, invalidate])
+  }, [time, mode, realistic, openPit, uniforms, invalidate])
   return <instancedMesh ref={ref} args={[geometry, material, BLADE_COUNT]} frustumCulled={false} raycast={() => null} userData={{scientificRole: 'seeded fine grass appearance, prescribed wind/scorch and shared ground displacement; no vegetation physics'}}/>
 }

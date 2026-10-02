@@ -1,6 +1,6 @@
 # Physical equations, article correspondence, and numerical evidence
 
-**Audit date:** 1 October 2026. **Code base:** 0.16 `main` at `e1468df`, before this documentation and navigation update. This is an equation and evidence map, not a claim of field validation. The app's *Physics formulas* view is a readable companion to this source-linked record.
+**Audit date:** 1 October 2026. **Physics code base:** 0.16 `main` at `e1468df`; the equation audit was carried forward to the 0.18.2 local app, whose later changes are presentation and documentation. This is an equation and evidence map, not a claim of field validation. The app's *Physical formulas* view is a readable companion to this source-linked record.
 
 ## What the supplied paper actually supports
 

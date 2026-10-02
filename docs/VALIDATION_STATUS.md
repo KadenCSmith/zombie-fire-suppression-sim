@@ -7,6 +7,25 @@ The new [physical formula audit](PHYSICS_FORMULA_AUDIT.md) maps active gas, heat
 The audit replots archived 2 s cold-source transport sweeps and separate analytical heat/consolidation checks from committed JSON. Spatial source-loss and local-probe differences are nonmonotone, so whole-case spatial convergence is not established. A three-level Richardson extrapolation suggests **0.285% conditional temporal discretization difference** in 2,560-cell, 0.125 s cold-source mass loss; it is not a measured physical prediction error. The 24 h hot sequence, liquid infiltration, fracture and suppression outcome still lack an end-to-end passing convergence and matched experimental validation study. The previously documented ~5.74% spatial fracture mesh-energy mismatch remains a failed 5% gate. No defensible model-wide field-error percentage is assigned.
 
 For this navigation/documentation change, `npm ci`, `npm run typecheck`, `npm run lint`, `npm test` (**1,706 tests in 85 files**) and `npm run build` passed locally. Browser visual QA exercised sequence header → formula page → return, including both data-backed charts. Lint reported only existing warnings. No new physics simulation was run; the figures are regenerated from archived output.
+## Open excavation and backfill revision (2026-09-30)
+
+The current 0.18.1 presentation replaces the widening underreamer with a fixed-width bucket and a staged open pit that is backfilled before the cap event. The cap and local water paths retain their bounded visual timing; accepted numerical states and the separate contact budget are unchanged. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. Excavation stability, root effects, compaction, cap pressure and suppression remain unvalidated. Native package, CI and installed-app checks are recorded after they run.
+
+## Current scene and single-app delivery (2026-09-30)
+
+For version 0.18.0, source checks passed: TypeScript typecheck, lint (existing warnings only), production build and all **1,709 tests in 85 files**. New checks bound the cap's concave-to-flat radius change, confine soil uplift to the overburden, and restrict water arrival to short branches after hose insertion. The cutter and pocket now complete before drill withdrawal. The gallery still includes available replays from 0.8 onward, with 0.10/0.11/0.13 honestly marked unavailable because no preserved movie exists. The arm64 package passed strict deep signing, extracted-ZIP and DMG verification, and all release checksums. Its installed bundle reports version 0.18.0, passes strict deep signature verification, and launched from `~/Applications`. One active bundle remains in the scanned Applications, Desktop, Downloads and Documents/Codex locations; older bundles and the earlier ZIP were moved to Trash. The native computer-control request was denied, so the window was not visually inspected.
+
+Cap pressure, metal strain, excavation forces, soil fracture, liquid infiltration and peat-fire extinction are not solved or experimentally validated by these scene tests. The accepted numerical field and separate finite contact model are unchanged. The in-app browser denied access to a local preview, so no visual UI interaction is claimed.
+
+## Visible interactive playback (2026-09-29)
+
+The 0.17.1 source puts play/pause controls above the interactive scene and a large initial Play button over it, and removes the older film option from the main sequence. The gallery retains archived films. Typecheck, lint, production build and 1,706 tests in 85 files passed. The ZIP extracts to exactly one app, reports version 0.17.1 and passes strict deep signature verification. The DMG build failed because `hdiutil` could not access a disk device, and the installed copy remains 0.17.0 because this session has no write access to `~/Applications`. The in-app browser denied local-preview access, so no visual UI interaction is claimed. This presentation change does not modify the physical calculation or validate suppression performance.
+
+## One-app gallery and interface controls (2026-09-29)
+
+The 0.17 gallery and two-tab three-dot menu passed TypeScript typecheck, lint, production build, the focused catalog checks, and the complete **1,706-test suite in 85 files**. The bundled 0.12 checkpoint movie is byte-for-byte equal to its preserved Blender source (SHA-256 `e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988`). It contains five 0.5-second held frames; no continuous physical motion is inferred. The 0.8/0.9 and 0.16/0.17 entries are interactive authored scenes, while 0.14/0.15 are exact archived films. Physics-only 0.10/0.11/0.13 have no preserved Blender render in the app.
+
+The in-app browser denied access to the local preview URL, so visual browser interaction was not observed. These software checks do not validate a physical suppression outcome or establish equivalent scientific models across versions. Packaging and installed-app checks are recorded after they run.
 
 ## Provisional mechanics boundary (2026-09-29)
 

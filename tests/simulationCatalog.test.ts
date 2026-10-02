@@ -10,8 +10,9 @@ describe('version comparison catalog', () => {
   })
 
   it('lists every version from 0.8 onward without inventing missing replay assets', () => {
-    expect(SIMULATION_CATALOG.map(version => version.id)).toEqual(['0.8.0', '0.9.0', '0.10.0', '0.11.0', '0.12.0', '0.13.0', '0.14.0', '0.15.0', '0.16.0'])
-    expect(availableVersions().map(version => version.id)).toEqual(['0.8.0', '0.9.0', '0.14.0', '0.15.0', '0.16.0'])
+    expect(SIMULATION_CATALOG.map(version => version.id)).toEqual(['0.8.0', '0.9.0', '0.10.0', '0.11.0', '0.12.0', '0.13.0', '0.14.0', '0.15.0', '0.16.0', '0.17.1', '0.18.0', '0.18.1'])
+    expect(availableVersions().map(version => version.id)).toEqual(['0.8.0', '0.9.0', '0.12.0', '0.14.0', '0.15.0', '0.16.0', '0.17.1', '0.18.0', '0.18.1'])
+    expect(SIMULATION_CATALOG.find(version => version.id === '0.12.0')).toMatchObject({ replay: 'film', durationS: 2.5, assetFile: 'accepted-checkpoint-review.mp4' })
     expect(SIMULATION_CATALOG.filter(version => !version.available).every(version => version.replay === 'unavailable')).toBe(true)
   })
 

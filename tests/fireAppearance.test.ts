@@ -49,4 +49,12 @@ describe('limited local soil wetting appearance',()=>{
     expect(count(late.data)).toBeGreaterThan(count(early.data))
     expect(count(late.data)/(late.width*late.height)).toBeLessThan(.15)
   })
+  it('fills only short current-scenario branches after the hose arrives',()=>{
+    const early=buildStoryWettingGrid(71,true),late=buildStoryWettingGrid(90,true)
+    const count=(data:Float32Array)=>Array.from(data).filter((v,i)=>i%4===0&&v>.05).length
+    expect(count(early.data)).toBe(0)
+    expect(count(late.data)).toBeGreaterThan(0)
+    expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
+    expect(count(buildStoryWettingGrid(90,true,'gradual').data)).toBe(0)
+  })
 })

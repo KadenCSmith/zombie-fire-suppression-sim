@@ -8,14 +8,18 @@ if(process.platform!=='darwin'){app.commandLine.appendSwitch('use-angle','swifts
 const timeout=setTimeout(()=>{console.error('FIRE_SMOKE_TIMEOUT');app.exit(1)},300000);
 app.on('browser-window-created',(_event,win)=>{
   win.webContents.on('render-process-gone',(_event,details)=>{console.error(details);app.exit(1)});
-  win.webContents.on('console-message',event=>{if(event.message.includes('THREE.WebGLProgram: Shader Error')){console.error('FIRE_SHADER_FAILURE: '+event.message);app.exit(1)}});
+  win.webContents.on('console-message',event=>{if(event.message.startsWith('FIRE_SMOKE:'))console.log(event.message);if(event.message.includes('THREE.WebGLProgram: Shader Error')){console.error('FIRE_SHADER_FAILURE: '+event.message);app.exit(1)}});
   win.webContents.once('did-finish-load',async()=>{
     try{
       const result=await win.webContents.executeJavaScript(`(async()=>{
         const wait=async(fn,label)=>{for(let i=0;i<1800;i++){if(fn()){console.log('FIRE_SMOKE: '+label);return;}await new Promise(r=>setTimeout(r,100));}throw new Error(label+' timed out: '+document.body.innerText.slice(-1500));};
         const button=label=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===label||b.getAttribute('aria-label')===label);
         const change=(label,value)=>{const el=document.querySelector('input[aria-label="'+label+'"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,String(value));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
-        await wait(()=>button('Play fire sequence')&&document.body.textContent.includes('Bundled numerical history loaded'),'default sequence and accepted cache');
+        await wait(()=>button('Play interactive sequence')&&button('Previous simulations · v0.8+')&&document.body.textContent.includes('Bundled numerical history loaded'),'default interactive sequence and accepted cache');
+        button('Play interactive sequence').click();
+        await wait(()=>Number(document.querySelector('input[aria-label="Fire sequence time"]')?.value)>0,'visible interactive play control');
+        button('Pause sequence').click();
+        change('Fire sequence time',0);
         [...document.querySelectorAll('.fire-mode-switch button')].find(b=>b.textContent.includes('Gradual')).click();
         await wait(()=>[...document.querySelectorAll('.fire-mode-switch button')].some(b=>b.textContent.includes('Gradual')&&b.getAttribute('aria-pressed')==='true'),'select gradual for comparison');
         change('Fire sequence time',63);
@@ -47,18 +51,22 @@ app.on('browser-window-created',(_event,win)=>{
         if(!document.querySelector('.fire-experiment-displayed').textContent.includes('completed'))throw new Error('Accepted result missing');
         button('Restore bundled result').click();
         await wait(()=>document.body.textContent.includes('Bundled accepted history restored'),'bundled restore');
-        button('Rendered film').click();
-        await wait(()=>document.querySelector('video')?.readyState>=1,'bundled video metadata');
-        const video=document.querySelector('video');
+        button('Previous simulations · v0.8+').click();
+        await wait(()=>document.querySelector('.comparison-shell')&&document.querySelectorAll('.comparison-card').length===2,'multi-view gallery with earlier replays');
+        document.querySelector('input[aria-label="Select version 0.14.0"]').click();
+        document.querySelector('input[aria-label="Select version 0.15.0"]').click();
+        await wait(()=>document.querySelectorAll('.comparison-card').length===4,'two archived films added');
+        await wait(()=>document.querySelector('.comparison-card[data-version="0.14.0"] video')?.readyState>=1&&document.querySelector('.comparison-card[data-version="0.15.0"] video')?.readyState>=1,'bundled film metadata');
+        const video=document.querySelector('.comparison-card[data-version="0.15.0"] video');
         if(Math.abs(video.duration-36)>.1)throw new Error('Incomplete rendered film: '+video.duration);
         const response=await fetch(video.currentSrc,{headers:{Range:'bytes=0-31'}});
         if(response.status!==206||response.headers.get('content-range')?.startsWith('bytes 0-31/')!==true||(await response.arrayBuffer()).byteLength!==32)throw new Error('Native video byte ranges failed');
         video.currentTime=28;
         await wait(()=>!video.seeking&&Math.abs(video.currentTime-28)<.2,'film seek');
-        [...document.querySelectorAll('.fire-mode-switch button')].find(b=>b.textContent.includes('Gradual')).click();
-        await wait(()=>document.querySelector('video')?.currentSrc.includes('gradual')&&document.querySelector('video').readyState>=1,'both films');
-        button('Interactive').click();
-        await wait(()=>button('Temperature'),'return to interaction');
+        [...document.querySelectorAll('.comparison-mode button')].find(b=>b.textContent.includes('rapid')).click();
+        await wait(()=>document.querySelector('.comparison-card[data-version="0.15.0"] video')?.currentSrc.includes('rapid')&&document.querySelector('.comparison-card[data-version="0.15.0"] video').readyState>=1,'both films');
+        window.dispatchEvent(new CustomEvent('workspace-request',{detail:'sequence'}));
+        await wait(()=>button('Temperature')&&Number(document.querySelector('input[aria-label="Fire sequence time"]')?.value)===63,'return to interactive sequence');
         change('Fire sequence time',78);
         await wait(()=>document.querySelector('.fire-contact-readout')?.textContent.includes('Water supplied 1.32 / 5 kg'),'contact water ledger advances after hose placement');
         window.dispatchEvent(new CustomEvent('workspace-request',{detail:'coupled'}));
@@ -69,7 +77,7 @@ app.on('browser-window-created',(_event,win)=>{
         return 'ok';
       })()`);
       if(result!=='ok')throw new Error('Unexpected fire smoke result');
-      clearTimeout(timeout);console.log('FIRE_SEQUENCE_SMOKE_PASS: accepted cache, event-aware fields, worker completion/cancel, both full films, native byte ranges, workspace state.');app.exit(0);
+      clearTimeout(timeout);console.log('FIRE_SEQUENCE_SMOKE_PASS: visible interactive play, accepted cache, worker completion/cancel, multi-view gallery, both full films, native byte ranges, workspace state.');app.exit(0);
     }catch(error){console.error(error);clearTimeout(timeout);app.exit(1)}
   });
 });
