@@ -1,0 +1,9 @@
+{
+  "initialAcceptedStepS": 1,
+  "pausedPhysicalS": 2,
+  "refinedStepS": 1,
+  "temperatureSamples": 25,
+  "checks": "run, step, pause, field/grid identity, moisture/pressure/flux, four-gas export EOS, mesh reset, archive access, session restore, repeated reset, formulas, WebGL",
+  "host": "darwin",
+  "date": "2026-10-02T11:24:23.729Z"
+}

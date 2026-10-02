@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { version } from '../../package.json'
-import type { PhysicsWorkspace } from './ModelSelector'
+import { HISTORICAL_WORKSPACES, type PhysicsWorkspace } from './ModelSelector'
 import { availableVersions } from './simulationCatalog'
 import { FinderPortal, ToolboxPortal, useCinematicUI } from './CinematicUI'
 import './app-chrome.css'
@@ -13,13 +13,11 @@ export function readLayout(value: string | null): LayoutMode { return LAYOUTS.so
 const Documentation = lazy(() => import('./FormulaReferenceWorkspace'))
 const destinations: { id: PhysicsWorkspace; title: string; detail: string }[] = [
   { id: 'sequence', title: 'Latest render', detail: 'Interactive complete fire sequence · straight bore, rapid release & connected water' },
-  { id: 'coupled', title: 'Coupled FEA / FVM', detail: 'Transport, heat, finite dry ice, soil deformation & cap' },
-  { id: 'simulation', title: 'Porous gas & heat', detail: 'Finite volume · setup, simulation, results, short event & developer tools' },
-  { id: 'mechanics', title: 'Soil mechanics & tensile lab', detail: 'FEA benchmarks · load cycles, material models & tensile specimens' },
-  { id: 'study', title: 'Fast demonstration', detail: 'Historical authored loading, rupture & debris controls' },
+  { id: 'peat-fem', title: 'Peat Fire FEM', detail: 'Active three-dimensional finite-element combustion baseline' },
   { id: 'comparison', title: 'Previous simulations', detail: 'Select archived models and compare synchronized replays' },
 ]
 const guides = [
+  { title: 'Active peat FEM baseline', text: 'Peat Fire FEM has its own accepted-state fields, inventories, probes and numerical evidence. Physical formulas describes the implemented scope and limitations. Historical workspaces remain accessible through Previous simulations.' },
   { title: 'Dry ice & the source', text: 'The physics models track a finite dry-ice inventory. Source size and mass are linked through density. Open the source controls in Toolbox; accepted results update only after their model is recalculated.' },
   { title: 'Heater & ignition', text: 'Heater power supplies external energy. In the fire experiment, ignition duration and ignition power describe surface preparation. They do not change the authored drilling sequence. Edit them in Experiment variables and calculate a new history.' },
   { title: 'Water, moisture & peat', text: 'Check the units next to each input: water per dry peat is a dry-mass ratio, while pore saturation is a volume fraction. The natural hose and crack wetting remain illustrative; scientific fields come from accepted snapshots.' },
@@ -48,20 +46,20 @@ export function AppChrome({ workspace, layout, onLayout, onWorkspace, selectedVe
   }, [menu])
   const navigate = (next: PhysicsWorkspace) => { onWorkspace(next); setMenu(false); open(null); window.scrollTo({ top: 0, behavior: 'instant' }) }
   const finder = (tab: 'guides' | 'docs' = 'guides') => { setFinderTab(tab); setMenu(false); open('finder') }
-  const results = destinations.filter(item => `${item.title} ${item.detail}`.toLowerCase().includes(query.toLowerCase()))
+  const results = [...destinations, ...HISTORICAL_WORKSPACES].filter(item => `${item.title} ${item.detail}`.toLowerCase().includes(query.toLowerCase()))
   return <>
     <header className={`cinematic-header ${compact || workspace !== 'sequence' ? 'is-compact' : ''}`}>
       <button className="cinematic-brand" onClick={() => navigate('sequence')} aria-label="Fire Simulation home">Fire Simulation<span>Ver.[{version}]</span></button>
       <div className="version-navigation" ref={menuRef}>
         <button className="cinematic-nav-button" aria-label="Simulation Version" aria-expanded={menu} aria-controls="simulation-version-menu" onClick={() => setMenu(value => !value)}><Pinwheel/><span>Simulation Version</span></button>
-        <nav className="cinematic-sublinks" aria-label="Simulation modes"><button aria-current={workspace === 'sequence' ? 'page' : undefined} onClick={() => navigate('sequence')}>render</button><button aria-current={workspaceMode(workspace) === 'physics' ? 'page' : undefined} onClick={() => setMenu(true)}>FEA / FVM physics</button><button aria-current={workspace === 'comparison' ? 'page' : undefined} onClick={() => navigate('comparison')}>previous sims</button></nav>
+        <nav className="cinematic-sublinks" aria-label="Simulation modes"><button aria-current={workspace === 'sequence' ? 'page' : undefined} onClick={() => navigate('sequence')}>render</button><button aria-current={workspace === 'peat-fem' ? 'page' : undefined} onClick={() => navigate('peat-fem')}>Peat Fire FEM</button><button aria-current={workspace === 'comparison' ? 'page' : undefined} onClick={() => navigate('comparison')}>previous sims</button></nav>
         {menu && <div id="simulation-version-menu" className="version-menu" role="dialog" aria-label="Select simulation version"><span className="drawer-section-label">SIMULATION VERSION</span>{destinations.map((item, index) => <button key={item.id} aria-current={workspace === item.id ? 'page' : undefined} onClick={() => navigate(item.id)}><small>{String(index+1).padStart(2,'0')}</small><span>{item.title}<em>{item.detail}</em></span><b>↗</b></button>)}</div>}
       </div>
       <div className="finder-navigation"><button className="cinematic-nav-button" aria-label="Open Finder" aria-expanded={panel === 'finder'} onClick={() => { setMenu(false); open(panel === 'finder' ? null : 'finder') }}><FinderIcon/><span>finder</span></button><nav className="cinematic-sublinks"><button onClick={() => finder()}>guides & values</button><button onClick={() => finder('docs')}>physics documentation</button><button onClick={() => finder()}>search</button></nav></div>
       <button className="toolbox-navigation" aria-label="Open Toolbox" aria-expanded={panel === 'toolbox'} title="Edit simulation variables" onClick={() => { setMenu(false); open(panel === 'toolbox' ? null : 'toolbox') }}><ToolboxIcon/><span>toolbox</span></button>
     </header>
-    <ToolboxPortal extra><section className="toolbox-destinations"><p>Additional workspaces</p>{destinations.filter(item => ['simulation','mechanics','study','comparison'].includes(item.id)).map(item => <button key={item.id} onClick={() => navigate(item.id)}>{item.title}<span>↗</span></button>)}</section><section className="toolbox-layouts"><p>Interface appearance</p>{LAYOUTS.map(item => <button key={item.id} aria-pressed={layout === item.id} onClick={() => onLayout(item.id)}>{item.label}</button>)}</section><section className="toolbox-selection"><p>Archived simulations · {selectedVersions.length} selected</p><button onClick={() => onSelectedVersions(availableVersions().map(item => item.id))}>Select all playable</button><button onClick={() => onSelectedVersions([])}>Clear selection</button><button onClick={() => navigate('comparison')}>Open comparison ↗</button></section></ToolboxPortal>
+    <ToolboxPortal extra><section className="toolbox-destinations"><p>Additional workspaces</p>{destinations.filter(item => ['peat-fem','comparison'].includes(item.id)).map(item => <button key={item.id} onClick={() => navigate(item.id)}>{item.title}<span>↗</span></button>)}</section><section className="toolbox-layouts"><p>Interface appearance</p>{LAYOUTS.map(item => <button key={item.id} aria-pressed={layout === item.id} onClick={() => onLayout(item.id)}>{item.label}</button>)}</section><section className="toolbox-selection"><p>Archived simulations · {selectedVersions.length} selected</p><button onClick={() => onSelectedVersions(availableVersions().map(item => item.id))}>Select all playable</button><button onClick={() => onSelectedVersions([])}>Clear selection</button><button onClick={() => navigate('comparison')}>Open comparison ↗</button></section></ToolboxPortal>
     <FinderPortal><section className="finder-destinations"><div className="drawer-section-label">JUMP TO</div>{results.map(item => <button key={item.id} onClick={() => navigate(item.id)}><span>{item.title}<small>{item.detail}</small></span><b>↗</b></button>)}{query && !results.length && <p>Search the controls and guides below for “{query}”.</p>}</section><section className="finder-handbook"><div className="drawer-section-label">GUIDES</div>{guides.filter(item=>`${item.title} ${item.text}`.toLowerCase().includes(query.toLowerCase())).map(item=><details key={item.title}><summary>{item.title}</summary><p>{item.text}</p></details>)}</section></FinderPortal>
-    <FinderPortal documentation>{finderTab === 'docs' && <Suspense fallback={<p>Opening physics documentation…</p>}><Documentation onWorkspace={navigate}/></Suspense>}</FinderPortal>
+    <FinderPortal documentation>{finderTab === 'docs' && workspace !== 'peat-fem' && <Suspense fallback={<p>Opening physics documentation…</p>}><Documentation onWorkspace={navigate}/></Suspense>}</FinderPortal>
   </>
 }

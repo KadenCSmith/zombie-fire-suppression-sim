@@ -1,5 +1,14 @@
 # Build status and handoff
 
+## Peat FEM M2 reacting porous transport (2026-10-02)
+
+Feature branch `feat/peat-fire-fem` adds five conservative condensed inventories and four gas species, source-normalized drying/pyrolysis/peat and char oxidation, evolving material properties, compressible Darcy storage, species transport and gas sensible enthalpy. Pressure/species and heat iterate together; a new boundary regression exposed and corrected a 4.208 Pa thermal-expansion pressure drift. The active worker, scene, fields and schema-2 recordings use this solver. Main remains published v20.
+
+Typecheck, lint (16 existing warnings), production build and 1,758 regression tests pass. Full-suite elapsed time was 7.36 s; the slowest concurrent groups were existing coupledEngine (6.82 s), sim/solver (5.99 s) and wideSoil (5.54 s). Before this task the repository contained 1,728 tests in 86 files; the new FEM checks cover assembly, sources, flow and integrated conservation. Native FEM checks cover controls, reset/replay, archive access, field identity and exported four-gas EOS. Historical native checks are reused from M1: their relevant source files are unchanged.
+
+This is verified implementation, not physical validation. Initial convergence runs failed at time zero and are retained; their old initial state and sequential-coupling code are not reused as current results. Throughput profiling also predates the coupling correction and must rerun. Matched measured-column comparison and visible 40 FPS verification remain unrun. See [model and limitations](PEAT_FIRE_FEM_MODEL.md) and [working checkpoint](review/peat-fem/PROGRESS.md).
+
+
 ## 0.20.0 cinematic interface and connected supply sequence (2026-10-02)
 
 The new default interface follows the supplied black, sparse reference: outlined navigation icons, a low cinematic hero, a scroll-revealed play/rewind bar and automatic playback on first reaching the bottom. Simulation Version opens the current render, coupled/porous/mechanics physics workspaces and previous-simulation comparison. Finder contains searchable destinations, guides, current editable values and the complete cited formula reference. Toolbox slides from the right at 30% of a desktop viewport; existing scenario controls, imports/exports, results/probes, numerical verification, tensile lab and alternate appearance controls remain accessible there. Keyboard focus, Escape and background-scroll handling are included. The comparison catalog preserves the 0.19.0 authored scene alongside earlier versions.
@@ -355,3 +364,8 @@ A separate checkout preserves the user's original Blender edit. Adds exactly 10Ã
 ## Unified reference completion â€” 27 September 2026
 
 Natural/scientific comparison UI and Blender integration are complete for the stated reduced-model scope. A 2,560-cell reference case reached 10 s in the browser. All 148 tests and six Blender contract tests pass; typecheck, lint and production build pass. See `review/unified/ui.md`, `review/unified/presentation.md`, `UNIFIED_BLENDER.md` and the independent source/initialization/operator reviews. Previous milestone entries above are historical. Native package verification is reported separately.
+# Local peat FEM increment (2026-10-02)
+
+`feat/peat-fire-fem` adds the active Peat Fire FEM route with a genuine 3D Q1 reduced dry-oxidation fixture, worker stepping, accepted-state probes, sampled temperature grid and recorded replay. The main menu has Latest render, Peat Fire FEM and Previous simulations; historical identifiers and workspaces remain available. v20 main is published at `161e7a4a1f8c35765e1878c132db79977be1f5ea`, with all three hosted CI platforms passing.
+
+This first fixture is intermediate. The accepted follow-up requires full five-step chemistry and conservative Darcy mixture transport. See `docs/review/peat-fem/PROGRESS.md` for current gates and `docs/PEAT_FIRE_FEM_MODEL.md` for scope. Feature-branch milestone uploads are authorized; further main publication is not.

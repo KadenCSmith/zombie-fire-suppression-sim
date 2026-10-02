@@ -5,7 +5,7 @@ import Play from 'lucide-react/dist/esm/icons/play.mjs'
 import RotateCcw from 'lucide-react/dist/esm/icons/rotate-ccw.mjs'
 import { storyToPlayback, type FireSourceMode } from '../story/fireSequence'
 import { FireSequenceScene, type FireSequenceLayers } from './FireSequenceScene'
-import { ModelSelector, type PhysicsWorkspace } from './ModelSelector'
+import { ModelSelector, HISTORICAL_WORKSPACES, type PhysicsWorkspace } from './ModelSelector'
 import { StudyScene } from './StudyScene'
 import { DEFAULT_STUDY_CAGE } from './studyModel'
 import { SOIL_PARTICLE_DEFAULTS } from './soilParticleModel'
@@ -78,6 +78,7 @@ export default function SimulationComparisonWorkspace({ onWorkspace, selected, o
       <div><span>MULTI-VIEW GALLERY · 0.8 AND ABOVE</span><h1>Previous simulations.</h1><p>Select preserved models and compare them on one presentation clock. Each replay keeps its own documented physical basis.</p><button className="comparison-select-models" onClick={()=>open('toolbox')}>Select models to compare <span>↗</span></button></div>
       <ModelSelector value="comparison" onChange={onWorkspace} />
     </header>
+    <section className="archived-workspaces" aria-label="Preserved historical workspaces"><h2>Historical workspaces</h2>{HISTORICAL_WORKSPACES.map(item => <button key={item.id} onClick={() => onWorkspace(item.id)}>{item.title}<small>{item.detail}</small></button>)}</section>
     <section className="comparison-controls" aria-label="Shared comparison controls">
       <button type="button" className="comparison-play" onClick={() => { if (referenceTime >= referenceDuration) seek(0); setPlaying(value => !value) }} aria-label={playing ? 'Pause all selected simulations' : 'Play all selected simulations'}>{playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}</button>
       <button type="button" className="comparison-reset" onClick={() => seek(0)} aria-label="Reset all selected simulations"><RotateCcw size={17} /></button>

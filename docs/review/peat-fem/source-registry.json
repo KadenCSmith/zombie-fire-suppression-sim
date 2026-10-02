@@ -1,0 +1,187 @@
+{
+  "configuration": "Irish-moss-C4-column-adaptation-v1",
+  "date": "2026-10-02",
+  "sources": [
+    {
+      "id": "C4",
+      "doi": "10.1071/WF16198",
+      "repository": "https://spiral.imperial.ac.uk/entities/publication/56b06e7f-a620-4f4d-a7d3-c14090996259",
+      "pdf": "https://spiral.imperial.ac.uk/bitstreams/4eea3c58-c751-433e-ab02-69ad203f9e64/download",
+      "locators": [
+        "Eq 4\u20138",
+        "Tables 1\u20132",
+        "Measured Fig 3",
+        "Measured Fig 4; simulated Fig 6/7 excluded"
+      ],
+      "access": "Repository PDF lawfully downloaded; SHA256 e6e6b6f96266fae6154ff3c812b72c4e2059d07c94a23a5eb79c465cb6c26acf; rendered Eq5/Tables1\u20132 and Fig2 inspected; raw sensor data not obtained",
+      "license": "CC BY-NC-ND 4.0; full source cache retained locally, not redistributed"
+    },
+    {
+      "id": "C3",
+      "doi": "10.1016/j.biortech.2016.01.027",
+      "url": "https://www.researchgate.net/publication/291554206_Thermochemical_Conversion_of_Biomass_in_Smouldering_Combustion_across_Scales_the_Roles_of_Heterogeneous_Kinetics_Oxygen_and_Transport_Phenomena",
+      "locators": [
+        "Eq 15\u201318 normalization",
+        "Appendix A.1 conversion"
+      ],
+      "access": "Author full text readable; rendered TG table not acquired; separate TG fit not adopted"
+    },
+    {
+      "id": "N1",
+      "doi": "10.1016/j.proci.2018.05.125",
+      "repositoryPdf": "https://ira.lib.polyu.edu.hk/bitstream/10397/88851/1/Huang_Upward-And-Downward_Spread_Smoldering.pdf",
+      "access": "Public primary repository discovered; detailed comparison pending"
+    }
+  ],
+  "parameters": {
+    "reactions": {
+      "basis": "kg reactant per kg initial source mass; chars normalized by initial dry peat; water by initial water",
+      "preexponentialUnit": "s^-1",
+      "enthalpyBasis": "J/kg destroyed reactant; positive endothermic",
+      "source": "C4 Table 1, rendered",
+      "log10Z": [
+        27,
+        8.18,
+        16.8,
+        8.38,
+        13.3
+      ],
+      "E_JMol": [
+        200000,
+        112000,
+        195000,
+        117000,
+        172000
+      ],
+      "n": [
+        0.5,
+        5.31,
+        2.33,
+        1.32,
+        2.58
+      ],
+      "nO": [
+        0,
+        0,
+        0.24,
+        0.52,
+        0.86
+      ],
+      "yield": [
+        0,
+        0.28,
+        0.61,
+        0.04,
+        0.07
+      ],
+      "oxygenKgKg": [
+        0,
+        0,
+        0.89,
+        2.21,
+        2.12
+      ],
+      "enthalpyJKg": [
+        2260000,
+        500000,
+        -11600000,
+        -28900000,
+        -27800000
+      ],
+      "uncertainty": "Not reported for this transferred column set"
+    },
+    "constituents": {
+      "source": "C4 Table 2, rendered",
+      "densityKgM3": [
+        1000,
+        1500,
+        1300,
+        1300,
+        2500
+      ],
+      "cpJKgK": [
+        4186,
+        1840,
+        1260,
+        1260,
+        880
+      ],
+      "intrinsicConductivityWMK": [
+        0.6,
+        1,
+        0.26,
+        0.26,
+        1.2
+      ],
+      "basis": "intrinsic volume and constituent mass",
+      "uncertainty": "not recovered",
+      "discrepancy": "printed density/porosity entries conflict; derive actual occupied volume; C4 beta logZ8.38 differs from C3 extracted7.38, so TG/column sets remain separate"
+    },
+    "adaptations": [
+      {
+        "name": "gasCp",
+        "value": 1000,
+        "unit": "J/(kg K)",
+        "basis": "all four gases",
+        "evidence": "illustrative common-cp thermodynamic surrogate",
+        "uncertainty": "unquantified"
+      },
+      {
+        "name": "emissionsMolecularMass",
+        "value": 0.02897,
+        "unit": "kg/mol",
+        "basis": "lumped pool",
+        "evidence": "declared air-like surrogate; not resolved CO2/CO",
+        "uncertainty": "unquantified"
+      },
+      {
+        "name": "gasDiffusivity",
+        "value": 2e-05,
+        "unit": "m\u00b2/s",
+        "basis": "gas-volume diffusivity; theta*rho multiplies flux once",
+        "evidence": "illustrative constant",
+        "uncertainty": "unquantified"
+      },
+      {
+        "name": "gasViscosity",
+        "value": 1.8e-05,
+        "unit": "Pa s",
+        "basis": "gas mixture",
+        "evidence": "illustrative constant",
+        "uncertainty": "unquantified"
+      },
+      {
+        "name": "permeability",
+        "value": 1e-12,
+        "unit": "m\u00b2",
+        "basis": "intrinsic",
+        "evidence": "assumed model setting; not hot-peat measurement",
+        "uncertainty": "unquantified; sensitivity needed"
+      },
+      {
+        "name": "relativePermeability",
+        "value": "(theta_g/phi)^3",
+        "unit": "dimensionless",
+        "basis": "gas-filled connectivity",
+        "evidence": "synthetic liquid blocking closure",
+        "uncertainty": "unquantified"
+      },
+      {
+        "name": "poreRadiationLength",
+        "value": 0.0005,
+        "unit": "m",
+        "basis": "bulk conductivity radiation term",
+        "evidence": "illustrative choice within C4 stated1e-4..1e-3m",
+        "uncertainty": "range is source model assumption, not confidence interval"
+      }
+    ]
+  },
+  "status": {
+    "runtime": "implemented five-step chemistry + fixed-volume materials + pressure + species + gas enthalpy",
+    "numericalVerification": "focused fixtures passed",
+    "convergence": "initial hot-wet matrix failed; diagnosis ongoing",
+    "calibrated": false,
+    "experimentallyCompared": false,
+    "validationCriteria": "unavailable; no matched raw/digitized observations yet"
+  }
+}

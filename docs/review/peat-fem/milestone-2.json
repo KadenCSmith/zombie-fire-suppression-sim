@@ -1,0 +1,47 @@
+{
+  "milestone": "M2 conservative reacting porous transport",
+  "baseMain": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "suite": {
+    "passed": 1758,
+    "failed": 0,
+    "files": 90,
+    "elapsedS": 7.361234375,
+    "preexistingTests": 1728,
+    "preexistingFiles": 86,
+    "slowestConcurrentGroups": [
+      {
+        "file": "tests/coupledEngine.test.ts",
+        "elapsedS": 6.815234375,
+        "existedBeforeTask": true
+      },
+      {
+        "file": "tests/sim/solver.test.ts",
+        "elapsedS": 5.9865859375,
+        "existedBeforeTask": true
+      },
+      {
+        "file": "tests/wideSoil.test.ts",
+        "elapsedS": 5.54308837890625,
+        "existedBeforeTask": true
+      }
+    ]
+  },
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed, 16 existing warnings",
+    "build": "passed, existing warnings",
+    "nativeFEM": "passed: controls, archive, field identity, schema-2 four-gas EOS export"
+  },
+  "reused": [
+    "Historical four native checks from M1; their relevant source files unchanged"
+  ],
+  "failed": [
+    "Earlier initial hot-wet convergence fixture, zero accepted physical time, retained separately; obsolete code/input hashes are not reused"
+  ],
+  "unrun": [
+    "Current-code throughput/convergence analysis",
+    "Matched measured column comparison",
+    "Visible 40 FPS gate"
+  ],
+  "status": "implementation verification; experimental validation not established"
+}

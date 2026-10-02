@@ -2,6 +2,7 @@ import { ToolboxPortal, useCinematicUI } from './ui/CinematicUI'
 import type { FireSequenceSession } from './ui/FireSequenceWorkspace'
 import { version as applicationVersion } from '../package.json'
 import type { CoupledSession } from './ui/CoupledWorkspace'
+import type { PeatFemSession } from './ui/PeatFemWorkspace'
 import type { TensileSession } from './ui/PeatTensionLab'
 import { ModelSelector, type PhysicsWorkspace } from './ui/ModelSelector'
 import type { MechanicsSession } from './ui/MechanicsWorkspace'
@@ -54,6 +55,7 @@ type SimClient = ReturnType<typeof createSimulationClient>
 const FireSequenceWorkspace = lazy(() => import('./ui/FireSequenceWorkspace'))
 const FormulaReferenceWorkspace = lazy(() => import('./ui/FormulaReferenceWorkspace'))
 const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
+const PeatFemWorkspace = lazy(() => import('./ui/PeatFemWorkspace'))
 const MechanicsWorkspace = lazy(() => import('./ui/MechanicsWorkspace'))
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
 const SimulationComparisonWorkspace = lazy(() => import('./ui/SimulationComparisonWorkspace'))
@@ -197,7 +199,7 @@ function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
   const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => {
     const requested = new URLSearchParams(window.location.search).get('workspace')
-    return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
+    return requested === 'peat-fem' || requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
   })
   const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-cinematic-layout')))
   const [selectedVersions, setSelectedVersions] = useState<string[]>(() => {
@@ -217,6 +219,7 @@ function App() {
   })
   const fireSequenceSession = useRef<FireSequenceSession | undefined>(undefined)
   const coupledSession = useRef<CoupledSession | undefined>(undefined)
+  const peatFemSession = useRef<PeatFemSession | undefined>(undefined)
   const tensileSession = useRef<TensileSession | undefined>(undefined)
   const mechanicsSession = useRef<MechanicsSession | undefined>(undefined)
   const mechanicsCamera = useRef<CameraMemory | undefined>(undefined)
@@ -680,7 +683,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
+      if (target !== 'peat-fem' && target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -694,6 +697,7 @@ function App() {
   }, [])
 
   const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
+  if (workspace === 'peat-fem') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening Peat Fire FEM…</div>}><PeatFemWorkspace session={peatFemSession}/></Suspense></>
   if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
   if (workspace === 'formulas') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the formula reference…</div>}><FormulaReferenceWorkspace onWorkspace={changeWorkspace} /></Suspense></>
   if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} selected={selectedVersions} onSelected={setSelectedVersions} /></Suspense></>
