@@ -1,5 +1,11 @@
 # Build status and handoff
 
+## 0.19.0 instant-release Mac source (2026-10-01)
+
+The saved straight-bore scene is commit `0c24485` and [PR #7](https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/7). Version 0.19.0 adds a shorter, more immediate illustrated release, a dry-ice sphere with twice the previous *display* diameter, and water fronts that start at the hose and enter a secondary crack only after reaching its junction through a parent crack. The fixed bore, fixed-size metal cap, preceding excavator sequence, fire appearance and wet peat texture remain. The 4 kg contact ledger, accepted numerical fields and model validation status are unchanged. The release effect is authored animation, with physical limitations and peer-reviewed context in [Fire sequence](FIRE_SEQUENCE.md).
+
+Local typecheck, lint, all **1,716 tests in 85 files**, production build and Electron fire-sequence smoke passed. Lint retained its existing non-failing warnings. Chrome review checked the enlarged sphere, brief release cue and connected water fronts. The Mac release packaging and publication are recorded with the release assets, whose manifest identifies the exact packaged source commit.
+
 ## Straight-bore Chrome preview (2026-10-01)
 
 The working branch `codex/scene-mix-bore-fracture` updates the main interactive scene in the Chrome development preview. It combines the V16 tracked auger, V17.1 dense smoldering embers and woven hose, V9 straight bore and fixed-size descending metal cap, and V18.1-style dark peat after water contact. The sphere settles by story 44 s, the fixed cap drops by 51.5 s, then an illustrated gas release at 55 s briefly disturbs soil, dims nearby embers and propagates twelve fine fracture paths across the peat. Water follows those paths from 72 s and darkens the remaining depicted fire. The bore and cap do not expand. The gas, oxygen displacement, soil failure and water quenching are animation, not predictions of the solvers. The historical gallery replays remain preserved. The installed 0.18.2 Mac application has not been updated in this preview pass.

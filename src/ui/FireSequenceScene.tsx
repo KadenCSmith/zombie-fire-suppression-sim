@@ -169,9 +169,11 @@ if(uStoryCavity>.005&&pow(length(vec2(vOak.x-${SOURCE_X},vOak.z))/(${G.cavityRad
 function SourceAndCap({time,mode,realistic,openPit,straightBore}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean;straightBore:boolean}){
   const pose=fireSequencePose(time,mode)
   const mass=contactCoolingState(time,mode).ledger.dryIceRemainingKg,radius=Math.cbrt(3*Math.max(0,mass)/(4*Math.PI*G.sourceDensityKgM3))
+  // Diameter-only presentation enlargement; the 4 kg contact ledger is unchanged.
+  const displayRadius=straightBore?radius*2:radius
   const pocket=!straightBore&&(realistic?eased(time,31,33):pose.underream)>.05
   const wallSegments=pocket?[[0,-G.cavityCenterY-G.cavityHalfHeightM],[-G.cavityCenterY+G.cavityHalfHeightM,pose.drillDepth]]:[[0,pose.drillDepth]]
-  return <>{!openPit&&<>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}{!straightBore&&<><Chamber time={time} constrained={realistic}/><Underreamer time={time} constrained={realistic}/></>}</>}<group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]}><mesh><sphereGeometry args={[Math.max(.001,radius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group>{realistic?<ConstrainedCap time={time} mode={mode} fixedSize={straightBore}/>:<SegmentedDome time={time} mode={mode}/>}</>
+  return <>{!openPit&&<>{pose.drillDepth>.005&&wallSegments.map(([top,bottom],i)=><mesh key={i} position={[SOURCE_X,-(top+bottom)/2,0]}><cylinderGeometry args={[G.boreRadiusM*.997,G.boreRadiusM*.997,Math.max(.001,bottom-top),32,1,true,Math.PI/2,Math.PI]}/><meshStandardMaterial color="#705a3b" roughness={1} side={THREE.BackSide}/></mesh>)}{!straightBore&&<><Chamber time={time} constrained={realistic}/><Underreamer time={time} constrained={realistic}/></>}</>}<group visible={pose.sourceVisible&&mass>1e-6} position={[SOURCE_X,pose.sourceY,.012]} userData={{scientificRole:straightBore?'2x-diameter presentation proxy; mass and density in the separate contact budget are unchanged':'contact-budget dry-ice geometry'}}><mesh><sphereGeometry args={[Math.max(.001,displayRadius),24,18]}/><meshStandardMaterial color="#e2f4f1" roughness={.5} emissive="#c7e4dc" emissiveIntensity={.12}/></mesh></group>{realistic?<ConstrainedCap time={time} mode={mode} fixedSize={straightBore}/>:<SegmentedDome time={time} mode={mode}/>}</>
 }
 function SurfaceConnection({time,visible}:{time:number;visible:boolean}){
   const points=useMemo(()=>new THREE.CatmullRomCurve3([new THREE.Vector3(1.72,.035,-.28),new THREE.Vector3(1.72,.005,.035),new THREE.Vector3(1.78,-.38,.038),new THREE.Vector3(1.64,-.73,.04),new THREE.Vector3(1.6,-1.02,.04)]).getPoints(60),[])
@@ -190,9 +192,9 @@ function Tracers({time,mode,layers,realistic,straightBore}:{time:number;mode:Fir
   useLayoutEffect(()=>{
     const object=new THREE.Object3D(),pose=fireSequencePose(time,mode)
     for(let i=0;i<170;i++){
-      const age=(time*.11+random(i+200))%1,angle=random(i+201)*Math.PI*2,reach=pose.gas*(straightBore?.18+1.55*age:.3+2.1*age),vertical=(random(i+300)-.45)*1.1
-      const visible=straightBore?layers.gas&&mode==='rapid'&&time>=55&&time<60:!realistic&&layers.gas&&time>=55
-      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,straightBore?.16+Math.abs(Math.sin(angle))*.05:.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(visible?(straightBore?.016+pose.gas*.033*(1-age):.013+pose.gas*.018*(1-age)):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
+      const age=(time*.11+random(i+200))%1,angle=random(i+201)*Math.PI*2,burst=eased(time,55.02,55.38),reach=(straightBore?burst:pose.gas)*(straightBore?.12+1.25*age:.3+2.1*age),vertical=(random(i+300)-.45)*1.1
+      const visible=straightBore?layers.gas&&mode==='rapid'&&time>=55.02&&time<56.25:!realistic&&layers.gas&&time>=55
+      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,straightBore?.16+Math.abs(Math.sin(angle))*.05:.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(visible?(straightBore?(1-eased(time,55.45,56.25))*(.012+burst*.013*(1-age)):.013+pose.gas*.018*(1-age)):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<65;i++){
       const age=(time*.25+random(i+33))%1,active=time<31?1-eased(time,20,31):0
@@ -204,22 +206,24 @@ function Tracers({time,mode,layers,realistic,straightBore}:{time:number;mode:Fir
     }
     for(const ref of[gas,smoke,cuttings])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
   },[time,mode,layers,realistic,straightBore,geometry,invalidate])
-  return <><instancedMesh ref={gas} args={[geometry,undefined,170]} raycast={()=>null}><meshBasicMaterial color="#7cd0d6" transparent opacity={.38} depthWrite={false}/></instancedMesh><instancedMesh ref={smoke} args={[geometry,undefined,65]} raycast={()=>null}><meshBasicMaterial color="#a9aaa0" transparent opacity={.11} depthWrite={false}/></instancedMesh><instancedMesh ref={cuttings} args={[geometry,undefined,100]} raycast={()=>null}><meshStandardMaterial color="#8a6845" roughness={1}/></instancedMesh></>
+  return <><instancedMesh ref={gas} args={[geometry,undefined,170]} raycast={()=>null}><meshBasicMaterial color={straightBore?'#b8bdba':'#7cd0d6'} transparent opacity={straightBore?.25:.38} depthWrite={false}/></instancedMesh><instancedMesh ref={smoke} args={[geometry,undefined,65]} raycast={()=>null}><meshBasicMaterial color="#a9aaa0" transparent opacity={.11} depthWrite={false}/></instancedMesh><instancedMesh ref={cuttings} args={[geometry,undefined,100]} raycast={()=>null}><meshStandardMaterial color="#8a6845" roughness={1}/></instancedMesh></>
 }
 function PressureBurst({time,mode,local=false}:{time:number;mode:FireSourceMode;local?:boolean}){
   const dust=useRef<THREE.InstancedMesh>(null),debris=useRef<THREE.InstancedMesh>(null),invalidate=useThree(state=>state.invalidate)
   const dustMaterial=useMemo(()=>new THREE.MeshBasicMaterial({color:'#a5997f',transparent:true,opacity:.1,depthWrite:false}),[])
   useEffect(()=>()=>dustMaterial.dispose(),[dustMaterial])
   useLayoutEffect(()=>{
-    const object=new THREE.Object3D(),age=time-55,active=mode==='rapid'&&age>=0&&age<3.2
-    dustMaterial.opacity=active?.13*(1-eased(time,56,58.2)):0
+    const object=new THREE.Object3D(),age=time-55,active=mode==='rapid'&&age>=0&&age<(local?1.35:3.2)
+    dustMaterial.opacity=active?(local?.24*(1-eased(time,55.55,56.3)):.13*(1-eased(time,56,58.2))):0
     for(let i=0;i<110;i++){
-      const t=Math.max(0,age-random(i+404)*.28),angle=random(i+710)*Math.PI*2,ring=random(i+143)
-      object.position.set(SOURCE_X+Math.cos(angle)*(.1+ring*.45+t*(local?.24:.6)),local?-G.sourceDepthM+Math.sin(angle)*(.12+t*.23):.05+t*(.6+random(i+193)*.5),local?.18+Math.abs(Math.sin(angle))*.05:-.1-Math.abs(Math.sin(angle))*(.1+t*.7));object.rotation.set(i,i*2,i*.3);object.scale.setScalar(active&&t>0?(local?.035+t*.045:.08+t*.24)*(.6+ring):0);object.updateMatrix();dust.current?.setMatrixAt(i,object.matrix)
+      const t=Math.max(0,age-random(i+404)*(local?.07:.28)),angle=random(i+710)*Math.PI*2,ring=random(i+143)
+      const burst=1-Math.exp(-9*t)
+      object.position.set(SOURCE_X+Math.cos(angle)*(local?.10+burst*(.3+ring*.55):.1+ring*.45+t*.6),local?-G.sourceDepthM+Math.sin(angle)*(.15+burst*.42):.05+t*(.6+random(i+193)*.5),local?.18+Math.abs(Math.sin(angle))*.05:-.1-Math.abs(Math.sin(angle))*(.1+t*.7));object.rotation.set(i,i*2,i*.3);object.scale.setScalar(active&&t>0?(local?.035+.045*burst:.08+t*.24)*(.6+ring):0);object.updateMatrix();dust.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<140;i++){
-      const t=Math.max(0,age-random(i+31)*.18),angle=random(i+810)*Math.PI*2,speed=1+random(i+145)*1.8,y=.05+(1.6+random(i+934)*2.1)*t-4.905*t*t
-      object.position.set(SOURCE_X+Math.cos(angle)*speed*t*(local?.28:1),local?-G.sourceDepthM+Math.sin(angle)*speed*t*.20:y,local?.19:-.12-Math.abs(Math.sin(angle))*(.12+speed*t*.6));object.rotation.set(i+t*5,i*.7+t*3,i+t*4);object.scale.setScalar(active&&t>0&&(local||y>-.03)?local?.010+random(i+514)*.020:.018+random(i+514)*.055:0);object.updateMatrix();debris.current?.setMatrixAt(i,object.matrix)
+      const t=Math.max(0,age-random(i+31)*(local?.06:.18)),angle=random(i+810)*Math.PI*2,speed=1+random(i+145)*1.8,y=.05+(1.6+random(i+934)*2.1)*t-4.905*t*t
+      const burst=1-Math.exp(-10*t)
+      object.position.set(SOURCE_X+Math.cos(angle)*(local?speed*burst*.36:speed*t),local?-G.sourceDepthM+Math.sin(angle)*speed*burst*.21-(t*t*.09):y,local?.19:-.12-Math.abs(Math.sin(angle))*(.12+speed*t*.6));object.rotation.set(i+t*5,i*.7+t*3,i+t*4);object.scale.setScalar(active&&t>0&&(local||y>-.03)?local?.010+random(i+514)*.020:.018+random(i+514)*.055:0);object.updateMatrix();debris.current?.setMatrixAt(i,object.matrix)
     }
     for(const ref of[dust,debris])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
   },[time,mode,local,dustMaterial,invalidate])

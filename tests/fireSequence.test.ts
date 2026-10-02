@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, rapidFractureProgress, rapidWettingProgress, rapidGasPulse, rapidGasQuench, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, rapidFractureProgress, rapidWettingProgress, rapidGasPulse, rapidGasQuench, rapidPathVertexFraction, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, RAPID_WATER_CONNECTIONS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
 
 describe('story and accepted-state separation', () => {
   const frames = [
@@ -109,19 +109,34 @@ describe('straight-bore animation variant',()=>{
     expect(SOURCE_CONTACT_CRACK_PATHS).toHaveLength(3)
     expect(SOURCE_CONTACT_CRACK_PATHS[0].at(-1)![1]).toBeGreaterThan(-1)
   })
-  it('orders the rapid release after the fixed cap and before peat-wide water entry',()=>{
+  it('orders an immediate release after the fixed cap and before peat-wide water entry',()=>{
     expect(fireSequencePose(44,'rapid').sourceY).toBeCloseTo(-G.sourceDepthM)
     expect(fireSequencePose(51.5,'rapid').capY).toBeCloseTo(-G.capDepthM)
+    const physicalRadius=Math.cbrt(3*G.sourceInitialMassKg/(4*Math.PI*G.sourceDensityKgM3))
+    expect(physicalRadius*2).toBeLessThan(G.boreRadiusM)
+    expect(G.sourceDepthM-physicalRadius*2).toBeGreaterThan(G.capDepthM+fixedBoreCapShape().depthM)
     expect(RAPID_PEAT_CRACK_PATHS.length).toBeGreaterThanOrEqual(10)
     expect(RAPID_PEAT_CRACK_PATHS.map(path=>path.at(-1)![0]).some(x=>x < -1.8)).toBe(true)
     expect(RAPID_PEAT_CRACK_PATHS.map(path=>path.at(-1)![0]).some(x=>x > 3)).toBe(true)
     expect(rapidFractureProgress(54.99,0)).toBe(0)
     expect(rapidGasPulse(55.3)).toBeGreaterThan(0)
+    expect(rapidGasPulse(56.2)).toBeLessThan(.01)
     expect(rapidFractureProgress(56,0)).toBeGreaterThan(0)
+    expect(rapidFractureProgress(55.7,RAPID_PEAT_CRACK_PATHS.length-1)).toBe(1)
     expect(rapidGasQuench(57.1)).toBe(1)
     expect(rapidWettingProgress(71.99,0)).toBe(0)
     expect(rapidWettingProgress(90,RAPID_PEAT_CRACK_PATHS.length-1)).toBe(1)
     expect(fixedBoreCapShape().radiusM).toBeLessThan(G.boreRadiusM)
+  })
+  it('opens water branches only after a connected front arrives from the hose',()=>{
+    for(let branch=0;branch<RAPID_PEAT_CRACK_PATHS.length;branch++){
+      const path=RAPID_PEAT_CRACK_PATHS[branch],connection=RAPID_WATER_CONNECTIONS[branch]
+      if(!connection){expect(path[0].slice(0,2)).toEqual(STORY_HOSE_POINTS.at(-1)!.slice(0,2));continue}
+      expect(path[0]).toEqual(RAPID_PEAT_CRACK_PATHS[connection.parent][connection.vertex])
+      const junction=rapidPathVertexFraction(RAPID_PEAT_CRACK_PATHS[connection.parent],connection.vertex)
+      for(let time=72;time<=90;time+=.1)if(rapidWettingProgress(time,branch)>1e-7)
+        expect(rapidWettingProgress(time,connection.parent)).toBeGreaterThanOrEqual(junction-1e-7)
+    }
   })
 })
 
