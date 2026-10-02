@@ -1,5 +1,14 @@
 # Build status and handoff
 
+## Local 0.18.2 formula build and installation (2026-10-01)
+
+The 0.18.1 scene/gallery branch and the physical-formulas reference were integrated into a 0.18.2 local Mac build. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. The Apple Silicon ZIP passed a clean extraction and strict deep signature check; the DMG passed verification. The ZIP SHA-256 is `f665f956becf8f6994adc72094851e7877cb606ebc13025b90f270ed55da1a4d`. Version 0.18.2 was installed at `~/Applications/Zombie Fire Suppression Sim.app`, launched, and its **Physical formulas** page was opened in the native window. The previous 0.18.1 bundle was archived before replacement. This is a local build from the open development pull requests, not a published GitHub release. The referenced convergence graphs still use the archived cold-source study; no new physical validation is claimed.
+
+## Physical formulas document and navigation (2026-10-01)
+
+Added an in-app **Physical formulas** workspace accessible beside **Open physics lab** and through the app-view selector. It summarizes the actual FVM/FEM/reduced/illustrative methods, cites peer-reviewed equation sources, identifies the limited correspondence with the supplied coal-mine CFD paper, and plots the archived cold-source refinement data. The detailed, source-linked [GitHub formula audit](PHYSICS_FORMULA_AUDIT.md) includes two reproducible scientific figures and explains the conditional 0.285% time-only mass-loss estimate and why no whole-model field-error percentage is available. The calculation code, accepted history and packaged releases were not changed in this milestone.
+
+Local `npm ci`, typecheck, lint, **1,706 tests in 85 files**, and production build passed. The in-app document navigation and charts were inspected in a browser preview. This is a source checkout/PR update; a new installed Mac release and full native-window verification were not performed for it.
 ## Open-pit revision — 0.18.1 (2026-09-30)
 
 The 0.18.0 widening cutter remained visually implausible. The current 0.18.1 scene replaces it with a fixed-width excavator bucket and a visible open pit. Source and cap placement occur before staged backfill; the concave cap flattens under the later illustrated pressure event. The prior 0.18.0 scene remains labeled as an older replay in the gallery. The solver and accepted fields are unchanged. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. Native package and installed-app results are recorded after completion.

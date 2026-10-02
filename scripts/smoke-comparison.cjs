@@ -28,6 +28,7 @@ app.on('browser-window-created',(_event,win)=>{
         document.querySelector('.app-chrome-more').click();
         await wait(()=>document.querySelector('.app-options'),'three-dot options');
         [...document.querySelectorAll('.app-options-tabs button')].find(button=>button.textContent==='Interface').click();
+        await wait(()=>document.querySelector('.app-options-layouts button'),'interface layout options');
         [...document.querySelectorAll('.app-options-layouts button')].find(button=>button.textContent.includes('Instrument')).click();
         await wait(()=>document.body.dataset.layout==='instrument','instrument layout');
         const after=[...document.querySelectorAll('.comparison-card')].map(card=>card.getAttribute('data-version')).join(',');

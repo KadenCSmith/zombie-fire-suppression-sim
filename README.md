@@ -5,6 +5,7 @@ An integrated Mac research app combining the coupled simulator with the editable
 **Physics first, with explicit limits.** The new 2,560 and 20,480 cell options are exactly 10× the former preview and research sizes. A shared material atlas conserves initial inventories across meshes. The finite CO₂ source now couples heat transfer, sensible energy and concentration-dependent mass transfer. The original float64 mechanics reference remains available alongside a measured sparse optimization. More elements do not establish experimental accuracy.
 
 - [Start here](docs/UNIFIED_QUICKSTART.md)
+- [Physical formulas, article correspondence, convergence graphs and error limits](docs/PHYSICS_FORMULA_AUDIT.md) — also available through **Physical formulas** beside **Open physics lab** in the app.
 - [Full fire sequence and both source modes](docs/FIRE_SEQUENCE.md)
 - [Separate contact-cooling model and conservation scope](docs/CONTACT_COOLING.md)
 - [Cold-start fire experiment and exact limitations](docs/FIRE_PROTOCOL.md)
@@ -50,7 +51,7 @@ Version 0.4 adds **12 researched composition profiles**: Irish moss peat, an And
 
 ## Download and launch
 
-The **0.18.1** app combines the current interactive scene and previous simulations in one package. **Previous simulations · v0.8+** is visible above the scene and in the top bar; its gallery plays selected prior animations together. The three-dot menu also contains the simulation selection and three interface styles. The current scene uses a fixed-width excavator bucket to open a pit, places a concave cap while it is accessible, and backfills over it. The cap then flattens with bounded diameter growth and local soil lift; a hose follows short illustrated fractures and dims reached embers. The earlier widening-cutter and dome sequences remain clearly labeled historical replays. The packaged app works offline.
+The **0.18.2** local app combines the current interactive scene, previous simulations, and a cited Physical formulas reference in one package. **Previous simulations · v0.8+** is visible above the scene and in the top bar; its gallery plays selected prior animations together. The three-dot menu also contains the simulation selection and three interface styles. The current scene uses a fixed-width excavator bucket to open a pit, places a concave cap while it is accessible, and backfills over it. The cap then flattens with bounded diameter growth and local soil lift; a hose follows short illustrated fractures and dims reached embers. The earlier widening-cutter and dome sequences remain clearly labeled historical replays. The packaged app works offline.
 
 The 0.12 reference retains the original float64 mechanics backend. The 0.13 accuracy-workflow successor enables the verified sparse optimization under the same physics and acceptance gates, with 0.125 s maximum steps on both new precision meshes. This trades additional runtime for lower observed temporal error. [Release tracks, installation and commands](docs/INSTALL.md) · [Verification status](docs/VALIDATION_STATUS.md).
 

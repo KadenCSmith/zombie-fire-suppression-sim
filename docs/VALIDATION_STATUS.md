@@ -1,5 +1,16 @@
 # Verification and validation status
 
+## 0.18.2 integration and installed-app check (2026-10-01)
+
+The formula reference was combined with the 0.18.1 scene/gallery branch. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, and production build passed. The arm64 package passed code-signature, extracted-ZIP and DMG checks, and the installed bundle reports 0.18.2. Its native window opened the new formula page. These checks establish software packaging and navigation only; they do not add a matched experiment or a whole-model physical error percentage. The spatial and temporal graphs remain limited to the archived 2 s cold-source calculation.
+
+## Equation/source audit and formula reference (2026-10-01)
+
+The new [physical formula audit](PHYSICS_FORMULA_AUDIT.md) maps active gas, heat, reaction, dry-ice, water-phase and FEM equations to implementation paths and peer-reviewed sources. The user-supplied An et al. *Fire* 8(1), 13 article concerns nonreactive coal-mine methane/air CFD; only its ideal-gas, Darcy/species-balance and finite-volume principles are relevant analogues. No numerical solver coefficient or equation was changed to imitate its unrelated turbulence/ventilation model. The app now has a **Physical formulas** workspace beside **Open physics lab**.
+
+The audit replots archived 2 s cold-source transport sweeps and separate analytical heat/consolidation checks from committed JSON. Spatial source-loss and local-probe differences are nonmonotone, so whole-case spatial convergence is not established. A three-level Richardson extrapolation suggests **0.285% conditional temporal discretization difference** in 2,560-cell, 0.125 s cold-source mass loss; it is not a measured physical prediction error. The 24 h hot sequence, liquid infiltration, fracture and suppression outcome still lack an end-to-end passing convergence and matched experimental validation study. The previously documented ~5.74% spatial fracture mesh-energy mismatch remains a failed 5% gate. No defensible model-wide field-error percentage is assigned.
+
+For this navigation/documentation change, `npm ci`, `npm run typecheck`, `npm run lint`, `npm test` (**1,706 tests in 85 files**) and `npm run build` passed locally. Browser visual QA exercised sequence header → formula page → return, including both data-backed charts. Lint reported only existing warnings. No new physics simulation was run; the figures are regenerated from archived output.
 ## Open excavation and backfill revision (2026-09-30)
 
 The current 0.18.1 presentation replaces the widening underreamer with a fixed-width bucket and a staged open pit that is backfilled before the cap event. The cap and local water paths retain their bounded visual timing; accepted numerical states and the separate contact budget are unchanged. Typecheck, lint (existing warnings only), all **1,710 tests in 85 files**, production build and whitespace checks passed. Excavation stability, root effects, compaction, cap pressure and suppression remain unvalidated. Native package, CI and installed-app checks are recorded after they run.

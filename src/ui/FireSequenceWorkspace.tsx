@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react'
-import { Layers, Thermometer, Wind, Cloud, Tags, RotateCcw, ArrowUpRight, Play, Pause, Crosshair } from 'lucide-react'
+import { Layers, Thermometer, Wind, Cloud, Tags, RotateCcw, ArrowUpRight, Play, Pause, Crosshair, BookOpen } from 'lucide-react'
 import { ModelSelector, type PhysicsWorkspace } from './ModelSelector'
 import { FireSequenceScene, type FireFieldSnapshot, type FireSequenceLayers } from './FireSequenceScene'
 import { FIRE_SEQUENCE_DURATION as DURATION, FIRE_SEQUENCE_STAGES as STAGES, sequenceStage, acceptedFireFrame, illustratedPeatCoverage, storyToPlayback, playbackToStory, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
@@ -56,6 +56,7 @@ export default function FireSequenceWorkspace({onWorkspace,session}:{onWorkspace
     <header className="fire-sequence-header">
       <div className="fire-sequence-brand"><span>Z</span><div><strong>ZOMBIE FIRE</strong><small>SUBSURFACE LABORATORY</small></div></div>
       <ModelSelector value={'sequence' as PhysicsWorkspace} onChange={onWorkspace}/>
+      <button className="fire-lab-link fire-formula-link" onClick={()=>onWorkspace('formulas')}>Physical formulas <BookOpen size={13}/></button>
       <button className="fire-lab-link" onClick={()=>onWorkspace('coupled')}>Open physics lab <ArrowUpRight size={13}/></button>
     </header>
     <div className="fire-workspace-heading"><div><span>PEAT FIRE / INTERVENTION STUDY</span><h1>Terrain &amp; subsurface operations.</h1></div><p>Explore the complete sequence.<br/>Compare the illustration with accepted numerical fields.</p></div>
