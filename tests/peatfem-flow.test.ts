@@ -20,6 +20,18 @@ describe('Q1 compressible Darcy and conservative gas species',()=>{
     expect(mass(mesh,next.gas)).toBeCloseTo(mass(mesh,old),12)
     expect(next.gas[0].every(v=>v===0)).toBe(true)
   })
+  it('recovers the analytical lumped-Q1 cosine species mode at zero Darcy permeability',()=>{
+    const mesh=createMesh(2,.1),n=mesh.weights.length,theta=new Float64Array(n).fill(.9),T=new Float64Array(n).fill(300),K=new Float64Array(n),dt=.1
+    const Y=Float64Array.from(theta,(_,i)=>.233+.02*Math.cos(Math.PI*mesh.coordinates[3*i+2]/.1))
+    const old=[Y,Float64Array.from(Y,y=>1-y),new Float64Array(n),new Float64Array(n)]
+    const next=gasStep(mesh,old,T,theta,K,dt,options),lambda=4*options.diffusivity*Math.sin(Math.PI/(2*mesh.n))**2/mesh.h**2
+    next.gas[0].forEach((value,i)=>{
+      const exact=.233+.02*Math.cos(Math.PI*mesh.coordinates[3*i+2]/.1)/(1+dt*lambda)
+      expect(Math.abs(value-exact)).toBeLessThan(1e-9)
+      expect(Math.abs(next.gas.reduce((sum,g)=>sum+g[i],0)-1)).toBeLessThan(1e-10)
+    })
+    expect(next.massFlux.length).toBe(0);expect(mass(mesh,next.gas)).toBeCloseTo(mass(mesh,old),12)
+  })
   it('recovers analytical homogeneous-column squared pressure and mass flux',()=>{
     const mesh=createMesh(4,.1),n=mesh.weights.length,T=new Float64Array(n).fill(300),theta=new Float64Array(n).fill(.9),K=new Float64Array(n).fill(1e-12),b=1/(R/.028014*300)
     const p0=102325,p1=101325,P=Float64Array.from(theta,(_,i)=>Math.sqrt(p0*p0+(p1*p1-p0*p0)*mesh.coordinates[3*i]/.1)),boundary=new Map<number,number>()

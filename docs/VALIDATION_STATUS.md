@@ -1,5 +1,12 @@
 # Verification and validation status
 
+## Peat FEM final evidence and recording milestone (2026-10-02)
+
+All 1,763 tests / 91 files pass in 5.38 s; 1,728 tests / 86 files existed before this task. Typecheck/lint/build and all five native checks pass, including exported-file import and deterministic continuation. Six separate mesh/time/source cases completed; hash-matched results are reused after UI changes. **Coarse accuracy fails:** 38.86 K probe / 3.1 mm contour differences against 16³ exceed 5 K / 2 mm limits. No asymptotic order, grid independence, matched-column validation or final visible 40 FPS pass is claimed. The native foreground benchmark was unavailable after bounded launch attempts. All failures and incomplete gates remain explicit in [evidence and reproduce commands](PEAT_FIRE_FEM_EVIDENCE.md).
+
+Initial v20 main checkpoint is `161e7a4`; outside this session GitHub merged the earlier FEM milestone through PR10 as main `4b2088e`. This session continues normal feature-branch pushes and has not merged or rewritten main.
+
+
 ## Peat FEM refined-mesh residual correction (2026-10-02)
 
 A buried hot seed on the 8³ mesh stalled after 6.4 microseconds because a dimensional 1e-14 linear residual floor was too loose relative to nodal gas inventory. Tightening that floor to 1e-18 resolves the regression without relaxing the 1e-8 nonlinear target. The regression fails with the former floor and passes with the correction. All 1,759 tests in 90 files pass in 6.62 s; typecheck/lint/build pass. Current-code analysis is being rerun; prior hashes are not reused. Physical validation is incomplete.

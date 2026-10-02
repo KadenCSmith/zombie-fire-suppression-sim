@@ -1,0 +1,119 @@
+{
+  "mode": "pilot",
+  "codeHash": "c8c268c2628dcf39de205bd96a15a07e3c37fea1b13bf404f3adc68fadc634d3",
+  "inputHash": "a9d549d157642afad9eece7292249f016555fdf8eee1e767b610db614b31eb55",
+  "reused": false,
+  "host": "darwin",
+  "node": "v26.8.2",
+  "generated": "2026-10-02T11:26:42.630Z",
+  "settings": {
+    "n": 4,
+    "lengthM": 0.1,
+    "ambientK": 300,
+    "oxygenMassFraction": 0.233,
+    "moistureRatio": 0.1,
+    "dryDensityKgM3": 123,
+    "ambientPressurePa": 101325,
+    "ignitionW": 8,
+    "ignitionS": 180,
+    "ignitionWidthM": 0.025,
+    "heatTransfer": 10,
+    "transferKgM2S": 0.01,
+    "permeabilityM2": 1e-12,
+    "poreRadiationM": 0.0005,
+    "gasDiffusivityM2S": 2e-05,
+    "gasViscosityPaS": 1.8e-05,
+    "emissivity": 0.95,
+    "gravityMS2": 0,
+    "maxStepS": 1,
+    "endS": 600,
+    "chemistry": true,
+    "closed": false
+  },
+  "matrix": [
+    {
+      "n": 4,
+      "dt": 0.125,
+      "end": 0.5,
+      "fixture": "localized-dry-hot"
+    }
+  ],
+  "cases": [
+    {
+      "n": 4,
+      "dt": 0.125,
+      "end": 0.5,
+      "fixture": "localized-dry-hot",
+      "settings": {
+        "n": 4,
+        "lengthM": 0.1,
+        "ambientK": 300,
+        "oxygenMassFraction": 0.233,
+        "moistureRatio": 0.1,
+        "dryDensityKgM3": 123,
+        "ambientPressurePa": 101325,
+        "ignitionW": 0,
+        "ignitionS": 180,
+        "ignitionWidthM": 0.025,
+        "heatTransfer": 10,
+        "transferKgM2S": 0.01,
+        "permeabilityM2": 1e-12,
+        "poreRadiationM": 0.0005,
+        "gasDiffusivityM2S": 2e-05,
+        "gasViscosityPaS": 1.8e-05,
+        "emissivity": 0.95,
+        "gravityMS2": 0,
+        "maxStepS": 0.125,
+        "endS": 0.5,
+        "chemistry": true,
+        "closed": false
+      },
+      "status": "running",
+      "samples": [
+        {
+          "timeS": 0,
+          "energyJ": 2897.6899133444485,
+          "gasKg": 0.0010345477137039742,
+          "oxygenKg": 0.000241049617293026,
+          "peatKg": 0.12299999999999993,
+          "charKg": 0,
+          "waterKg": 0.011180998909467221,
+          "ashKg": 0,
+          "maximumK": 850,
+          "maximumNode": 112,
+          "componentsKg": 0.13521554662317112,
+          "peakK": 850,
+          "peakTimeS": 0,
+          "oxygenProbe": 0.23299999999999998,
+          "pressureProbePa": 101325,
+          "probeK": [
+            676.1145051732416,
+            502.2290103464834,
+            301.06174977492526
+          ],
+          "contour500KDepthM": 0.020100000000000007,
+          "peatDepletion5pctDepthM": 0,
+          "massResidualKg": 0,
+          "energyResidualJ": 0,
+          "linearResidual": 0,
+          "splitError": 0,
+          "rejected": 0,
+          "gasEnthalpyOutJ": 0,
+          "maxPeclet": 7.809574812875414e-14
+        }
+      ],
+      "acceptedSteps": 0,
+      "minimumStepS": null,
+      "maximumStepS": 0,
+      "wallS": 0
+    }
+  ],
+  "differences": [],
+  "limits": {
+    "coarseTemperatureK": 5,
+    "coarseRemainingMassRelative": 0.05,
+    "contourDepthM": 0.002
+  },
+  "status": "interrupted computational pilot, no convergence claim",
+  "interruptionReason": "Hot seed on prescribed-pressure boundary introduces rapid chemistry/transport coupling; runtime greatly exceeds ambient fixture. Last flushed observation is initial state, not a final accepted state."
+}

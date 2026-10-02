@@ -1,0 +1,7 @@
+{
+  "status": "unrun on final build",
+  "reason": "Direct native launches could not obtain visible focused window; one normal macOS launch stalled before benchmark startup and was terminated. No benchmark acceptance claimed for final build.",
+  "earlierResult": "visible-benchmark-focus-failure.json retains loss-of-focus run and zero-frame windows",
+  "earlierDiagnostic": "An earlier intermediate build had minimum rolling FPS119 in a finite 30 s interval; its raw output was overwritten by the repeat, so it is not used as final acceptance evidence.",
+  "screenshots": "unrun: native UI inspection unavailable; no alternate capture used to bypass prior browser denial"
+}

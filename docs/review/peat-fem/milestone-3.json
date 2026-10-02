@@ -1,0 +1,124 @@
+{
+  "milestone": "M3 evidence, visible benchmark, recordings and worked runtime formulas",
+  "initialV20Main": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "externalMainMerge": "4b2088e926662aee357cde680f2b22c4fbf24f79, PR10 merged outside this session",
+  "branch": "feat/peat-fire-fem",
+  "suite": {
+    "passed": 1763,
+    "failed": 0,
+    "files": 91,
+    "elapsedS": 5.37503125,
+    "preexistingTests": 1728,
+    "preexistingFiles": 86,
+    "slowest": [
+      {
+        "file": "tests/coupledEngine.test.ts",
+        "elapsedS": 5.13103125,
+        "preexisting": true
+      },
+      {
+        "file": "tests/sim/solver.test.ts",
+        "elapsedS": 4.412344970703125,
+        "preexisting": true
+      },
+      {
+        "file": "tests/wideSoil.test.ts",
+        "elapsedS": 3.36060205078125,
+        "preexisting": true
+      }
+    ]
+  },
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed, 16 existing warnings",
+    "build": "passed",
+    "nativeFEM": "passed recording import/export EOS and live/reset/archive lifecycle",
+    "nativeFireSequence": "passed; reused after final FEM-only edits, relevant legacy sources unchanged",
+    "nativeCoupled": "passed; reused after final FEM-only edits, relevant legacy sources unchanged",
+    "nativeDesktop": "passed; reused after final FEM-only edits, relevant legacy sources unchanged",
+    "nativeComparison": "passed; reused after final FEM-only edits, relevant legacy sources unchanged"
+  },
+  "analysis": {
+    "completedCases": 6,
+    "caseFailures": 0,
+    "coarseAccuracyGate": {
+      "passed": false,
+      "coarseTemperatureK": 5,
+      "coarseRemainingMassRelative": 0.05,
+      "contourDepthM": 0.002,
+      "status": "comparison to 16\u00b3 only; grid independence and error order not established"
+    },
+    "coarseProbeDifferenceK": 38.86251822157436,
+    "coarseContourDifferenceM": 0.0031000000000000055,
+    "timeProbeDifferencesK": [
+      0.00456962973953523,
+      0.004029756439081211
+    ],
+    "stricterToleranceControlK": 0.00719726097088369,
+    "maximumMassResidualKg": 9.402850490548365e-15,
+    "maximumEnergyResidualJ": 2.242555473941417e-08,
+    "codeHash": "beb28d56152ee1e52bda6b2f41f0856f5bb0c2a10040e2b3b5a47825eda19fa2",
+    "inputHash": "888f85aa369481af8986169d60b60ee2840167cda26f67d383cead97d2ca7198",
+    "cachedReuse": "Exact code/input hashes verified after UI-only final changes; labeled reused",
+    "orderStatus": "No demonstrated asymptotic mesh/time regime; no Richardson/GCI claim"
+  },
+  "profiling": [
+    {
+      "mesh": 4,
+      "wallS": 0.30238737499999996,
+      "physicalPerWallS": 3.3070163726246844
+    },
+    {
+      "mesh": 8,
+      "wallS": 2.1619729160000003,
+      "physicalPerWallS": 0.46254048448033375
+    },
+    {
+      "mesh": 16,
+      "wallS": 26.703446042,
+      "physicalPerWallS": 0.03744835024015886
+    }
+  ],
+  "failed": [
+    "Default coarse 5 K probe and 2 mm contour accuracy gate",
+    "Earlier sequential hot-wet initialization and refined residual-floor stalls, retained as superseded failure evidence",
+    "Visible benchmark lost focus; raw failure retained"
+  ],
+  "unrun": [
+    "Matched C4 column comparison/calibration/holdout validation",
+    "Long-duration 850 K front mesh/time convergence",
+    "Multidimensional measured-front comparison",
+    "Feature-build Windows/Linux native and packaging checks",
+    "Final-build visible 40 FPS gate",
+    "Developer screenshot"
+  ],
+  "budget": {
+    "basis": "best-effort account-wide weekly usage, rounded tool percentage",
+    "initialUsedPercent": 27,
+    "latestObservedUsedPercent": 29,
+    "targetTotalUsedPercent": 34.3,
+    "ceilingTotalUsedPercent": 41.6,
+    "hardCapAvailable": false
+  },
+  "status": "Runnable implementation and numerical evidence; physical accuracy acceptance incomplete",
+  "visibleBenchmark": {
+    "status": "unrun on final build",
+    "reason": "Unable to establish focused visible native window; normal macOS launcher stalled before script startup",
+    "earlierFailureRetained": "visible-benchmark-focus-failure.json"
+  },
+  "hotPilot": {
+    "n": 4,
+    "physicalS": 0.5,
+    "wallS": 69.46932925,
+    "acceptedSteps": 981,
+    "rejected": 783,
+    "peakK": 855.8734203525892,
+    "massResidualKg": 2.9989032090949053e-15,
+    "energyResidualJ": -9.630029881337043e-07
+  },
+  "reusedChecks": [
+    "Dependency install: unchanged manifest and lock",
+    "Profile/short transport analysis: current relevant core/input/config hashes match",
+    "Four historical native checks: reused after final FEM-only edits; relevant legacy code, routes, inputs and configuration unchanged"
+  ]
+}

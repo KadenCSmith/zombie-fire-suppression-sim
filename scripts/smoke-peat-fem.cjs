@@ -18,7 +18,7 @@ app.on('browser-window-created',(_event,win)=>{
       const select=(label,value)=>{const el=document.querySelector('select[aria-label="'+label+'"]');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(el,value);el.dispatchEvent(new Event('change',{bubbles:true}));};
       await wait(()=>button('Single FEM step')&&!button('Single FEM step').disabled,'worker ready');
       await wait(()=>document.querySelectorAll('.fem-grid-value').length===25,'temperature sample grid');
-      button('Single FEM step').click();await wait(()=>clock()>0&&!button('Single FEM step').disabled,'accepted FE step');const first=clock();
+      button('Single FEM step').click();await wait(()=>clock()>0&&!button('Single FEM step').disabled,'accepted FE step');const first=clock();if(Number(document.querySelector('.fem-shell').dataset.femAcceptedSteps)<1)throw new Error('Accepted-step performance counter missing');
       button('Run Peat Fire FEM').click();await wait(()=>clock()>first,'live solve');button('Pause Peat Fire FEM').click();await wait(()=>button('Run Peat Fire FEM'),'pause');
       const paused=clock();await new Promise(r=>setTimeout(r,250));if(clock()!==paused)throw new Error('Pause advanced accepted state');
       document.querySelector('button[aria-label="Open Toolbox"]').click();await wait(()=>document.querySelector('select[aria-label="FEM field"]'),'settings');
@@ -35,6 +35,10 @@ app.on('browser-window-created',(_event,win)=>{
         const moles=state.gas.reduce((sum,g,j)=>sum+g[i]/[.031998,.028014,.01801528,.02897][j],0),p=8.31446261815324*state.temperature[i]*moles/theta;
         if(Math.abs(state.pressure[i]-p)/p>1e-10)throw new Error('Rendered/exported pressure is inconsistent with species and temperature');
       }
+      button('Reset FEM').click();await wait(()=>clock()===0&&!button('Single FEM step').disabled,'reset before file import');
+      const files=new DataTransfer();files.items.add(new File([blob],'peat-fire-fem-recording.json',{type:'application/json'}));
+      const input=document.querySelector('input[aria-label="Import FEM recording"]');input.files=files.files;input.dispatchEvent(new Event('change',{bubbles:true}));
+      await wait(()=>clock()===paused&&!button('Single FEM step').disabled,'exported file recording restored');
       select('FEM mesh','8');await wait(()=>clock()===0&&!button('Single FEM step').disabled,'mesh reset');
       button('Single FEM step').click();await wait(()=>clock()>0&&!button('Single FEM step').disabled,'refined step');const refined=clock();
       window.dispatchEvent(new CustomEvent('workspace-request',{detail:'comparison'}));await wait(()=>document.querySelector('.archived-workspaces'),'archive navigation');
@@ -44,7 +48,7 @@ app.on('browser-window-created',(_event,win)=>{
       button('Physical formulas ↗').click();await wait(()=>document.querySelector('.fem-formulas'),'current equation reference');
       if(document.querySelector('.formula-reference-shell'))throw new Error('Historical equations duplicated in active Finder');
       const gl=document.querySelector('.fem-viewport canvas').getContext('webgl2');if(!gl||gl.isContextLost())throw new Error('WebGL context unavailable');
-      return{initialAcceptedStepS:first,pausedPhysicalS:paused,refinedStepS:refined,temperatureSamples:25,checks:'run, step, pause, field/grid identity, moisture/pressure/flux, four-gas export EOS, mesh reset, archive access, session restore, repeated reset, formulas, WebGL'};
+      return{initialAcceptedStepS:first,pausedPhysicalS:paused,refinedStepS:refined,temperatureSamples:25,checks:'run, step, pause, field/grid identity, moisture/pressure/flux, four-gas export EOS, exported-file import, accepted-step counter, mesh reset, archive access, session restore, repeated reset, formulas, WebGL'};
     })()`);
     if(graphicsErrors.length)throw new Error(graphicsErrors.join('\n'));
     fs.mkdirSync(path.join(root,'docs/review/peat-fem'),{recursive:true});fs.writeFileSync(path.join(root,'docs/review/peat-fem/native-smoke.json'),JSON.stringify({...result,host:process.platform,date:new Date().toISOString()},null,2));

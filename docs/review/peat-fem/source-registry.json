@@ -13,7 +13,7 @@
         "Measured Fig 3",
         "Measured Fig 4; simulated Fig 6/7 excluded"
       ],
-      "access": "Repository PDF lawfully downloaded; SHA256 e6e6b6f96266fae6154ff3c812b72c4e2059d07c94a23a5eb79c465cb6c26acf; rendered Eq5/Tables1\u20132 and Fig2 inspected; raw sensor data not obtained",
+      "access": "Imperial published PDF acquired lawfully; SHA retained; rendered equations/tables and measured Fig 3 inspected. Native figure raster /Im3 (918\u00d7563) used for approximate manual peak extraction. Raw sensor traces and replicate uncertainty not obtained.",
       "license": "CC BY-NC-ND 4.0; full source cache retained locally, not redistributed"
     },
     {
@@ -179,9 +179,78 @@
   "status": {
     "runtime": "implemented five-step chemistry + fixed-volume materials + pressure + species + gas enthalpy",
     "numericalVerification": "focused fixtures passed",
-    "convergence": "initial hot-wet matrix failed; diagnosis ongoing",
+    "convergence": "Six short cases completed; coarse 5K/2mm gate failed (38.86K / 3.1mm versus 16\u00b3); no asymptotic/grid-independent claim. Long hot-front gate incomplete.",
     "calibrated": false,
     "experimentallyCompared": false,
-    "validationCriteria": "unavailable; no matched raw/digitized observations yet"
-  }
+    "validationCriteria": "Project criteria predeclared in C4-measured-peaks.json; not paper criteria or measured replicate uncertainty. Comparison unrun because geometry/heater/bottom boundary unmatched.",
+    "digitizedObservations": "C4 Figure3(a,c) temperature peaks and peak-arrival facts, 10 points; extraction bounds 0.242 h / 8 K; raw replicate traces unavailable."
+  },
+  "equationImplementationMap": [
+    {
+      "equation": "five source extents / C4 Eq5 + C3 Eq15\u201318",
+      "functions": [
+        "chemistry.reactionRates",
+        "chemistry.reactLocal"
+      ],
+      "checks": [
+        "peatfem-chemistry.test.ts",
+        "peatfem-coupled.test.ts"
+      ]
+    },
+    {
+      "equation": "volume fractions, material mixing, ideal-mixture EOS / C4 Eq6\u20138 adaptations",
+      "functions": [
+        "chemistry.properties"
+      ],
+      "checks": [
+        "peatfem-chemistry.test.ts",
+        "peatfem-coupled.test.ts"
+      ]
+    },
+    {
+      "equation": "mixture storage and Darcy momentum / C4 model paragraph p912; fixed geometry adaptation",
+      "functions": [
+        "operators.gasStep",
+        "operators.diffusionMatrix",
+        "coupled.derive"
+      ],
+      "checks": [
+        "peatfem-flow.test.ts"
+      ]
+    },
+    {
+      "equation": "conservative four-species transport, common D closure / C4 model paragraph p912",
+      "functions": [
+        "operators.gasStep",
+        "operators.upwindOperator"
+      ],
+      "checks": [
+        "peatfem-flow.test.ts",
+        "peatfem-coupled.test.ts"
+      ]
+    },
+    {
+      "equation": "LTE energy and gas enthalpy / C4 model paragraph p912; cv storage adaptation",
+      "functions": [
+        "coupled.split",
+        "operators.upwindOperator"
+      ],
+      "checks": [
+        "peatfem-coupled.test.ts"
+      ]
+    },
+    {
+      "equation": "Q1 weak form, mass lumping, graph stabilization / project discretization",
+      "functions": [
+        "model.basis",
+        "model.elementOperators",
+        "model.createMesh",
+        "operators.diffusionMatrix"
+      ],
+      "checks": [
+        "peatfem.test.ts",
+        "peatfem-flow.test.ts"
+      ]
+    }
+  ]
 }

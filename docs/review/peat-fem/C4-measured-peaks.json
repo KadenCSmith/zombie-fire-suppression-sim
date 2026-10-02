@@ -1,0 +1,242 @@
+{
+  "source": {
+    "title": "Huang & Rein (2017), measured Figure 3(a,c), page 910 / PDF page 4",
+    "doi": "10.1071/WF16198",
+    "pdf": "https://spiral.imperial.ac.uk/bitstreams/4eea3c58-c751-433e-ab02-69ad203f9e64/download",
+    "sha256": "e6e6b6f96266fae6154ff3c812b72c4e2059d07c94a23a5eb79c465cb6c26acf",
+    "imageObject": "/Im3",
+    "imageEncoding": "CMYK JPEG, 918 × 563; converted to RGB for inspection, original source cached unmodified"
+  },
+  "method": "Manual peak coordinates selected in the native-resolution figure raster, with axis values checked against the rendered labeled PDF. Linear axis calibration. These are approximate extracted facts, not raw thermocouple traces or an averaged replicate.",
+  "calibration": {
+    "nativeRaster": {
+      "width": 918,
+      "height": 563
+    },
+    "panelA": {
+      "x0": 4,
+      "x34h": 426,
+      "y0C": 244,
+      "y600C": 19
+    },
+    "panelC": {
+      "x0": 4,
+      "x34h": 426,
+      "y0C": 562,
+      "y600C": 337
+    },
+    "pointSelectionErrorPx": 2,
+    "axisSelectionErrorPx": 1
+  },
+  "cases": [
+    {
+      "id": "MC10-natural",
+      "role": "designated baseline, no parameters fitted",
+      "moistureDryRatio": 0.1,
+      "wetDensityKgM3": 135,
+      "dryDensityKgM3": 122.72727272727272
+    },
+    {
+      "id": "MC35-natural",
+      "role": "same-study held-out condition; no calibration performed",
+      "moistureDryRatio": 0.35,
+      "wetDensityKgM3": 150,
+      "dryDensityKgM3": 111.1111111111111
+    }
+  ],
+  "protocol": {
+    "geometryM": [
+      0.1,
+      0.1,
+      0.3
+    ],
+    "peat": "Commercial Irish Shamrock moss peat",
+    "heaterW": 100,
+    "heaterDurationS": 1800,
+    "heaterDepthM": 0.05,
+    "sensorDepthSpacingM": 0.02,
+    "scanHz": 0.1,
+    "replicates": "2–3 experiments; selected figure is a group of histories, not replicate mean",
+    "moistureTreatmentUncertaintyDryRatio": 0.05,
+    "densityTreatmentUncertaintyKgM3": 5,
+    "sideInsulationThicknessM": 0.0127
+  },
+  "points": [
+    {
+      "case": "MC10-natural",
+      "depthCm": 7,
+      "x": 43,
+      "y": 22,
+      "timeH": 3.1421800947867298,
+      "temperatureC": 592,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC10-natural",
+      "depthCm": 11,
+      "x": 91,
+      "y": 35,
+      "timeH": 7.009478672985781,
+      "temperatureC": 557.3333333333334,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC10-natural",
+      "depthCm": 15,
+      "x": 162,
+      "y": 51,
+      "timeH": 12.729857819905213,
+      "temperatureC": 514.6666666666666,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC10-natural",
+      "depthCm": 19,
+      "x": 247,
+      "y": 80,
+      "timeH": 19.578199052132703,
+      "temperatureC": 437.33333333333337,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC10-natural",
+      "depthCm": 23,
+      "x": 326,
+      "y": 108,
+      "timeH": 25.943127962085306,
+      "temperatureC": 362.6666666666667,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC35-natural",
+      "depthCm": 7,
+      "x": 25,
+      "y": 384,
+      "timeH": 1.6919431279620853,
+      "temperatureC": 474.6666666666667,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC35-natural",
+      "depthCm": 11,
+      "x": 66,
+      "y": 350,
+      "timeH": 4.995260663507109,
+      "temperatureC": 565.3333333333333,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC35-natural",
+      "depthCm": 15,
+      "x": 115,
+      "y": 359,
+      "timeH": 8.943127962085308,
+      "temperatureC": 541.3333333333334,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC35-natural",
+      "depthCm": 19,
+      "x": 177,
+      "y": 367,
+      "timeH": 13.938388625592417,
+      "temperatureC": 520,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    },
+    {
+      "case": "MC35-natural",
+      "depthCm": 23,
+      "x": 247,
+      "y": 391,
+      "timeH": 19.578199052132703,
+      "temperatureC": 456,
+      "extractionBoundTimeH": 0.24170616113744076,
+      "extractionBoundTemperatureK": 8
+    }
+  ],
+  "intervals": [
+    {
+      "case": "MC10-natural",
+      "fromDepthCm": 7,
+      "toDepthCm": 11,
+      "speedCmH": 1.0343137254901962,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC10-natural",
+      "fromDepthCm": 11,
+      "toDepthCm": 15,
+      "speedCmH": 0.6992543496271748,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC10-natural",
+      "fromDepthCm": 15,
+      "toDepthCm": 19,
+      "speedCmH": 0.5840830449826988,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC10-natural",
+      "fromDepthCm": 19,
+      "toDepthCm": 23,
+      "speedCmH": 0.628443782576322,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC35-natural",
+      "fromDepthCm": 7,
+      "toDepthCm": 11,
+      "speedCmH": 1.21090387374462,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC35-natural",
+      "fromDepthCm": 11,
+      "toDepthCm": 15,
+      "speedCmH": 1.0132052821128452,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC35-natural",
+      "fromDepthCm": 15,
+      "toDepthCm": 19,
+      "speedCmH": 0.8007590132827325,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    },
+    {
+      "case": "MC35-natural",
+      "fromDepthCm": 19,
+      "toDepthCm": 23,
+      "speedCmH": 0.7092436974789913,
+      "definition": "sensor-depth separation / digitized temperature-peak arrival difference"
+    }
+  ],
+  "uncertainty": "Conservative 3 pixel extraction bounds combine 2 pixel point selection and 1 pixel axis selection; not statistical confidence intervals. Experimental replicate temperature/time uncertainty is unavailable from Figure 3; Figure 4 spread error bars have not been extracted.",
+  "comparisonContract": {
+    "metrics": [
+      "peak temperature at each actual sensor",
+      "peak arrival time at each actual sensor",
+      "spread from differences of peak arrival"
+    ],
+    "engineeringLimits": {
+      "peakTemperatureAbsoluteK": 40,
+      "peakArrivalRelative": 0.2,
+      "spreadRelative": 0.25
+    },
+    "numericalRequirement": "Separately bound discretization errors to 5 K and 10% of the arrival/spread metric before interpreting physical discrepancy",
+    "basis": "Predeclared project engineering tolerances, not paper criteria or measurement uncertainty",
+    "fitStatus": "no calibration or retuning",
+    "comparisonStatus": "unrun: active .10 m cube, top Gaussian ignition and insulated bottom do not match this .30 m column with buried heater; fixed mesh also omits measured recession/shrinkage"
+  },
+  "status": "measured figure evidence digitized; matched simulation comparison and uncertainty qualification remain incomplete"
+}
