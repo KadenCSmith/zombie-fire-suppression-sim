@@ -2,9 +2,15 @@ import { useMemo, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
 import * as THREE from 'three'
-import { sample, type Mesh, type Frame } from '../peatfem/model'
-export type PeatField='temperature'|'oxygen'|'fuel'|'char'
-export const FIELD_INFO:Record<PeatField,{label:string;unit:string}>={temperature:{label:'Temperature',unit:'K'},oxygen:{label:'Oxygen',unit:'kg O₂/m³ gas'},fuel:{label:'Remaining dry peat',unit:'kg/m³ bulk'},char:{label:'Passive β-char',unit:'kg/m³ bulk'}}
+import { sample, type Mesh } from '../peatfem/model'
+import type { Frame } from '../peatfem/coupled'
+export type PeatField='temperature'|'oxygen'|'fuel'|'char'|'alphaChar'|'water'|'ash'|'pressure'|'darcySpeed'|'porosity'|'peclet'
+export const FIELD_INFO:Record<PeatField,{label:string;unit:string}>={
+  temperature:{label:'Temperature',unit:'K'},oxygen:{label:'Oxygen mass fraction',unit:'kg O₂/kg gas'},
+  fuel:{label:'Remaining dry peat',unit:'kg/m³ bulk'},char:{label:'β-char',unit:'kg/m³ bulk'},alphaChar:{label:'α-char',unit:'kg/m³ bulk'},
+  water:{label:'Condensed water',unit:'kg/m³ bulk'},ash:{label:'Ash',unit:'kg/m³ bulk'},pressure:{label:'Gas pressure',unit:'Pa absolute'},
+  darcySpeed:{label:'Darcy superficial flux magnitude',unit:'m/s'},porosity:{label:'Total pore volume',unit:'m³/m³ bulk'},peclet:{label:'Cell gas Peclet number',unit:'dimensionless'},
+}
 function geometry(mesh:Mesh){
   const surface:number[]=[],edges:number[]=[],nodes:number[]=[],half=Math.max(1,Math.ceil(mesh.n/2))
   const faces=[[0,2,6,4],[1,5,7,3],[0,4,5,1],[2,3,7,6],[0,1,3,2],[4,6,7,5]],edgePairs=[[0,1],[0,2],[0,4],[1,3],[1,5],[2,3],[2,6],[3,7],[4,5],[4,6],[5,7],[6,7]]

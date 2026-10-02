@@ -1,4 +1,60 @@
-# Peat Fire FEM: specification before implementation
+# Peat Fire FEM: active reacting porous baseline
+
+Updated 2026-10-02 after the accepted follow-up. The active worker and scene now use `src/peatfem/coupled.ts`, `chemistry.ts` and `operators.ts`. The reduced dry fixture below remains a separate verification reference; it is no longer the active physical model.
+
+## Active inventories and exact source family
+
+A fixed 0.10 m cube has five finite condensed inventories (water, virgin dry peat, alpha-char, beta-char, ash) and four gas pools (O2, N2, vapor, lumped emissions), all kg/m³ **bulk**. Temperature is K, absolute pressure Pa, oxygen is kg O2/kg **total gas**, Darcy flux m/s superficial; pore velocity is q/theta_g. Gas fractions sum to one by solving the same conservative operator for every species; fields are never renormalized after transport.
+
+C4 Irish-moss **column** constants from the rendered Table 1 are used together: log10 Z [s⁻¹] = 27, 8.18, 16.80, 8.38, 13.30; E [kJ/mol] = 200,112,195,117,172; n = .50,5.31,2.33,1.32,2.58; oxidative orders = .24,.52,.86. Drying and pyrolysis are oxygen independent. Oxidation uses `(1+Y_O2)^nO−1`. C3 Eq 15–18 establishes initial source-species normalization: initial water for drying; initial dry peat for peat and **both chars**. Initial peat includes its original mineral content, released as source-fitted ash yields; adding separate initial mineral mass would double count it. A separately versioned TG fit has not been transferred.
+
+Stoichiometry: water→vapor; peat→.28 alpha-char+.72 emissions; peat+.89 O2→.61 beta-char+1.28 emissions; beta-char+2.21 O2→.04 ash+3.17 emissions; alpha-char+2.12 O2→.07 ash+3.05 emissions. Accepted extents update every inventory, gas source and reaction heat together. Endothermic ΔH [MJ/kg] is +2.26,+.50; oxidative ΔH is −11.60,−28.90,−27.80. Drying latent demand appears once, in ΔH. No resolved elemental CO/CO2/H2O emissions beyond the evaporation pool are claimed: the global chemistry does not provide elemental yields. Ash fractions along the two paths (.0196 and .0244) differ because of the published fitted yields; exact common mineral yield is not asserted.
+
+Local rates are explicitly source-normalized. Conservative subcycling limits shared-reactant depletion and thermal changes; oxygen uses a frozen-state exponential inventory factor shared by all oxidative extents. This is a numerical approximation and its splitting/source error is controlled through full-step versus two-half-step comparison. It is not a nonlinear chemical-equilibrium solve. No arbitrary temperature ceiling, source thermostat, reaction-zone broadening or active suppressant is present. Condensation is omitted; column drying constants are not a complete reversible phase-equilibrium law.
+
+## Active material, mass, pressure and energy closure
+
+Intrinsic constituent densities [kg/m³] =1000,1500,1300,1300,2500; cp [J/(kg K)] =4186,1840,1260,1260,880; intrinsic k [W/(m K)] =.60,1,.26,.26,1.2 (C4 Table 2). Some printed porosities conflict with density ratios. Runtime follows the rendered Eq 6 dimensional relation and derives volumes directly, instead of copying inconsistent entries or changing intrinsic density. Printed Eq 8/text mass-volume labels are inconsistent; the implemented mixing basis is explicit.
+
+    theta_g = 1 − sum(m_i/rho_s,i)
+    phi_total = theta_g + m_water/rho_water
+    U = [sum(m_i cp_i) + sum(g_j cv_j)] (T−300 K)
+    cv_j = cp_g − R/M_j
+    p = R T sum(g_j/M_j) / theta_g
+    k = sum((m_i/rho_s,i) k_s,i) + theta_g k_g + gamma theta_g sigma T³
+
+This is a fixed-volume adaptation, not Gpyro shrinking geometry. Material loss increases gas-filled space without geometric recession. gamma=.0005 m is an illustrative selection within C4's stated .0001–.001 m range. k_g=.026 W/(m K), common gas cp=1000 J/(kg K), molecular masses [.031998,.028014,.01801528,.02897] kg/mol define an explicit surrogate thermodynamics. The emissions MW is air-like, not a measured molecular emission yield. Char/ash hot properties and gas thermodynamics lack independent calibration.
+
+Intrinsic K=1e-12 m² is a named model assumption comparable to N1, not measured hot-peat permeability. Relative gas connectivity `(theta_g/phi_total)^3` is an explicitly synthetic liquid-blocking closure. μ=1.8e-5 Pa·s and D=2e-5 m²/s are constant illustrative coefficients. Storage, gas density and diffusion coefficient theta*rho*D evolve; no arbitrary temperature multiplier is added. Liquid transport and shrinkage remain absent.
+
+    d(theta_g rho_g)/dt + div(rho_g q) = S_g
+    q = −K krg/mu (grad p − rho_g g)
+    d(theta_g rho_g Y_j)/dt + div(rho_g q Y_j − theta_g rho_g D grad Y_j)=S_j
+    dU/dt + div(rho_g q cp_g (T−300)) − div(k grad T)=−sum(ΔH_k r_k)
+
+Equal species D and common cp imply zero summed diffusive mass and sensible-enthalpy flux, since sum grad Y=0. Species sum/source sum are checked, rather than independently fixing gas density and pressure. Gas generation and thermal expansion affect pressure through the EOS. Gas enthalpy advection and boundary enthalpy are retained in the energy ledger. Sensible storage and latent/reaction source have a common declared 300 K reference. Gas potential/kinetic energy, Darcy dissipation and pressure work associated with changing pore space are omitted. At 1 atm, drying pore-work scale p/rho_water /latent ≈4.5e-5; this only bounds the drying contribution, not every high-pressure composition change. Large overpressures would invalidate that approximation; no fully thermodynamic hot-mixture validation is claimed.
+
+## Active FEM and stabilization
+
+The weak balance is `∫w storage_dot −∫grad(w)·flux +∫boundary w flux·n −∫w source=0`. Heat, pressure and species diffusion are assembled from genuine Q1 hexahedral shapes, connectivity, Jacobian, 2×2×2 volume and 2×2 face Gauss quadrature. Variable diffusion/heat coefficients use element means (piecewise constant coefficient approximation). Time storage uses nodal row-sum lumping. Cubic isotropic Q1 stiffness has nonpositive off-diagonal entries.
+
+Compressible pressure uses EOS storage and a Picard-frozen density Darcy stiffness; symmetric Dirichlet elimination retains physical row scaling, so pressure rows cannot dominate the mixture-mass residual. Darcy stiffness edges furnish a compatible conservative mass-flux representation. Species advection uses donor values on that **assembled FEM graph**; this is an edge upwind / graph-viscosity approximation of the advective weak term, rather than exact Gauss integration of the nonlinear advective product. It adds spatial numerical diffusion. Pressure itself is Galerkin FEM; no existing FVM module is relabeled. Pair fluxes cancel exactly in global balances. Positive diagonal, nonpositive off-diagonal and continuity-derived positive row sums give an M-matrix and a positive species update for positive RHS. The nodal diffusion action preserves constants and summed species flux is zero. Analytical cases and the separate refinement study assess consistency and numerical diffusion; formal second-order advection accuracy is not claimed.
+
+Each split interval performs reaction, frozen-temperature compressible pressure/species EOS Picard, and gas enthalpy/conduction iterated together to relative temperature/EOS error <1e-8, followed by exact EOS evaluation. Every iteration starts from the same reacted checkpoint, so sources and transport are not counted twice. This retains the prescribed boundary pressure after thermal expansion. Reaction versus transport remains first-order operator splitting; gas/heat transport is Picard coupled. It is not a monolithic implicit chemistry solve. Two half intervals are accepted after comparing with a full interval. Norms: T/(.1+.001T), p/(1+.0005p), condensed masses/(1e-5+.002rho0), gas/(1e-7+.001 total gas), times toleranceScale. Error>1, invalid state or failed residual rejects the interval. Bounded retries preserve the last accepted checkpoint. Physics advances in a worker; render speed never changes dt. Actual computed physical seconds per advance-call wall second are displayed separately from requested pacing and rendering.
+
+Top p=101325 Pa; incoming mixture [.233,.767,0,0]; outgoing composition is upwind. Top composition exchange .01 kg/(m² s) times (Y−Yambient) has zero summed mass flux. Other mass faces are sealed. Top convective heat loss h=10 plus Picard-iterated radiation emissivity .95; other heat faces insulated in the cube fixture. A finite normalized Gaussian supplies 8 W for 180 s. Closed fixtures seal/insulate all boundaries. Radiation's coefficient is iterated with temperature; its factored flux recovers sigma(T⁴−Ta⁴) at nonlinear convergence. Gas enthalpy, boundary pressure and species share the converged transport state.
+
+## Current evidence and analysis protocol
+
+Focused checks cover source normalization, zero-oxygen independence, latent cooling, separate chars, EOS, variable materials, homogeneous Darcy flux, gravity equilibrium, closed pressure relaxation, generated-gas venting, total mixture/species/energy closure, finite ignition, deterministic checkpoint, disabled intervention identity and failure retention. The expanded native worker/field/navigation/session lifecycle passes. The full integration suite passes (1758 tests in 90 files, 7.36 s including the thermal-boundary correction), including pre-existing regressions. Test count is not physical validation.
+
+`node --experimental-strip-types scripts/analyze-peat-fem.mts profile` measures actual throughput at 4³/8³/16³. The separate `convergence` mode runs three meshes, three maximum steps and a stricter solve/splitting case, retains raw observers/residuals and hashes the relevant code and inputs. Reuse requires exact hashes and is labeled. The initial hot-wet runs of the earlier sequential transport implementation failed at t=0: simultaneously imposing an 850 K wet seed and its inherited cold-gas inventory creates an incompatible pressure/rapid-drying start. This is retained failure evidence, not a convergence pass. This suspected incompatible initial state is being diagnosed. Next step is a physically compatible localized dry-hot seed with wet surroundings, followed by rerunning the matrix; no tolerance loosening is authorized to conceal it.
+
+Temperature contour 500 K and 5% peat-depletion depth are numerical fixture diagnostics, not the C4 measured front. C4 derives spread from thermocouple peak arrival; that definition must be used for a matched comparison. Predeclared coarse limits: 5 K probe error, 5% mass error, 2 mm contour difference. A 16³ reference is not automatically grid independent; order/extrapolation require asymptotic evidence. Raw measured observations have not yet been digitized. No calibration or experimental validation criteria pass is claimed. Source acquisition, observable-level comparisons and limitations belong in the source registry and evidence reports.
+
+---
+
+# Preserved reduced fixture specification (model.ts)
 
 Written 2026-10-02 on `feat/peat-fire-fem`, based on published v0.20.0
 `161e7a4a1f8c35765e1878c132db79977be1f5ea`. This is a reduced verification

@@ -24,6 +24,17 @@ app.on('browser-window-created',(_event,win)=>{
       document.querySelector('button[aria-label="Open Toolbox"]').click();await wait(()=>document.querySelector('select[aria-label="FEM field"]'),'settings');
       select('FEM field','oxygen');document.querySelector('input[aria-label="FEM temperature grid"]').click();await new Promise(r=>setTimeout(r,100));
       if(clock()!==paused||document.querySelectorAll('.fem-grid-value').length)throw new Error('Display controls changed state or grid');
+      for(const field of ['water','pressure','darcySpeed']){select('FEM field',field);await new Promise(r=>setTimeout(r,50));if(clock()!==paused)throw new Error('New field changed physical state')}
+      let blob;const url=URL.createObjectURL,anchor=HTMLAnchorElement.prototype.click;
+      URL.createObjectURL=b=>{blob=b;return url.call(URL,b)};HTMLAnchorElement.prototype.click=()=>{};
+      button('Export FEM recording').click();URL.createObjectURL=url;HTMLAnchorElement.prototype.click=anchor;
+      const record=JSON.parse(await blob.text()),state=record.history.at(-1);
+      if(record.schema!==2||state.gas.length!==4||state.water.length!==125||state.pressure.length!==125)throw new Error('Active reacting-flow export mismatch');
+      for(let i=0;i<125;i++){
+        const theta=1-state.water[i]/1000-state.fuel[i]/1500-(state.alphaChar[i]+state.char[i])/1300-state.ash[i]/2500;
+        const moles=state.gas.reduce((sum,g,j)=>sum+g[i]/[.031998,.028014,.01801528,.02897][j],0),p=8.31446261815324*state.temperature[i]*moles/theta;
+        if(Math.abs(state.pressure[i]-p)/p>1e-10)throw new Error('Rendered/exported pressure is inconsistent with species and temperature');
+      }
       select('FEM mesh','8');await wait(()=>clock()===0&&!button('Single FEM step').disabled,'mesh reset');
       button('Single FEM step').click();await wait(()=>clock()>0&&!button('Single FEM step').disabled,'refined step');const refined=clock();
       window.dispatchEvent(new CustomEvent('workspace-request',{detail:'comparison'}));await wait(()=>document.querySelector('.archived-workspaces'),'archive navigation');
@@ -33,7 +44,7 @@ app.on('browser-window-created',(_event,win)=>{
       button('Physical formulas ↗').click();await wait(()=>document.querySelector('.fem-formulas'),'current equation reference');
       if(document.querySelector('.formula-reference-shell'))throw new Error('Historical equations duplicated in active Finder');
       const gl=document.querySelector('.fem-viewport canvas').getContext('webgl2');if(!gl||gl.isContextLost())throw new Error('WebGL context unavailable');
-      return{initialAcceptedStepS:first,pausedPhysicalS:paused,refinedStepS:refined,temperatureSamples:25,checks:'run, step, pause, field/grid identity, mesh reset, archive access, session restore, repeated reset, formulas, WebGL'};
+      return{initialAcceptedStepS:first,pausedPhysicalS:paused,refinedStepS:refined,temperatureSamples:25,checks:'run, step, pause, field/grid identity, moisture/pressure/flux, four-gas export EOS, mesh reset, archive access, session restore, repeated reset, formulas, WebGL'};
     })()`);
     if(graphicsErrors.length)throw new Error(graphicsErrors.join('\n'));
     fs.mkdirSync(path.join(root,'docs/review/peat-fem'),{recursive:true});fs.writeFileSync(path.join(root,'docs/review/peat-fem/native-smoke.json'),JSON.stringify({...result,host:process.platform,date:new Date().toISOString()},null,2));
