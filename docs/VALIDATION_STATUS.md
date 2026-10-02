@@ -1,5 +1,13 @@
 # Verification and validation status
 
+## 0.20.0 cinematic interface and connected supply sequence (2026-10-02)
+
+These changes affect presentation, navigation and stored-state sampling, without changing governing equations or solver integration. Current numerical views map stored growth frames over story 10–40 s; archived views retain the earlier 10–24 s mapping. Rapid mode still holds the accepted pre-treatment reference. Neither the moving natural-view front, truck, drilling pace nor water route is physically calibrated. Experimental field suppression and coupled fracture/infiltration validation remain pending.
+
+Local typecheck, lint (existing warnings only), **1,728 tests in 86 files**, production build and the fire-sequence, desktop, comparison and coupled Electron integration checks pass. New tests check smooth speed at event boundaries, clock invertibility, identical playback at 24/30/60 fps and all five speed settings, loop overshoot, reset state, continued illustrated spread during drilling, event order, attached inlet, continuous moving tip and dense samples of the rendered tube against soil/bore/cap service-gap clearance. These tests establish animation behavior, not scientific validity.
+
+The in-app browser was inspected at active drilling (29 s), parked truck/hose deployment (67 s), insertion (70.5 s) and progressive wetting (78 s). The contact readout showed 0.00 kg water at 70.5 s and 1.32 kg at 78 s. Finder navigation/current-value editing, full equation documentation, a 10 s coupled run, archived movies and synchronized selection were exercised. Native installed-app and archive observations are reported separately in release verification; no unrun cross-platform execution is claimed. Existing Three.js/Vite dependency warnings remain.
+
 ## 0.19.0 authored scene and release checks (2026-10-01)
 
 The rapid cue now starts at story 55 s and dissipates within about 1.3 presentation seconds; all twelve authored fractures complete by 55.7 s. The source sphere is drawn at twice its former diameter without changing its separate 4 kg contact inventory. Rapid-mode wetting starts at the hose, and each secondary crack waits for a continuous parent front to reach its shared junction. Source tests check these timing, bore-fit and graph-continuity constraints. Typecheck, lint (existing warnings only), **1,716 tests in 85 files**, production build and the Electron fire-sequence smoke passed. The Chrome preview was inspected at source placement, release and wetting stages.

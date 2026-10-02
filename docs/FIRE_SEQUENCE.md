@@ -1,5 +1,9 @@
 # Fire-first workflow and visual evidence boundaries
 
+## Current 0.20.0 interface and connected-supply sequence
+
+The current render adds smooth arrival slowdown, drilling during continuous illustrated spread, a parked water truck and an attached hose that extends before insertion. Existing water delivery still starts at story 72 s. Navigation, named timing/rate constants, checks and limits are in [Current presentation](FIRE_PRESENTATION.md). Older sequence descriptions below refer to preserved versions and films.
+
 ## Instant-release Chrome iteration (after saved commit `0c24485`)
 
 The preceding straight-bore scene is preserved at commit `0c24485` on `codex/scene-mix-bore-fracture` and [PR #7](https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/7). This follow-up keeps its excavator, fixed-width bore, descending fixed-size cap, smoldering appearance and wet-peat texture. The dry-ice sphere's **display diameter is doubled**; its contact-model inventory remains 4 kg and its implied physical radius and density are unchanged. This enlargement is a visibility choice and does not assert that twice the diameter contains the same physical density.

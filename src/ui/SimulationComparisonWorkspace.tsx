@@ -1,3 +1,4 @@
+import { ToolboxPortal, useCinematicUI } from './CinematicUI'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Pause from 'lucide-react/dist/esm/icons/pause.mjs'
 import Play from 'lucide-react/dist/esm/icons/play.mjs'
@@ -28,7 +29,7 @@ function ArchivedFilm({ version, mode, timeS }: { version: SimulationVersion; mo
 function Replay({ version, timeS, mode }: { version: SimulationVersion; timeS: number; mode: FireSourceMode }) {
   if (version.replay === 'study-scene') return <StudyScene view="cutaway" time={timeS} labels={false} cage={DEFAULT_STUDY_CAGE} resetToken={0} version={version.id === '0.8.0' ? 'fracture' : 'rupture'} soilOptions={SOIL_PARTICLE_DEFAULTS} />
   if (version.replay === 'film') return <ArchivedFilm version={version} mode={mode} timeS={timeS} />
-  if (version.replay === 'fire-scene') return <FireSequenceScene time={timeS} mode={mode} view="natural" layers={FIRE_LAYERS} resetToken={0} realistic={version.id==='0.18.0'||version.id==='0.18.1'} openPit={version.id==='0.18.1'} />
+  if (version.replay === 'fire-scene') return <FireSequenceScene time={timeS} mode={mode} view="natural" layers={FIRE_LAYERS} resetToken={0} realistic={version.id==='0.18.0'||version.id==='0.18.1'||version.id==='0.19.0'} straightBore={version.id==='0.19.0'} openPit={version.id==='0.18.1'} />
   return null
 }
 
@@ -37,6 +38,7 @@ export default function SimulationComparisonWorkspace({ onWorkspace, selected, o
   selected: string[]
   onSelected: (versions: string[]) => void
 }) {
+  const { open } = useCinematicUI()
   const available = useMemo(availableVersions, [])
   const [referenceId, setReferenceId] = useState(selected[0] ?? available[0].id)
   const [referenceTime, setReferenceTime] = useState(0)
@@ -73,7 +75,7 @@ export default function SimulationComparisonWorkspace({ onWorkspace, selected, o
 
   return <div className="comparison-shell">
     <header className="comparison-header">
-      <div><span>MULTI-VIEW GALLERY · 0.8 AND ABOVE</span><h1>Watch every selected animation together</h1><p>Choose any playable version from the left or the three-dot menu. One presentation clock coordinates the tiles; unrelated timelines use a labeled duration-normalized alignment.</p></div>
+      <div><span>MULTI-VIEW GALLERY · 0.8 AND ABOVE</span><h1>Previous simulations.</h1><p>Select preserved models and compare them on one presentation clock. Each replay keeps its own documented physical basis.</p><button className="comparison-select-models" onClick={()=>open('toolbox')}>Select models to compare <span>↗</span></button></div>
       <ModelSelector value="comparison" onChange={onWorkspace} />
     </header>
     <section className="comparison-controls" aria-label="Shared comparison controls">
@@ -85,13 +87,13 @@ export default function SimulationComparisonWorkspace({ onWorkspace, selected, o
       <div className="comparison-mode"><span>FIRE REPLAY</span>{(['gradual', 'rapid'] as const).map(value => <button key={value} type="button" aria-pressed={mode === value} onClick={() => setMode(value)}>{value}</button>)}</div>
     </section>
     <div className="comparison-body">
-      <aside className="comparison-catalog" aria-label="Simulation versions">
+      <ToolboxPortal><aside className="comparison-catalog" aria-label="Simulation versions">
         <h2>Animation sources</h2><p>Select any combination to watch like simultaneous camera feeds. Physics-only versions without a Blender render are documented below.</p>
         {SIMULATION_CATALOG.map(version => <label key={version.id} className={!version.available ? 'is-unavailable' : ''} title={version.limitation}>
           <input type="checkbox" aria-label={`Select version ${version.id}`} checked={selected.includes(version.id)} disabled={!version.available} onChange={() => toggle(version)} />
           <span><strong>v{version.id}</strong><small>{version.title}</small></span><em>{version.available ? 'PLAYABLE' : 'NO RENDER'}</em>
         </label>)}
-      </aside>
+      </aside></ToolboxPortal>
       <main className="comparison-stage">
         {!selectedVersions.length && <div className="comparison-empty"><strong>Select at least one preserved simulation.</strong><p>Versions without replay assets remain documented in the catalog.</p></div>}
         <div className="comparison-grid" data-selected-count={selectedVersions.length}>{selectedVersions.map(version => {

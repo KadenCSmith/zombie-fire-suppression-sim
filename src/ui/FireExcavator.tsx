@@ -4,6 +4,8 @@ import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { FIRE_SEQUENCE_GEOMETRY as G, eased, fireSequencePose, illustratedPeatCoverage } from '../story/fireSequence'
 
+import { currentEquipmentState } from '../story/firePresentation'
+
 type Point = [number, number, number]
 type Palette = ReturnType<typeof createPalette>
 const UP = new THREE.Vector3(0, 1, 0)
@@ -197,7 +199,11 @@ function Vehicle({time, travel, openPit=false}: {time: number; travel: number; o
   </group>
 }
 /** The treatment gate is presentation-only; no numerical burn fraction drives it. */
-export function SequenceExcavator({time,openPit=false}: {time: number;openPit?:boolean}) {
+export function SequenceExcavator({time,openPit=false,connectedSupply=false}: {time: number;openPit?:boolean;connectedSupply?:boolean}) {
+  if (connectedSupply) {
+    const state = currentEquipmentState(time)
+    return state.excavatorVisible ? <Vehicle time={time} travel={state.excavatorTravel} openPit={openPit}/> : null
+  }
   if (time < 24 || time >= 40 || illustratedPeatCoverage(time) < .7) return null
   const travel = -6 * (1 - eased(time, 24, 27)) - 6 * eased(time, 36.5, 40)
   return <Vehicle time={time} travel={travel} openPit={openPit}/>

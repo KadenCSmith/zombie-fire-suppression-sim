@@ -3,7 +3,7 @@ import { FRACTURE_STUDY_PHASES, STUDY_DURATION } from './studyModel'
 
 export type SimulationMode = 'animation' | 'physics'
 export type ReplayKind = 'study-scene' | 'film' | 'fire-scene' | 'unavailable'
-export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0' | '0.17.1' | '0.18.0' | '0.18.1'
+export type SimulationVersionId = '0.8.0' | '0.9.0' | '0.10.0' | '0.11.0' | '0.12.0' | '0.13.0' | '0.14.0' | '0.15.0' | '0.16.0' | '0.17.1' | '0.18.0' | '0.18.1' | '0.19.0'
 
 export interface SimulationVersion {
   id: SimulationVersionId
@@ -37,6 +37,7 @@ export const SIMULATION_CATALOG: readonly SimulationVersion[] = [
   { id: '0.17.1', commit: 'cab4241007f15f1084318f3b4559580dbbdb965b', title: 'Unified interactive sequence', summary: 'Visible playback controls with the earlier illustrated bore and dome.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Legacy authored scene retained for visual comparison; it does not represent a validated excavation or pressure event.' },
   { id: '0.18.0', commit: '4508016f19fb6e5a01b33b46e0054fb0b2045693', title: 'Underreamed cap study', summary: 'A straight bore with an expanding pocket and bounded cap flattening.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Earlier illustrative reconstruction with the widening cutter; retained only for comparison.' },
   { id: '0.18.1', commit: 'ccb3fb3', title: 'Open excavation & backfill', summary: 'A fixed-width bucket digs an open pit; a concave cap is placed, buried, then flattens.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'Preserved historical illustration. Excavation stability, cap pressure, infiltration and suppression success are not validated.' },
+  { id: '0.19.0', commit: 'ba07edd', title: 'Straight bore & connected water', summary: 'Current preserved render with a fixed bore, finite contact source, brief illustrated gas pulse and hose-connected wetting.', mode: 'animation', available: true, replay: 'fire-scene', durationS: FIRE_SEQUENCE_DURATION, markersS: fireMarkers, alignmentGroup: 'fire-sequence', limitation: 'The exact 0.19.0 authored scene is unchanged in the 0.20.0 UI overhaul. Gas release, excavation and wetting are illustrative; no field suppression outcome is validated.' },
 ] as const
 
 export function parseSemver(version: string): [number, number, number] {
