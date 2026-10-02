@@ -26,7 +26,7 @@ function bladeGeometry() {
  * has no material inventory or mechanics; the authored displacement moves each
  * grass root with its ground position rather than leaving it suspended.
  */
-export function SequenceGrass({time, mode = 'gradual', realistic = false, openPit = false}: {time: number; mode?: FireSourceMode; realistic?: boolean; openPit?:boolean}) {
+export function SequenceGrass({time, mode = 'gradual', realistic = false, openPit = false, straightBore = false}: {time: number; mode?: FireSourceMode; realistic?: boolean; openPit?:boolean; straightBore?:boolean}) {
   const ref = useRef<THREE.InstancedMesh>(null), invalidate = useThree(state => state.invalidate)
   const geometry = useMemo(bladeGeometry, [])
   const uniforms = useMemo(() => ({ uGrassTime: {value: 0}, uGrassBurn: {value: 0}, uGrassBore: {value: 0}, uGrassPit:{value:0}, uGrassLift: {value: 0}, uGrassPulse: {value: 0}, uGrassDamage: {value: 0} }), [])
@@ -83,9 +83,9 @@ gl_Position=projectionMatrix*mvPosition;`)
     uniforms.uGrassTime.value = time; uniforms.uGrassBurn.value = eased(time, 1, 13)
     uniforms.uGrassBore.value = !openPit&&fireSequencePose(time, 'gradual').drillDepth > 0 ? 1 : 0
     uniforms.uGrassPit.value = openPit&&time>=24?1:0
-    uniforms.uGrassLift.value = realistic?constrainedCapShape(time,mode).soilLiftM:0
-    uniforms.uGrassPulse.value = rupture.pulse; uniforms.uGrassDamage.value = rupture.damage
+    uniforms.uGrassLift.value = realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0
+    uniforms.uGrassPulse.value = realistic?0:rupture.pulse; uniforms.uGrassDamage.value = realistic?0:rupture.damage
     invalidate()
-  }, [time, mode, realistic, openPit, uniforms, invalidate])
+  }, [time, mode, realistic, openPit, straightBore, uniforms, invalidate])
   return <instancedMesh ref={ref} args={[geometry, material, BLADE_COUNT]} frustumCulled={false} raycast={() => null} userData={{scientificRole: 'seeded fine grass appearance, prescribed wind/scorch and shared ground displacement; no vegetation physics'}}/>
 }

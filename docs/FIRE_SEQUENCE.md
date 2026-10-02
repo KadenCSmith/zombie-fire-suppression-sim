@@ -1,6 +1,12 @@
 # Fire-first workflow and visual evidence boundaries
 
-## Current 0.18.1 scene
+## Current Chrome development scene (after 0.18.2)
+
+The main interactive natural view now combines preserved visual elements: V16's tracked excavator and rotating auger, V17.1's dense orange smoldering embers and woven hose, V9's straight cylindrical bore and descending metal cap, and V18.1's dark peat after water contact. The auger and bore stay at their original 0.20 m and 0.24 m radii; no underreamed chamber or open pit is made. The metal cap has a constant 0.2184 m radius and 0.055 m concavity during descent and afterward. Its center descends from the surface into the bore at story 48–51.5 s. Neither the cap nor the bore expands or flattens. These dimensions and motions are authored visualization geometry, not an installation or a mechanical calculation.
+
+In rapid mode the dry-ice sphere lands at story 44 s, then the metal cap drops. At story 55 s the sphere disappears into an **illustrated** CO₂ release: pale tracer particles and a brief, bounded soil jolt show the event, an authored local oxygen-displacement cue dims nearby embers, and twelve fine branched paths progressively fracture the displayed peat through roughly 59 s. The cylindrical bore and cap remain fixed. The hose enters at 69–72 s; water then follows the same paths, darkens the peat and extinguishes the remaining depicted embers by the end of the story. Gradual mode retains three short contact fractures and local wetting. The pulse, fracture paths, oxygen effect, wetting and visual extinguishment are not solved by pressure, failure, gas transport or Darcy/Richards equations. The separate contact ledger **exports** residual dry ice at 55 s without sublimation enthalpy credit: it cannot quantify the depicted instantaneous conversion or gas pressure. Accepted numerical fields remain unchanged and rapid mode holds its pre-treatment reference. This is a browser development preview; the installed 0.18.2 Mac app still has the earlier scene.
+
+## Historical 0.18.1 scene
 
 The main interactive scene shows a fixed-width excavator bucket opening a pit with sloped sides. A finite source proxy and shallow concave metal cap are placed while the pit remains open. The pit is then backfilled above the cap. In rapid mode the cap flattens instead of inverting; its projected radius increases only up to the initial meridian length, and soil directly above it lifts by at most 0.04 m. Short illustrated fractures receive water after hose insertion, and embers dim where assumed wetting arrives. The scene omits the prior widening cutter, global burst debris and visible CO₂. The excavation, backfill, deformation and wetting are staged, not measured construction performance or a validated peat-fire treatment. Root damage and excavation support are not calculated. The accepted numerical fields and separate contact budget are unchanged. The earlier 0.18.0 underreamed pocket remains selectable under **Previous simulations · v0.8+**.
 
@@ -30,7 +36,7 @@ The interactive story lasts 90 presentation seconds. Default playback and both c
 
 A shared seeded connected arrival graph on the 200 × 80 appearance atlas drives peat involvement. The front reaches 70% of its 4,141 display samples before equipment starts, leaving an unburnt margin. The arrival map is a display construction, not a transport/combustion solution. Boundary smoothing does not alter that threshold. Hot peat uses embers and char rather than a buried flame sheet.
 
-In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The current 0.18.1 scene instead uses open excavation and backfill, bounded cap flattening and local soil lift. CO₂ is nonflammable and invisible; gas wisps in earlier replays are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
+In historical replays, rapid ground uplift, irregular piece separation, decorative dust/debris, dome inversion and cracks are prescribed. The preserved 0.18.1 scene uses open excavation and backfill, bounded cap flattening and local soil lift. The current Chrome preview uses a straight bore, fixed-size cap, then a rapid visual soil disturbance and fine peat fractures. CO₂ is nonflammable and invisible; pale particles are labeled tracers. No pressure, explosive yield, detonation or mechanical failure threshold is inferred from animation.
 
 ## Reproducibility and limits
 

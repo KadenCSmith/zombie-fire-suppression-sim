@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CatmullRomCurve3, Vector3 } from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, rapidFractureProgress, rapidWettingProgress, rapidGasPulse, rapidGasQuench, constrainedSoilLiftAt, constrainedWettingProgress, openPitDepthAt, openPitRadiusAtY, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, storyHosePoints, STORY_HOSE_POINTS, STORY_CRACK_PATHS, storyWettingProgress, acceptedFireFrame, fireSequencePose, illustratedPeatCoverage, illustratedPeatFront, storyToPlayback, playbackToStory } from '../src/story/fireSequence'
 
 describe('story and accepted-state separation', () => {
   const frames = [
@@ -86,6 +86,42 @@ describe('constrained current cap and water illustration',()=>{
       expect(constrainedWettingProgress(71,i)).toBe(0)
       expect(constrainedWettingProgress(90,i)).toBe(1)
     }
+  })
+})
+
+describe('straight-bore animation variant',()=>{
+  it('uses the original fixed bore and keeps the cap inside it throughout descent and treatment',()=>{
+    const cap=fixedBoreCapShape()
+    expect(G.augerRadiusM).toBeLessThan(G.boreRadiusM)
+    expect(cap.radiusM).toBeLessThan(G.boreRadiusM)
+    expect(cap.depthM).toBeGreaterThan(0)
+    for(const time of [47,48,50,51.5,55,65,90]){
+      expect(fixedBoreCapShape()).toEqual(cap)
+      expect(fireSequencePose(time,'rapid').drillDepth).toBeCloseTo(G.boreDepthM)
+    }
+    expect(fireSequencePose(48,'rapid').capY).toBeGreaterThan(fireSequencePose(51.5,'rapid').capY)
+  })
+  it('retains short contact fractures for the gradual scene',()=>{
+    expect(fireSequencePose(44,'rapid').sourceY).toBeCloseTo(-G.sourceDepthM)
+    expect(sourceContactFracture(43.9)).toBe(0)
+    expect(sourceContactFracture(44.8)).toBeGreaterThan(0)
+    expect(sourceContactFracture(45.5)).toBe(1)
+    expect(SOURCE_CONTACT_CRACK_PATHS).toHaveLength(3)
+    expect(SOURCE_CONTACT_CRACK_PATHS[0].at(-1)![1]).toBeGreaterThan(-1)
+  })
+  it('orders the rapid release after the fixed cap and before peat-wide water entry',()=>{
+    expect(fireSequencePose(44,'rapid').sourceY).toBeCloseTo(-G.sourceDepthM)
+    expect(fireSequencePose(51.5,'rapid').capY).toBeCloseTo(-G.capDepthM)
+    expect(RAPID_PEAT_CRACK_PATHS.length).toBeGreaterThanOrEqual(10)
+    expect(RAPID_PEAT_CRACK_PATHS.map(path=>path.at(-1)![0]).some(x=>x < -1.8)).toBe(true)
+    expect(RAPID_PEAT_CRACK_PATHS.map(path=>path.at(-1)![0]).some(x=>x > 3)).toBe(true)
+    expect(rapidFractureProgress(54.99,0)).toBe(0)
+    expect(rapidGasPulse(55.3)).toBeGreaterThan(0)
+    expect(rapidFractureProgress(56,0)).toBeGreaterThan(0)
+    expect(rapidGasQuench(57.1)).toBe(1)
+    expect(rapidWettingProgress(71.99,0)).toBe(0)
+    expect(rapidWettingProgress(90,RAPID_PEAT_CRACK_PATHS.length-1)).toBe(1)
+    expect(fixedBoreCapShape().radiusM).toBeLessThan(G.boreRadiusM)
   })
 })
 

@@ -1,4 +1,4 @@
-import { eased, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, type FireSourceMode } from './fireSequence'
+import { eased, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, rapidGasPulse, rapidWettingProgress, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, type FireSourceMode } from './fireSequence'
 
 /** Authored appearance only. Arrival order is not a combustion calculation. */
 export const PEAT_APPEARANCE_GRID = { nx: 200, ny: 80, minX: -4, minY: -3.2, width: 8, height: 3.2, seed: 29173 } as const
@@ -90,13 +90,30 @@ vec3 storyRuptureOffset(vec3 p,float pulse,float damage){
 }
 `
 
+/** Bounded visual soil jolt outside the fixed bore; no stress or pressure solve. */
+export function rapidSoilDisruptionAt(x:number,y:number,z:number,time:number,mode:FireSourceMode):[number,number,number]{
+  if(mode!=='rapid')return [0,0,0]
+  const pulse=rapidGasPulse(time),radius=Math.hypot(x-.4,z),guard=eased(radius,.26,.42)
+  const influence=guard*Math.exp(-((x-.4)**2/2.8+(y+1.3)**2/.85+z*z/2.0))*pulse
+  return [Math.sign(x-.4)*.065*influence,.052*influence,Math.sign(z)*.025*influence]
+}
+export const RAPID_SOIL_DISRUPTION_GLSL=`
+vec3 rapidSoilDisruption(vec3 p,float pulse){
+ float radius=length(vec2(p.x-.4,p.z));
+ float q=clamp((radius-.26)/.16,0.0,1.0);float guard=q*q*(3.0-2.0*q);
+ float influence=guard*exp(-((p.x-.4)*(p.x-.4)/2.8+(p.y+1.3)*(p.y+1.3)/.85+p.z*p.z/2.0))*pulse;
+ return vec3(sign(p.x-.4)*.065,.052,sign(p.z)*.025)*influence;
+}
+`
+
 /** Authored local wetting halo around the reached part of each shared path. */
-export function buildStoryWettingGrid(time: number, constrained = false, mode: FireSourceMode = 'rapid') {
+export function buildStoryWettingGrid(time: number, constrained = false, mode: FireSourceMode = 'rapid', sourceFracture = false) {
   const width=128,height=64,data=new Float32Array(width*height*4)
-  if(time<=72||(constrained&&mode==='gradual'))return {width,height,data}
-  const paths=(constrained?CONSTRAINED_CRACK_PATHS:STORY_CRACK_PATHS).map((path,branch)=>{
-    const front=constrained?constrainedWettingProgress(time,branch):storyWettingProgress(time,branch)
-    return {front,points:Array.from({length:18},(_,i)=>pointAlongStoryPath(path,front*i/17)),radius:constrained?.045+.055*front:.028+.12*Math.sqrt(Math.max(0,Math.min(1,(time-72-branch*.65)/18)))}
+  if(time<=72||(constrained&&mode==='gradual'&&!sourceFracture))return {width,height,data}
+  const rapidNetwork=sourceFracture&&mode==='rapid'
+  const paths=(rapidNetwork?RAPID_PEAT_CRACK_PATHS:sourceFracture?SOURCE_CONTACT_CRACK_PATHS:constrained?CONSTRAINED_CRACK_PATHS:STORY_CRACK_PATHS).map((path,branch)=>{
+    const front=rapidNetwork?rapidWettingProgress(time,branch):constrained?constrainedWettingProgress(time,branch):storyWettingProgress(time,branch)
+    return {front,points:Array.from({length:18},(_,i)=>pointAlongStoryPath(path,front*i/17)),radius:rapidNetwork?.13+.48*eased(time,72,90):constrained?(sourceFracture?.105+.16*front:.045+.055*front):.028+.12*Math.sqrt(Math.max(0,Math.min(1,(time-72-branch*.65)/18)))}
   })
   for(let j=0;j<height;j++)for(let i=0;i<width;i++){
     const x=-4+(i+.5)*8/width,y=-3.2+(j+.5)*3.2/height
