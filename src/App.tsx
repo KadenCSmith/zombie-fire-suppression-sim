@@ -50,6 +50,7 @@ type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
 const FireSequenceWorkspace = lazy(() => import('./ui/FireSequenceWorkspace'))
+const FormulaReferenceWorkspace = lazy(() => import('./ui/FormulaReferenceWorkspace'))
 const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
 const MechanicsWorkspace = lazy(() => import('./ui/MechanicsWorkspace'))
 const StudyWorkspace = lazy(() => import('./ui/StudyWorkspace'))
@@ -192,7 +193,7 @@ function App() {
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
   const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => {
     const requested = new URLSearchParams(window.location.search).get('workspace')
-    return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' ? requested : 'sequence'
+    return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
   })
   const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-layout')))
   const fireSequenceSession = useRef<FireSequenceSession | undefined>(undefined)
@@ -659,7 +660,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison') return
+      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -674,6 +675,7 @@ function App() {
 
   const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} />
   if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
+  if (workspace === 'formulas') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the formula reference…</div>}><FormulaReferenceWorkspace onWorkspace={changeWorkspace} /></Suspense></>
   if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} /></Suspense></>
   if (workspace === 'coupled') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense></>
   if (workspace === 'mechanics') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening mechanics workbench…</div>}><MechanicsWorkspace onWorkspace={changeWorkspace} version={studyVersion} onVersion={next => { studySession.current=undefined; setStudyVersion(next); changeWorkspace('study') }} session={mechanicsSession} camera={mechanicsCamera} tensileSession={tensileSession} /></Suspense></>

@@ -1,5 +1,11 @@
 # Build status and handoff
 
+## Physical formulas document and navigation (2026-10-01)
+
+Added an in-app **Physical formulas** workspace accessible beside **Open physics lab** and through the app-view selector. It summarizes the actual FVM/FEM/reduced/illustrative methods, cites peer-reviewed equation sources, identifies the limited correspondence with the supplied coal-mine CFD paper, and plots the archived cold-source refinement data. The detailed, source-linked [GitHub formula audit](PHYSICS_FORMULA_AUDIT.md) includes two reproducible scientific figures and explains the conditional 0.285% time-only mass-loss estimate and why no whole-model field-error percentage is available. The calculation code, accepted history and packaged releases were not changed in this milestone.
+
+Local `npm ci`, typecheck, lint, **1,706 tests in 85 files**, and production build passed. The in-app document navigation and charts were inspected in a browser preview. This is a source checkout/PR update; a new installed Mac release and full native-window verification were not performed for it.
+
 ## Provisional mechanics boundary (2026-09-29)
 
 Added Agent A's complementary D/F/G mechanics boundary and four repository integration tests. The full **1,706-test suite**, typecheck, lint and build passed. It has no live solver import. [Details](MECHANICS_PACKAGE_INTEGRATION.md).

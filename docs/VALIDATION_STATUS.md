@@ -1,5 +1,13 @@
 # Verification and validation status
 
+## Equation/source audit and formula reference (2026-10-01)
+
+The new [physical formula audit](PHYSICS_FORMULA_AUDIT.md) maps active gas, heat, reaction, dry-ice, water-phase and FEM equations to implementation paths and peer-reviewed sources. The user-supplied An et al. *Fire* 8(1), 13 article concerns nonreactive coal-mine methane/air CFD; only its ideal-gas, Darcy/species-balance and finite-volume principles are relevant analogues. No numerical solver coefficient or equation was changed to imitate its unrelated turbulence/ventilation model. The app now has a **Physical formulas** workspace beside **Open physics lab**.
+
+The audit replots archived 2 s cold-source transport sweeps and separate analytical heat/consolidation checks from committed JSON. Spatial source-loss and local-probe differences are nonmonotone, so whole-case spatial convergence is not established. A three-level Richardson extrapolation suggests **0.285% conditional temporal discretization difference** in 2,560-cell, 0.125 s cold-source mass loss; it is not a measured physical prediction error. The 24 h hot sequence, liquid infiltration, fracture and suppression outcome still lack an end-to-end passing convergence and matched experimental validation study. The previously documented ~5.74% spatial fracture mesh-energy mismatch remains a failed 5% gate. No defensible model-wide field-error percentage is assigned.
+
+For this navigation/documentation change, `npm ci`, `npm run typecheck`, `npm run lint`, `npm test` (**1,706 tests in 85 files**) and `npm run build` passed locally. Browser visual QA exercised sequence header → formula page → return, including both data-backed charts. Lint reported only existing warnings. No new physics simulation was run; the figures are regenerated from archived output.
+
 ## Provisional mechanics boundary (2026-09-29)
 
 Four new tests passed against installed D/G modules; the 1,706-test suite, typecheck, lint and build passed. This proves adapter behavior for synthetic cases, not global equilibrium or measured soil fracture. [Details](MECHANICS_PACKAGE_INTEGRATION.md).

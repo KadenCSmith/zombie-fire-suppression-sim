@@ -1,0 +1,53 @@
+.formula-shell{--formula-bg:#111d22;--formula-panel:#17282e;--formula-line:#344a4e;--formula-text:#dce5df;--formula-muted:#9eb3b0;--formula-accent:#dfa979;min-height:100dvh;background:radial-gradient(ellipse at 70% 0,#20353a 0,transparent 62%),var(--formula-bg);color:var(--formula-text);font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:0 28px 56px}
+.has-app-chrome .formula-shell{height:calc(100dvh - 66px);min-height:0;overflow-y:auto;overflow-x:hidden;scroll-padding-top:22px}
+body[data-layout=instrument] .formula-shell{height:calc(100dvh - 78px)}
+.formula-shell *{box-sizing:border-box}
+.formula-shell a{color:#e5b994;text-decoration-color:#a27859;text-underline-offset:3px}
+.formula-shell a:hover{color:#ffe0c2}
+.formula-shell button{font:inherit;cursor:pointer}
+.formula-shell button:focus-visible,.formula-shell a:focus-visible,.formula-shell select:focus-visible{outline:2px solid var(--formula-accent);outline-offset:3px}
+.formula-header{min-height:65px;display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--formula-line);max-width:1360px;margin:auto}
+.formula-brand{display:flex;align-items:center;gap:10px;margin-right:auto;white-space:nowrap}
+.formula-brand>span{width:29px;height:29px;display:grid;place-items:center;background:#453b33;border:1px solid #987a5f;border-radius:5px;color:#e8b894;font-size:19px}
+.formula-brand strong{display:block;letter-spacing:.18em;font-size:10px}.formula-brand small{display:block;color:var(--formula-muted);letter-spacing:.13em;font-size:8px;margin-top:1px}
+.formula-shell .model-selector>span{font-size:9px;color:var(--formula-muted)}
+.formula-shell .model-selector select{background:#1c3034;border-color:var(--formula-line);color:var(--formula-text);font-size:11px;max-width:350px}
+.formula-back{display:flex;align-items:center;gap:7px;border:1px solid var(--formula-line);border-radius:6px;background:#213238;color:var(--formula-text);padding:8px 12px;white-space:nowrap}
+.formula-back:hover{border-color:#a68468;background:#2c393b}
+.formula-document{max-width:1210px;margin:0 auto}
+.formula-hero{padding:48px 0 27px;max-width:900px}
+.formula-eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--formula-accent);font-size:10px;letter-spacing:.16em;font-weight:600}
+.formula-hero h1{font-size:clamp(28px,4vw,46px);line-height:1.15;letter-spacing:-.045em;font-weight:500;margin:12px 0 16px}
+.formula-hero p{color:#b1c4bc;font-size:14px;line-height:1.75;max-width:860px;margin:0}
+.formula-alert{background:#332e29;border:1px solid #695440;border-left:3px solid #d9a778;border-radius:6px;padding:15px 18px;max-width:1020px}
+.formula-alert strong{font-size:12px;color:#f0c79f}.formula-alert p{margin:5px 0 0;color:#d7c8b9;font-size:12px;line-height:1.65}.formula-alert a{display:inline-flex;gap:2px;align-items:center}
+.formula-nav{display:flex;flex-wrap:wrap;gap:8px;padding:26px 0 25px;border-bottom:1px solid var(--formula-line)}
+.formula-nav a{display:inline-block;border:1px solid #4a6262;border-radius:20px;padding:6px 12px;background:#1a2e33;color:#bfd1c9;text-decoration:none;font-size:11px}
+.formula-nav a:hover{background:#2b4447;border-color:#a98564;color:#fff}
+.formula-section{scroll-margin-top:18px;padding:32px 0 7px;border-bottom:1px solid var(--formula-line)}
+.formula-section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:15px;margin-bottom:15px}
+.formula-section-heading h2{font-size:23px;font-weight:500;letter-spacing:-.025em;margin:0}
+.formula-section-heading>span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#b6a68f;text-align:right}
+.formula-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.formula-card{min-width:0;display:flex;flex-direction:column;background:var(--formula-panel);border:1px solid var(--formula-line);border-radius:9px;padding:19px 20px}
+.formula-section#formula-water .formula-card:last-child{grid-column:1/-1;border-color:#6d604c;background:#252d2d}
+.formula-card h3{font-size:15px;font-weight:600;margin:0 0 12px;color:#e8e8d8}
+.formula-equation{background:#0d2027;border:1px solid #375159;border-radius:5px;padding:12px 14px;color:#a9d3ce;font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.formula-card p{color:#b3c6be;font-size:12px;line-height:1.65;margin:13px 0 0}
+.formula-card .formula-choice{color:#9fb6b0;margin-top:10px}.formula-choice strong{color:#d9bb9b;font-weight:600}
+.formula-sources{margin-top:auto;padding-top:18px;display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;font-size:10px;color:#849e9e}
+.formula-sources>span{width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.formula-sources a{display:inline-flex;align-items:center;gap:2px}
+.formula-section-note{margin:12px 0 0;color:#e9b98c;font-size:12px}
+.formula-intro{font-size:13px;color:#afc5bc;line-height:1.75;max-width:1050px;margin:0 0 18px}.formula-intro strong{color:#ead4bc}
+.formula-chart-grid-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.formula-chart-grid-layout figure{margin:0;min-width:0;background:var(--formula-panel);border:1px solid var(--formula-line);border-radius:9px;padding:16px 18px 15px}
+.formula-chart-grid-layout figcaption strong,.formula-chart-grid-layout figcaption span{display:block}.formula-chart-grid-layout figcaption strong{font-size:14px;font-weight:600}.formula-chart-grid-layout figcaption span{font-size:11px;color:#9bb3ac;margin-top:3px}
+.formula-chart{display:block;width:100%;height:auto;margin:10px auto 0;max-width:570px;overflow:visible}
+.formula-chart-grid{stroke:#3c5557;stroke-width:1}.formula-chart-line{fill:none;stroke:#e3ab79;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.formula-chart-point{fill:#e7b988;stroke:#25383b;stroke-width:2}.formula-chart-point.is-reference{fill:#a8d2c1}.formula-chart-tick{fill:#a9bdb5;font:10px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.formula-chart-axis{fill:#a9bdb5;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.formula-chart-grid-layout figure>p{color:#a9beb7;font-size:11px;line-height:1.65;margin:6px 0 0}
+.formula-richardson{margin-top:14px;border:1px solid #6b654b;border-left:3px solid #d7aa71;border-radius:7px;background:#292f2c;padding:14px 17px;color:#c9d2bd}.formula-richardson strong{display:block;color:#e8c698;font-size:12px;letter-spacing:.03em}.formula-richardson p{font-size:12px;line-height:1.7;margin:5px 0 0}
+.formula-evidence-footer{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin:14px 0 18px}.formula-evidence-footer p{margin:0;border:1px solid #456065;border-radius:7px;background:#1d3238;padding:15px 16px;color:#b9cdc5;font-size:12px;line-height:1.7}.formula-evidence-footer strong{color:#efc196}.formula-evidence-footer code{font-size:11px;color:#c9dacf;overflow-wrap:anywhere}.formula-url{overflow-wrap:anywhere}
+.formula-next ol{margin:0 0 25px;padding:0 0 0 22px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 32px;color:#b7c9c1;font-size:12px;line-height:1.65}.formula-next li{padding-left:5px}.formula-next li::marker{color:#dda97b;font-weight:600}
+@media(max-width:850px){.formula-shell{padding:0 18px 38px}.formula-header{flex-wrap:wrap;padding:11px 0;gap:10px 14px}.formula-brand{flex:1}.formula-header .model-selector{order:3;width:100%}.formula-header .model-selector select{max-width:none;width:100%}.formula-hero{padding-top:31px}.formula-cards,.formula-chart-grid-layout,.formula-evidence-footer,.formula-next ol{grid-template-columns:1fr}}
+@media(max-width:560px){.formula-shell{padding:0 12px 30px}.formula-header .model-selector>span{display:none}.formula-back{font-size:11px;padding:7px 8px}.formula-hero h1{font-size:31px}.formula-hero p{font-size:12px}.formula-alert{padding:12px}.formula-nav{gap:6px}.formula-nav a{font-size:10px;padding:5px 9px}.formula-section{padding-top:25px}.formula-section-heading{display:block}.formula-section-heading h2{font-size:21px}.formula-section-heading>span{display:block;text-align:left;margin-top:3px}.formula-card{padding:15px}.formula-equation{font-size:11px}.formula-chart-grid-layout figure{padding:12px}.formula-chart-tick{font-size:10px}}

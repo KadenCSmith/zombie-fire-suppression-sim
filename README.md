@@ -5,6 +5,7 @@ An integrated Mac research app combining the coupled simulator with the editable
 **Physics first, with explicit limits.** The new 2,560 and 20,480 cell options are exactly 10× the former preview and research sizes. A shared material atlas conserves initial inventories across meshes. The finite CO₂ source now couples heat transfer, sensible energy and concentration-dependent mass transfer. The original float64 mechanics reference remains available alongside a measured sparse optimization. More elements do not establish experimental accuracy.
 
 - [Start here](docs/UNIFIED_QUICKSTART.md)
+- [Physical formulas, article correspondence, convergence graphs and error limits](docs/PHYSICS_FORMULA_AUDIT.md) — also available through **Physical formulas** beside **Open physics lab** in the app.
 - [Full fire sequence and both source modes](docs/FIRE_SEQUENCE.md)
 - [Separate contact-cooling model and conservation scope](docs/CONTACT_COOLING.md)
 - [Cold-start fire experiment and exact limitations](docs/FIRE_PROTOCOL.md)
