@@ -11,8 +11,8 @@ import { SequenceExcavator, SequenceGrass } from './FireSequenceEquipment'
 import { NaturalAggregates } from './CoupledNaturalContext'
 import { Chamber, Underreamer, SegmentedDome, CrackAndWaterPaths, ConstrainedCap, ConstrainedCrackAndWaterPaths } from './FireInterventionEquipment'
 import { createFireGroundGeometry } from './FireGroundGeometry'
-import { buildPeatAppearance, buildStoryWettingGrid, storyRupture, storyRuptureOffset, STORY_RUPTURE_GLSL } from '../story/fireAppearance'
-import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, constrainedCapShape, constrainedSoilLiftAt, openPitDepthAt, eased, illustratedPeatCoverage, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
+import { buildPeatAppearance, buildStoryWettingGrid, rapidSoilDisruptionAt, storyRupture, storyRuptureOffset, STORY_RUPTURE_GLSL, RAPID_SOIL_DISRUPTION_GLSL } from '../story/fireAppearance'
+import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, rapidGasPulse, rapidGasQuench, constrainedCapShape, constrainedSoilLiftAt, openPitDepthAt, eased, illustratedPeatCoverage, type FireSourceMode, type FireSequenceView } from '../story/fireSequence'
 
 export interface FireFieldSnapshot { timeS: number; nx: number; ny: number; nz: number; temperatureK: ArrayLike<number>; oxygen: ArrayLike<number>; co2: ArrayLike<number>; dryIceKg?: number }
 export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolean; anatomy: boolean }
@@ -35,12 +35,12 @@ function Ground({ time, mode, view, frame, fire, water, realistic, openPit, stra
   const groundGeometry = useMemo(createFireGroundGeometry, [])
   const peatTexture = useMemo(() => { const field=buildPeatAppearance(), data=new Float32Array(field.nx*field.ny*4);for(let i=0;i<field.arrival.length;i++){data[i*4]=field.arrival[i];data[i*4+1]=field.mask[i];data[i*4+3]=1}const tex=new THREE.DataTexture(data,field.nx,field.ny,THREE.RGBAFormat,THREE.FloatType);tex.minFilter=tex.magFilter=THREE.NearestFilter;tex.needsUpdate=true;return tex },[])
   useEffect(()=>()=>{groundGeometry.dispose();peatTexture.dispose()},[groundGeometry,peatTexture])
-  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uPitDepth:{value:0},uCapLift:{value:0},uRealistic:{value:0},uStraightBore:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
+  const uniforms = useMemo(() => ({ uContacts:{value:Array.from({length:13},()=>new THREE.Vector4(0,0,.1,1))},uWet:{value:wetTexture},uShowWater:{value:1},uUnderream:{value:0},uPitDepth:{value:0},uCapLift:{value:0},uRealistic:{value:0},uStraightBore:{value:0},uPeat:{value:peatTexture}, uPulse:{value:0}, uDamage:{value:0}, uGasPulse:{value:0},uGasQuench:{value:0}, uClock: { value: 0 }, uDrill: { value: 0 }, uView: { value: 0 }, uHasField: { value: 0 }, uShowFire: { value: 1 }, uField: { value: texture }, uGrid: { value: new THREE.Vector3(2,1,2) }, uCoverage: { value: 0 } }), [])
   const material = useMemo(() => {
     const m = new THREE.MeshStandardMaterial({ roughness: .96, side: THREE.DoubleSide })
     m.onBeforeCompile = shader => {
       Object.assign(shader.uniforms,uniforms)
-      shader.vertexShader = STORY_RUPTURE_GLSL+'attribute vec3 displayCenter; attribute float displaySeed; uniform float uPulse,uDamage,uView,uCapLift; varying vec3 vGround;\n' + shader.vertexShader
+      shader.vertexShader = STORY_RUPTURE_GLSL+RAPID_SOIL_DISRUPTION_GLSL+'attribute vec3 displayCenter; attribute float displaySeed; uniform float uPulse,uDamage,uGasPulse,uView,uCapLift; varying vec3 vGround;\n' + shader.vertexShader
       shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
 vGround=position;
 if(uView<.5){
@@ -51,11 +51,12 @@ if(uView<.5){
  transformed.xy=displayCenter.xy+mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*local.xy*(1.0-shrink);
  transformed.z=displayCenter.z+local.z*(1.0-shrink);
  transformed+=storyRuptureOffset(displayCenter,uPulse,uDamage)*.75+storyRuptureOffset(position,uPulse,uDamage)*.25;
+ transformed+=rapidSoilDisruption(displayCenter,uGasPulse)*.75+rapidSoilDisruption(position,uGasPulse)*.25;
  float radial=length(vec2(position.x-${SOURCE_X.toFixed(2)},position.z));
  float overhead=(1.0-smoothstep(.20,.90,radial))*smoothstep(-1.16,-.25,position.y);
  transformed.y+=uCapLift*overhead;
 }`)
-      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uPitDepth,uShowWater,uRealistic,uStraightBore; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
+      shader.fragmentShader = `varying vec3 vGround; uniform float uClock,uDrill,uView,uHasField,uShowFire,uCoverage,uUnderream,uPitDepth,uShowWater,uRealistic,uStraightBore,uGasPulse,uGasQuench; uniform sampler2D uField,uPeat,uWet; uniform vec3 uGrid; uniform vec4 uContacts[13];
 float grain(vec3 p){return fract(sin(dot(p,vec3(12.9898,78.233,41.21)))*43758.5453);}
 vec3 palette(float a){return mix(mix(vec3(.05,.26,.35),vec3(.28,.67,.48),smoothstep(.0,.6,a)),vec3(1.0,.38,.075),smoothstep(.55,1.0,a));}
 // Same outline as insideIllustratedPeat; the sampled arrival graph stays unchanged.
@@ -90,9 +91,13 @@ float ember=step(.68,grain(floor(p*vec3(28.0,37.0,25.0))))*(.45+.55*coarseHeat);
 vec3 emberTint=mix(vec3(.90,.065,.003),vec3(1.0,.39,.026),step(.94,grain(floor(p*63.0))));
 float localGlow=1.0;for(int i=0;i<13;i++){float footprint=1.0-smoothstep(.3,1.0,distance(p.xy,uContacts[i].xy)/uContacts[i].z);localGlow=min(localGlow,mix(1.0,uContacts[i].w,footprint));}
 float wetness=texture2D(uWet,vec2((p.x+4.0)/8.0,(p.y+3.2)/3.2)).r*uShowWater;
+float gasNear=(1.0-smoothstep(.18,1.34,length((p.xy-vec2(.4,-1.3))*vec2(1.0,1.16))))*peatMask;
+float gasSuppression=gasNear*uGasQuench;
 vec3 peatEmission=vec3(0.0);
 if(uView<.5 && p.z>-.02){
  earth=mix(earth,vec3(.035,.017,.009),heat*(.72+.13*grit));
+ earth=mix(earth,vec3(.032,.027,.022),gasSuppression*.78*heat);
+ earth=mix(earth,vec3(.21,.29,.28),gasNear*uGasPulse*.16);
  float wetBlend=smoothstep(.08,.80,wetness);
  if(uStraightBore>.5){
   vec3 wetPeat=vec3(.040,.027,.020)*(.72+.42*grain(floor(p*vec3(61.0,69.0,53.0))));
@@ -100,6 +105,7 @@ if(uView<.5 && p.z>-.02){
  }else earth=mix(earth,earth*.40,wetness*.8);
  float sparse=step(.94,grain(floor(p*vec3(18.0,23.0,17.0))))*.16;
  float visibleEmber=uStraightBore>.5?mix(1.0,sparse,wetBlend):(uRealistic>.5?sparse:1.0);
+ visibleEmber*=1.0-.985*gasSuppression;
  float wetGlow=uStraightBore>.5?1.0-.58*wetBlend:(uRealistic>.5?1.0-.98*wetness:1.0);
  peatEmission=heat*localGlow*(.035+.065*coarseHeat+ember*1.7)*emberTint*visibleEmber*wetGlow;
 }
@@ -108,7 +114,7 @@ diffuseColor.rgb=earth;`)
     }
     return m
   },[uniforms])
-  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uStraightBore.value=straightBore?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit&&!straightBore?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,straightBore,uniforms,texture,wetTexture,invalidate])
+  useLayoutEffect(() => { contactCoolingState(time,mode).patches.forEach((p,i)=>uniforms.uContacts.value[i].set(p.xM,p.yM,p.radiusM,Math.max(0,Math.min(1,(p.temperatureK-550)/(823.15-550)))**1.7));uniforms.uWet.value=wetTexture;uniforms.uShowWater.value=water?1:0;uniforms.uRealistic.value=realistic?1:0;uniforms.uStraightBore.value=straightBore?1:0;uniforms.uUnderream.value=view==='natural'&&!openPit&&!straightBore?(realistic?.92*eased(time,31,33):fireSequencePose(time,mode).underream):0;uniforms.uPitDepth.value=view==='natural'&&openPit?openPitDepthAt(time):0;uniforms.uCapLift.value=view==='natural'&&realistic&&!straightBore?constrainedCapShape(time,mode).soilLiftM:0;uniforms.uClock.value=time;uniforms.uDrill.value=view==='natural'&&!openPit?fireSequencePose(time,'gradual').drillDepth:0;uniforms.uView.value=['natural','temperature','oxygen','co2'].indexOf(view);uniforms.uHasField.value=frame?1:0;uniforms.uShowFire.value=fire?1:0;uniforms.uCoverage.value=illustratedPeatCoverage(time);const rupture=storyRupture(time,mode);uniforms.uPulse.value=view==='natural'&&!realistic?rupture.pulse:0;uniforms.uDamage.value=view==='natural'&&!realistic?rupture.damage:0;uniforms.uGasPulse.value=view==='natural'&&straightBore?rapidGasPulse(time)*(mode==='rapid'?1:0):0;uniforms.uGasQuench.value=view==='natural'&&straightBore&&mode==='rapid'?rapidGasQuench(time):0;uniforms.uField.value=texture;uniforms.uGrid.value.set(frame?.nx??2,frame?.ny??1,frame?.nz??2);invalidate() },[time,mode,view,frame,fire,water,realistic,openPit,straightBore,uniforms,texture,wetTexture,invalidate])
   useEffect(()=>()=>texture.dispose(),[texture]);useEffect(()=>()=>material.dispose(),[material])
   return <mesh geometry={groundGeometry} material={material} receiveShadow castShadow/>
 }
@@ -135,7 +141,7 @@ if(uCavity>.005&&pow(length(vec2(vAggregateWorld.x-${SOURCE_X},vAggregateWorld.z
       material.needsUpdate=true
     })
   },[uniform,cavityUniform,pitUniform])
-  useLayoutEffect(()=>{cavityUniform.value=openPit||straightBore?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);if(realistic&&!straightBore)position.y+=constrainedSoilLiftAt(position.x,position.y,position.z,time,mode);else if(!realistic)position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,realistic,openPit,straightBore,uniform,cavityUniform,pitUniform,invalidate])
+  useLayoutEffect(()=>{cavityUniform.value=openPit||straightBore?0:realistic?.92*eased(time,31,33):fireSequencePose(time,'gradual').underream;pitUniform.value=openPit?openPitDepthAt(time):0;uniform.value=openPit?0:fireSequencePose(time,'gradual').drillDepth;const r=storyRupture(time,mode),position=new THREE.Vector3(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3(),matrix=new THREE.Matrix4();group.current?.traverse(object=>{if(!(object instanceof THREE.InstancedMesh))return;if(!originals.current.has(object)){const values=Array.from({length:object.count},(_,i)=>{const m=new THREE.Matrix4();object.getMatrixAt(i,m);return m});originals.current.set(object,values)}originals.current.get(object)!.forEach((base,i)=>{base.decompose(position,rotation,scale);if(realistic&&straightBore)position.add(new THREE.Vector3(...rapidSoilDisruptionAt(position.x,position.y,position.z,time,mode)));else if(realistic)position.y+=constrainedSoilLiftAt(position.x,position.y,position.z,time,mode);else position.add(new THREE.Vector3(...storyRuptureOffset(position.x,position.y,position.z,r.pulse,r.damage)));matrix.compose(position,rotation,scale);object.setMatrixAt(i,matrix)});object.instanceMatrix.needsUpdate=true;object.computeBoundingSphere()});invalidate()},[time,mode,realistic,openPit,straightBore,uniform,cavityUniform,pitUniform,invalidate])
   return <group ref={group}><NaturalAggregates fidelity="precision2560" cut/></group>
 }
 function Tree({time,mode,realistic,openPit,straightBore}:{time:number;mode:FireSourceMode;realistic:boolean;openPit:boolean;straightBore:boolean}){
@@ -177,15 +183,16 @@ function SurfaceFire({time,visible}:{time:number;visible:boolean}){
   const amount=Math.min(1,.15+eased(time,0,9))*(1-.82*eased(time,12,23)),startX=1.72
   return <group visible={visible&&time<27} position={[startX,.02,-.28]}>{Array.from({length:13},(_,i)=>{const angle=i*2.3999,r=.09+random(i)*.24,h=(.2+random(i+12)*.5)*(1+.12*Math.sin(time*7+i));return <mesh key={i} position={[Math.cos(angle)*r,h*amount*.46,Math.sin(angle)*r*.55]} scale={[.05+random(i+37)*.075,h*amount,.06+random(i+89)*.04]} rotation={[0,angle,Math.sin(time*4+i)*.12]}><coneGeometry args={[1,1,7]}/><meshBasicMaterial color={i%3===0?'#ffe3a0':i%3===1?'#ef742c':'#bf3a18'} transparent opacity={.86}/></mesh>})}<pointLight color="#ff9d50" intensity={amount*1.8} distance={2.5}/></group>
 }
-function Tracers({time,mode,layers,realistic}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers;realistic:boolean}){
+function Tracers({time,mode,layers,realistic,straightBore}:{time:number;mode:FireSourceMode;layers:FireSequenceLayers;realistic:boolean;straightBore:boolean}){
   const gas=useRef<THREE.InstancedMesh>(null),smoke=useRef<THREE.InstancedMesh>(null),cuttings=useRef<THREE.InstancedMesh>(null),invalidate=useThree(state=>state.invalidate)
   const geometry=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[])
   useEffect(()=>()=>geometry.dispose(),[geometry])
   useLayoutEffect(()=>{
     const object=new THREE.Object3D(),pose=fireSequencePose(time,mode)
     for(let i=0;i<170;i++){
-      const age=(time*.11+random(i+200))%1,angle=random(i+201)*Math.PI*2,reach=pose.gas*(.3+2.1*age),vertical=(random(i+300)-.45)*1.1
-      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(!realistic&&layers.gas&&time>=55?.013+pose.gas*.018*(1-age):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
+      const age=(time*.11+random(i+200))%1,angle=random(i+201)*Math.PI*2,reach=pose.gas*(straightBore?.18+1.55*age:.3+2.1*age),vertical=(random(i+300)-.45)*1.1
+      const visible=straightBore?layers.gas&&mode==='rapid'&&time>=55&&time<60:!realistic&&layers.gas&&time>=55
+      object.position.set(SOURCE_X+Math.cos(angle)*reach,-G.sourceDepthM+vertical*reach,straightBore?.16+Math.abs(Math.sin(angle))*.05:.03+Math.abs(Math.sin(angle))*.055);object.scale.setScalar(visible?(straightBore?.016+pose.gas*.033*(1-age):.013+pose.gas*.018*(1-age)):0);object.updateMatrix();gas.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<65;i++){
       const age=(time*.25+random(i+33))%1,active=time<31?1-eased(time,20,31):0
@@ -196,10 +203,10 @@ function Tracers({time,mode,layers,realistic}:{time:number;mode:FireSourceMode;l
       object.position.set(SOURCE_X+Math.cos(angle)*age*.7,.05+Math.sin(age*Math.PI)*.4,-.06+Math.sin(angle)*age*.4);object.rotation.set(i,time+i,i*.7);object.scale.setScalar(active?.012+random(i+101)*.025:0);object.updateMatrix();cuttings.current?.setMatrixAt(i,object.matrix)
     }
     for(const ref of[gas,smoke,cuttings])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
-  },[time,mode,layers,realistic,geometry,invalidate])
+  },[time,mode,layers,realistic,straightBore,geometry,invalidate])
   return <><instancedMesh ref={gas} args={[geometry,undefined,170]} raycast={()=>null}><meshBasicMaterial color="#7cd0d6" transparent opacity={.38} depthWrite={false}/></instancedMesh><instancedMesh ref={smoke} args={[geometry,undefined,65]} raycast={()=>null}><meshBasicMaterial color="#a9aaa0" transparent opacity={.11} depthWrite={false}/></instancedMesh><instancedMesh ref={cuttings} args={[geometry,undefined,100]} raycast={()=>null}><meshStandardMaterial color="#8a6845" roughness={1}/></instancedMesh></>
 }
-function PressureBurst({time,mode}:{time:number;mode:FireSourceMode}){
+function PressureBurst({time,mode,local=false}:{time:number;mode:FireSourceMode;local?:boolean}){
   const dust=useRef<THREE.InstancedMesh>(null),debris=useRef<THREE.InstancedMesh>(null),invalidate=useThree(state=>state.invalidate)
   const dustMaterial=useMemo(()=>new THREE.MeshBasicMaterial({color:'#a5997f',transparent:true,opacity:.1,depthWrite:false}),[])
   useEffect(()=>()=>dustMaterial.dispose(),[dustMaterial])
@@ -208,14 +215,14 @@ function PressureBurst({time,mode}:{time:number;mode:FireSourceMode}){
     dustMaterial.opacity=active?.13*(1-eased(time,56,58.2)):0
     for(let i=0;i<110;i++){
       const t=Math.max(0,age-random(i+404)*.28),angle=random(i+710)*Math.PI*2,ring=random(i+143)
-      object.position.set(SOURCE_X+Math.cos(angle)*(.1+ring*.45+t*.6),.05+t*(.6+random(i+193)*.5),-.1-Math.abs(Math.sin(angle))*(.1+t*.7));object.rotation.set(i,i*2,i*.3);object.scale.setScalar(active&&t>0?(.08+t*.24)*(.6+ring):0);object.updateMatrix();dust.current?.setMatrixAt(i,object.matrix)
+      object.position.set(SOURCE_X+Math.cos(angle)*(.1+ring*.45+t*(local?.24:.6)),local?-G.sourceDepthM+Math.sin(angle)*(.12+t*.23):.05+t*(.6+random(i+193)*.5),local?.18+Math.abs(Math.sin(angle))*.05:-.1-Math.abs(Math.sin(angle))*(.1+t*.7));object.rotation.set(i,i*2,i*.3);object.scale.setScalar(active&&t>0?(local?.035+t*.045:.08+t*.24)*(.6+ring):0);object.updateMatrix();dust.current?.setMatrixAt(i,object.matrix)
     }
     for(let i=0;i<140;i++){
       const t=Math.max(0,age-random(i+31)*.18),angle=random(i+810)*Math.PI*2,speed=1+random(i+145)*1.8,y=.05+(1.6+random(i+934)*2.1)*t-4.905*t*t
-      object.position.set(SOURCE_X+Math.cos(angle)*speed*t,y,-.12-Math.abs(Math.sin(angle))*(.12+speed*t*.6));object.rotation.set(i+t*5,i*.7+t*3,i+t*4);object.scale.setScalar(active&&t>0&&y>-.03?.018+random(i+514)*.055:0);object.updateMatrix();debris.current?.setMatrixAt(i,object.matrix)
+      object.position.set(SOURCE_X+Math.cos(angle)*speed*t*(local?.28:1),local?-G.sourceDepthM+Math.sin(angle)*speed*t*.20:y,local?.19:-.12-Math.abs(Math.sin(angle))*(.12+speed*t*.6));object.rotation.set(i+t*5,i*.7+t*3,i+t*4);object.scale.setScalar(active&&t>0&&(local||y>-.03)?local?.010+random(i+514)*.020:.018+random(i+514)*.055:0);object.updateMatrix();debris.current?.setMatrixAt(i,object.matrix)
     }
     for(const ref of[dust,debris])if(ref.current){ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere()}invalidate()
-  },[time,mode,dustMaterial,invalidate])
+  },[time,mode,local,dustMaterial,invalidate])
   return <group userData={{scientificRole:'prescribed pressure-release dust and debris; no explosive yield calculation'}}><instancedMesh ref={dust} args={[undefined,dustMaterial,110]} raycast={()=>null}><icosahedronGeometry args={[1,1]}/></instancedMesh><instancedMesh ref={debris} args={[undefined,undefined,140]} raycast={()=>null} castShadow><icosahedronGeometry args={[1,0]}/><meshStandardMaterial color="#685539" roughness={1}/></instancedMesh></group>
 }
 function Camera({resetToken}:{resetToken:number}){
@@ -238,8 +245,9 @@ export function FireSequenceScene(props:SceneProps){
       <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
       {openPit&&<OpenExcavation time={props.time}/>}
       <SequenceExcavator time={props.time} openPit={openPit}/><SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
-      <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic}/>
+      <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic} straightBore={straightBore}/>
       {!realistic&&<><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}
+      {realistic&&straightBore&&<PressureBurst time={props.time} mode={props.mode} local/>}
       {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water} sourceFracture={straightBore}/>}
     </>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>

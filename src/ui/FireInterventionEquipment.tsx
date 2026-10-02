@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Line } from '@react-three/drei/core/Line.js'
 import * as THREE from 'three'
-import { FIRE_SEQUENCE_GEOMETRY as G, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, fireSequencePose, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, storyHosePoints, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, eased, type FireSourceMode, type StoryPoint } from '../story/fireSequence'
+import { FIRE_SEQUENCE_GEOMETRY as G, STORY_CRACK_PATHS, CONSTRAINED_CRACK_PATHS, SOURCE_CONTACT_CRACK_PATHS, RAPID_PEAT_CRACK_PATHS, fireSequencePose, storyCapShape, constrainedCapShape, fixedBoreCapShape, sourceContactFracture, rapidFractureProgress, rapidWettingProgress, storyHosePoints, storyWettingProgress, constrainedWettingProgress, pointAlongStoryPath, eased, type FireSourceMode, type StoryPoint } from '../story/fireSequence'
 import { storyRupture, storyRuptureOffset } from '../story/fireAppearance'
 
 const UP = new THREE.Vector3(0,1,0)
@@ -80,14 +80,20 @@ export function CrackAndWaterPaths({time,mode,showWater}:{time:number;mode:FireS
   return <>{mode==='rapid'&&pose.crack>0&&STORY_CRACK_PATHS.map((points,i)=><Line key={i} points={points.map(offset)} color="#0b0806" lineWidth={.6+pose.crack*1.8} transparent opacity={pose.crack*.85}/>)}{showWater&&time>=72&&STORY_CRACK_PATHS.map((points,i)=>{const front=storyWettingProgress(time,i),wet=Array.from({length:24},(_,j)=>offset(pointAlongStoryPath(points,front*j/23)));return <Line key={i} points={wet} color="#536e70" lineWidth={1.8} transparent opacity={.5*eased(time,72+i*.65,74+i*.65)}/>})}{showWater&&<FabricHose time={time}/>}</>
 }
 export function ConstrainedCrackAndWaterPaths({time,mode,showWater,sourceFracture=false}:{time:number;mode:FireSourceMode;showWater:boolean;sourceFracture?:boolean}) {
+  const rapidNetwork=sourceFracture&&mode==='rapid'
   const fracture=sourceFracture?sourceContactFracture(time):constrainedCapShape(time,mode).flatten
-  const paths=sourceFracture?SOURCE_CONTACT_CRACK_PATHS:CONSTRAINED_CRACK_PATHS
-  return <>{(sourceFracture||mode==='rapid')&&fracture>0&&paths.map((points,i)=><group key={`fracture-${i}`}><Line points={points} color="#17100d" lineWidth={sourceFracture?1.1+fracture*1.4:.65+fracture*.8} transparent opacity={fracture*.9}/>{sourceFracture&&<Line points={points.map(([x,y,z])=>[x,y+.015,z+.004] as StoryPoint)} color="#a57e5d" lineWidth={.7} transparent opacity={fracture*.55}/>}</group>)}
+  const paths=rapidNetwork?RAPID_PEAT_CRACK_PATHS:sourceFracture?SOURCE_CONTACT_CRACK_PATHS:CONSTRAINED_CRACK_PATHS
+  return <>{(sourceFracture||mode==='rapid')&&paths.map((points,i)=>{
+      const progress=rapidNetwork?rapidFractureProgress(time,i):fracture
+      if(progress<=0)return null
+      const visible=rapidNetwork?Array.from({length:24},(_,j)=>pointAlongStoryPath(points,progress*j/23)):points
+      return <group key={`fracture-${i}`}><Line points={visible} color="#17100d" lineWidth={rapidNetwork?1.05:sourceFracture?1.1+progress*1.4:.65+progress*.8} transparent opacity={progress*.9}/>{sourceFracture&&<Line points={visible.map(([x,y,z])=>[x,y+.015,z+.004] as StoryPoint)} color="#a57e5d" lineWidth={rapidNetwork?.45:.7} transparent opacity={progress*.48}/>}</group>
+    })}
     {(sourceFracture||mode==='rapid')&&showWater&&time>=72&&paths.map((points,i)=>{
-      const progress=constrainedWettingProgress(time,i)
+      const progress=rapidNetwork?rapidWettingProgress(time,i):constrainedWettingProgress(time,i)
       if(progress<=0)return null
       const wet=Array.from({length:24},(_,j)=>pointAlongStoryPath(points,progress*j/23))
-      return <Line key={`water-${i}`} points={wet} color="#5b7c7a" lineWidth={1.2} transparent opacity={.72}/>
+      return <Line key={`water-${i}`} points={wet} color="#5b7c7a" lineWidth={rapidNetwork?1.7:1.2} transparent opacity={.72}/>
     })}
     {showWater&&<FabricHose time={time}/>}
   </>

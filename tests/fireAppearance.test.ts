@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildPeatAppearance, buildStoryWettingGrid, storyRupture, storyRuptureOffset } from '../src/story/fireAppearance'
+import { buildPeatAppearance, buildStoryWettingGrid, rapidSoilDisruptionAt, storyRupture, storyRuptureOffset } from '../src/story/fireAppearance'
 import { FIRE_SEQUENCE_GEOMETRY as G, illustratedPeatCoverage } from '../src/story/fireSequence'
 
 describe('connected, reproducible presentation appearance', () => {
@@ -57,14 +57,33 @@ describe('limited local soil wetting appearance',()=>{
     expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
     expect(count(buildStoryWettingGrid(90,true,'gradual').data)).toBe(0)
   })
-  it('shows local wetting after hose contact in both source modes of the straight-bore scene',()=>{
+  it('keeps gradual wetting local while rapid water reaches the remaining depicted fire',()=>{
     const count=(data:Float32Array)=>Array.from(data).filter((v,i)=>i%4===0&&v>.05).length
+    const field=buildPeatAppearance()
     for(const mode of ['gradual','rapid'] as const){
       expect(count(buildStoryWettingGrid(72,true,mode,true).data)).toBe(0)
       const early=buildStoryWettingGrid(75,true,mode,true),late=buildStoryWettingGrid(90,true,mode,true)
       expect(count(early.data)).toBeGreaterThan(0)
       expect(count(late.data)).toBeGreaterThan(count(early.data))
-      expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
+      if(mode==='gradual')expect(count(late.data)/(late.width*late.height)).toBeLessThan(.08)
+      else {
+        let hot=0,wet=0
+        for(let j=0;j<field.ny;j++)for(let i=0;i<field.nx;i++){
+          const id=j*field.nx+i
+          if(!field.mask[id]||field.arrival[id]>.7)continue
+          hot++
+          const x=field.minX+(i+.5)*field.width/field.nx,y=field.minY+(j+.5)*field.height/field.ny
+          const ii=Math.floor((x+4)/8*late.width),jj=Math.floor((y+3.2)/3.2*late.height)
+          if(late.data[(jj*late.width+ii)*4]>.5)wet++
+        }
+        expect(wet/hot).toBeGreaterThan(.95)
+      }
     }
+  })
+  it('bounds the brief visual soil disturbance and protects the bore center',()=>{
+    expect(rapidSoilDisruptionAt(.4,-1.3,0,55.3,'rapid')).toEqual([0,0,0])
+    expect(rapidSoilDisruptionAt(1,-1.3,.1,55.3,'gradual')).toEqual([0,0,0])
+    expect(Math.hypot(...rapidSoilDisruptionAt(1,-1.3,.1,55.3,'rapid'))).toBeLessThan(.09)
+    expect(Math.hypot(...rapidSoilDisruptionAt(1,-1.3,.1,61,'rapid'))).toBeLessThan(.002)
   })
 })
