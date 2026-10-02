@@ -50,24 +50,40 @@ export const SOURCE_CONTACT_CRACK_PATHS: StoryPoint[][] = [
 ]
 /** Fine, branching rapid-release fractures on the visible peat cut face. Authored, not a failure solve. */
 export const RAPID_PEAT_CRACK_PATHS: StoryPoint[][] = [
-  [[.55,-1.28,.14],[.92,-1.14,.14],[1.32,-1.25,.14],[1.78,-1.12,.14],[2.20,-1.20,.14],[2.70,-1.08,.14],[3.16,-1.24,.14]],
-  [[.55,-1.28,.14],[.91,-1.54,.14],[1.31,-1.50,.14],[1.76,-1.68,.14],[2.22,-1.58,.14],[2.66,-1.76,.14],[3.18,-1.66,.14]],
-  [[.55,-1.28,.14],[.48,-1.65,.14],[.80,-1.89,.14],[1.12,-2.00,.14],[1.57,-2.12,.14],[1.93,-2.16,.14]],
-  [[.55,-1.28,.14],[.12,-1.35,.14],[-.35,-1.30,.14],[-.77,-1.43,.14],[-1.24,-1.39,.14],[-1.72,-1.54,.14],[-2.22,-1.49,.14]],
-  [[.55,-1.28,.14],[.15,-1.58,.14],[-.24,-1.74,.14],[-.64,-1.70,.14],[-1.01,-1.90,.14],[-1.42,-1.88,.14],[-1.86,-2.06,.14]],
-  [[.55,-1.28,.14],[.18,-1.11,.14],[-.26,-1.00,.14],[-.68,-1.14,.14],[-1.10,-1.00,.14],[-1.57,-1.13,.14],[-2.05,-1.04,.14]],
-  [[1.30,-1.25,.145],[1.52,-.95,.145],[1.85,-.83,.145],[2.23,-.92,.145],[2.56,-.86,.145]],
-  [[1.76,-1.68,.145],[2.05,-1.91,.145],[2.40,-1.96,.145],[2.81,-1.89,.145]],
-  [[-.77,-1.43,.145],[-1.02,-1.18,.145],[-1.36,-.98,.145],[-1.74,-.89,.145]],
-  [[-.64,-1.70,.145],[-.88,-2.03,.145],[-1.14,-2.17,.145],[-1.49,-2.20,.145]],
-  [[.80,-1.89,.145],[.64,-2.14,.145],[.33,-2.24,.145],[-.02,-2.18,.145]],
-  [[2.22,-1.58,.145],[2.47,-1.37,.145],[2.88,-1.39,.145],[3.20,-1.49,.145]],
+  [[.515,-1.265,.115],[.92,-1.14,.14],[1.32,-1.25,.14],[1.78,-1.12,.14],[2.20,-1.20,.14],[2.70,-1.08,.14],[3.16,-1.24,.14]],
+  [[.515,-1.265,.115],[.91,-1.54,.14],[1.31,-1.50,.14],[1.76,-1.68,.14],[2.22,-1.58,.14],[2.66,-1.76,.14],[3.18,-1.66,.14]],
+  [[.515,-1.265,.115],[.48,-1.65,.14],[.80,-1.89,.14],[1.12,-2.00,.14],[1.57,-2.12,.14],[1.93,-2.16,.14]],
+  [[.515,-1.265,.115],[.12,-1.35,.14],[-.35,-1.30,.14],[-.77,-1.43,.14],[-1.24,-1.39,.14],[-1.72,-1.54,.14],[-2.22,-1.49,.14]],
+  [[.515,-1.265,.115],[.15,-1.58,.14],[-.24,-1.74,.14],[-.64,-1.70,.14],[-1.01,-1.90,.14],[-1.42,-1.88,.14],[-1.86,-2.06,.14]],
+  [[.515,-1.265,.115],[.18,-1.11,.14],[-.26,-1.00,.14],[-.68,-1.14,.14],[-1.10,-1.00,.14],[-1.57,-1.13,.14],[-2.05,-1.04,.14]],
+  [[1.32,-1.25,.14],[1.52,-.95,.145],[1.85,-.83,.145],[2.23,-.92,.145],[2.56,-.86,.145]],
+  [[1.76,-1.68,.14],[2.05,-1.91,.145],[2.40,-1.96,.145],[2.81,-1.89,.145]],
+  [[-.77,-1.43,.14],[-1.02,-1.18,.145],[-1.36,-.98,.145],[-1.74,-.89,.145]],
+  [[-.64,-1.70,.14],[-.88,-2.03,.145],[-1.14,-2.17,.145],[-1.49,-2.20,.145]],
+  [[.80,-1.89,.14],[.64,-2.14,.145],[.33,-2.24,.145],[-.02,-2.18,.145]],
+  [[2.22,-1.58,.14],[2.47,-1.37,.145],[2.88,-1.39,.145],[3.20,-1.49,.145]],
 ]
-/** A sequential visual front: release first, branch tips next, water last. */
-export function rapidFractureProgress(time:number,branch:number){return eased(time,55.06+branch*.07,58.25+branch*.10)}
-export function rapidWettingProgress(time:number,branch:number){return eased(time,72+branch*.12,86+branch*.18)}
-export function rapidGasQuench(time:number){return eased(time,55.15,57.1)}
-export function rapidGasPulse(time:number){const age=time-55;if(age<=0)return 0;return (1-Math.exp(-16*age))*Math.exp(-1.12*age)}
+/** The pulse and crack opening are staged within seven-tenths of a presentation second. */
+export function rapidFractureProgress(time:number,branch:number){return eased(time,55.04+branch*.015,55.36+branch*.028)}
+export function rapidGasQuench(time:number){return eased(time,55.08,55.5)}
+export function rapidGasPulse(time:number){const age=time-55;if(age<=0)return 0;return (1-Math.exp(-28*age))*Math.exp(-5.2*age)}
+/** Secondary water branches open only after their parent front reaches the exact junction. */
+export const RAPID_WATER_CONNECTIONS: readonly ({parent:number;vertex:number}|null)[] = [null,null,null,null,null,null,
+  {parent:0,vertex:2},{parent:1,vertex:3},{parent:3,vertex:3},{parent:4,vertex:3},{parent:2,vertex:2},{parent:1,vertex:4}]
+export function rapidPathVertexFraction(path:readonly StoryPoint[],vertex:number){
+  const segment=path.slice(1).map((point,i)=>Math.hypot(...point.map((v,j)=>v-path[i][j])))
+  return segment.slice(0,vertex).reduce((a,b)=>a+b,0)/segment.reduce((a,b)=>a+b,0)
+}
+function inverseEase(fraction:number){let lo=0,hi=1;for(let i=0;i<30;i++){const mid=(lo+hi)/2,smoothed=mid*mid*(3-2*mid);if(smoothed<fraction)lo=mid;else hi=mid}return (lo+hi)/2}
+export function rapidWettingWindow(branch:number):[number,number]{
+  const connection=RAPID_WATER_CONNECTIONS[branch]
+  if(!connection)return [72,86]
+  const [start,end]=rapidWettingWindow(connection.parent)
+  const fraction=rapidPathVertexFraction(RAPID_PEAT_CRACK_PATHS[connection.parent],connection.vertex)
+  const arrival=start+(end-start)*inverseEase(fraction)
+  return [arrival,Math.min(90,arrival+7)]
+}
+export function rapidWettingProgress(time:number,branch:number){const [start,end]=rapidWettingWindow(branch);return eased(time,start,end)}
 /** A shallow concave panel gains projected radius as it flattens; no pressure is inferred. */
 export function constrainedCapShape(time:number,mode:FireSourceMode) {
   const initialRadiusM=.49,initialDepthM=.22,flatten=mode==='rapid'?eased(time,55,58):0

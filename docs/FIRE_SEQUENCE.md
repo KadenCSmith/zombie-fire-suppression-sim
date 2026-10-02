@@ -1,6 +1,14 @@
 # Fire-first workflow and visual evidence boundaries
 
-## Current Chrome development scene (after 0.18.2)
+## Instant-release Chrome iteration (after saved commit `0c24485`)
+
+The preceding straight-bore scene is preserved at commit `0c24485` on `codex/scene-mix-bore-fracture` and [PR #7](https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/7). This follow-up keeps its excavator, fixed-width bore, descending fixed-size cap, smoldering appearance and wet-peat texture. The dry-ice sphere's **display diameter is doubled**; its contact-model inventory remains 4 kg and its implied physical radius and density are unchanged. This enlargement is a visibility choice and does not assert that twice the diameter contains the same physical density.
+
+The rapid-release cue begins at story 55 s. The gas pulse decays to below 1% of its normalized peak-scale expression by 56.2 s; all twelve authored peat fractures reach full extent by 55.7 s. The short dust/debris and pale tracer cues disappear by roughly 56.3 s. The cap and bore do not grow. The timing and displacement are animation values: no expansion pressure, dry-ice conversion rate, impulse, soil-failure threshold or oxygen concentration is calculated. [Purandare et al. (2023)](https://doi.org/10.1016/j.icheatmasstransfer.2023.107042) show that dry-ice sublimation temperature depends on the surrounding pressure and CO₂ concentration, and [Energies sandy-soil study (2023)](https://www.mdpi.com/1996-1073/16/2/987) study heat-transfer-dependent sublimation on sandy soil. Neither supplies a validated impulse for this capped peat geometry. Pressure data for engineered *liquid* CO₂ phase-transition fracturing, such as [this ACS Omega study](https://doi.org/10.1021/acsomega.4c02026), cannot be used as a solid-dry-ice peat pressure prediction.
+
+At story 72 s, the six primary displayed water paths begin at the hose outlet. Each secondary path begins at an exact primary-path vertex and its wet front waits until the parent front reaches that junction. Wetting and ember dimming therefore appear only on a continuous authored route from the hose. The front speeds and widths remain illustrative: there is no solved liquid pressure, infiltration, saturation or moisture-dependent smoldering chemistry. This does not improve the accepted numerical field's convergence or physical prediction-error estimate.
+
+## Saved straight-bore Chrome scene (after 0.18.2)
 
 The main interactive natural view now combines preserved visual elements: V16's tracked excavator and rotating auger, V17.1's dense orange smoldering embers and woven hose, V9's straight cylindrical bore and descending metal cap, and V18.1's dark peat after water contact. The auger and bore stay at their original 0.20 m and 0.24 m radii; no underreamed chamber or open pit is made. The metal cap has a constant 0.2184 m radius and 0.055 m concavity during descent and afterward. Its center descends from the surface into the bore at story 48–51.5 s. Neither the cap nor the bore expands or flattens. These dimensions and motions are authored visualization geometry, not an installation or a mechanical calculation.
 
