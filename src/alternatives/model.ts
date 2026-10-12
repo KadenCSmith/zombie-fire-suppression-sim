@@ -26,6 +26,8 @@ export function buildContact(config: PanelConfig) {
 function createSupportedRun(config: PanelConfig) {
   const reason = compatible(config.variantId, config.engine, config.medium)
   if (reason) throw new Error(reason)
+  const windowS = config.engine === 'peat-fem' ? config.fem.endS : config.thermal.endS
+  if (!Number.isFinite(windowS) || windowS <= 0) throw new Error('Observation window must be finite and positive.')
   const contact = config.engine === 'contact' ? buildContact(config) : undefined
   const fem = config.engine === 'peat-fem' ? new PeatSolver(config.fem) : undefined
   const base = fem ? totals(fem.mesh, fem.frame) : undefined
@@ -39,7 +41,7 @@ function createSupportedRun(config: PanelConfig) {
         massResidualKg: Math.max(Math.abs(l.waterMassResidualKg), Math.abs(l.dryIceMassResidualKg)), oxygenKg: null, fuelKg: null, reactionW: null } }
     }
     if (fem && base) {
-      const f = fem.snapshot(), t = totals(fem.mesh, f)
+      const f = structuredClone(fem.snapshot()), t = totals(fem.mesh, f)
       const lastReactionJ = reactionPreviousJ, lastTimeS = reactionPreviousTimeS
       return { timeS: f.timeS, fem: f, metrics: { maximumK: t.maximumK, waterUsedKg: 0, dryIceUsedKg: 0, energyJ: t.energyJ,
         energyResidualJ: t.energyJ - base.energyJ - f.ledger.ignitionJ - f.ledger.reactionJ + f.ledger.heatOutJ + f.ledger.gasEnthalpyOutJ,

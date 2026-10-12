@@ -27,7 +27,7 @@ The V20 four-column header remains: Fire Simulation, Simulation Version, finder 
 | 4.2.3.2 Rapid pressure change without liquid | Draft title; abstract disturbance with no liquid; conceptual stage clock only | Collapse, cooling, suppression and all physical outcome curves |
 | 4.2.4 Earthquake Extinguisher | Bounded illustrative drill motion with simultaneous contact markers; continuous liquid thermal contact | Vibration/compaction/loosening effects on transport or suppression |
 
-New method renders use an independently authored concept Canvas outside the protected original. They do not copy the original scene, equipment, timeline, camera, assets or defaults. Ring radii, drill motion and blue markers are presentation choices. They do not change temperature, oxygen, soil, permeability or a solver. The original 4.2.3 rapid scene and all historical assets are unchanged. No method is experimentally validated. The implementation supplies no physical pressure-source design or operating specification.
+New method renders reuse the original fire-spreading and drilling animation through the unchanged read-only FireSequenceScene export. The additive host limits its separate context to pre-treatment seconds 0–36; private method cues appear in a separate illustrative diagram. Original 4.2.3 retains its complete original timeline, scene, assets, defaults and camera. Ring radii, drill motion and blue markers are presentation choices. They do not change temperature, oxygen, soil, permeability or a solver. The original 4.2.3 rapid scene and all historical assets are unchanged. No method is experimentally validated. The implementation supplies no physical pressure-source design or operating specification.
 
 ## Implemented equations and inputs
 

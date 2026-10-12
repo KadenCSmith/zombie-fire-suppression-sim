@@ -3,6 +3,7 @@ import AlternativeWorker from '../worker/alternatives.worker.ts?worker'
 import { VARIANTS, ENGINES, MEDIA, PARAMETERS, compatible, variant, type VariantId, type EngineId, type MediumId } from '../alternatives/registry'
 import { acceptsMessage, duplicatePanel, freshPanel, linkedCompatibility, type AcceptedState, type PanelConfig, type RunMessage, type WorkerCommand } from '../alternatives/model'
 import { readComparison, serializeComparison, SESSION_KEY, SESSION_SCHEMA } from '../alternatives/persistence'
+import { currentRecord, RECORD_UNITS } from '../alternatives/records'
 import { createMesh } from '../peatfem/model'
 import { PeatFemScene } from './PeatFemScene'
 import { AlternativeScience } from './AlternativeScience'
@@ -64,11 +65,12 @@ function Panel({ config, onChange, onDuplicate, onRemove, control, onResult, onI
     return () => { w?.terminate(); if (worker.current === w) worker.current = null; onResult(config.id, undefined) }
   }, [config, generation, reason])
   const send = (type: WorkerCommand['type'], targetS?: number) => worker.current?.postMessage({ type, panelId: config.id, runId: runId.current, targetS } satisfies WorkerCommand)
+  const reset = () => { onResult(config.id, undefined); setGeneration(n => n + 1) }
   useEffect(() => {
     if (consumed.current === control.epoch) return
     consumed.current = control.epoch
     if (control.exceptId === config.id) return
-    if (control.type === 'reset') setGeneration(n => n + 1)
+    if (control.type === 'reset') reset()
     else send(control.type, control.targetS)
   }, [control])
   const state = result.state, m = state?.metrics, time = state?.timeS ?? 0, end = config.engine === 'peat-fem' ? config.fem.endS : config.thermal.endS
@@ -78,7 +80,7 @@ function Panel({ config, onChange, onDuplicate, onRemove, control, onResult, onI
     <header className="alt-panel-heading"><div><span className="alt-eyebrow">{v.number} / {config.engine === 'concept' ? 'ILLUSTRATIVE' : 'LIVE COMPUTATION'}</span><h2>{v.id === 'baseline' ? 'Untreated reference' : v.label}</h2></div><span className={`alt-run-dot ${result.running ? 'running' : ''}`}/></header>
     <label className="alt-select">Method / variant<select aria-label={`Alternative ${config.id}`} value={config.variantId} onChange={e => changeVariant(e.target.value as VariantId)}>{VARIANTS.map(item => <option key={item.id} value={item.id}>{item.number} {item.label}{item.draft ? ' · draft label' : ''}</option>)}</select></label>
     <p className="alt-subtitle">{config.variantId === 'baseline' && config.engine === 'contact' ? 'Isolated hot-specimen reference · no combustion in this engine' : v.subtitle}</p><p className="alt-panel-scope">{config.engine === 'contact' ? 'THERMAL PROXY · prescribed contact only · no suppression prediction' : config.engine === 'peat-fem' ? 'MODELED COMBUSTION BASELINE · suppression interventions disabled' : 'ILLUSTRATIVE · no physical outcome'} · experimentally validated: no</p>
-    <div className="alt-panel-controls"><button disabled={!result.ready || !!result.error || time >= end} onClick={() => { onIndividual(); send(result.running || coordinated ? 'pause' : 'run') }}>{result.running || coordinated ? 'Pause' : time > 0 ? 'Resume' : 'Start'}</button><button onClick={() => { onIndividual(); setGeneration(n => n + 1) }}>Reset</button><button disabled={!canAdd} onClick={onDuplicate}>Duplicate</button><button disabled={!canRemove} onClick={onRemove}>Remove</button><output>{result.error ? 'Unavailable' : coordinated ? 'Linked time running' : result.running ? 'Running' : time >= end ? 'Complete' : result.ready ? 'Ready / paused' : 'Starting…'}</output></div>
+    <div className="alt-panel-controls"><button disabled={!result.ready || !!result.error || time >= end} onClick={() => { onIndividual(); send(result.running || coordinated ? 'pause' : 'run') }}>{result.running || coordinated ? 'Pause' : time > 0 ? 'Resume' : 'Start'}</button><button onClick={() => { onIndividual(); reset() }}>Reset</button><button disabled={!canAdd} onClick={onDuplicate}>Duplicate</button><button disabled={!canRemove} onClick={onRemove}>Remove</button><output>{result.error ? 'Unavailable' : coordinated ? 'Linked time running' : result.running ? 'Running' : time >= end ? 'Complete' : result.ready ? 'Ready / paused' : 'Starting…'}</output></div>
     {result.error && <p className="alt-error" role="alert">{result.error}</p>}
     <div className="alt-stage">{state?.contact ? <ContactView state={state}/> : state?.fem && mesh ? <PeatFemScene mesh={mesh} frame={state.fem} field="temperature" wireframe nodes={false} overlay={false} range={[293,1000]} onProbe={() => {}} renderBudget="comparison"/> : <div className="alt-concept"><span>{v.id === 'nanoparticles' ? 'TBD' : 'CONCEPT ONLY'}</span><p>{v.id === 'nanoparticles' ? 'Mechanism and inputs must be defined before execution.' : 'No physical outcome is calculated.'}</p></div>}</div>
     <div className="alt-stage-steps" aria-label="Conceptual method stages; presentation only">{v.stages.map((stage,i) => <span key={stage} className={config.engine === 'concept' && i === stages(v,time,end) ? 'current' : ''}><small>{String(i+1).padStart(2,'0')}</small>{stage}</span>)}</div>
@@ -113,7 +115,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
   useEffect(() => { try { localStorage.setItem(SESSION_KEY, serializeComparison(configs)) } catch { /* Private/quota mode: current session remains usable. */ } }, [configs])
   useEffect(() => { setTab('alternatives') }, [selectedVariant])
   useEffect(() => { setTab(navigation.tab) }, [navigation])
-  function command(type: Control['type'], targetS?: number, exceptId?: string) { setControl(c => ({ epoch: c.epoch + 1, type, targetS, exceptId })) }
+  function command(type: Control['type'], targetS?: number, exceptId?: string) { if(type==='reset'){resultRef.current={};setResults({})} setControl(c => ({ epoch: c.epoch + 1, type, targetS, exceptId })) }
   function unlink(exceptId?: string) { if (linkedRunning) command('pause', undefined, exceptId); setLinkedRunning(false); setLinked(false); target.current = null }
   const mutate: Dispatch<SetStateAction<PanelConfig[]>> = next => { unlink(); setConfigs(next) }
   useEffect(() => {
@@ -130,8 +132,11 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
   function add(id: VariantId) { if (configs.length >= MAX_PANELS) return; mutate(old => [...old,freshPanel(uid(),id)]); setTab('compare') }
   function exportRun() {
     const contents = JSON.stringify({ format: 'zombie-fire-live-alternatives', schema: SESSION_SCHEMA, applicationVersion: '0.21.0', engineVersions: { contact: 'contactCooling-0.20-public-reference/v21.2', 'peat-fem': 'q1-five-step-0.20', concept: 'stages-1' },
-      units: { temperature: 'K', time: 's', mass: 'kg', energy: 'J', oxygen: 'kg O2', oxygenMassFraction: 'kg O2 / kg gas' }, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
-      linkedPhysicalTime: linked, fairness: comparisonNotes(configs), panels: configs.map(config => ({ config, result: results[config.id] })), experimentalValidation: false }, (_,value) => ArrayBuffer.isView(value) ? Array.from(value as unknown as ArrayLike<number>) : value, 2)
+      units: RECORD_UNITS, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
+      linkedPhysicalTime: linked, fairness: comparisonNotes(configs), panels: configs.map(config => {
+        const result=resultRef.current[config.id]
+        return { config, result: currentRecord(config, result) }
+      }), experimentalValidation: false }, (_,value) => ArrayBuffer.isView(value) ? Array.from(value as unknown as ArrayLike<number>) : value, 2)
     const url = URL.createObjectURL(new Blob([contents],{type:'application/json'})), a=document.createElement('a'); a.href=url; a.download='version21-alternatives.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
   }
   return <main className="alternatives-shell">
