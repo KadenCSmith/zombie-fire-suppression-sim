@@ -28,7 +28,16 @@ describe('authored compaction output lifecycle',()=>{
       getViewport:(out:THREE.Vector4)=>out.copy(viewport),setViewport:(value:THREE.Vector4)=>viewport.copy(value),
       getScissor:(out:THREE.Vector4)=>out.copy(scissor),setScissor:(value:THREE.Vector4)=>scissor.copy(value),
       getScissorTest:()=>scissorTest,setScissorTest:(value:boolean)=>{scissorTest=value},
-      render:(value:THREE.Scene)=>{renders.push(value);if(fail&&value!==scene)throw new Error('output failed')},
+      render:(value:THREE.Scene)=>{
+        renders.push(value)
+        // WebGLRenderer updates camera world matrices during the scene draw.
+        if(value===scene){camera.position.x+=1;camera.updateMatrixWorld()}
+        else {
+          expect(owned.material.uniforms.cameraWorld.value.equals(camera.matrixWorld)).toBe(true)
+          expect(owned.material.uniforms.inverseProjection.value.equals(camera.projectionMatrixInverse)).toBe(true)
+          if(fail)throw new Error('output failed')
+        }
+      },
     }
     const renderer=mock as unknown as THREE.WebGLRenderer
     owned.render(renderer,scene,camera,0)

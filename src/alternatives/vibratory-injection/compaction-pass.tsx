@@ -44,12 +44,12 @@ export function createCompactionPass() {
       gl.getDrawingBufferSize(size)
       if (target.width !== size.x || target.height !== size.y) target.setSize(Math.max(1, size.x), Math.max(1, size.y))
       uniforms.progress.value = progress
-      uniforms.inverseProjection.value.copy(viewCamera.projectionMatrixInverse)
-      uniforms.cameraWorld.value.copy(viewCamera.matrixWorld)
       const previous = gl.getRenderTarget(), autoClear = gl.autoClear, scissorTest = gl.getScissorTest()
       gl.getViewport(viewport); gl.getScissor(scissor)
       try {
         gl.autoClear = true; gl.setScissorTest(false); gl.setRenderTarget(target); gl.render(scene, viewCamera)
+        uniforms.inverseProjection.value.copy(viewCamera.projectionMatrixInverse)
+        uniforms.cameraWorld.value.copy(viewCamera.matrixWorld)
         gl.setRenderTarget(previous); gl.setViewport(viewport); gl.setScissor(scissor); gl.setScissorTest(scissorTest)
         gl.render(output, camera)
       } finally {
