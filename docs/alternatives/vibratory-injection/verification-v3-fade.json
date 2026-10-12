@@ -1,0 +1,190 @@
+{
+  "runId": "e98b33b1-210b-4f16-bc98-c3cd30ece7a6",
+  "executor": "C implementer /root; not independent reviewer",
+  "recordedUTC": "2026-10-12T09:03:33.308815+00:00",
+  "sourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "environment": {
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu": "Apple M3 Pro",
+    "memoryBytes": "38654705664",
+    "node": "v26.8.2",
+    "npm": "11.19.1"
+  },
+  "scenario": "Current authored timeline0\u201390 display s; deterministic seed fixed in visual code. No current physical source, field, force, strain, composition or extinction result. Historical numerical tests retained off-scope.",
+  "browserGPU": "Supplied coordinator normalChrome observations at499d112 plus final caption/action uncommitted diff:65bright,70dim,73.9\u219274continuousdark,90settled/noembers/no water;OFF90bright/unsettled with corrected original-context labels;See vibration enablesON/resumes38;restart0paused;oneCanvas/errors[]. Root reports source/config hashes stable across final UIcheck. Current render/pose body unchanged; exact durable coordinator-ui-v3.json copied; all214 recorded source/config hashes match frozen95972c9. C independent live browser/GPU UNVERIFIED under unavailable browser-tool policy; no bypass and no physical validation/FPS claim.",
+  "fullSuite": "Not run by C in this revision; root owns final combined suite. Old broad green is not current evidence.",
+  "conservationResiduals": "N/A: no active physical vibration model. Retained historical liquid residuals do not validate current method.",
+  "reviewCounter": {
+    "initialScored": 1,
+    "retriesScored": 2,
+    "totalScoredPasses": 3,
+    "unusedRetries": 1,
+    "status": "Stop below7 for concrete forcing/work/constitutive/coupling/validation gaps"
+  },
+  "frozenCodeTestCommit": "95972c98ba1df981df386966a81508b9c52a971e",
+  "reusedHistoricalTests": {
+    "runId": "1c2c7226-9187-4f57-8cfc-f5c46e633707",
+    "files": [
+      "tests/alternatives/vibratory-injection/field-evidence.test.ts",
+      "tests/alternatives/vibratory-injection/field.test.ts",
+      "tests/alternatives/vibratory-injection/session.test.ts",
+      "tests/alternatives/vibratory-injection/visuals.test.ts"
+    ],
+    "tests": 15,
+    "basis": "Hashes match the prior27-test/8-file execution. No code/dependency inputs for these inactive historical tests changed; they are excluded from current mechanism evidence."
+  },
+  "relevantHashes": {
+    "src/alternatives/vibratory-injection/compaction-effects.tsx": "e2188ca8134beab722ebd293b9193a79cab570a6f6f5a8e441ea62c6f9d29a82",
+    "src/alternatives/vibratory-injection/compaction-pass.tsx": "e421faec4db8a1ba41a76b6b5031bdc5b3f55258128e92cb9fada8a1ddc48111",
+    "src/alternatives/vibratory-injection/effects.tsx": "7aa1130a8ee347ba81e83ab0e9dc08d5d3e45b561e2c0380e3db1265af41e15a",
+    "src/alternatives/vibratory-injection/field-scene.tsx": "5bab4ef10599dbf91a56bc95b3e408cf4cf1b829b77ac5b75e54853a5cc7ecec",
+    "src/alternatives/vibratory-injection/field.ts": "991ed5b91acde4bd9cbe7bf1199f191e6f71848b0af9cc77a42a4e4d60618827",
+    "src/alternatives/vibratory-injection/field.worker.ts": "ebe7f16e2d9b729e82adda1678ec1a3bad7123dae565e61b7b038e463b23673d",
+    "src/alternatives/vibratory-injection/index.ts": "6e8b917cdf228edb250f3999bd3942d81e912aa2d0f6c8b72e1ed21f7daa344b",
+    "src/alternatives/vibratory-injection/model.ts": "84baa5d5750a813c7c8672d35cc6a8cc330827a364b730c60ea3f03826d6a937",
+    "src/alternatives/vibratory-injection/preview.html": "05fecf75c8cab83fe81b8f003a6bc701dbe293cdba99aa8c66cc5d6bb0f3c52a",
+    "src/alternatives/vibratory-injection/preview.tsx": "d8716e4036eb1c865e35b59e0f87781cc1541fae4602dd05c82ad3b377ceeb1e",
+    "src/alternatives/vibratory-injection/scene.tsx": "33b506a59bdf0e7ff46782b93e776e9ef9fc4e5841dd99130d6aff0374499d41",
+    "src/alternatives/vibratory-injection/science.tsx": "fd62408bcecb889bfd0f2b3524891853139fdf040b9b00d4f7f615e4f7e445c6",
+    "src/alternatives/vibratory-injection/session.ts": "2bbfa775ef73a2be287eab787e5a095140af21732a2935f6a6b2306ef0b98a64",
+    "src/alternatives/vibratory-injection/vibration-effects.tsx": "c98583adebb04a1331b581596ac0fc02599f0e5f0b55422dd97da68aac66dcb1",
+    "src/alternatives/vibratory-injection/vibration-scene.tsx": "2ae1839d7dc8db8385bf3bff939580ce0a9eb58d806acd62b2794e9d1f2c8cc0",
+    "src/alternatives/vibratory-injection/vibration.ts": "0916c1b96e301468dc8dfff5e60b0d74f916455234fea90b338d9009631c1b3a",
+    "src/alternatives/vibratory-injection/visuals.ts": "c17fc66c694295aee9357b16e30d75d79873d6c8da55a27862c186b7faedbdc9",
+    "src/alternatives/vibratory-injection/workspace.css": "c973becd89430d3963cebf377e98b06d099fca8176e8cb102c92d1996094b92b",
+    "src/alternatives/vibratory-injection/workspace.tsx": "d7ffd7f44e5d0b5b6256336c25c53f5926294db99f3dbf134ba35b18608570c5",
+    "tests/alternatives/vibratory-injection/compaction.test.ts": "50fc79226b12a5d9862d00eb3af79674dbac23bd4fb15996b5a320519ddc0885",
+    "tests/alternatives/vibratory-injection/evidence.test.ts": "e2c4d502ab280ccd7502d4bf5b4cca4b177b2a529b6543cce6ddc695712b2a5a",
+    "tests/alternatives/vibratory-injection/field-evidence.test.ts": "0e2bb52457ab586b92920865085f7abdf12224dda39d02d4734b343c0475c8f6",
+    "tests/alternatives/vibratory-injection/field.test.ts": "6dda8292a2fca6a56e4b56cd37165c60ce1735b0708a3942003335fbf18e8673",
+    "tests/alternatives/vibratory-injection/model.test.ts": "977cc639d6e2914bdaa587b0be8cbf02c4f4dde8e55b8db1d8d5d5708ac26ce6",
+    "tests/alternatives/vibratory-injection/session.test.ts": "689c7c540ea8b43a1930b5853cf75df2b21cc623589e85b8a617cb5ca5baeff5",
+    "tests/alternatives/vibratory-injection/vibration-scene.test.tsx": "476590c9f602311aa29e9438086d96b567829db999a05043691992eb48834651",
+    "tests/alternatives/vibratory-injection/visuals.test.ts": "b43fa3e3d949563bdd264a6140027c8b86c48622fd2c4d188343fd838b4b4ff7",
+    "package.json": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83",
+    "package-lock.json": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d",
+    "src/alternatives/contract.ts": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+    "src/alternatives/registry.ts": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+    "src/alternatives/model.ts": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+    "src/alternatives/modules.ts": "b2d965a3adbb6904c7e52678457c007fb36c23fa24ca69a7e2302fed97277d39",
+    "src/alternatives/contactAdapter.ts": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+    "docs/review/version21/original-preservation.json": "a0ad327b424f60aa039c4c94f63331683e357aa3b707fe1d63881353f1480889"
+  },
+  "priorEvidence": {
+    "path": "verification-v3.json",
+    "runId": "fc98e6b1-b214-43af-baf6-ea1f10671db4",
+    "basis": "Camera-order candidate3b2994e evidence remains historical/scoped. Current resource/composition pass changed; its12 active tests and general affected checks are freshly rerun.15 unchanged inactive historical tests reuse original hash-valid run1c2c7226."
+  },
+  "checks": [
+    {
+      "command": "npm test -- tests/alternatives/vibratory-injection/compaction.test.ts tests/alternatives/vibratory-injection/vibration-scene.test.tsx tests/alternatives/vibratory-injection/model.test.ts tests/alternatives/vibratory-injection/evidence.test.ts --exclude 'work/**' --maxWorkers=1 --reporter=json --outputFile=/tmp/v21-c-final-tests.json",
+      "result": "PASS",
+      "files": 4,
+      "tests": 12,
+      "failed": 0,
+      "startTimeUnixMs": 1791795639271,
+      "outputSha256": "4537b5a4d2fd922c5d60a034a2ed290401bd9ec044c7857c8cd5ad4a180f3f26",
+      "coverage": "Current source boundary, same-geometry reference composition, appearance visibility/endpoint/error restoration, resource disposal, current camera matrices and authored limits; no physics validation"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "PASS",
+      "logSha256": "60986fa24fdefa8f38739b36aa5e7498f48e70644dbdc61a5ed59d96bc5020c4",
+      "warnings": "none"
+    },
+    {
+      "command": "npm run lint",
+      "result": "PASS",
+      "logSha256": "d451a5f43f393b98d79c9aa591a99f1022bb93b7470dac8a449862b306ddced0",
+      "warnings": "16 inherited; none C"
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS",
+      "logSha256": "9436830d129663f459d0d43310ee45a17b3792b7aab89e91580487b663b76293",
+      "warnings": "Inherited lucide directives and chunk size"
+    },
+    {
+      "command": "Vite build() with rollupOptions.input=src/alternatives/vibratory-injection/preview.html; outDir=/tmp/v21-c-final-private-preview-dist; private generateBundle module audit",
+      "result": "PASS",
+      "logSha256": "0b3320a9323a4f50455428256e9d0ff0a6d0f9f1a32e8bf7e028a2be81a2bb31",
+      "moduleAuditSha256": "1fd6927666d09c8991207d93c2002fe63c0bbbeeda1809506c255a3751d9c732",
+      "inactiveHistoricalModulesIncluded": []
+    },
+    {
+      "command": "node scripts/check-original-preservation.mjs",
+      "result": "PASS",
+      "identities": 57,
+      "baseline": "161e7a4a1f8c35765e1878c132db79977be1f5ea"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "currentScreenshots": {
+    "version21-vibration-only-preview.png": {
+      "path": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/version21-vibration-only-preview.png",
+      "sha256": "5ac58901f864bcb236dcd81d9bf6415bbe92767b57ee724d67f4cc642e9fea7d",
+      "executor": "coordinator normalChrome; supplied artifact inspected by C; no independentGPU execution"
+    },
+    "version21-vibration-only-ending.png": {
+      "path": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/version21-vibration-only-ending.png",
+      "sha256": "a3076f400bb4b8f870aa2f86f53543c8ea2a078e6b4e3c5b73ebd8d1f43c2b14",
+      "executor": "coordinator normalChrome; supplied artifact inspected by C; no independentGPU execution"
+    },
+    "version21-vibration-boundary-fixed-before.png": {
+      "path": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/version21-vibration-boundary-fixed-before.png",
+      "sha256": "419ab9ee585ed3eb4c28f30158da075346bb733546aa757eefb42a4a050ff768",
+      "executor": "coordinator normalChrome; supplied artifact inspected by C; no independentGPU execution"
+    },
+    "version21-vibration-boundary-fixed-after.png": {
+      "path": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/version21-vibration-boundary-fixed-after.png",
+      "sha256": "a616d56c56ebece9ef6d3491e4275d4e0a36e1a9617a81d3694d04def3719a0d",
+      "executor": "coordinator normalChrome; supplied artifact inspected by C; no independentGPU execution"
+    }
+  },
+  "suppliedCoordinatorUIProvenance": {
+    "path": "docs/alternatives/vibratory-injection/coordinator-ui-v3.json",
+    "sha256": "59713aa5ddf0bcccbb48d75884f3fce18348cedec53b2e0d0bccd8d71fb28a4f",
+    "sourceHashEntriesMatchingFinalCandidate": 214,
+    "sourceStableAcrossUiCheck": true,
+    "basis": "Coordinator reported499d112+uncommitted diff3cfb1ab...; every recorded source/package/lock/config hash exactly matches final frozen95972c9. Supplied normalChrome execution only, not independent reviewerGPU or final combined native pass."
+  },
+  "independentReview": {
+    "reviewer": "/root/vibration_reviewer",
+    "sourceCommit": "95972c98ba1df981df386966a81508b9c52a971e",
+    "report": "ROUND_2_C.md",
+    "reportSha256": "8571bb1a3e7d9bddb53e8b43884abbbe3595782aac3399f55924a254436ebedd",
+    "evidence": "realism-retry2-evidence.tar.gz",
+    "evidenceSha256": "ca4dbf3d37d89c394f43d9999146fa1582521e226ad11cd01add318d5acaf9e1",
+    "criterionScores": [
+      1,
+      1,
+      2,
+      1,
+      1
+    ],
+    "weights": [
+      0.3,
+      0.2,
+      0.2,
+      0.2,
+      0.1
+    ],
+    "unroundedTotal": 1.2,
+    "cap": 6,
+    "verified7": false,
+    "physicalGates": "Unassessable: absent current dynamics",
+    "focusedTests": 17,
+    "repositoryTests": 12,
+    "reviewerSelectedTests": 5,
+    "files": 5,
+    "failed": 0,
+    "protectedHashesMatched": 57,
+    "frozenBlobsVerified": 632,
+    "suppliedUIHashesMatched": 214,
+    "independentLiveGPU": "Unverified; supplied coordinator observations/images only"
+  }
+}

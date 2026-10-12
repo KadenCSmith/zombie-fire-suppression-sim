@@ -1,4 +1,4 @@
-> **Current revision:** [V3 — vibration only, requested authored compaction/fire-out](./REVISION_V3.md). The liquid/contact content below is retained historical, inactive and off-scope for current vibration validation.
+> **Current revision:** [Final V3 handoff — vibration only, requested authored compaction/fire-out](./FINAL_HANDOFF_V3.md). The liquid/contact content below is retained historical, inactive and off-scope for current vibration validation.
 
 # Worker C handoff — 4.2.4
 
