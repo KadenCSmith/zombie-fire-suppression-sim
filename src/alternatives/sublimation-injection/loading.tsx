@@ -1,6 +1,6 @@
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
-import { SOLID_COUNT, loadingBucketPose, solidLoadingPose } from './visuals'
+import { SOLID_COUNT, loadingBoomPose, loadingBucketPose, solidLoadingPose } from './visuals'
 
 type Point = [number, number, number]
 function Rod({ from, to, radius = .025, color = '#738078' }: { from: Point; to: Point; radius?: number; color?: string }) {
@@ -12,17 +12,29 @@ function Rod({ from, to, radius = .025, color = '#738078' }: { from: Point; to: 
   </mesh>
 }
 
+function Beam({ from, to, width }: { from: Point; to: Point; width: number }) {
+  const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to), direction = b.clone().sub(a)
+  return <mesh position={a.add(b).multiplyScalar(.5)} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize())} castShadow>
+    <boxGeometry args={[width, direction.length(), width * .8]}/><meshStandardMaterial color="#647d6a" metalness={.45} roughness={.62}/>
+  </mesh>
+}
+
 /** Generic open loading prop, entirely separate from the liquid source.
  * All sizes/poses are authored artwork, not equipment construction data. */
 export function LoadingAssembly({ time }: { time: number }) {
   const { position, tilt } = loadingBucketPose(time), [x, y] = position
+  const { shoulder, elbow, wrist } = loadingBoomPose(time)
   return <group userData={{ scientificRole: 'Authored open bucket handling and gravity-shaped solid motion; no pressure mechanism or dynamics prediction' }}>
-    <RoundedBox position={[1.1, -.73, -.46]} args={[.31, .13, .32]} radius={.025} smoothness={2} castShadow>
+    <RoundedBox position={[1.1, -.805, .65]} args={[.31, .13, .32]} radius={.025} smoothness={2} castShadow>
       <meshStandardMaterial color="#465149" metalness={.4} roughness={.6}/>
     </RoundedBox>
-    <Rod from={[1.1, -.73, -.46]} to={[1.1, 1.95, -.46]} radius={.055}/>
-    <mesh position={[1.1, y + .34, -.46]}><boxGeometry args={[.16, .23, .17]}/><meshStandardMaterial color="#455b53" metalness={.5} roughness={.5}/></mesh>
-    <Rod from={[1.1, y + .38, -.46]} to={[x, y + .38, 0]} radius={.035}/>
+    <Rod from={[1.1, -.87, .65]} to={shoulder} radius={.06}/>
+    <Beam from={shoulder} to={elbow} width={.11}/>
+    <Beam from={elbow} to={wrist} width={.085}/>
+    {[shoulder, elbow, wrist].map((p, i) => <mesh key={'joint-' + i} position={p} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[.075, .075, .10, 16]}/><meshStandardMaterial color="#a4afa4" metalness={.7} roughness={.4}/>
+    </mesh>)}
+    <Rod from={wrist} to={[x, y + .38, 0]} radius={.035}/>
     <Rod from={[x, y + .38, -.3]} to={[x, y + .38, .3]} radius={.025}/>
     {[-.3, .3].map(z => <group key={z}>
       <Rod from={[x, y + .38, z]} to={[x, y, z]} radius={.018}/>

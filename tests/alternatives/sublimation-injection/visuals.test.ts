@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createRun, freshPanel } from '../../../src/alternatives/model'
-import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from '../../../src/alternatives/sublimation-injection/visuals'
+import { DELIVERY_ROUTE, MEDIA_MOUNT, MEDIA_OUTLET, MEDIA_SCALE, TREATMENT_PARKED, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from '../../../src/alternatives/sublimation-injection/visuals'
 
 describe('4.2.1 authored world sequence', () => {
   it('supports arbitrary seeking, restart and invalid inputs without persistent animation state', () => {
@@ -28,9 +28,8 @@ describe('4.2.1 authored world sequence', () => {
   })
 
   it('connects the payload outlet continuously to the original drilled access', () => {
-    const outlet = [.56, -.38, .4]
     DELIVERY_ROUTE[0].forEach((coordinate, i) => {
-      expect(coordinate).toBeCloseTo(TRUCK_PARKED[i] + MEDIA_MOUNT[i] + outlet[i], 12)
+      expect(coordinate).toBeCloseTo(TREATMENT_PARKED[i] + MEDIA_MOUNT[i] + MEDIA_SCALE * MEDIA_OUTLET[i], 12)
     })
     expect(DELIVERY_ROUTE.at(-1)).toEqual([.4, -1.3, .08])
     for (let time = 0; time <= WORLD_STAGING.hoseReady; time += .25) {

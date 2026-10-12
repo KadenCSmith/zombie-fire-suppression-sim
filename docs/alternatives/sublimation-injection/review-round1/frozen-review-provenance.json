@@ -1,0 +1,67 @@
+{
+  "reviewer": "/root/realism_a_review",
+  "createdAtUtc": "2026-10-12T08:33:46.958293+00:00",
+  "commit": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "liveStatus": "",
+  "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "archiveSha256": "b1d9a11ea83f354bfaaa3b3d6fd4d01f1d00241b293787f1189d9c5abfcb8ee9",
+  "snapshotPath": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568",
+  "originalIndependentTestSha256": "06becef50f6a9d7476c1aad2dac3742f733fc9ec1605570430a9c1179969f94d",
+  "originalBenchmarkSpecSha256": "a958a214cf3e39e54c4e0787198cdd64f7016f905dddedb4aa01dcdfef94daf3",
+  "installedDependenciesCopiedFrom": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/zombie-fire-suppression-sim/work/version21-realism/round-1/a/node_modules",
+  "dependencyInstallRun": false,
+  "packages": {
+    "react": {
+      "version": "19.3.0",
+      "copiedHash": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+      "implementerHash": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+      "same": true
+    },
+    "react-dom": {
+      "version": "19.3.0",
+      "copiedHash": "136d4af63de473392ea79d6a21932b0ed9eb37fe518ce70f4621250f3d79e9bb",
+      "implementerHash": "136d4af63de473392ea79d6a21932b0ed9eb37fe518ce70f4621250f3d79e9bb",
+      "same": true
+    },
+    "three": {
+      "version": "0.186.1",
+      "copiedHash": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+      "implementerHash": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+      "same": true
+    },
+    "@react-three/fiber": {
+      "version": "9.8.1",
+      "copiedHash": "08cdd95784a1ecaa7a5c8d895d5da659bc23780301b7d6873916c03236cb198b",
+      "implementerHash": "08cdd95784a1ecaa7a5c8d895d5da659bc23780301b7d6873916c03236cb198b",
+      "same": true
+    },
+    "@react-three/drei": {
+      "version": "10.7.8",
+      "copiedHash": "7e38b2dec648fc3841c20f4e545fa531417fcc594e1a03a9ebecd577dedf3f31",
+      "implementerHash": "7e38b2dec648fc3841c20f4e545fa531417fcc594e1a03a9ebecd577dedf3f31",
+      "same": true
+    },
+    "vitest": {
+      "version": "5.0.2",
+      "copiedHash": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+      "implementerHash": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+      "same": true
+    },
+    "vite": {
+      "version": "7.3.6",
+      "copiedHash": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "implementerHash": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "same": true
+    },
+    "typescript": {
+      "version": "7.0.2",
+      "copiedHash": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+      "implementerHash": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+      "same": true
+    }
+  },
+  "frozenManifestSha256": "6337b57def9ecdd4280153a31061075ef15c7ad366a45fed90f35ae2bba5c19e",
+  "localCheckProvenanceSha256": "cadc912610def750dd15b72531bcfc330123293518452bcc10ec35f9c512e1e8",
+  "localCheckProvenanceHashesAllMatch": true,
+  "snapshotIsDisposableAuditCopyNotImplementation": true
+}

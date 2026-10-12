@@ -1,0 +1,40 @@
+{
+  "executor": "/root/realism_a_review",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "tests/alternatives/sublimation-injection",
+    "tests/alternatives-contact-adapter.test.ts",
+    "tests/alternatives-infusion-accuracy.test.ts",
+    "tests/contactCooling.test.ts",
+    "tests/alternativeSceneComposition.test.tsx",
+    "tests/alternatives.test.ts",
+    "tests/independent-realism-a.test.ts",
+    "tests/independent-realism-a-current.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568",
+  "startUtc": "2026-10-12T08:35:55.427983+00:00",
+  "endUtc": "2026-10-12T08:35:58.733883+00:00",
+  "exitCode": 1,
+  "CPUloadBefore": [
+    20.11083984375,
+    26.109375,
+    29.94970703125
+  ],
+  "CPUloadAfter": [
+    20.11083984375,
+    26.109375,
+    29.94970703125
+  ],
+  "runtime": {
+    "node": "v26.8.2",
+    "npm": "11.19.1"
+  },
+  "hardware": "Apple M3 Pro / 12 logical CPUs / 36 GiB RAM / macOS27 arm64",
+  "protocolSha256": "6c3fb64fe1ffc2b3248a87de134013be06e2e0dbddc415cb42e552f08abe6dc7",
+  "reviewerNewTestSha256": "5001dd8cba6d9031c3b4b7165a069af4135d5c8a853a162baf03f19fea2ce4e5",
+  "logSha256": "8ed820f9ee8725fede93b61beb76267a5d48a98da476b46cc7475021c6cc84cb"
+}

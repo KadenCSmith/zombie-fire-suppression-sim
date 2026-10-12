@@ -5,14 +5,24 @@ export const WORLD_STAGING = {
   liftStart: 55, liftEnd: 59, iceStart: 59, iceEnd: 66,
   lidStart: 68.5, lidClosed: 71.3, boostStart: 71.5, boostEnd: 77.5, end: 90,
 } as const
-export const TRUCK_PARKED = [2.15, 0, -2.05] as const
-export const MEDIA_MOUNT = [.4, 1.6, 0] as const
+export const TRUCK_PARKED = [1.45, 0, -.95] as const
+export const TREATMENT_PARKED = [-.3, 0, -.95] as const
+export const MEDIA_MOUNT = [0, 1.312, 0] as const
+export const MEDIA_SCALE = .68
+export const MEDIA_OUTLET = [.56, -.38, .4] as const
+export const SUPPLY_OUTLET_LOCAL = [-.60, 1.0, .4] as const
+const treatmentOutlet = TREATMENT_PARKED.map((v, i) => v + MEDIA_MOUNT[i] + MEDIA_SCALE * MEDIA_OUTLET[i]) as [number, number, number]
+const treatmentInlet = TREATMENT_PARKED.map((v, i) => v + MEDIA_MOUNT[i] + MEDIA_SCALE * [.52, .22, .48][i]) as [number, number, number]
 export const SOLID_COUNT = 9
 /** Authored display timing, not a physical loading schedule. */
 export const LOADING_CUE = { reachStart: 58.5, reachEnd: 60.5, tipEnd: 62.5, firstRelease: 62.3, fallDuration: .55, upright: 67, retract: 68.5, returned: 70 } as const
 export const DELIVERY_ROUTE: readonly [number, number, number][] = [
-  [3.11, 1.22, -1.65], [3.1, .45, -1.3], [2.45, .18, -1.22],
-  [.95, .16, -.6], [.4, .23, -.15], [.4, -.1, .06], [.4, -1.3, .08],
+  treatmentOutlet, [.22, .75, -.44], [.74, .78, -.20], [.65, .22, -.26],
+  [.4, .23, -.15], [.4, -.1, .06], [.4, -1.3, .08],
+]
+export const FILL_ROUTE: readonly [number, number, number][] = [
+  TRUCK_PARKED.map((v, i) => v + SUPPLY_OUTLET_LOCAL[i]) as [number, number, number],
+  [.50, 1.02, -.27], [.20, 1.02, -.27], [.12, 1.25, -.45], treatmentInlet,
 ]
 const clamp = (value: number) => Math.max(0, Math.min(1, value))
 const ease = (time: number, start: number, end: number) => {
@@ -65,6 +75,19 @@ export function loadingBucketPose(timeS: number) {
     position: [1.1 - .92 * reach * (1 - retract), -.22 + 1.65 * lift * (1 - lower), 0] as [number, number, number],
     tilt: 1.92 * ease(time, LOADING_CUE.reachEnd, LOADING_CUE.tipEnd) * (1 - ease(time, WORLD_STAGING.iceEnd, LOADING_CUE.upright)),
   }
+}
+
+/** Artist-defined rigid-link pose for the display boom, not forces or a
+ * hydraulic model. Keeping link lengths fixed avoids stretching hardware. */
+export function loadingBoomPose(timeS: number) {
+  const { position } = loadingBucketPose(timeS)
+  const shoulder: [number, number, number] = [1.1, -.5, .65]
+  const wrist: [number, number, number] = [position[0], position[1] + .38, .65]
+  const dx = wrist[0] - shoulder[0], dy = wrist[1] - shoulder[1], distance = Math.hypot(dx, dy)
+  const bend = Math.acos(Math.max(-1, Math.min(1, (1.55 ** 2 + distance ** 2 - 1.1 ** 2) / (2 * 1.55 * distance))))
+  const angle = Math.atan2(dy, dx) - bend
+  const elbow: [number, number, number] = [shoulder[0] + 1.55 * Math.cos(angle), shoulder[1] + 1.55 * Math.sin(angle), shoulder[2]]
+  return { shoulder, elbow, wrist }
 }
 
 export function bucketPoint(timeS: number, local: readonly [number, number, number]): [number, number, number] {

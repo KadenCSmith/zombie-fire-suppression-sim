@@ -2,10 +2,11 @@ import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
 import type { MethodSceneProps } from '../contract'
-import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals } from './visuals'
+import { DELIVERY_ROUTE, MEDIA_MOUNT, MEDIA_SCALE, TREATMENT_PARKED, WORLD_STAGING, preparationVisuals } from './visuals'
 import { IllustrativeQuench } from './quench'
 import { Annotation } from './annotation'
 import { LoadingAssembly, WaterContact } from './loading'
+import { WaterSupply } from './supply'
 
 const TEAL = '#78bac2'
 const SILVER = '#9aa9a1'
@@ -110,43 +111,6 @@ function DeliveryPath({ time }: { time: number }) {
   </group>
 }
 
-function SupplyTruck({ time }: { time: number }) {
-  const visual = preparationVisuals(time)
-  return <group position={[TRUCK_PARKED[0] + visual.truckTravel, TRUCK_PARKED[1], TRUCK_PARKED[2]]}
-    userData={{ scientificRole: 'Authored flatbed arrival with open demonstration payload; no vehicle or pressure-system dynamics' }}>
-    <RoundedBox position={[.03, .5, 0]} args={[2.9, .18, 1.22]} radius={.055} smoothness={3} castShadow>
-      <meshStandardMaterial color="#354139" metalness={.45} roughness={.6}/>
-    </RoundedBox>
-    <RoundedBox position={[.46, .73, 0]} args={[2.12, .12, 1.35]} radius={.025} smoothness={2} castShadow>
-      <meshStandardMaterial color="#77897b" metalness={.55} roughness={.47}/>
-    </RoundedBox>
-    <RoundedBox position={[-1.01, 1.06, 0]} args={[.91, 1, 1.23]} radius={.1} smoothness={3} castShadow>
-      <meshStandardMaterial color="#899a85" metalness={.28} roughness={.52}/>
-    </RoundedBox>
-    <mesh position={[-1.476, 1.25, 0]} rotation={[0, 0, -.12]}><boxGeometry args={[.022, .4, .99]}/><meshStandardMaterial color="#304e4d" metalness={.3} roughness={.18}/></mesh>
-    {[-.628, .628].map(z => <group key={z}>
-      <mesh position={[-.99, 1.28, z]}><boxGeometry args={[.62, .38, .018]}/><meshStandardMaterial color="#3e5d57" metalness={.3} roughness={.2}/></mesh>
-      <mesh position={[-.92, .93, z * 1.015]}><boxGeometry args={[.15, .025, .025]}/><meshStandardMaterial color="#b3c0af" metalness={.8} roughness={.3}/></mesh>
-      <mesh position={[-1.48, .8, z * .77]}><boxGeometry args={[.022, .12, .15]}/><meshStandardMaterial color="#dedbc2" emissive="#d9cc9c" emissiveIntensity={.17}/></mesh>
-    </group>)}
-    <mesh position={[-1.49, .6, 0]}><boxGeometry args={[.1, .12, 1.33]}/><meshStandardMaterial color="#8a9888" metalness={.7} roughness={.4}/></mesh>
-    {[-.97, 1.02].flatMap(x => [-.67, .67].map(z => <group key={x + ':' + z} position={[x, .32, z]} rotation={[Math.PI / 2, 0, 0]}>
-      <group rotation={[0, visual.truckTravel / .3, 0]}>
-        <mesh castShadow><cylinderGeometry args={[.3, .3, .2, 28]}/><meshStandardMaterial color="#151c17" roughness={.92}/></mesh>
-        <mesh><cylinderGeometry args={[.15, .15, .215, 18]}/><meshStandardMaterial color="#a3afa0" metalness={.8} roughness={.35}/></mesh>
-        {[0, 1, 2, 3, 4].map(i => <mesh key={i} position={[Math.cos(i * Math.PI * .4) * .095, z > 0 ? -.112 : .112, Math.sin(i * Math.PI * .4) * .095]}>
-          <sphereGeometry args={[.02, 6, 4]}/><meshStandardMaterial color="#46554a" metalness={.7} roughness={.4}/>
-        </mesh>)}
-      </group>
-    </group>))}
-    <group position={[...MEDIA_MOUNT]}>
-      <MediaCutaway time={time}/>
-      <LoadingAssembly time={time}/>
-      <PhaseChange time={time}/>
-    </group>
-  </group>
-}
-
 function ContactSteam({ time }: { time: number }) {
   const texture = useMemo(softParticleTexture, [])
   useEffect(() => () => texture.dispose(), [texture])
@@ -170,11 +134,15 @@ export function MethodCues({ time }: MethodSceneProps) {
   const visual = preparationVisuals(time)
   if (visual.time < WORLD_STAGING.arrive) return null
   return <group userData={{ scientificRole: '4.2.1 world-space authored truck, dry-ice loading and faster liquid cues; no predicted pressure or suppression' }}>
-    <SupplyTruck time={visual.time}/>
+    <WaterSupply time={visual.time}>
+      <MediaCutaway time={visual.time}/>
+      <LoadingAssembly time={visual.time}/>
+      <PhaseChange time={visual.time}/>
+    </WaterSupply>
     <DeliveryPath time={visual.time}/>
     <ContactSteam time={visual.time}/>
     <IllustrativeQuench progress={visual.quench}/>
-    {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TRUCK_PARKED[0] + MEDIA_MOUNT[0], 3, TRUCK_PARKED[2]]}>
+    {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TREATMENT_PARKED[0] + MEDIA_MOUNT[0], MEDIA_MOUNT[1] + 2.1 * MEDIA_SCALE, TREATMENT_PARKED[2]]}>
       {visual.boost > 0 ? 'Faster flow · illustrative' : visual.lid === 1 ? 'Capped preparation · illustrative' : visual.lid > 0 ? 'Closing lid · illustrative' : 'Dry ice added to water'}
     </Annotation>}
     {visual.time >= 75 && <Annotation position={[.4, -.7, .3]}>Illustrative quenching</Annotation>}

@@ -1,0 +1,58 @@
+{
+  "reviewer": "/root/realism_a_review",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "tabId": "862380283",
+  "browser": "Normal Chrome through purpose-built CUA; independent tab",
+  "url": "http://127.0.0.1:5174/?alternative=sublimation-injection&method-preview=1",
+  "sourceWasFrozenThroughoutObservations": true,
+  "observationsCompleteBeforeParentNewRevision": true,
+  "acceptedNarrativeSamplesS": [
+    55,
+    60,
+    63,
+    66,
+    69,
+    72,
+    75,
+    86
+  ],
+  "aestheticObservationsSeparateFromScience": [
+    "55 s: tank/rim, raised open cover, side bucket and visibly attached loading support rendered.",
+    "60 s: bucket raised above rim and traversed inward; upper bucket and carried solids partially obscured by foreground tree/label from default camera.",
+    "63 s: tipped bucket and solids visible near rim/water; no premature lid closure.",
+    "66 s: submerged solids and restrained bubble/mist cues visible while cover still open.",
+    "69 s: bucket retracted beside vessel, cover visibly closing; owned sprite states Closing lid.",
+    "72 s: cover visibly closed and loader lowered; owned sprite states Faster flow illustrative.",
+    "75 s: quench label/steam/fade render; no black scene.",
+    "86 s: authored fire removed; no computed extinction inference.",
+    "Default tree partly occludes loader and individual solids; current stage caption says Illustrative flow + quenching at69s before boost71.5/quench72, while sprite correctly identifies closure."
+  ],
+  "runtimeChecks": [
+    "Accepted0\u219275\u21920\u219275 then immediate simulation menu\u21924.2.2 reached definition-pending route.",
+    "A remounted after4.2.2; accepted75 rendered.",
+    "Viewport1024x768 at75 showed scene and sprite; override reset to normal viewport.",
+    "Restart returned accepted0.0 s.",
+    "Comparison opened with baseline and A at0; only A started. A reached60s and baseline remained0/unmodified.",
+    "Leaving comparison\u21924.2.2 succeeded."
+  ],
+  "computedReadouts": {
+    "initialMaximumK": 823.15,
+    "finalPhysicalTimeS": 60,
+    "finalMaximumK": 489.04,
+    "waterDeliveredKg": 0.5,
+    "heatTransferredDisplayedJ": "9.22e+5",
+    "energyResidualDisplayedJ": "-2.04e-8",
+    "massResidualDisplayedKg": "2.01e-14",
+    "specimenSVG": "all three489.0K/0.167kg received",
+    "untreatedSVG": "all three823.1K/0.000kg received",
+    "oxygenFuelReaction": "N/A"
+  },
+  "ownFinalErrorLogs": [],
+  "limitations": [
+    "Own development-browser run is not the coordinator final combined/native/production-GPU verification. Historical removeChild cause is not established by this successful reproduction attempt.",
+    "Playback reset once during isolated source/dependency copy creation; repeated initialization logs and extension warnings observed. Possible watch reload, not independently diagnosed; no application defect inferred. Later final browser checks occurred after source/runtime setup and remained stable.",
+    "Three deprecation warnings and browser-extension warnings present; no new app error recorded.",
+    "No FPS claim, experimental validation, leak-free GPU-memory count or zero-job instrumentation claim.",
+    "Intermediate screenshot/AX outputs retained in tool trace; no screenshot files invented."
+  ]
+}
