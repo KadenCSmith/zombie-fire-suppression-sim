@@ -24,9 +24,9 @@ export function createLiquidWavesRun(config: PanelConfig, hooks: SupportedAdapte
 export function liquidWavesPresentation(id: VariantId, timeS: number): MethodPresentation {
   if (id !== 'liquid-waves') throw new Error('4.2.3.1 presentation requires liquid-waves identity.')
   const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
-  const injection = time >= 64
+  const injection = time >= 56
   return { contextTime: Math.min(time, 36), access: true, pulse: false,
-    waves: time >= 44 && time < 56, injection, vibration: 0, contacts: injection ? 1 : 0 }
+    waves: time >= 38 && time < 56, injection, vibration: 0, contacts: injection ? 1 : 0 }
 }
 
 /** Dimensionless visual envelope; neither distance nor pressure is inferred. */

@@ -6,8 +6,11 @@ app.getAppPath=()=>path.resolve(__dirname,'..');process.argv.push('--sequence');
 if(process.platform!=='darwin'){app.commandLine.appendSwitch('use-angle','swiftshader');app.commandLine.appendSwitch('enable-unsafe-swiftshader');}
 const timeout=setTimeout(()=>{console.error('ALTERNATIVES_SMOKE_TIMEOUT');app.exit(1)},180000);
 app.on('browser-window-created',(_event,win)=>{
+  // This fixture measures animation frames while the user's Chrome stays usable.
+  // Disable only this test window's background throttling, not production prefs.
+  win.webContents.setBackgroundThrottling(false);
   const errors=[];win.webContents.on('render-process-gone',(_e,details)=>{console.error(details);app.exit(1)});
-  win.webContents.on('console-message',event=>{if(event.level==='error'&&!event.message.includes('sandbox_extension'))errors.push(event.message);if(event.message.startsWith('ALT_STAGE:'))console.log(event.message)});
+  win.webContents.on('console-message',event=>{if(event.level==='error'&&!event.message.includes('sandbox_extension')){errors.push(event.message);console.error(event.message)}if(event.message.startsWith('ALT_STAGE:'))console.log(event.message)});
   win.webContents.once('did-finish-load',async()=>{
     try{
       const result=await win.webContents.executeJavaScript(`(async()=>{
@@ -40,8 +43,12 @@ app.on('browser-window-created',(_event,win)=>{
             assert(Number(document.querySelector('[data-original-animation]').dataset.originalContextTime)<=38,'Alternative context replayed original treatment');
             if(id!=='nanoparticles'){
               const seek=document.querySelector('input[aria-label="Method render time"]');
-              Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(seek,'45');seek.dispatchEvent(new Event('input',{bubbles:true}));
-              await wait(()=>document.querySelector('[data-presentation-active="true"]'),'method animation promoted after original introduction');
+              for(const target of [45,75,0,75]){
+                Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(seek,String(target));seek.dispatchEvent(new Event('input',{bubbles:true}));
+                await wait(()=>Number(seek.value)===target&&document.querySelector('[data-presentation-active]')?.dataset.presentationActive===String(target>=38),'method seek '+id+' '+target);
+                assert(document.querySelectorAll('[data-original-animation] canvas').length===1,'World scene must share one Canvas');
+                assert(!document.querySelector('.alternative-method-diagram'),'Rejected inset still present');
+              }
             }
           }
         }
