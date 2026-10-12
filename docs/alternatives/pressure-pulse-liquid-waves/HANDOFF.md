@@ -39,3 +39,11 @@ Only these six roots changed: `src/alternatives/pressure-pulse-liquid-waves/**`,
 Preview server remains running: Vite **PID 99796**, `http://127.0.0.1:5175/`, isolated process session 58887. Coordinator alone controls the separate Chrome preview window. No native userData or additional listening port was created by B. No new top-level folder was created by B; the assigned worktree was coordinator-created, so B did not duplicate Finder tagging attempts.
 
 Global BUILD_STATUS/VALIDATION_STATUS edits, menu/catalog registration, worker lifecycle, physical-time fairness, exports and final integration/release are coordinator-only. Frozen existing exports suffice; no new shared hook or contract version was requested. Full original pressure/soil/FEM treatment coupling stays unavailable. This delivery does not authorize touching protected originals or merging to main.
+
+## User-requested animation revision
+
+The user rejected the frozen backdrop and separate inset. This follow-up replaces the private cues with world-space animation intended for the coordinator's transparent external host over the unchanged original cutaway. No protected original or shared pulse code was edited. The initial draft host's large inset is not an accepted finished preview. The coordinator alone owns the aligned camera/host integration.
+
+4.2.3.1: waves start immediately at 38 presentation seconds, the existing read-only truck/hose exports stage delivery during 46–56 s, and moving liquid and contact-route tracers continue during 56–90 s. 4.2.3.2: a distinct gold transient expands and relaxes during 38–66 s with no liquid or soil displacement. All geometry changes derive from the supplied presentation timestamp; pause/seek/replay are deterministic and no private timer or physical source was added. Authored routes are not fractures, infiltration predictions or suppression results.
+
+Verification for this revision: 23/23 focused tests across four files; typecheck PASS; lint PASS with the same 16 inherited warnings; production build PASS (2.70 s); whitespace PASS; protected original SHA-256 identities 57/57 PASS. The previous full-suite timeout report remains historical, not a new rerun. Main-scene visual verification is pending the coordinator-owned overlay host and will be recorded before final handoff.
