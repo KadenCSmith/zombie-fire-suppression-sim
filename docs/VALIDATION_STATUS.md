@@ -1,3 +1,7 @@
+## Narrow runtime fix / final acceptance run (2026-10-12)
+
+The0133f59 local repeat passed1931tests/120files, typecheck/lint/build/57guard, then its historical desktop0.9 landscape timed out at150s. Unnecessary Three/R3F deduplication was removed; deduplication now applies only to the single installed React/ReactDOM versions. Original3D dependencies retain their existing resolution, including nested Three versions. The narrowed build and complete desktop smoke nowPASS, including all archived landscapes, scientific state retention, fracture/tensile tools and replay. The actual app entry remains the only dependency-scan entry; ignored reviewer packages no longer appear in optimizer metadata. Full final verification repeats after this runtime correction. All57original source identities remain unchanged.
+
 ## Final verification correction and signed D acceptance (2026-10-12)
 
 D final independent5.3FAIL is verified: all24signed artifact hashes match,4/4scored passes exhausted,3/3retriesused,0remaining. Root source605dde9and report-onlybd832f5integration preserve all57original identities. The reviewer confirms both substantive falsezero bugs reject atomically; broad coarse-grid diagnostic remainsFAIL and full-domain accuracy is not certified. See the final scorecard and private signed packet. Animation acceptance is separate from realism.
