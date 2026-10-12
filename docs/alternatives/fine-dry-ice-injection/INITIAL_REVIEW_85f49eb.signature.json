@@ -1,0 +1,29 @@
+{
+  "signedBy": "/root/d_realism_reviewer",
+  "signatureType": "Reviewer identity plus SHA-256 evidence integrity manifest; not a cryptographic identity attestation",
+  "signedUTC": "2026-10-12T09:28:11.024545+00:00",
+  "sourceCommit": "85f49eb7423f94c68b544e4d9450628d0ccade20",
+  "criteriaSHA256": "e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d",
+  "scoredPassesUsed": 1,
+  "implementationRetriesUsed": 0,
+  "unroundedTotal": "1.3",
+  "pass": false,
+  "sourceEdited": false,
+  "files": {
+    "INITIAL_REVIEW_85f49eb.md": "53422dad47974c8aee40a7b04fa9ec59fa09157938cde2b7f9dce28a4db4519a",
+    "initial-score.json": "abe1141cb783b6c3decbca69fd5b746221e4bd467538e8d9f25708dac3b648de",
+    "initial-provenance.json": "0a08d584f9847b8b0bb3a9f7940cfa667053d3ff9b57f3a1656284625e062599",
+    "initial-tests.json": "5a3a000cbf28c1b86dca9385ce2adf0de9a319beb3f61ff9b9758e5647bdd3a8",
+    "initial-independent-results.json": "bd6e47079f8419497e6c4801fdf66e990b021ea68a752b15fc702159651c7d30",
+    "initial-ui.json": "43324d3884ec73e2b4fac0d8f1793eae8fed0d8f64a1ff9c70d54fb296680cc1",
+    "initial-ui-overview.png": "425466abf83ced0bcaf8cad7a1107d3f9e1bc2093e66e50d6a77cc12b2145681",
+    "initial-ui-render.png": "544ef7b95e4e5453ec65e7930860889cb6dde78ab28a81173e72544a89a5f011",
+    "initial-independent-harness.mts": "8808b0b1970eed215e03bd8ae01e31591c444506e2e53b22256923228422ae11",
+    "initial-independent-harness.mjs": "9cc028d49918054cbce93050a9078f421ea77b3534b7edf9dd906eff19164ff9",
+    "initial-ui-review.cjs": "154c53a762737a91962b4dd33f979aace8b688c7fd1a4680eeaa28c021831ec6",
+    "vite-review.config.mjs": "5296fd2be2ad04ee3bf4fa24fecdc51fafe9aa48bd686a1e2ac38433a0b17b0e",
+    "initial-source-manifest.json": "2513842d42c00919425fda5e3502076559bf038a59fd9ca9da9cf4af11f6c578",
+    "initial-dependencies-manifest.json": "559b3a93430c0b32689066f9b34739847ce3cedc20ea33bd42f92161f2bdd901",
+    "initial-dependency-version-check.json": "fd08ef29c77f9d4f77e6f1a2ee26efd35fd71302fc0af8c21442f8e2717eb8ee"
+  }
+}
