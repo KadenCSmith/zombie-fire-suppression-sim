@@ -45,11 +45,11 @@ Reproduce:
 - node scripts/check-original-preservation.mjs
 - git diff --check
 
-B browser access is denied because the admin-enforced browser security policy could not be verified. No bypass or indirect browser automation was attempted. B does not claim final visual verification; independently authorized coordinator/reviewer inspection is required. Prior round0 reviewer actually inspected the app; it does not establish this new animation's visual pass.
+B browser access is denied because the admin-enforced browser security policy could not be verified. No bypass or indirect browser automation was attempted. B does not claim its own browser inspection. Coordinator independently inspected the normal Chrome5175preview at77s: left service truck, unchanged right water truck, rigid silver conduit and ground fragments/fissures were visible, private cyan rings absent, original context in the same Canvas, and own-tab error log empty. Actual screenshot outputs/version21-pressure-round1-preview.png was supplied and viewed. This bounded visual check is not whole-native signoff, motion/FPS measurement, numerical validation or independent round1 scoring; early76.15s pulse and full lifecycle checks remain with coordinator/reviewer.
 
 ## Delivery and ownership
 
-Only B's owned source/test/doc trees are authored. Original/shared code, package/lock, assets, timeline, camera, defaults and routes remain untouched. Current source/checkpoint identity and draftPR are supplied in the frozen delivery message. Earlier PR12/16/17 are historical merged deliveries.
+Only B's owned source/test/doc trees are authored. Original/shared code, package/lock, assets, timeline, camera, defaults and routes remain untouched. DraftPR20: https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/20. Exact final source/checkpoint identity is supplied in the frozen delivery message. Earlier PR12/16/17 are historical merged deliveries.
 
 Live user-selected preview: http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1
 Independent pressure-only preview: http://127.0.0.1:5175/?alternative=pressure-only&method-preview=1
