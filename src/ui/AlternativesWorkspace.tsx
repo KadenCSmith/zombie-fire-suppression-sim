@@ -39,6 +39,7 @@ function Panel({ config, onChange, onDuplicate, onRemove, control, onResult, onI
     const id = `${config.id}-run-${++sequence}`, w = reason ? null : new AlternativeWorker()
     worker.current = w; runId.current = id; history.current = []
     const blank: PanelResult = { configurationKey, runId: id, history: [], running: false, ready: false, solveMs: 0, wallMs: 0, error: reason ?? undefined }
+    let latest = blank
     setResult(blank); onResult(config.id, blank)
     if (w) {
       w.onmessage = (event: MessageEvent<RunMessage>) => {
@@ -49,9 +50,15 @@ function Panel({ config, onChange, onDuplicate, onRemove, control, onResult, onI
           history.current = last?.timeS === d.state.timeS ? [...old.slice(0,-1), d.state] : [...old, d.state]
         }
         const next = { configurationKey, runId: id, state: d.state, history: history.current, ready: d.type !== 'failed', running: d.running, solveMs: d.solveMs, wallMs: d.wallMs, error: d.error }
+        latest = next
         setResult(next); onResult(config.id, next)
       }
-      w.onerror = e => { const next = { ...blank, error: e.message || 'Worker failed' }; setResult(next); onResult(config.id, next); w.terminate() }
+      w.onerror = e => {
+        e.preventDefault()
+        if (worker.current !== w || runId.current !== id) return
+        const next = { ...latest, running: false, ready: false, error: e.message || 'Worker failed' }
+        setResult(next); onResult(config.id, next); w.terminate()
+      }
       w.postMessage({ type: 'init', panelId: config.id, runId: id, config } satisfies WorkerCommand)
     }
     return () => { w?.terminate(); if (worker.current === w) worker.current = null; onResult(config.id, undefined) }
@@ -123,7 +130,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
   function add(id: VariantId) { if (configs.length >= MAX_PANELS) return; mutate(old => [...old,freshPanel(uid(),id)]); setTab('compare') }
   function exportRun() {
     const contents = JSON.stringify({ format: 'zombie-fire-live-alternatives', schema: SESSION_SCHEMA, applicationVersion: '0.21.0', engineVersions: { contact: 'contactCooling-0.20-public-reference/v21.2', 'peat-fem': 'q1-five-step-0.20', concept: 'stages-1' },
-      units: { temperature: 'K', time: 's', mass: 'kg', energy: 'J', oxygen: 'kg O2 / kg gas' }, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
+      units: { temperature: 'K', time: 's', mass: 'kg', energy: 'J', oxygen: 'kg O2', oxygenMassFraction: 'kg O2 / kg gas' }, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
       linkedPhysicalTime: linked, fairness: comparisonNotes(configs), panels: configs.map(config => ({ config, result: results[config.id] })), experimentalValidation: false }, (_,value) => ArrayBuffer.isView(value) ? Array.from(value as unknown as ArrayLike<number>) : value, 2)
     const url = URL.createObjectURL(new Blob([contents],{type:'application/json'})), a=document.createElement('a'); a.href=url; a.download='version21-alternatives.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
   }

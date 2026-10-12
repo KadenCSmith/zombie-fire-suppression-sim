@@ -62,8 +62,16 @@ app.on('browser-window-created',(_event,win)=>{
         button('Reset all').click();await delay(100);button('Start / resume all').click();await wait(()=>panels().every(p=>time(p)>=1),'four simultaneous computations');await delay(2200);await wait(()=>perf().samples===120,'four-panel frame sample');const four=perf();
         assert(four.p95Ms<50,'Four-panel presentation p95 exceeds 50 ms on this fixture');
         const began=performance.now();button('Pause all').click();await wait(()=>panels().every(p=>p.dataset.running==='false'),'four-panel pause responsive');const pauseMs=performance.now()-began;
+        const beforeFailure=panels().map(p=>({id:p.dataset.panelId,time:time(p)})),failedWorker=[...alive][0];
+        failedWorker.dispatchEvent(new ErrorEvent('error',{message:'Injected lifecycle failure',cancelable:true}));
+        await wait(()=>panels().some(p=>p.textContent.includes('Injected lifecycle failure')),'worker failure reported');
+        const failedPanel=panels().find(p=>p.textContent.includes('Injected lifecycle failure'));
+        assert(time(failedPanel)===beforeFailure.find(p=>p.id===failedPanel.dataset.panelId).time&&failedPanel.querySelector('.alt-history'),'Worker crash discarded last accepted state/history');
+        button('Reset',failedPanel).click();await wait(()=>time(failedPanel)===0&&button('Start',failedPanel)&&!button('Start',failedPanel).disabled&&alive.size===4,'failed worker reset independently');
+        failedWorker.dispatchEvent(new ErrorEvent('error',{message:'Stale terminated worker failure',cancelable:true}));await delay(50);
+        assert(!failedPanel.textContent.includes('Stale terminated worker failure'),'Stale worker error replaced current run');
         button('Fire Simulation home').click();await wait(()=>document.querySelector('.fire-sequence-shell')&&alive.size===0,'navigation disposes all live jobs and preserves rapid renderer');
-        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance']};
+        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance','worker crash retains accepted state/history','reset after failure','stale terminated-worker error rejected']};
       })()`);
       assertNoErrors(errors);fs.mkdirSync(path.resolve(__dirname,'../docs/review/version21'),{recursive:true});fs.writeFileSync(path.resolve(__dirname,'../docs/review/version21/live-smoke.json'),JSON.stringify({...result,date:new Date().toISOString(),environment:process.platform+' '+process.arch,scope:'software/numerical checks only; no physical validation'},null,2));
       clearTimeout(timeout);console.log('ALTERNATIVES_SMOKE_PASS '+JSON.stringify(result));app.exit(0);
