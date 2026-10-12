@@ -66,7 +66,7 @@ describe('4.2.1 authored world sequence', () => {
     let previous = preparationVisuals(0)
     for (let frame = 1; frame <= 90 * 30; frame++) {
       const next = preparationVisuals(frame / 30)
-      for (const key of ['arrival', 'hose', 'loading', 'phaseChange', 'delivery', 'contact', 'boost'] as const) {
+      for (const key of ['arrival', 'hose', 'loading', 'phaseChange', 'delivery', 'contact', 'boost', 'quench'] as const) {
         expect(next[key]).toBeGreaterThanOrEqual(previous[key])
         expect(next[key]).toBeGreaterThanOrEqual(0)
         expect(next[key]).toBeLessThanOrEqual(1)
