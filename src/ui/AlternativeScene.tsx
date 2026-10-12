@@ -11,7 +11,10 @@ export function AlternativeScene({id,time,resetToken,cameraDistance}:{id:Variant
   // Its authored treatment remains illustrative, never a new calculated result.
   const fullBase = id === 'liquid-waves'
   const contextTime = Math.max(0, Math.min(fullBase ? 90 : 38, time))
-  const original = FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire:true,gas:fullBase,water:fullBase,anatomy:true},resetToken,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance})
+  // Explicitly requested authored movie endings, not calculated extinction.
+  // This uses the export's public layer prop only in these new alternatives.
+  const fire = id === 'sublimation-injection' ? time < 86 : fullBase ? time < 89 : true
+  const original = FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire,gas:fullBase,water:fullBase,anatomy:true},resetToken,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance})
   const scene = id === 'nanoparticles' ? original : cloneElement(original, undefined,
     original.props.children,
     <group key="alternative-world-cues" userData={{alternative:id,illustrative:true}}><AlternativeMethodCues id={id} time={time}/></group>)

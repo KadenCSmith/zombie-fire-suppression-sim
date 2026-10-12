@@ -44,4 +44,16 @@ describe('external original-scene composition', () => {
     expect(composed.props.children.props.children[0]).toEqual(baseline.props.children)
     expect(AlternativeScene({id:'pressure-only',time:75,resetToken:0,cameraDistance:15.75}).props['data-original-context-time']).toBe(38)
   })
+
+  it('uses public fire-layer control only at the requested authored endings of new liquid alternatives', () => {
+    for (const [id,ending] of [['sublimation-injection',86],['liquid-waves',89]] as const) {
+      for(const time of [ending-.1,ending]) {
+        const composed=AlternativeScene({id,time,resetToken:0,cameraDistance:15.75})
+        const ground=composed.props.children.props.children[0].find((child:{props?:{fire?:boolean}})=>typeof child?.props?.fire==='boolean')
+        expect(ground.props.fire).toBe(time<ending)
+      }
+    }
+    const pressure=AlternativeScene({id:'pressure-only',time:90,resetToken:0,cameraDistance:15.75})
+    expect(pressure.props.children.props.children[0].find((child:{props?:{fire?:boolean}})=>typeof child?.props?.fire==='boolean').props.fire).toBe(true)
+  })
 })
