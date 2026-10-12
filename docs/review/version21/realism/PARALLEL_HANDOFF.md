@@ -6,10 +6,12 @@ Each implementer now manages its own dedicated independent read-only reviewer an
 
 | Owner / alternative | Verified completed initial audit | Initial passes used | Scored revision retries used | Current work | Retries remaining |
 |---|---:|---:|---:|---|---:|
-|A /4.2.1|4.1|1|0|First local implementation retry; unscored|3|
-|B /4.2.3.1|3.9|1|0|First local frozen candidate; unscored|3|
-|B /4.2.3.2|1.3|1|0|First local frozen candidate; unscored|3|
-|C /4.2.4|2.3|1|0|First local implementation retry; unscored|3|
+|A /4.2.1|4.1|1|1 reported|Owner reports retry1=4.1; second visual revision underway; signed packet integration pending|2|
+|B /4.2.3.1|3.9|1|1|Signed retry1=4.1, integrated; justified scientific stop for missing mechanism/data|2 unused|
+|B /4.2.3.2|1.3|1|1|Signed retry1=1.3, integrated; justified scientific stop for missing mechanism/data|2 unused|
+|C /4.2.4|2.3|1|1 reported|Owner reports retry1=1.2; supported fade/caption correction enters retry2; packet integration pending|2 before retry2|
+
+B delivery `c6dd9ca23b92d7dc378741e42acc803bc2296f00` was integrated independently at `13c26c8ef8e387657a01b6392e3186013e467b03`, without waiting for A/C. Reviewed source is `03bae79560d893f716dca9dc8f7fdc80f4f3c747`; later commits contain owned docs/evidence only. Root verified all63 changed paths remain inside B ownership, the signed report SHA256, and57/57 original identities after merge. [Signed B review](../../../alternatives/pressure-pulse-liquid-waves/realism-round-1/REVIEW_B_ROUND_1.md) and its portable artifact manifest preserve separate scores/counters and the justified below7 stop. Root's shared toolbox wording correction is editorial only; no solver, interface, scene timing or input changes. Combined checks, main, release and Mac installation remain pending.
 
 Each alternative has at most3scored implementation/review retries after its existing initial audit,4scored passes total. A/B/C progress independently; B scores and counts both children separately. Actual execution attempts are distinguished from substantive revision/scored passes. Do not hide a cycle as a tool retry or reset budgets by changing prompts/reviewers/subtasks. Keep a per-alternative ledger in the owner's private docs, and send exact frozen reviewed identities as soon as ready. Continue justified corrections after failed reviews while meaningful work/retries remain; stop at exhaustion or sooner when consistent independent evidence establishes a concrete non-fixable data/mechanism/permission gap. Do not waste retries on cosmetic rescoring.
 

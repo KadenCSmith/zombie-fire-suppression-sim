@@ -522,3 +522,8 @@ Initial independent audits completed before new implementation: A4.1, liquid3.9,
 ## Parallel review and C scope correction pending — 2026-10-12
 
 Revised human prompt supersedes coordinator-wide barriers/shared counter. Each owner/reviewer pair uses a local per-alternative ledger, preserving1completed initial scored pass and0completed retries at handoff. Shared science documentation now reflects latest vibration-only/no-water intent; private C workspace/descriptor delivery and final combined checks are pending. Historical liquid-field tests are not vibration validation. All prior runtime figures remain scoped to their recorded snapshots. See docs/review/version21/realism/PARALLEL_HANDOFF.md.
+
+
+## Parallel B integration — 12 October 2026
+
+B signed delivery c6dd9ca was integrated at13c26c8 without waiting for A/C. Source03bae79 adds the requested private reversed service truck, stabilizers, sectioned drill string and retained pumping pipe; removed private droplets/external L-shaped feed. Original57identities PASS. Independent scores: liquid4.1, pressure-only1.3; each used initial+1retry, with2unused retries and a justified missing-mechanism/data stop below7. Independent analytical early-fill error0.105489K passes the unchanged0.2K tolerance; no experimental validation or pressure/soil coupling is claimed. Root checked private ownership/signed evidence and corrected obsolete toolbox cue wording. Full combined verification, main/release/install remain pending A/C deliveries. See review/version21/realism/PARALLEL_HANDOFF.md.
