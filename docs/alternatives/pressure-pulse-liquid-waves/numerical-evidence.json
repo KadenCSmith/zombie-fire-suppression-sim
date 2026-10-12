@@ -1,0 +1,106 @@
+{
+  "kind": "numerical verification only; no experiments",
+  "apiVersion": "v21.2",
+  "reproduction": "node tests/alternatives/pressure-pulse-liquid-waves/record-evidence.mjs",
+  "config": {
+    "id": "evidence-liquid-waves",
+    "variantId": "liquid-waves",
+    "engine": "contact",
+    "medium": "water",
+    "sourceStatus": "unspecified",
+    "thermal": {
+      "initialK": 823.15,
+      "waterKg": 0.5,
+      "flowKgS": 0.025,
+      "inletK": 293.15,
+      "contactStartS": 12,
+      "conductanceWK": 24,
+      "dryIceKg": 0.05,
+      "endS": 60,
+      "enabled": true,
+      "seed": 21
+    },
+    "fem": {
+      "n": 4,
+      "lengthM": 0.1,
+      "ambientK": 300,
+      "oxygenMassFraction": 0.233,
+      "moistureRatio": 0.1,
+      "dryDensityKgM3": 123,
+      "ambientPressurePa": 101325,
+      "ignitionW": 8,
+      "ignitionS": 180,
+      "ignitionWidthM": 0.025,
+      "heatTransfer": 10,
+      "transferKgM2S": 0.01,
+      "permeabilityM2": 1e-12,
+      "poreRadiationM": 0.0005,
+      "gasDiffusivityM2S": 0.00002,
+      "gasViscosityPaS": 0.000018,
+      "emissivity": 0.95,
+      "gravityMS2": 0,
+      "maxStepS": 1,
+      "endS": 600,
+      "chemistry": true,
+      "closed": false
+    }
+  },
+  "beforeArrival": {
+    "timeS": 12,
+    "metrics": {
+      "maximumK": 823.15,
+      "waterUsedKg": 0,
+      "dryIceUsedKg": 0,
+      "energyJ": 0,
+      "energyResidualJ": 0,
+      "massResidualKg": 0,
+      "oxygenKg": null,
+      "fuelKg": null,
+      "reactionW": null
+    }
+  },
+  "final": {
+    "timeS": 60,
+    "metrics": {
+      "maximumK": 501.75266005643573,
+      "waterUsedKg": 0.5,
+      "dryIceUsedKg": 0,
+      "energyJ": 887056.6582442669,
+      "energyResidualJ": -2.8405338525772095e-8,
+      "massResidualKg": 4.440892098500626e-16,
+      "oxygenKg": null,
+      "fuelKg": null,
+      "reactionW": null
+    },
+    "ledger": {
+      "initialPeatEnergyJ": 1462800,
+      "peatEnergyJ": 575743.3417557627,
+      "heatToDryIceJ": 0,
+      "heatToWaterJ": 887056.6582442669,
+      "waterStoredSensibleJ": 60809.36879962839,
+      "vaporEnthalpyJ": 826247.2894446374,
+      "energyResidualJ": -2.8405338525772095e-8,
+      "dryIceInitialKg": 0,
+      "dryIceRemainingKg": 0,
+      "dryIceSublimatedKg": 0,
+      "dryIceExportedKg": 0,
+      "dryIceMassResidualKg": 0,
+      "waterInitialKg": 0.5,
+      "waterRemainingSupplyKg": 0,
+      "waterSuppliedKg": 0.5,
+      "waterBypassKg": 0,
+      "waterLiquidKg": 0.18158554944943933,
+      "waterVaporKg": 0.3184144505505602,
+      "waterMassResidualKg": 4.440892098500626e-16
+    }
+  },
+  "offMatchesMatchedReference": true,
+  "missing": [
+    "pressure transport",
+    "infiltration",
+    "soil mechanics",
+    "reaction",
+    "suppression",
+    "re-ignition"
+  ]
+}

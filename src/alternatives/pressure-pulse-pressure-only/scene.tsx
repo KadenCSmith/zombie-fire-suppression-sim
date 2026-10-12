@@ -1,11 +1,15 @@
-import { Line } from '@react-three/drei/core/Line.js'
 import { DoubleSide } from 'three'
 import type { MethodSceneProps } from '../contract'
-import { methodModule } from './index'
-export function MethodCues({id,time}:MethodSceneProps) {
-  const p=methodModule.presentation(id,time),x=.4
-  return <>
-    {(p.pulse||p.waves)&&[0,1,2].map(i=><mesh key={i} position={[x,-1.4,.12+i*.01]} scale={1+((time*(p.waves?1.5:.7)+i*.33)%1)*2}><ringGeometry args={[.18,.19,48]}/><meshBasicMaterial color={p.waves?'#81b6c3':'#b4baa1'} transparent opacity={.5-i*.1} side={DoubleSide}/></mesh>)}
-    {p.injection&&<><Line points={[[x,.2,.14],[x,-1.8,.14]]} color="#81b6c3" lineWidth={2}/>{Array.from({length:p.contacts},(_,i)=><group key={i} position={[x,-.6-i*.55,.14]}><Line points={[[-.35,0,0],[.35,0,0]]} color="#81b6c3" lineWidth={3}/><mesh><sphereGeometry args={[.045,12,8]}/><meshBasicMaterial color="#81b6c3"/></mesh></group>)}</>}
-  </>
+import { pressureCueEnvelope, pressureOnlyPresentation } from './model'
+
+/** An abstract transient marker. Soil geometry does not move or collapse and
+ * no line/drop/contact marker implies liquid injection. */
+export function MethodCues({ id, time }: MethodSceneProps) {
+  const p = pressureOnlyPresentation(id, time), envelope = pressureCueEnvelope(time)
+  return p.pulse ? <group position={[.4, -1.35, .18]}>
+    {[0, 1].map(i => <mesh key={i} scale={1 + i * .75 + envelope * .45}>
+      <ringGeometry args={[.27, .29, 48]}/>
+      <meshBasicMaterial color="#c3b992" transparent opacity={envelope * (.5 - i * .15)} side={DoubleSide}/>
+    </mesh>)}
+  </group> : null
 }
