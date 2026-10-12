@@ -1,0 +1,228 @@
+{
+  "signedBy": "/root/realism_a_review",
+  "signedAtUtc": "2026-10-12T09:30:44.476929+00:00",
+  "reviewerIndependence": "Read-only independent reviewer; no implementation/source/test/live-doc edits, no delegation",
+  "alternative": "4.2.1",
+  "snapshot": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+  "branch": "feature/v21-sublimation-injection",
+  "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "implementationDeltaBaseSignedPass2": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "changedSourceFiles": 6,
+  "changedMaintainedTestFiles": 2,
+  "initialEvidence": {
+    "reviewer": "/root/realism_a_round0",
+    "snapshot": "22a60811f9c9381ea38085e4cc03aff6e559dbec",
+    "score": 4.1,
+    "pass": 1,
+    "preserved": true
+  },
+  "priorSignedReview": {
+    "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+    "score": 4.1,
+    "pass": 2,
+    "preserved": true
+  },
+  "withdrawnCandidate": "57d9bcc7f2b3ff0ccb2bd8763513bb3d3d14f5f1 explicitly withdrawn before round2 tests/GUI/scoring; static preparation/snapshot preserved, no completed review discarded",
+  "retryAccounting": {
+    "thisIsScoredPass": 3,
+    "thisIsScoredRevisionRetry": 2,
+    "totalScoredPassesUsed": 3,
+    "scoredRetriesUsed": 2,
+    "scoredRetriesRemaining": 1,
+    "maximumTotalScoredPasses": 4,
+    "counterReset": false,
+    "withdrawnPreparationScored": false,
+    "commandRepairScored": false
+  },
+  "criterionScores": [
+    {
+      "name": "Governing physics/conservation",
+      "weight": 0.3,
+      "initial": 5,
+      "pass2": 5,
+      "score": 5,
+      "basis": "Unchanged finite conservative lumped contact; missing surface source/transport/reaction physics."
+    },
+    {
+      "name": "Medium/soil properties and constitutive behavior",
+      "weight": 0.2,
+      "initial": 3,
+      "pass2": 3,
+      "score": 3,
+      "basis": "Unchanged local property approximations; unmeasured peat/UA and missing hydraulic/reactive constitutive data."
+    },
+    {
+      "name": "Numerical verification and independent validation",
+      "weight": 0.2,
+      "initial": 6,
+      "pass2": 6,
+      "score": 6,
+      "basis": "Exact current adapter/reference/conservation re-execution plus valid reused initial benchmarks; no matched measured validation."
+    },
+    {
+      "name": "Method-specific mechanism/coupling",
+      "weight": 0.2,
+      "initial": 2,
+      "pass2": 2,
+      "score": 2,
+      "basis": "No computed surface sublimation-assisted outlet/pre-cooling/pressure/field response."
+    },
+    {
+      "name": "Visual correspondence to computed states",
+      "weight": 0.1,
+      "initial": 4,
+      "pass2": 4,
+      "score": 3,
+      "verified": false,
+      "basis": "Source confirms time-authored mechanism; required affected actual-app observations unavailable. Old-truck GUI observations do not verify this new renderer. Source-only assessment."
+    }
+  ],
+  "weightedArithmeticUnrounded": 4.0,
+  "centralMechanismUnsupported": true,
+  "centralMechanismCap": 6,
+  "finalScore": 4.0,
+  "verifiedAtLeast7": false,
+  "visualCriterionVerified": false,
+  "seriousConservationSIUnitNumericalStabilityFailureFound": false,
+  "gates": {
+    "testedNumericalConservationSIUnitStability": "No serious failure found within frozen tested bounds",
+    "centralMechanism": "Unsupported; cap6 remains",
+    "requiredAffectedBrowserVisualEvidence": "UNVERIFIED; access denied",
+    "overallVerifiedPass": false
+  },
+  "scoreChangeExplanation": "Physics/numerical scores unchanged.4.1\u21924.0 reflects unavailable affected actual-app evidence and source-only visual-correspondence score3; it is not evidence of a numerical physics regression. Aesthetic scores excluded.",
+  "originalPreservation": {
+    "baseline": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+    "independentlyHashed": 57,
+    "mismatches": 0
+  },
+  "independentExecution": {
+    "newTestsPassed": 80,
+    "files": 12,
+    "vitestDurationS": 2.08,
+    "processElapsedSeconds": 2.668148041004315,
+    "maintainedAffectedTests": 78,
+    "unchangedReviewerCurrentAdapterChecks": 2,
+    "reusedPriorNumericalSuiteTests": 99,
+    "doNotAddReusedAndReexecutedCounts": true,
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/alternatives/sublimation-injection",
+      "tests/alternativeSceneComposition.test.tsx",
+      "tests/alternatives.test.ts",
+      "tests/alternatives-infusion-accuracy.test.ts",
+      "tests/independent-realism-a-current.test.ts",
+      "--maxWorkers=1"
+    ],
+    "metadata": "independent-run-metadata.json",
+    "failedAttempt": "npm Vitest shim failed before tests because reviewer copy dereferenced.bin link; exact canonical installed module invocation repaired only command, failure retained",
+    "currentMaximumAbsoluteResiduals": {
+      "massKg": 6.861178292183467e-14,
+      "energyJ": 2.0372681319713593e-08
+    },
+    "reusedFullBenchmarkMaximumAbsoluteResiduals": {
+      "massKg": 6.861178292183467e-14,
+      "energyJ": 3.6694109439849854e-07
+    },
+    "currentResultsExactlyEqualPriorSignedResults": true,
+    "w1MaximumErrorsK": {
+      ".05s": 0.019203044476910236,
+      ".00625s": 0.0026181586201232676,
+      ".003125s": 0.0013229686160229903
+    },
+    "tolerancesUnchanged": {
+      "energy": "1e-4J+1e-9*initialEnergyScale",
+      "mass": "1e-9kg+1e-9*inventoryScale",
+      "W1": ".15K default/.05K refined; strict error decrease",
+      "exactDryOrPostExhaustion": "1e-8K",
+      "finitePhaseBudget": "1e-5J"
+    },
+    "runtime": {
+      "node": "v26.8.2",
+      "npm": "11.19.1",
+      "python": "3.13.15",
+      "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "load": [
+        19.841796875,
+        21.4150390625,
+        23.85595703125
+      ],
+      "hardware": [
+        "Mac15,7",
+        "12",
+        "38654705664",
+        "Apple M3 Pro"
+      ]
+    }
+  },
+  "scopeAndReuse": {
+    "sourceImportClosureFiles": 75,
+    "verifiedCompletePackageTrees": 8,
+    "packageFiles": 2414,
+    "sourcePackageConfigLockRuntimeMatched": true,
+    "physicsCoreAdapterWorkerSourceDefaultsUnchanged": true,
+    "descriptorChange": "Stage text only; numerical createRun validation/default contract unchanged",
+    "reusedNumericalEvidence": "Original frozen benchmarks/99 tests retain validity under exact source/dependency/config/scenario hashes; 2 current adapter checks independently re-executed unchanged",
+    "reusedGuiEvidenceForNewTruck": false,
+    "dependencyInstallRun": false,
+    "suppliedImplementerChecks": "78tests/11files2.10s, type/lint/build2.87s,57hash/whitespace; identity verified, not misrepresented as reviewer execution"
+  },
+  "appEvidence": {
+    "snapshot": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+    "attemptedTool": "mcp__cua_repl.js, normal selected Chrome extension browser1",
+    "attemptedAction": "await reviewBrowser.nameSession('\ud83d\udd0e A truck review'); let reviewTab2 = await cua.createBrowserTab('chrome','http://127.0.0.1:5174/?alternative=sublimation-injection&method-preview=1',{sessionName:'\ud83d\udd0e A truck review'});",
+    "status": "ACCESS DENIED; new-truck application observations UNVERIFIED",
+    "diagnosticVerbatim": "Browser Use could not complete this action because a browser security check was unavailable. Reason: The admin-enforced policy could not be verified, so access was not granted. Browser use could not verify the admin-enforced policy before accessing http://127.0.0.1:5174. This failure may be temporary. The agent may retry after the issue is resolved, but must not bypass browser security controls or use an indirect workaround.",
+    "actualRound2AppFramesObserved": 0,
+    "actualRound2NavigationRuntimeTestsExecuted": 0,
+    "screenshotRetained": false,
+    "oldTruckChromeEvidenceAppliedToNewRenderer": false,
+    "policyBypassOrAlternateRouteAttempted": false,
+    "requestedButUnrun": [
+      "55/60/63/66/69/72/75/86 accepted states",
+      "whole truck and cab visibility/proportions",
+      "all wheels grounding",
+      "pump/reel/module/boom connections and visible clearances",
+      "individual solids gravity/contact and lid readability",
+      "returned loader before cap; cap before faster flow; visible quench",
+      "0\u219275\u21920\u219275\u2192immediate4.2.2 navigation",
+      "restart/seek/remount/resize/leave/error-console checks",
+      "representative screenshot"
+    ],
+    "noAppFailureInferredFromToolDenial": true,
+    "sourceAndNumericalChecksCompletedBeforeAttempt": true,
+    "requiredVisualCriterionVerified": false
+  },
+  "sourceGeometryFinding": "A2-GEOM-1 confirmed pump motor/front reel flange overlap; actual severity unverified",
+  "aestheticAssessment": "UNVERIFIED; no score/no representative frame; source geometry/connection intent is not perceived realism evidence",
+  "remainingBlockers": [
+    "Conservative finite surface solid/liquid source and exported liquid mass/enthalpy seam, with measured thermal contact/ambient exchange and phase/freezing bounds; debit the computed outlet exactly once downstream.",
+    "Supported abstract pressure/flow boundary coupling and measured/validated material/domain/boundary inputs; no containment/trigger or device construction design.",
+    "Conservative water/CO2 porous peat transport and reaction/oxygen/fuel/moisture coupling with defensible geometry, density/porosity/fraction bases, retention/permeability, thermal and kinetics data/uncertainty.",
+    "Held-out matched mass/thermal/evaporation observations; suppression/re-ignition requires supported histories over a stated observation window.",
+    "Accepted-state renderer interface; currentid/time contract and time-authored fireoff86 cannot establish physical correspondence.",
+    "Required actual application evidence of the newly authored truck and navigation/resource behavior unavailable after policy denial; confirmed pump/reel source overlap also remains."
+  ],
+  "unrunByReviewer": [
+    "Affected actual-app visual/navigation/restart/remount/resize/console checks",
+    "New-truck screenshot",
+    "General full suite/typecheck/lint/build (exact local supplied reports available)",
+    "Native/production-GPU/final combined checks",
+    "Matched physical experiments/calibration/validation"
+  ],
+  "stoppingAssessment": "Finish below7. Persistent central mechanism/data/seam gaps and unavailable required browser evidence warrant stopping early; one scored retry remains but no scientific basis to spend it on labels/artwork alone. Integration/release/final combined gates remain coordinator-owned.",
+  "finderTag": "Only nested ignored runtime outputs created; no new top-level project/output folder, no tagging applicable.",
+  "samePassReportClarification": {
+    "firstCheckpointUtc": "2026-10-12T09:27:18.243960+00:00",
+    "clarifiedUtc": "2026-10-12T09:30:44.476929+00:00",
+    "sourceUnchanged": true,
+    "scoreUnchanged": true,
+    "newScoredPass": false,
+    "firstCheckpointPreserved": true,
+    "reason": "Parent plumbing concern arrived after first signature; independent source coordinates show tube through motor/head, not disconnected. Added precise finding without new implementation or execution."
+  },
+  "sourcePlumbingFinding": "A2-PLUMB-1 single FILL tube passes through motor/head interiors without explicit pump port seam; not wholly disconnected; actual visible severity unverified"
+}

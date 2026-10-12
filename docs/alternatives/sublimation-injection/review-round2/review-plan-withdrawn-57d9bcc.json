@@ -1,0 +1,24 @@
+{
+  "publishedBeforeExecutionUtc": "2026-10-12T09:13:21.655168+00:00",
+  "snapshot": "57d9bcc7f2b3ff0ccb2bd8763513bb3d3d14f5f1",
+  "scoredPass": 3,
+  "revisionRetry": 2,
+  "fixedCriterionScoresBeforeRevision": [
+    5,
+    3,
+    6,
+    2,
+    4
+  ],
+  "weights": [
+    0.3,
+    0.2,
+    0.2,
+    0.2,
+    0.1
+  ],
+  "cap": 6,
+  "protocol": "Execute affected current A/contact call path + new pose/resource tests in isolated snapshot, maxWorkers=1; reuse prior independently executed 99 numerical tests only for unchanged source/dependencies/config; inspect actual normal Chrome after setup complete. No tolerance/benchmark changes. Visual checks55/60/63/66/69/72/75/86, fast seek0/75/0/75 and immediate4.2.2 navigation, remount/reset/resize/leave.",
+  "numericalTolerancesUnchanged": true,
+  "separateAestheticEvaluation": true
+}

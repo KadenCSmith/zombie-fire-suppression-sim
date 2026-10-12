@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { DELIVERY_ROUTE, FILL_ROUTE, MEDIA_MOUNT, MEDIA_SCALE, SUPPLY_OUTLET_LOCAL, TREATMENT_PARKED, TRUCK_PARKED, TRUCK_WHEEL_RADIUS, loadingBoomPose, loadingBucketPose, preparationVisuals, wheelRollAngle } from '../../../src/alternatives/sublimation-injection/visuals'
+import { CatmullRomCurve3, Vector3 } from 'three'
+import { DELIVERY_ROUTE, FILL_ROUTE, HOSE_REEL_LOCAL, MEDIA_MOUNT, MEDIA_SCALE, PUMP_BAY_LOCAL, PUMP_INLET_LOCAL, PUMP_OUTLET_LOCAL, SUPPLY_OUTLET_LOCAL, TANK_PUMP_ROUTE_LOCAL, TREATMENT_PARKED, TRUCK_PARKED, TRUCK_WHEEL_RADIUS, loadingBoomPose, loadingBucketPose, preparationVisuals, wheelRollAngle } from '../../../src/alternatives/sublimation-injection/visuals'
 
 describe('new integrated water truck artwork', () => {
   it('keeps the tire contact point stationary during forward and reverse seeking', () => {
@@ -26,11 +27,35 @@ describe('new integrated water truck artwork', () => {
   })
 
   it('connects the supply port to the preparation vessel and outgoing line to the bore', () => {
-    expect(FILL_ROUTE[0]).toEqual(TRUCK_PARKED.map((v, i) => v + SUPPLY_OUTLET_LOCAL[i]))
+    expect(TANK_PUMP_ROUTE_LOCAL[0]).toEqual(SUPPLY_OUTLET_LOCAL)
+    expect(TANK_PUMP_ROUTE_LOCAL.at(-1)).toEqual(PUMP_INLET_LOCAL)
+    expect(FILL_ROUTE[0]).toEqual(TRUCK_PARKED.map((v, i) => v + PUMP_OUTLET_LOCAL[i]))
     expect(FILL_ROUTE.at(-1)).toEqual(TREATMENT_PARKED.map((v, i) => v + MEDIA_MOUNT[i] + MEDIA_SCALE * [.52, .22, .48][i]))
     expect(DELIVERY_ROUTE.at(-1)).toEqual([.4, -1.3, .08])
     expect(preparationVisuals(48).hose).toBe(0)
     expect(preparationVisuals(56).hose).toBe(1)
+  })
+
+  it('separates pump hardware from the reel and routes hoses around their solids', () => {
+    // Complete pump X bounds include head sphere, motor, fins and base.
+    expect(PUMP_BAY_LOCAL[0] + .22 + .05).toBeLessThan(HOSE_REEL_LOCAL[0] - .235)
+    expect(PUMP_BAY_LOCAL[0] - .255).toBeGreaterThan(-2.55)
+    expect(PUMP_BAY_LOCAL[0] + .22).toBeLessThan(-.85)
+    const routes = [TANK_PUMP_ROUTE_LOCAL, FILL_ROUTE.map(p => p.map((v, i) => v - TRUCK_PARKED[i]) as [number, number, number])]
+    for (const route of routes) {
+      const curve = new CatmullRomCurve3(route.map(p => new Vector3(...p)), false, 'centripetal')
+      for (const p of curve.getPoints(1000)) {
+        // Conservative expanded motor cylinder and both flange cylinders.
+        const motorAxial = Math.abs(p.x - (PUMP_BAY_LOCAL[0] + .08))
+        const motorRadial = Math.hypot(p.y - (PUMP_BAY_LOCAL[1] + .13), p.z - PUMP_BAY_LOCAL[2])
+        expect(motorAxial > .135 + .036 || motorRadial > .11 + .036).toBe(true)
+        for (const flangeZ of [-.12, .12]) {
+          const radial = Math.hypot(p.x - HOSE_REEL_LOCAL[0], p.y - HOSE_REEL_LOCAL[1])
+          const axial = Math.abs(p.z - (HOSE_REEL_LOCAL[2] + flangeZ))
+          expect(radial > .235 + .036 || axial > .0175 + .036).toBe(true)
+        }
+      }
+    }
   })
 
   it('keeps both articulated arms rigid and attached through lift, tip and return', () => {

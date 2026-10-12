@@ -1,0 +1,23 @@
+{
+  "publishedBeforeExecutionUtc": "2026-10-12T08:35:37.643282+00:00",
+  "reviewer": "/root/realism_a_review",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "baseSpec": "benchmark-spec.json unchanged from initial",
+  "changesToInitialBenchmarks": null,
+  "additions": [
+    {
+      "id": "CURRENT_W1",
+      "settings": "Actual A createRun water contact; initial350K/inlet293.15K,3x.5kg,UA24W/K each,total.5kgwater,.025kg/s,arrival8s,actual step.00625; samples8/8.5/9/18/28/60s",
+      "reference": "unchanged original independent continuous-influx exact series and postdepletion exponential",
+      "tolerance": "original .15K default, plus independently compare maximum error against same core .05s and .003125s; strictly smaller errors required",
+      "massToleranceKg": "1e-9+1e-9*inventory",
+      "energyToleranceJ": "1e-4+1e-9*initialEnergy"
+    },
+    {
+      "id": "CURRENT_DEFAULT",
+      "settings": "Actual A default water/co2-water and off, checkpoints0/.5/8/8.5/20/30/60s",
+      "reference": "frozen scenario and independently evaluated ledger; compare implementer round1 supplied values only after independent execution",
+      "tolerance": "same frozen conservation bounds; no phase timing accuracy claim"
+    }
+  ]
+}

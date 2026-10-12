@@ -14,6 +14,13 @@ export const MEDIA_MOUNT = [0, 1.312, 0] as const
 export const MEDIA_SCALE = .68
 export const MEDIA_OUTLET = [.56, -.38, .4] as const
 export const SUPPLY_OUTLET_LOCAL = [-.60, 1.0, .4] as const
+export const PUMP_BAY_LOCAL = [-1.75, .89, .64] as const
+export const HOSE_REEL_LOCAL = [-.88, .78, .63] as const
+export const PUMP_INLET_LOCAL = [PUMP_BAY_LOCAL[0] - .15, PUMP_BAY_LOCAL[1] + .13, PUMP_BAY_LOCAL[2] + .22] as const
+export const PUMP_OUTLET_LOCAL = [PUMP_BAY_LOCAL[0] - .15, PUMP_BAY_LOCAL[1] + .32, PUMP_BAY_LOCAL[2]] as const
+export const TANK_PUMP_ROUTE_LOCAL: readonly [number, number, number][] = [
+  [...SUPPLY_OUTLET_LOCAL], [-.55, 1.15, .82], [-1.15, 1.18, .84], [-1.70, 1.05, .84], [...PUMP_INLET_LOCAL],
+]
 const treatmentOutlet = TREATMENT_PARKED.map((v, i) => v + MEDIA_MOUNT[i] + MEDIA_SCALE * MEDIA_OUTLET[i]) as [number, number, number]
 const treatmentInlet = TREATMENT_PARKED.map((v, i) => v + MEDIA_MOUNT[i] + MEDIA_SCALE * [.52, .22, .48][i]) as [number, number, number]
 export const SOLID_COUNT = 9
@@ -24,8 +31,8 @@ export const DELIVERY_ROUTE: readonly [number, number, number][] = [
   [.4, .23, -.15], [.4, -.1, .06], [.4, -1.3, .08],
 ]
 export const FILL_ROUTE: readonly [number, number, number][] = [
-  TRUCK_PARKED.map((v, i) => v + SUPPLY_OUTLET_LOCAL[i]) as [number, number, number],
-  [.50, 1.02, -.27], [.20, 1.02, -.27], [.12, 1.25, -.45], treatmentInlet,
+  TRUCK_PARKED.map((v, i) => v + PUMP_OUTLET_LOCAL[i]) as [number, number, number],
+  [-.45, 1.48, -.27], [-.27, 1.57, -.37], treatmentInlet,
 ]
 const clamp = (value: number) => Math.max(0, Math.min(1, value))
 const ease = (time: number, start: number, end: number) => {

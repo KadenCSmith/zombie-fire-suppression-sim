@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
-import { SUPPLY_OUTLET_LOCAL, TRUCK_WHEEL_RADIUS, wheelRollAngle } from './visuals'
+import { HOSE_REEL_LOCAL, PUMP_BAY_LOCAL, PUMP_INLET_LOCAL, PUMP_OUTLET_LOCAL, SUPPLY_OUTLET_LOCAL, TRUCK_WHEEL_RADIUS, wheelRollAngle } from './visuals'
 
 const BODY = '#6c7e70', FRAME = '#29352f', METAL = '#aab5aa'
 
@@ -34,7 +34,7 @@ function HoseReel({ payout }: { payout: number }) {
     return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 150, .026, 6, false)
   }, [])
   useEffect(() => () => coil.dispose(), [coil])
-  return <group position={[-.88, .78, .63]}>
+  return <group position={[...HOSE_REEL_LOCAL]}>
     <mesh position={[0, -.19, 0]}><boxGeometry args={[.48, .11, .34]}/><meshStandardMaterial color={FRAME} roughness={.7}/></mesh>
     <group rotation={[0, 0, -payout * Math.PI * 8]}>
       {[-.12, .12].map(z => <mesh key={z} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
@@ -84,12 +84,18 @@ export function ServiceVehicle({ travel, payout }: { travel: number; payout: num
     <mesh position={[-1.70, .65, 0]} castShadow><boxGeometry args={[1.7, .14, 1.64]}/><meshStandardMaterial color="#67786b" metalness={.45} roughness={.72}/></mesh>
     <mesh position={[-2.56, .51, 0]}><boxGeometry args={[.10, .16, 1.42]}/><meshStandardMaterial color="#6e7e70" metalness={.55} roughness={.65}/></mesh>
     <HoseReel payout={payout}/>
-    <group position={[-1.10, .89, .68]}>
+    <group position={[...PUMP_BAY_LOCAL]}>
       <mesh position={[0, -.11, 0]}><boxGeometry args={[.36, .12, .24]}/><meshStandardMaterial color="#526757" metalness={.4} roughness={.7}/></mesh>
       <mesh><boxGeometry args={[.44, .10, .32]}/><meshStandardMaterial color={FRAME} metalness={.4} roughness={.7}/></mesh>
       <mesh position={[.08, .13, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.11, .11, .27, 20]}/><meshStandardMaterial color="#819584" metalness={.5} roughness={.55}/></mesh>
       {[-.08, -.04, 0, .04, .08].map(x => <mesh key={x} position={[.08 + x, .13, 0]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[.12, .12, .008, 20]}/><meshStandardMaterial color="#506958" metalness={.45} roughness={.6}/></mesh>)}
       <mesh position={[-.15, .13, 0]}><sphereGeometry args={[.105, 16, 12]}/><meshStandardMaterial color="#8d9b8b" metalness={.7} roughness={.4}/></mesh>
     </group>
+    <mesh position={[PUMP_INLET_LOCAL[0], PUMP_INLET_LOCAL[1], PUMP_INLET_LOCAL[2] - .06]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[.045, .045, .12, 16]}/><meshStandardMaterial color={METAL} metalness={.75} roughness={.36}/>
+    </mesh>
+    <mesh position={[PUMP_OUTLET_LOCAL[0], PUMP_OUTLET_LOCAL[1] - .06, PUMP_OUTLET_LOCAL[2]]}>
+      <cylinderGeometry args={[.045, .045, .12, 16]}/><meshStandardMaterial color={METAL} metalness={.75} roughness={.36}/>
+    </mesh>
   </group>
 }

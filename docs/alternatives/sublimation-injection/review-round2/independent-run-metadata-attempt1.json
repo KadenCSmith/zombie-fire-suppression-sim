@@ -1,0 +1,32 @@
+{
+  "executor": "/root/realism_a_review",
+  "commit": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "tests/alternatives/sublimation-injection",
+    "tests/alternativeSceneComposition.test.tsx",
+    "tests/alternatives.test.ts",
+    "tests/alternatives-infusion-accuracy.test.ts",
+    "tests/independent-realism-a-current.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-2/snapshot-b27486d",
+  "startedUtc": "2026-10-12T09:20:28.555591+00:00",
+  "elapsedSeconds": 0.27471595897804946,
+  "exitCode": 1,
+  "loadBefore": [
+    31.2744140625,
+    23.83203125,
+    24.68603515625
+  ],
+  "loadAfter": [
+    31.2744140625,
+    23.83203125,
+    24.68603515625
+  ],
+  "seed": "frozen scenario/default seed; authored pose samples deterministic",
+  "configuration": "verified immutable package/lock/vite/tsconfig; one worker",
+  "scope": "78 maintained affected A/composition/adapter/accuracy checks plus 2 unchanged independent actual-adapter numerical/conservation checks"
+}
