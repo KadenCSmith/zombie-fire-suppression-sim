@@ -1,0 +1,83 @@
+diff --git a/docs/alternatives/pressure-pulse-liquid-waves/README.md b/docs/alternatives/pressure-pulse-liquid-waves/README.md
+index 9c783d7..87ee7ba 100644
+--- a/docs/alternatives/pressure-pulse-liquid-waves/README.md
++++ b/docs/alternatives/pressure-pulse-liquid-waves/README.md
+@@ -14,7 +14,7 @@ Short illustrated hydraulic pulses occur at 76–78, 82–84 and 87–89 present
+ 
+ Private animation is deterministic under pause, seek and replay. The wetting material/texture are owned and disposed per mounted instance. It samples the existing read-only peat silhouette through its public function; no original shader/appearance code is copied. Private crack banks, turf pieces, soil fragments, service vehicle and drill string are independently authored additions, not modifications to original geometry or computed fracture paths.
+ 
+-The latest truck-detail request adds an independently modeled off-white cab with sloped glazing, mirrors, grille, lights and steps; a three-axle chassis with rounded tires, rims and wheel fasteners; and a separate exposed engine, cooling grille, guarded driveline, pump/manifold shapes, access platform and rails. The broad visual arrangement was checked against [Propell's manufacturer photographs](https://propell.com/fracpump/) on 2026-10-12; no photographs, branding, equipment specifications or operating values are imported. Its rotating machinery cue uses the existing presentation timestamp. Arrival, pipe installation, outlet position, ground animation and numerical state remain unchanged. This is display geometry, not a dimensioned apparatus or a claimed calibrated model of a commercial pump.
++The truck-detail request adds an independently modeled off-white cab with sloped glazing, mirrors, grille, lights and steps; a three-axle chassis with rounded tires, rims and wheel fasteners; and a separate exposed engine, cooling grille, guarded driveline, pump/manifold shapes, access platform and rails. The broad visual arrangement was checked against [Propell's manufacturer photographs](https://propell.com/fracpump/) on 2026-10-12; no photographs, branding, equipment specifications or operating values are imported. At the user's subsequent request and supplied visual reference, four retractable stabilizer feet extend sideways after parking and lower broad pads onto the ground during65–67s, before drilling begins. They remain planted throughout pumping. All machinery poses use the existing presentation timestamp. These are authored display geometries, not dimensioned apparatus, load/stability calculations or a calibrated commercial pump model; numerical state is unchanged.
+ 
+ ## Actual equations and units
+ 
+diff --git a/src/alternatives/pressure-pulse-liquid-waves/animation.ts b/src/alternatives/pressure-pulse-liquid-waves/animation.ts
+index cfe3407..c01e79a 100644
+--- a/src/alternatives/pressure-pulse-liquid-waves/animation.ts
++++ b/src/alternatives/pressure-pulse-liquid-waves/animation.ts
+@@ -51,6 +51,8 @@ export function pipeTruckFrame(presentationS: number) {
+   return {
+     visible: time >= 57,
+     position, heading: Math.PI, travel, deployment,
++    outriggerSpread: smooth(time, 65, 65.8),
++    feetPlanted: smooth(time, 65.8, 67),
+     rigPosition: [position[0] + 1.4 + (G.sourceX - .11 - position[0] - 1.4) * deployment,
+       1.58 - deployment * 1.08, position[2] + .15 + (.09 - position[2] - .15) * deployment] as [number, number, number],
+     mastAngle: (1 - deployment) * Math.PI / 2,
+diff --git a/src/alternatives/pressure-pulse-liquid-waves/equipment.tsx b/src/alternatives/pressure-pulse-liquid-waves/equipment.tsx
+index 63d1bce..704b2a0 100644
+--- a/src/alternatives/pressure-pulse-liquid-waves/equipment.tsx
++++ b/src/alternatives/pressure-pulse-liquid-waves/equipment.tsx
+@@ -144,6 +144,21 @@ function TruckBody({ time, travel }: { time: number; travel: number }) {
+   </group>
+ }
+ 
++function StabilizerFeet({ frame: f }: { frame: ReturnType<typeof pipeTruckFrame> }) {
++  const reach = .43 + f.outriggerSpread * .43
++  const padY = .34 * (1 - f.feetPlanted) + .025 * f.feetPlanted
++  return <group>
++    {[-1.32, .37].flatMap(x => [-1, 1].map(side => <group key={x + ':' + side}>
++      <Block at={[x, .53, side * reach / 2]} size={[.13, .12, reach]} color="#536458"/>
++      <Block at={[x, .59, side * reach]} size={[.12, .36, .12]} color="#293a30" rounded/>
++      {[.44, .74].map(y => <Block key={y} at={[x, y, side * reach]} size={[.14, .035, .14]} color="#728578"/>)}
++      <MetalSegment from={[x, .41, side * reach]} to={[x, padY + .045, side * reach]} radius={.03} color="#a8b6a6"/>
++      <Block at={[x, padY, side * reach]} size={[.34, .05, .27]} color="#566a58" rounded/>
++      <MetalSegment from={[x, .68, side * .38]} to={[x, .53, side * reach]} radius={.016} color="#819483"/>
++    </group>))}
++  </group>
++}
++
+ function DrillRig({ frame: f }: { frame: ReturnType<typeof pipeTruckFrame> }) {
+   const pipeX = G.sourceX - .11
+   return <group>
+@@ -204,6 +219,7 @@ export function PipeTruck({ time }: { time: number }) {
+   return <group userData={{ scientificRole: 'Authored opposite-side service truck and rigid pipe installation; no equipment or pressure design' }}>
+     <group position={f.position} rotation={[0, f.heading, 0]}>
+       <TruckBody time={time} travel={f.travel}/>
++      <StabilizerFeet frame={f}/>
+     </group>
+     <DrillRig frame={f}/>
+   </group>
+diff --git a/tests/alternatives/pressure-pulse-liquid-waves/animation.test.ts b/tests/alternatives/pressure-pulse-liquid-waves/animation.test.ts
+index 1f13946..bf48608 100644
+--- a/tests/alternatives/pressure-pulse-liquid-waves/animation.test.ts
++++ b/tests/alternatives/pressure-pulse-liquid-waves/animation.test.ts
+@@ -40,6 +40,10 @@ describe('original-based liquid method animation regressions', () => {
+     expect(pipeTruckFrame(80)).toEqual(parked)
+   })
+   it('joins separate pipe sections with rotation paused, then leaves the assembled string embedded for every pulse', () => {
++    expect(pipeTruckFrame(64.9)).toMatchObject({ outriggerSpread: 0, feetPlanted: 0 })
++    expect(pipeTruckFrame(66).outriggerSpread).toBe(1)
++    expect(pipeTruckFrame(66).feetPlanted).toBeLessThan(1)
++    expect(pipeTruckFrame(67)).toMatchObject({ outriggerSpread: 1, feetPlanted: 1, pipeVisible: false })
+     for (const [i, start] of DRILL_SECTION_STARTS.entries()) {
+       const joining = pipeTruckFrame(start + .2), drilling = pipeTruckFrame(start + .7)
+       expect(joining.sectionCount).toBe(i + 1)
+@@ -57,6 +61,7 @@ describe('original-based liquid method animation regressions', () => {
+       expect(pumping.pipeBottom).toBe(installed.pipeBottom)
+       expect(pumping.pipeTop).toBe(installed.pipeTop)
+       expect(pumping.drillRotation).toBe(installed.drillRotation)
++      expect(pumping.feetPlanted).toBe(1)
+     }
+     const pausedJoin = pipeTruckFrame(DRILL_SECTION_STARTS[1] + .2)
+     pipeTruckFrame(0); pipeTruckFrame(90)

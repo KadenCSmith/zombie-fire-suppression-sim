@@ -1,0 +1,464 @@
+{
+  "baseline": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "manifestSha256": "a0ad327b424f60aa039c4c94f63331683e357aa3b707fe1d63881353f1480889",
+  "files": [
+    {
+      "path": "src/ui/FireSequenceWorkspace.tsx",
+      "established": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "baselineSha256": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "frozenSha256": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "liveSha256": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireSequenceScene.tsx",
+      "established": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "baselineSha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "frozenSha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "liveSha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireSequenceEquipment.tsx",
+      "established": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "baselineSha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "frozenSha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "liveSha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireSequenceGrass.tsx",
+      "established": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "baselineSha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "frozenSha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "liveSha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireExcavator.tsx",
+      "established": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "baselineSha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "frozenSha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "liveSha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireWaterTruck.tsx",
+      "established": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "baselineSha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "frozenSha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "liveSha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireInterventionEquipment.tsx",
+      "established": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "baselineSha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "frozenSha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "liveSha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireGroundGeometry.ts",
+      "established": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "baselineSha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "frozenSha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "liveSha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "pass": true
+    },
+    {
+      "path": "src/ui/FireExperimentControls.tsx",
+      "established": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "baselineSha256": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "frozenSha256": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "liveSha256": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "pass": true
+    },
+    {
+      "path": "src/ui/fire-sequence.css",
+      "established": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "baselineSha256": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "frozenSha256": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "liveSha256": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "pass": true
+    },
+    {
+      "path": "src/story/fireSequence.ts",
+      "established": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "baselineSha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "frozenSha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "liveSha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "pass": true
+    },
+    {
+      "path": "src/story/firePresentation.ts",
+      "established": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "baselineSha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "frozenSha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "liveSha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "pass": true
+    },
+    {
+      "path": "src/story/fireAppearance.ts",
+      "established": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "baselineSha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "frozenSha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "liveSha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "pass": true
+    },
+    {
+      "path": "src/story/contactCooling.ts",
+      "established": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "baselineSha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "frozenSha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "liveSha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "pass": true
+    },
+    {
+      "path": "src/coupled/fireProtocol.ts",
+      "established": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "baselineSha256": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "frozenSha256": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "liveSha256": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "pass": true
+    },
+    {
+      "path": "src/coupled/fireProtocolRunner.ts",
+      "established": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "baselineSha256": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "frozenSha256": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "liveSha256": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "pass": true
+    },
+    {
+      "path": "src/worker/fireProtocol.worker.ts",
+      "established": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "baselineSha256": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "frozenSha256": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "liveSha256": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "pass": true
+    },
+    {
+      "path": "public/fire-sequence-cache.json",
+      "established": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "baselineSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "frozenSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "liveSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "pass": true
+    },
+    {
+      "path": "public/fire-sequence-contract.json",
+      "established": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "baselineSha256": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "frozenSha256": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "liveSha256": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "pass": true
+    },
+    {
+      "path": "public/contact-cooling.json",
+      "established": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "baselineSha256": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "frozenSha256": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "liveSha256": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "pass": true
+    },
+    {
+      "path": "public/fire-appearance.json",
+      "established": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "baselineSha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "frozenSha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "liveSha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "pass": true
+    },
+    {
+      "path": "scripts/smoke-fire-sequence.cjs",
+      "established": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "baselineSha256": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "frozenSha256": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "liveSha256": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "pass": true
+    },
+    {
+      "path": "tests/fireSequence.test.ts",
+      "established": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "baselineSha256": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "frozenSha256": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "liveSha256": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "pass": true
+    },
+    {
+      "path": "tests/firePresentation.test.ts",
+      "established": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "baselineSha256": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "frozenSha256": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "liveSha256": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "pass": true
+    },
+    {
+      "path": "tests/fireAppearance.test.ts",
+      "established": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "baselineSha256": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "frozenSha256": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "liveSha256": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "pass": true
+    },
+    {
+      "path": "tests/contactCooling.test.ts",
+      "established": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "baselineSha256": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "frozenSha256": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "liveSha256": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "pass": true
+    },
+    {
+      "path": "tests/fireProtocol.test.ts",
+      "established": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "baselineSha256": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "frozenSha256": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "liveSha256": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "pass": true
+    },
+    {
+      "path": "tests/fireProtocolRunner.test.ts",
+      "established": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "baselineSha256": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "frozenSha256": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "liveSha256": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "pass": true
+    },
+    {
+      "path": "docs/review/unified/fire-sequence-audit.md",
+      "established": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "baselineSha256": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "frozenSha256": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "liveSha256": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "pass": true
+    },
+    {
+      "path": "docs/review/unified/fire-runner-equivalence.json",
+      "established": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "baselineSha256": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "frozenSha256": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "liveSha256": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "pass": true
+    },
+    {
+      "path": "docs/review/unified/fire-controls-smoke.json",
+      "established": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "baselineSha256": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "frozenSha256": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "liveSha256": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "pass": true
+    },
+    {
+      "path": "public/history/v0.12/accepted-checkpoint-review.manifest.json",
+      "established": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "baselineSha256": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "frozenSha256": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "liveSha256": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "pass": true
+    },
+    {
+      "path": "public/history/v0.12/accepted-checkpoint-review.mp4",
+      "established": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "baselineSha256": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "frozenSha256": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "liveSha256": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "pass": true
+    },
+    {
+      "path": "public/history/v0.14/manifest.json",
+      "established": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "baselineSha256": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "frozenSha256": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "liveSha256": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "pass": true
+    },
+    {
+      "path": "public/history/v0.14/peat-fire-gradual.mp4",
+      "established": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "baselineSha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "frozenSha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "liveSha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "pass": true
+    },
+    {
+      "path": "public/history/v0.14/peat-fire-rapid.mp4",
+      "established": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "baselineSha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "frozenSha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "liveSha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "pass": true
+    },
+    {
+      "path": "public/models/dry-ice-reference-animation.glb",
+      "established": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "baselineSha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "frozenSha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "liveSha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "pass": true
+    },
+    {
+      "path": "public/models/dry-ice-reference-animation.manifest.json",
+      "established": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "baselineSha256": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "frozenSha256": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "liveSha256": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "pass": true
+    },
+    {
+      "path": "public/models/peat-study.glb",
+      "established": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "baselineSha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "frozenSha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "liveSha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "pass": true
+    },
+    {
+      "path": "public/models/peat-study.manifest.json",
+      "established": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "baselineSha256": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "frozenSha256": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "liveSha256": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "pass": true
+    },
+    {
+      "path": "public/renders/Fire_Sequence_Contact_Sheet.png",
+      "established": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "baselineSha256": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "frozenSha256": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "liveSha256": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "pass": true
+    },
+    {
+      "path": "public/renders/Fire_Sequence_Poster.png",
+      "established": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "baselineSha256": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "frozenSha256": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "liveSha256": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "pass": true
+    },
+    {
+      "path": "public/renders/manifest.json",
+      "established": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "baselineSha256": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "frozenSha256": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "liveSha256": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "pass": true
+    },
+    {
+      "path": "public/renders/peat-fire-gradual.mp4",
+      "established": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "baselineSha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "frozenSha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "liveSha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "pass": true
+    },
+    {
+      "path": "public/renders/peat-fire-rapid.mp4",
+      "established": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "baselineSha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "frozenSha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "liveSha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/README.md",
+      "established": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "baselineSha256": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "frozenSha256": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "liveSha256": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/build_fire_sequence.py",
+      "established": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "baselineSha256": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "frozenSha256": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "liveSha256": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/contact_assets.py",
+      "established": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "baselineSha256": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "frozenSha256": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "liveSha256": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/create_contact_sheet.py",
+      "established": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "baselineSha256": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "frozenSha256": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "liveSha256": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/package_render_assets.py",
+      "established": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "baselineSha256": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "frozenSha256": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "liveSha256": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/render_delivery.py",
+      "established": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "baselineSha256": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "frozenSha256": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "liveSha256": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/render_fire_sequence.py",
+      "established": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "baselineSha256": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "frozenSha256": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "liveSha256": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/rupture_geometry.py",
+      "established": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "baselineSha256": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "frozenSha256": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "liveSha256": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/storyboard.json",
+      "established": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "baselineSha256": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "frozenSha256": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "liveSha256": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/verify_fire_sequence.py",
+      "established": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "baselineSha256": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "frozenSha256": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "liveSha256": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/verify_movies.py",
+      "established": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "baselineSha256": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "frozenSha256": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "liveSha256": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "pass": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/visual_assets.py",
+      "established": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "baselineSha256": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "frozenSha256": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "liveSha256": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "pass": true
+    }
+  ],
+  "passed": 57,
+  "count": 57
+}

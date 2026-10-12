@@ -1,0 +1,27 @@
+{
+  "executor": "/root/realism_a_review",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "tests/independent-realism-a-current.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568",
+  "startUtc": "2026-10-12T08:36:18.288327+00:00",
+  "endUtc": "2026-10-12T08:36:18.814092+00:00",
+  "exitCode": 0,
+  "CPUloadBefore": [
+    21.36767578125,
+    25.9921875,
+    29.81689453125
+  ],
+  "CPUloadAfter": [
+    21.36767578125,
+    25.9921875,
+    29.81689453125
+  ],
+  "reviewerTestSha256": "f783d7e6dab5b27887efb03ad2286e94b1fc9743966f74f4c37cf817c6b7fcc2",
+  "repair": "Reviewer-only newly written harness declaration typo corrected; no implementation/benchmark/input/tolerance change. First attempt log retained; its 97 successful tests remain valid. Only previously unexecuted new file rerun."
+}

@@ -1,0 +1,436 @@
+diff --git a/src/alternatives/pressure-pulse-pressure-only/animation.ts b/src/alternatives/pressure-pulse-pressure-only/animation.ts
+index 9cb0675..4d27a29 100644
+--- a/src/alternatives/pressure-pulse-pressure-only/animation.ts
++++ b/src/alternatives/pressure-pulse-pressure-only/animation.ts
+@@ -1,22 +1,32 @@
+-/** Authored dimensionless disturbance, never a pressure law or soil response. */
++import { FIRE_SEQUENCE_GEOMETRY as G } from '../../story/fireSequence'
++
++/** Presentation timing only; no pressure, stress, energy or displacement law. */
+ const clamp = (n: number) => Math.max(0, Math.min(1, n))
+-export const PRESSURE_SEQUENCE = { start: 38, release: 44, observe: 66, end: 90 } as const
++const ease = (time: number, start: number, end: number) => {
++  const u = clamp((time - start) / (end - start))
++  return u * u * (3 - 2 * u)
++}
++export const PRESSURE_SEQUENCE = { start: 38, release: 55, settle: 58, observe: 62, end: 90 } as const
+ 
+ export function pressureAnimationFrame(presentationS: number) {
+   const time = Number.isFinite(presentationS) ? Math.max(0, Math.min(90, presentationS)) : 0
+-  const elapsed = time - 38, active = elapsed >= 0 && time < 66
+-  const expansion = 1 - Math.exp(-Math.max(0, elapsed) * .22)
+-  const fade = active ? Math.min(1, Math.max(0, elapsed) / .7) * (1 - clamp((time - 57) / 9)) : 0
++  const age = Math.max(0, time - PRESSURE_SEQUENCE.release)
++  const active = time >= PRESSURE_SEQUENCE.release
++  const jolt = active && age < 3 ? clamp((1 - Math.exp(-age * 32)) * Math.exp(-age * 3.7) * 1.8) : 0
++  const settled = ease(time, 56, PRESSURE_SEQUENCE.observe)
+   return {
+-    time, active,
+-    stage: time < 38 ? 'Drilled access' : time < 44 ? 'Rapid pressure change' : time < 66 ? 'Transient relaxation' : 'Observe · no liquid injected',
+-    fronts: active ? Array.from({ length: 5 }, (_, i) => ({
+-      radius: .12 + expansion * (.42 + i * .32) + Math.sin(elapsed * 2.7 - i * .8) * .055 * Math.exp(-elapsed * .055),
+-      opacity: fade * (.75 - i * .09),
+-      angle: i * Math.PI * .4 + elapsed * .22,
+-    })) : [],
+-    direction: active && time < 41 ? -1 : 1,
+-    indicator: active ? .3 + .7 * Math.sin(elapsed * 2.7) ** 2 : 0,
+-    observationCursor: time >= 66 ? clamp((time - 66) / 24) : 0,
++    time, age, active, jolt, settled,
++    opening: ease(time, 55, 55.5) * (1 - settled * .65),
++    tremor: active && age < 3 ? Math.sin(age * 31) * Math.exp(-age * 3.7) * .035 : 0,
++    fragments: active && age < 3,
++    stage: time < 38 ? 'Original fire and drilled access' : time < 55 ? 'Original dry-ice placement and pressure release' : time < 56 ? 'Illustrative ground jolt' : time < 62 ? 'Soil fragments fall and settle' : 'Observe · no liquid injected',
+   }
+ }
++
++/** Irregular authored earth seams, never computed fracture trajectories. */
++export function pressureSoilPoint(branch: number, fraction: number): [number, number, number] {
++  const u = clamp(fraction), angle = branch * Math.PI / 4 + .13
++  return [G.sourceX + Math.cos(angle) * (1.55 + (branch % 3) * .28) * u,
++    -G.sourceDepthM + Math.sin(angle) * (.35 + (branch % 2) * .12) * u + Math.sin(u * 15 + branch) * .035 * u,
++    .15]
++}
+diff --git a/src/alternatives/pressure-pulse-pressure-only/groundResponse.tsx b/src/alternatives/pressure-pulse-pressure-only/groundResponse.tsx
+new file mode 100644
+index 0000000..bce0222
+--- /dev/null
++++ b/src/alternatives/pressure-pulse-pressure-only/groundResponse.tsx
+@@ -0,0 +1,49 @@
++import { useEffect, useMemo } from 'react'
++import { BufferGeometry, DoubleSide, Float32BufferAttribute } from 'three'
++import { pressureSoilPoint } from './animation'
++
++/** Owned cutaway lips move; the original ground is never modified. */
++export function pressureBankVertices(branch: number, opening: number, jolt: number, settled: number, bank: -1 | 0 | 1) {
++  const vertices: number[] = []
++  const point = (u: number, edge: number): [number, number, number] => {
++    const p = pressureSoilPoint(branch, u)
++    const a = pressureSoilPoint(branch, Math.max(0, u - .01)), b = pressureSoilPoint(branch, Math.min(1, u + .01))
++    const dx = b[0] - a[0], dy = b[1] - a[1], length = Math.hypot(dx, dy) || 1
++    const taper = Math.sin(Math.PI * u) ** .35
++    const gap = (.012 + .045 * opening + .035 * jolt) * taper
++    const across = bank === 0 ? edge * gap : bank * (gap + edge * (.04 + opening * .02))
++    return [p[0] - dy / length * across,
++      p[1] + dx / length * across + (.07 * jolt - .035 * settled) * taper,
++      p[2] + (bank === 0 ? .003 : .022 + .13 * jolt * taper * (1 - edge))]
++  }
++  for (let i = 0; i < 32; i++) {
++    const a = point(i / 32, bank === 0 ? -1 : 0), b = point(i / 32, 1)
++    const c = point((i + 1) / 32, bank === 0 ? -1 : 0), d = point((i + 1) / 32, 1)
++    for (const p of [a, b, c, b, d, c]) vertices.push(...p)
++  }
++  return vertices
++}
++
++function EarthBank({ branch, opening, jolt, settled, bank }: {
++  branch: number; opening: number; jolt: number; settled: number; bank: -1 | 0 | 1
++}) {
++  const geometry = useMemo(() => {
++    const g = new BufferGeometry()
++    g.setAttribute('position', new Float32BufferAttribute(pressureBankVertices(branch, opening, jolt, settled, bank), 3))
++    g.computeVertexNormals()
++    return g
++  }, [branch, opening, jolt, settled, bank])
++  useEffect(() => () => geometry.dispose(), [geometry])
++  return <mesh geometry={geometry} castShadow>
++    <meshStandardMaterial color={bank === 0 ? '#120d08' : bank === 1 ? '#766247' : '#5b4b36'} roughness={1} side={DoubleSide}/>
++  </mesh>
++}
++
++export function PressureGround({ opening, jolt, settled }: { opening: number; jolt: number; settled: number }) {
++  if (opening <= 0) return null
++  return <group userData={{ scientificRole: 'Authored earth jolt and settling hypothesis; no computed mechanics or suppression' }}>
++    {Array.from({ length: 8 }, (_, branch) => <group key={branch}>
++      {([-1, 0, 1] as const).map(bank => <EarthBank key={bank} branch={branch} opening={opening} jolt={jolt} settled={settled} bank={bank}/>)}
++    </group>)}
++  </group>
++}
+diff --git a/src/alternatives/pressure-pulse-pressure-only/index.ts b/src/alternatives/pressure-pulse-pressure-only/index.ts
+index b5170b7..074ca5c 100644
+--- a/src/alternatives/pressure-pulse-pressure-only/index.ts
++++ b/src/alternatives/pressure-pulse-pressure-only/index.ts
+@@ -6,8 +6,8 @@ export const variants: readonly Variant[] = [{
+   id: 'pressure-only', method: '4.2.3', number: '4.2.3.2',
+   label: 'Rapid pressure change without liquid', subtitle: 'Descriptive draft label · no liquid injection', draft: true,
+   engines: ['concept'], media: ['none', 'unspecified'], defaultMedium: 'none', defaultEngine: 'concept',
+-  stages: ['Excavator-drilled access', 'Abstract rapid pressure change', 'Observe an unresolved soil-response hypothesis'],
+-  limitation: 'No liquid or thermal source is instantiated. Pressure propagation, soil rearrangement/collapse and suppression remain unavailable without a constitutive and transport model; all physical metrics are N/A.',
++  stages: ['Original drilled access and dry-ice reference sequence', 'Illustrative ground jolt', 'Soil fragments settle · no liquid injected'],
++  limitation: 'Earth motion is an authored soil-response hypothesis, not computed pressure, fracture or collapse. No liquid or thermal source is instantiated; physical metrics and suppression remain N/A.',
+   status: { illustrative: true, modeled: 'Unavailable — pressure/soil response not coupled', experimentallyValidated: false },
+   provenance: 'User capstone subsection; generic environmental input with unspecified source properties. No device, pressure law or measured outcome is inferred.',
+ }]
+diff --git a/src/alternatives/pressure-pulse-pressure-only/model.ts b/src/alternatives/pressure-pulse-pressure-only/model.ts
+index 0ab2332..8ae4639 100644
+--- a/src/alternatives/pressure-pulse-pressure-only/model.ts
++++ b/src/alternatives/pressure-pulse-pressure-only/model.ts
+@@ -1,6 +1,7 @@
+ import type { AlternativeRun, MethodPresentation, SupportedAdapterHooks } from '../contract'
+ import type { PanelConfig } from '../model'
+ import type { VariantId } from '../registry'
++import { pressureAnimationFrame } from './animation'
+ 
+ export const PRESSURE_ONLY_CAPABILITIES = {
+   liquidSource: 'absent', thermalSource: 'absent', pressureTransport: 'unavailable',
+@@ -21,12 +22,11 @@ export function createPressureOnlyRun(config: PanelConfig, hooks: SupportedAdapt
+ export function pressureOnlyPresentation(id: VariantId, timeS: number): MethodPresentation {
+   if (id !== 'pressure-only') throw new Error('4.2.3.2 presentation requires pressure-only identity.')
+   const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
+-  return { contextTime: Math.min(time, 36), access: true, pulse: time >= 38 && time < 66,
++  return { contextTime: Math.min(time, 57), access: true, pulse: time >= 55 && time < 58,
+     waves: false, injection: false, vibration: 0, contacts: 0 }
+ }
+ 
+ /** Smooth authored visibility only, with no dimensional pressure quantity. */
+ export function pressureCueEnvelope(timeS: number): number {
+-  const u = Math.max(0, Math.min(1, (timeS - 48) / 6))
+-  return Math.sin(Math.PI * u) ** 2
++  return pressureAnimationFrame(timeS).jolt
+ }
+diff --git a/src/alternatives/pressure-pulse-pressure-only/scene.tsx b/src/alternatives/pressure-pulse-pressure-only/scene.tsx
+index abbf4f2..4a885fb 100644
+--- a/src/alternatives/pressure-pulse-pressure-only/scene.tsx
++++ b/src/alternatives/pressure-pulse-pressure-only/scene.tsx
+@@ -1,34 +1,36 @@
+-import { AdditiveBlending, DoubleSide } from 'three'
+ import type { MethodSceneProps } from '../contract'
+ import { FIRE_SEQUENCE_GEOMETRY as G } from '../../story/fireSequence'
+ import { pressureOnlyPresentation } from './model'
+-import { pressureAnimationFrame } from './animation'
++import { pressureAnimationFrame, pressureSoilPoint } from './animation'
++import { PressureGround } from './groundResponse'
+ 
+-/** A transient in the original world coordinates. Only abstract input contours
+- * and neutral tracer glyphs move; soil, roots and fire are never displaced,
+- * fractured, cooled or suppressed. There is no liquid/equipment source. */
++/** Original dry-ice event is read-only host context. Only privately owned earth
++ * cues move; no water, equipment, heat source or extinction state is created. */
+ export function MethodCues({ id, time }: MethodSceneProps) {
+   pressureOnlyPresentation(id, time)
+   const f = pressureAnimationFrame(time)
+   if (!f.active) return null
+-  return <group position={[G.sourceX, -G.sourceDepthM, .13]} userData={{ stage: f.stage, illustrative: true, worldSpace: true, liquid: false }}>
+-    {f.fronts.map((front, i) => <group key={i}>
+-      <mesh scale={[front.radius, front.radius * .48, .035]}>
+-        <sphereGeometry args={[1, 40, 20]}/><meshBasicMaterial color="#b4a382" transparent opacity={front.opacity * .04} depthWrite={false} blending={AdditiveBlending}/>
++  return <group userData={{ stage: f.stage, illustrative: true, worldSpace: true, liquid: false }}>
++    <PressureGround opening={f.opening} jolt={f.jolt} settled={f.settled}/>
++    {f.fragments && Array.from({ length: 48 }, (_, i) => {
++      const branch = i % 8, p = pressureSoilPoint(branch, .15 + (i * .137) % .75)
++      const flight = Math.max(0, Math.sin(Math.PI * Math.min(1, f.age / (1.15 + (i % 4) * .22))))
++      const side = p[0] < G.sourceX ? -1 : 1
++      return <mesh key={i} position={[p[0] + side * flight * (.08 + (i % 3) * .04) + f.tremor,
++        p[1] + flight * (.12 + (i % 5) * .025), p[2] + .04 + flight * .17]}
++        rotation={[i * .83 + flight * 3, flight + i, f.tremor * 5]} scale={.7 + flight * .5}>
++        <icosahedronGeometry args={[.021 + (i % 3) * .008, 0]}/><meshStandardMaterial color={i % 2 ? '#897556' : '#65553b'} roughness={1}/>
+       </mesh>
+-      <mesh scale={[front.radius, front.radius * .48, 1]}>
+-        <ringGeometry args={[.989, 1, 96]}/><meshBasicMaterial color="#c4ab7f" transparent opacity={front.opacity * .7} side={DoubleSide} depthWrite={false}/>
+-      </mesh>
+-      {Array.from({ length: 8 }, (_, j) => {
+-        const angle = front.angle + j * Math.PI / 4
+-        return <mesh key={j} position={[Math.cos(angle) * front.radius, Math.sin(angle) * front.radius * .48, .035]}
+-          rotation={[0, 0, angle + Math.PI / 4]} scale={[1, .6, .6]}>
+-          <octahedronGeometry args={[.018, 0]}/><meshBasicMaterial color="#dbc8a8" transparent opacity={front.opacity * .7}/>
+-        </mesh>
+-      })}
+-    </group>)}
+-    <mesh rotation={[0, 0, Math.PI / 4]} scale={f.indicator}>
+-      <octahedronGeometry args={[.065, 0]}/><meshBasicMaterial color="#e4c594" transparent opacity={.45}/>
+-    </mesh>
++    })}
++    {Array.from({ length: 10 }, (_, i) => {
++      const angle = i * 2.4, radius = .3 + (i % 3) * .19
++      return <group key={i} position={[G.sourceX + Math.cos(angle) * radius + f.tremor,
++        .014 + f.jolt * (.1 + (i % 3) * .025) - f.settled * .022,
++        -.12 - Math.abs(Math.sin(angle)) * radius]}
++        rotation={[f.tremor * 3, angle, f.jolt * (i % 2 ? .1 : -.1)]}>
++        <mesh castShadow><boxGeometry args={[.19, .05, .14]}/><meshStandardMaterial color="#59482f" roughness={1}/></mesh>
++        <mesh position={[0, .027, 0]}><boxGeometry args={[.19, .008, .14]}/><meshStandardMaterial color="#536b37" roughness={1}/></mesh>
++      </group>
++    })}
+   </group>
+ }
+diff --git a/src/alternatives/pressure-pulse-pressure-only/science.tsx b/src/alternatives/pressure-pulse-pressure-only/science.tsx
+index ff9e33c..0c6fef5 100644
+--- a/src/alternatives/pressure-pulse-pressure-only/science.tsx
++++ b/src/alternatives/pressure-pulse-pressure-only/science.tsx
+@@ -1,10 +1,10 @@
+ export function MethodScience() {
+   return <section data-method-science="4.2.3.2">
+     <h3>4.2.3.2 · Rapid pressure change without liquid</h3>
+-    <p>Expanding and relaxing gold contours in the existing cutaway represent an abstract environmental disturbance. It has no pressure amplitude, wave speed, source material, energy or equipment interpretation. Existing soil geometry stays fixed. Rearrangement or collapse remains an unresolved hypothesis.</p>
++    <p>The preview replays the unchanged original drilled-access and dry-ice reference sequence through the release at55 presentation seconds. Private earth banks then jolt, soil fragments lift and fall, and turf patches settle around the bore. Gold contours and translucent wave shells are removed. This illustrates an unresolved soil-response hypothesis; it does not calculate pressure, fracture, collapse or treatment success.</p>
+     <p><strong>No liquid source.</strong> This child rejects contact/FEM engines and liquid/solid treatment media. Its private adapter removes stale inventory, flow and thermal-contact settings from an owned copy before invoking the concept lifecycle. It creates no calorimeter or transport state. Water, heat, oxygen, fuel, reaction, displacement and suppression outcomes are N/A, rather than invented zero-valued predictions.</p>
+     <p><strong>Missing equations.</strong> A quantitative result would require measured environmental pressure boundary data, compressible multiphase transport, an appropriate stress/effective-stress and deformation law, material calibration and validated coupling to reaction/thermal behavior. These hooks are absent. No heat or species source, pressure law, permeability multiplier or outcome curve is implemented.</p>
+-    <p>The preview uses dimensionless authored contour radii and opacity during 38–66 presentation seconds; exponential/trigonometric easing is animation choreography, not a pressure law or measured relaxation. It never advances a physical solver. Concept checkpoints support independent playback/controls with null metrics; linked physical comparisons are unavailable.</p>
++    <p>The burst is authored at55s and the earth settles through62s. Its easing, fragment arcs and mesh positions are display choreography, not measured displacement or a mechanics law. The host invokes the original unchanged through57s, then holds that context with water disabled. No water trucks, hose, droplets, contact patches or authored fire-out ending are added. The original dry-ice depiction supplies reference imagery only; it does not add solid inventory, heat or species to this child. Concept checkpoints retain null metrics and cannot enter linked physical comparisons.</p>
+     <p><strong>Proposed, unperformed validation.</strong> A qualified laboratory would first document soil composition, water content, density, boundaries and uncertainty, then independently measure a prescribed generic disturbance and soil response against matched untreated controls. Thermal/reactive validation would be a separate later task. No pressure-generation apparatus, operating settings or construction procedure is specified here, and no experiments have been performed.</p>
+     <p><strong>Evidence and cost.</strong> The capstone subsection supplies a concept, not measured data or material properties. No cited water or gas properties can fill those missing inputs. Pressure-source, access, instrumentation and operation costs remain unavailable until a safe, defined study and supplier quotations exist. This child consumes no modeled liquid; that is not a claim of zero operating cost.</p>
+   </section>
+diff --git a/src/ui/AlternativeRenderWorkspace.tsx b/src/ui/AlternativeRenderWorkspace.tsx
+index 4f68057..6bbeea3 100644
+--- a/src/ui/AlternativeRenderWorkspace.tsx
++++ b/src/ui/AlternativeRenderWorkspace.tsx
+@@ -56,7 +56,7 @@ export default function AlternativeRenderWorkspace({ id, onCompare, onDetails }:
+         </div>
+       </main>
+     </div>
+-    <ToolboxPortal><div className="method-render-tools"><h3>{v.number} {v.label}</h3><p>{v.limitation}</p><p>The ring, drill vibration and blue contact markers are authored cues. They do not change the peat, temperature, oxygen, permeability or any solver state.</p><button onClick={onCompare}>Compare supported components ↗</button><button onClick={onDetails}>Method details & equations ↗</button><button onClick={()=>setResetToken(n=>n+1)}>Reset camera</button><label>Camera distance <input aria-label="Method camera distance" type="range" min={5} max={19} step={.05} value={cameraDistance} onChange={e=>setCameraDistance(Number(e.target.value))}/></label></div></ToolboxPortal>
++    <ToolboxPortal><div className="method-render-tools"><h3>{v.number} {v.label}</h3><p>{v.limitation}</p><p>Equipment, ground motion and treatment cues are authored illustrations. They do not change the peat, temperature, oxygen, permeability or any solver state.</p><button onClick={onCompare}>Compare supported components ↗</button><button onClick={onDetails}>Method details & equations ↗</button><button onClick={()=>setResetToken(n=>n+1)}>Reset camera</button><label>Camera distance <input aria-label="Method camera distance" type="range" min={5} max={19} step={.05} value={cameraDistance} onChange={e=>setCameraDistance(Number(e.target.value))}/></label></div></ToolboxPortal>
+     <FinderPortal><section className="method-render-tools"><h3>{v.number} {v.label}</h3><p>{v.limitation}</p><p>Illustrative: method stages. Modeled components: {v.status.modeled}. Experimentally validated: no.</p><button onClick={onDetails}>Read mathematics & evidence ↗</button></section></FinderPortal>
+   </div>
+ }
+diff --git a/src/ui/AlternativeScene.tsx b/src/ui/AlternativeScene.tsx
+index 5efd082..9f95aed 100644
+--- a/src/ui/AlternativeScene.tsx
++++ b/src/ui/AlternativeScene.tsx
+@@ -10,15 +10,18 @@ export function AlternativeScene({id,time,resetToken,cameraDistance}:{id:Variant
+   // The user explicitly selected the complete original as liquid-waves' base.
+   // Its authored treatment remains illustrative, never a new calculated result.
+   const fullBase = id === 'liquid-waves'
+-  const contextTime = Math.max(0, Math.min(fullBase ? 90 : 38, time))
++  // Pressure-only reuses the original dry-ice addition/cap/release animation,
++  // held before the original water delivery. This remains authored imagery.
++  const pressureOnly = id === 'pressure-only'
++  const contextTime = Math.max(0, Math.min(fullBase ? 90 : pressureOnly ? 57 : 38, time))
+   // Explicitly requested authored movie endings, not calculated extinction.
+   // This uses the export's public layer prop only in these new alternatives.
+   const fire = id === 'sublimation-injection' ? time < 86 : fullBase ? time < 89 : true
+-  const original = FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire,gas:fullBase,water:fullBase,anatomy:true},resetToken,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance})
++  const original = FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire,gas:fullBase || pressureOnly,water:fullBase,anatomy:true},resetToken,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance})
+   const scene = id === 'nanoparticles' ? original : cloneElement(original, undefined,
+     original.props.children,
+     <group key="alternative-world-cues" userData={{alternative:id,illustrative:true}}><AlternativeMethodCues id={id} time={time}/></group>)
+-  return <div className="alternative-scene-composition" data-method={id} data-presentation-active={time >= 38} data-original-animation="fire-spread-and-drilling" data-original-context-time={contextTime} data-original-replay={fullBase?'full-authored-base':'introduction'} data-presentation-space="original-world">
++  return <div className="alternative-scene-composition" data-method={id} data-presentation-active={time >= 38} data-original-animation="fire-spread-and-drilling" data-original-context-time={contextTime} data-original-replay={fullBase?'full-authored-base':pressureOnly?'authored-gas-release-no-water':'introduction'} data-presentation-space="original-world">
+     {scene}
+   </div>
+ }
+diff --git a/src/ui/AlternativeScience.tsx b/src/ui/AlternativeScience.tsx
+index 522eb6e..3cd0ee8 100644
+--- a/src/ui/AlternativeScience.tsx
++++ b/src/ui/AlternativeScience.tsx
+@@ -5,7 +5,7 @@ export function AlternativeScience() {
+     <header><span className="alt-eyebrow">MATHEMATICS / EVIDENCE / LIMITATIONS</span><h2>What is actually calculated.</h2><p>Numerical verification is separate from experimental validation. None of the capstone methods has passed matched experimental validation.</p></header>
+     <div className="science-columns"><section><h3>Implemented thermal proxy</h3><pre>{'Cp = mpeat cp,peat; Cw = mwater cp,water\nQeq = (Tp − Tw) / (1/Cp + 1/Cw)\nQ = Qeq [1 − exp(−UA (1/Cp + 1/Cw) Δt)]\nQdry = Cp (Tp − Tdry) [1 − exp(−UAdry Δt/Cp)]\nΔmdry = Qdry / Lsub ≤ remaining dry mass\nQwater = mwater cp,water ΔT + mevap Lv\nΔUpeat + Uwater + Hvapor,out + Qdry = 0'}</pre><p>Three independent 0.5 kg lumped specimens share a finite reservoir. Delivery and contact locations are prescribed; sample order is not a solved depth profile. Initial temperature 823.15 K, water inlet 293.15 K, fixed physical integration step 0.00625 s, default observation window 60 s. UA is assumed, not calibrated. No ambient heat loss, fuel reaction or oxygen transport is active in this proxy.</p><p>Incoming water carries sensible energy relative to the selected inlet reference. Vapor leaves at the assumed atmospheric boiling point, 373.15 K. Sensible exchange stops at the boiling boundary before latent transfer. Dry contact stops at the inlet-temperature validity boundary; no subambient ice physics is claimed. Source inventory, bypass, stored water heat and vapor export remain in separate ledgers.</p><p>Mass residual = initial supply − remaining − bypass − liquid retained − vapor exported. Energy residual = initial peat sensible energy − current peat energy − water sensible energy − vapor enthalpy − dry-source heat. Intervention off sets liquid/dry source inventories and thermal contacts to zero.</p></section>
+     <section><h3>Preserved Peat Fire FEM</h3><pre>{'∂(θg ρg Yj)/∂t + ∇·(ρg q Yj − θg ρg D∇Yj) = Sj\nq = −K krg/μ (∇p − ρg g)\np = R T Σ(gj/Mj) / θg\n∂U/∂t + ∇·(ρg q cp,g (T−300)) − ∇·(k∇T)\n  = −Σ ΔHk rk + prescribed ignition\nrk = m0 10^logA exp(−E/RT) (m/m0)^n g(YO₂)'}</pre><p>Q1 hexahedral finite elements with lumped storage, stabilized conservative nodal transport, local five-step reaction and thermal/pressure Picard iteration. Two half steps are accepted after a full-step error estimate; failed candidates shrink the step. Maximum step is 1 s by default and integration is independent of render FPS. Top Robin heat/species exchange and prescribed atmospheric pressure; other faces sealed. Initial 300 K, 0.233 kg O₂/kg gas, 0.1 kg water/kg dry peat. Full equations, source terms, material assumptions and diagnostics remain in Peat Fire FEM → Physical formulas.</p><p>Energy residual includes ignition, reaction, outward heat and gas enthalpy. Total mass residual includes all five condensed inventories, four gas pools and boundary exchange. Suppression interventions remain disabled. CO₂ is never an oxygen source. No experimental validation is claimed for the transferred column kinetics in this cube.</p></section></div>
+-    <h3>4.2.4 experimental field view</h3><pre>{'dm = min(remaining supply, prescribed flow × accepted Δt)\nHin = dm [4186 (Tin − 273.15) + pinterface / 1000]\ncorrected mass = raw mass residual − delivered mass\ncorrected energy = raw thermal residual − imported enthalpy'}</pre><p>The separate latest-render workspace owns a 1,280-cell reacting peat calculation, outside the comparison engines. It deposits finite liquid at an assumed advancing tip after each accepted step, resolves local equilibrium, and restores the whole candidate on failure. Interface pressure is assumed equal to local absolute gas pressure; pure-liquid admission requires inlet saturation pressure below that pressure. No pump power, liquid migration or vibration mechanics is solved. Its prepared hot initial field is independent of the original opening animation.</p><p>Calculated views show temperature, gas oxygen mole fraction and positive net liquid change in kg/cell, sampled at the middle-y slice and extruded for display. This liquid difference is not a source tracer. The default 60 s calculation remains hot and reacting. Site-view shaking, lateral jets, wetting and fire-out are authored illustrations and do not establish numerical extinction, suppression or a treatment ranking. Raw and source-corrected mass, species and energy ledgers are retained separately.</p>
++    <h3>4.2.4 vibration-only model status</h3><p>The requested method reuses the original fire-spreading and drilling scene, with authored vibration and dust cues. No supported vibration-force, mechanical-work, cyclic soil-response or transport-coupling calculation is available. Its predictive comparison execution is unavailable; shaking does not calculate cooling, oxygen loss, permeability change or suppression.</p><p>The earlier finite-liquid experimental field and its numerical evidence are preserved as historical work, outside the current vibration-only method. Its mass and enthalpy checks do not validate vibration. No liquid is delivered. The requested fracture, soil-settling and covered-fire ending is an authored concept illustration, not calculated compression, permeability change or extinction. Mechanical forcing, peat constitutive and damping data, and independent measurements are required before a predictive vibration response can be assessed.</p>
+     <h3>Live comparison component capabilities</h3><div className="science-table-wrap"><table><thead><tr><th>Method / variant</th><th>Modeled comparison component</th><th>Missing physics</th></tr></thead><tbody>{VARIANTS.map(v => <tr key={v.id}><td>{v.number} {v.label}</td><td>{v.status.modeled}<br/>Experimentally validated: no</td><td>{v.limitation}</td></tr>)}</tbody></table></div>
+     <h3>Material sources and validity</h3><p>SI internally; temperature in kelvin. Contact model does not contain concentration fractions. FEM oxygen is mass per total gas mass; FEM moisture is water per initial dry peat mass. Geometry, initial conditions, seed and observation window must match before a fair physical comparison.</p><ul>{MEDIA.map(m => <li key={m.id}><strong>{m.label}:</strong> {m.provenance}</li>)}</ul><p>Peat cp = 1840 J/(kg K) is the existing constant approximation. Water cp and latent heat are near-ambient/atmospheric-boiling constants; no broad temperature or pressure accuracy is asserted. CO₂ latent heat is 6030 cal/mol × 4.184 / 0.0440095 kg/mol, frozen near 195 K; it is not a general phase diagram. Unspecified pressure sources have no thermodynamic prediction.</p><p><a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4" target="_blank" rel="noreferrer">NIST CO₂ phase-change data / Giauque & Egan (1937)</a> · <a href="https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Mask=2" target="_blank" rel="noreferrer">NIST water reference data</a> · <a href="https://doi.org/10.1071/WF16198" target="_blank" rel="noreferrer">Huang & Rein (2017), five-step peat kinetics</a> · <a href="https://doi.org/10.1071/WF20117" target="_blank" rel="noreferrer">Santoso et al. (2021), measured water-suppression context</a></p>
+     <h3>Suppression and re-ignition assessment</h3><p>N/A for contact proxies and conceptual stages: cooling is not extinguishment. FEM can record reaction activity, oxygen, peat/char inventories and thermal history over its 600 s window; it does not model these capstone interventions. No success threshold, re-ignition guarantee, or winner is inferred from a lower temperature.</p>
+diff --git a/src/ui/AlternativesWorkspace.tsx b/src/ui/AlternativesWorkspace.tsx
+index 0df246e..69d5168 100644
+--- a/src/ui/AlternativesWorkspace.tsx
++++ b/src/ui/AlternativesWorkspace.tsx
+@@ -1,5 +1,6 @@
+ import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+ import AlternativeWorker from '../worker/alternatives.worker.ts?worker'
++import { ALTERNATIVE_CONTACT_STEP_S } from '../alternatives/contactAdapter'
+ import { VARIANTS, ENGINES, MEDIA, PARAMETERS, compatible, variant, type VariantId, type EngineId, type MediumId } from '../alternatives/registry'
+ import { acceptsMessage, duplicatePanel, freshPanel, linkedCompatibility, type AcceptedState, type PanelConfig, type RunMessage, type WorkerCommand } from '../alternatives/model'
+ import { readComparison, serializeComparison, SESSION_KEY, SESSION_SCHEMA } from '../alternatives/persistence'
+@@ -132,7 +133,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
+   function add(id: VariantId) { if (configs.length >= MAX_PANELS) return; mutate(old => [...old,freshPanel(uid(),id)]); setTab('compare') }
+   function exportRun() {
+     const contents = JSON.stringify({ format: 'zombie-fire-live-alternatives', schema: SESSION_SCHEMA, applicationVersion: '0.21.0', engineVersions: { contact: 'contactCooling-0.20-public-reference/v21.2', 'peat-fem': 'q1-five-step-0.20', concept: 'stages-1' },
+-      units: RECORD_UNITS, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
++      units: RECORD_UNITS, numerics: { contactIntegrationStepS: ALTERNATIVE_CONTACT_STEP_S, outputCheckpointStepS: .5 }, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
+       linkedPhysicalTime: linked, fairness: comparisonNotes(configs), panels: configs.map(config => {
+         const result=resultRef.current[config.id]
+         return { config, result: currentRecord(config, result) }
+@@ -146,7 +147,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
+       if (configs.length >= MAX_PANELS) mutate(old => [...old.slice(0,-1),freshPanel(old.at(-1)!.id,v.id)])
+       else add(v.id)
+       setTab('compare')
+-    }}>{v.engines.length ? configs.length >= MAX_PANELS ? 'Replace last comparison panel' : 'Add independent comparison panel' : v.id==='pressure-pulse' ? 'Live comparison unavailable · original preserved' : 'Execution disabled · mechanism unspecified'}</button><button onClick={() => setTab('science')}>Read implemented equations ↗</button></article></section>}
++    }}>{v.engines.length ? configs.length >= MAX_PANELS ? 'Replace last comparison panel' : 'Add independent comparison panel' : v.id==='pressure-pulse' ? 'Live comparison unavailable · original preserved' : v.id==='vibratory-injection' ? 'Vibration comparison unavailable' : 'Execution disabled · mechanism unspecified'}</button><button onClick={() => setTab('science')}>Read implemented equations ↗</button></article></section>}
+     <section hidden={tab !== 'compare'} className="alt-compare" aria-label="Independent live alternative comparison">
+       <div className="alt-comparison-toolbar"><div><span className="alt-eyebrow">LIVE ALTERNATIVES · {configs.length} INDEPENDENT JOBS</span><p>Accepted solver states. Archived replay clocks remain in Previous simulations.</p></div><div><button onClick={() => { if (linked && !linkReason) { command('pause'); target.current=null;setLinkedRunning(true) } else command('run') }}>Start / resume all</button><button onClick={() => { setLinkedRunning(false);target.current=null;command('pause') }}>Pause all</button><button onClick={() => { setLinkedRunning(false);target.current=null;command('reset') }}>Reset all</button><button disabled={configs.length >= MAX_PANELS} onClick={() => add(selectedVariant === 'nanoparticles' ? 'baseline' : selectedVariant)}>Add panel</button><button onClick={exportRun}>Export records</button></div></div>
+       <div className="alt-fairness"><label><input type="checkbox" aria-label="Link physical time" checked={linked} disabled={!!linkReason} onChange={e => { command('pause');target.current=null;setLinkedRunning(false);setLinked(e.target.checked) }}/> Link accepted physical time</label><span>{linkReason ?? (linked ? 'Barrier coordination at 0.5 s checkpoints; individual control unlinks all.' : 'Same engine supports linked physical checkpoints.')}</span><button onClick={() => mutate(old => old.map(c => ({ ...c, thermal: { ...c.thermal, initialK: old[0].thermal.initialK, inletK: old[0].thermal.inletK, endS: old[0].thermal.endS, seed: old[0].thermal.seed }, fem: structuredClone(old[0].fem) })))}>Match initial conditions & window</button><button onClick={() => mutate(old => {
+diff --git a/tests/alternatives-host.test.tsx b/tests/alternatives-host.test.tsx
+new file mode 100644
+index 0000000..02345a7
+--- /dev/null
++++ b/tests/alternatives-host.test.tsx
+@@ -0,0 +1,45 @@
++import { describe, expect, it, vi } from 'vitest'
++import { AlternativeScene } from '../src/ui/AlternativeScene'
++import { FireSequenceScene } from '../src/ui/FireSequenceScene'
++
++vi.mock('../src/ui/FireSequenceScene', async () => {
++  const { createElement } = await import('react')
++  return { FireSequenceScene: vi.fn(() => createElement('canvas', { 'data-protected-prop': 'retained' }, createElement('group', { name: 'original-world' }))) }
++})
++vi.mock('../src/ui/AlternativeMethodModules', () => ({ AlternativeMethodCues: () => null }))
++
++function compose(id: Parameters<typeof AlternativeScene>[0]['id'], time: number) {
++  const view = AlternativeScene({ id, time, resetToken: 2, cameraDistance: 9 })
++  const factory = vi.mocked(FireSequenceScene)
++  return { view, props: factory.mock.calls.at(-1)![0], original: factory.mock.results.at(-1)!.value }
++}
++
++describe('read-only alternative host layer boundaries', () => {
++  it('reuses original dry-ice release for pressure-only while excluding every water cue', () => {
++    for (const time of [0, 38, 44, 51.5, 55, 57, 90]) {
++      const { view, props } = compose('pressure-only', time)
++      expect(props.time).toBe(Math.min(time, 57))
++      expect(props.layers).toEqual({ fire: true, gas: true, water: false, anatomy: true })
++      expect(view.props['data-original-replay']).toBe('authored-gas-release-no-water')
++      expect(props.mode).toBe('rapid')
++    }
++  })
++  it('retains the existing liquid and surface-method treatment boundaries', () => {
++    const liquid = compose('liquid-waves', 90).props
++    expect(liquid.time).toBe(90)
++    expect(liquid.layers).toEqual({ fire: false, gas: true, water: true, anatomy: true })
++    const surface = compose('sublimation-injection', 75).props
++    expect(surface.time).toBe(38)
++    expect(surface.layers).toEqual({ fire: true, gas: false, water: false, anatomy: true })
++  })
++  it('retains the original Canvas props/world and supplied camera controls', () => {
++    const { view, props, original } = compose('pressure-only', 55)
++    const canvas = view.props.children
++    expect(canvas.type).toBe(original.type)
++    expect(canvas.props['data-protected-prop']).toBe('retained')
++    expect(canvas.props.children[0]).toBe(original.props.children)
++    expect(props.cameraDistance).toBe(9)
++    expect(props.resetToken).toBe(2)
++    expect(props.connectedSupply).toBe(true)
++  })
++})
+diff --git a/tests/alternatives/pressure-pulse-pressure-only/animation.test.ts b/tests/alternatives/pressure-pulse-pressure-only/animation.test.ts
+index 365c16a..a30a4ec 100644
+--- a/tests/alternatives/pressure-pulse-pressure-only/animation.test.ts
++++ b/tests/alternatives/pressure-pulse-pressure-only/animation.test.ts
+@@ -1,23 +1,38 @@
+ import { describe, expect, it } from 'vitest'
+ import { createRun, freshPanel } from '../../../src/alternatives/model'
+ import { pressureAnimationFrame } from '../../../src/alternatives/pressure-pulse-pressure-only/animation'
++import { pressureBankVertices } from '../../../src/alternatives/pressure-pulse-pressure-only/groundResponse'
+ 
+ describe('pressure-only animation regressions', () => {
+-  it('starts at the drilling handoff and expands and relaxes throughout its distinct stage', () => {
+-    expect(pressureAnimationFrame(37.9).active).toBe(false)
+-    expect(pressureAnimationFrame(38).active).toBe(true)
+-    expect(pressureAnimationFrame(38.2).fronts).not.toEqual(pressureAnimationFrame(38.8).fronts)
+-    expect(pressureAnimationFrame(46).fronts).not.toEqual(pressureAnimationFrame(46.2).fronts)
+-    expect(pressureAnimationFrame(65).active).toBe(true)
+-    expect(pressureAnimationFrame(66).active).toBe(false)
++  it('waits for the original release, jolts quickly and lets soil settle without liquid', () => {
++    expect(pressureAnimationFrame(54.9).active).toBe(false)
++    expect(pressureAnimationFrame(55)).toMatchObject({ active: true, jolt: 0, settled: 0 })
++    expect(pressureAnimationFrame(55.1).jolt).toBeGreaterThan(pressureAnimationFrame(55.8).jolt)
++    expect(pressureAnimationFrame(55.1).tremor).not.toBe(pressureAnimationFrame(55.2).tremor)
++    expect(pressureAnimationFrame(58)).toMatchObject({ jolt: 0, fragments: false })
++    expect(pressureAnimationFrame(62).settled).toBe(1)
++    expect(pressureAnimationFrame(62).opening).toBeLessThan(pressureAnimationFrame(55.8).opening)
+     expect(pressureAnimationFrame(70).stage).toBe('Observe · no liquid injected')
+   })
++  it('moves owned earth meshes outward then settles, with finite geometry throughout', () => {
++    const burst = pressureAnimationFrame(55.1), rest = pressureAnimationFrame(62)
++    for (let branch = 0; branch < 8; branch++) {
++      const a = pressureBankVertices(branch, burst.opening, burst.jolt, burst.settled, 1)
++      const b = pressureBankVertices(branch, rest.opening, rest.jolt, rest.settled, 1)
++      expect(a.every(Number.isFinite)).toBe(true)
++      expect(b.every(Number.isFinite)).toBe(true)
++      expect(Math.max(...a.filter((_, i) => i % 3 === 2))).toBeGreaterThan(Math.max(...b.filter((_, i) => i % 3 === 2)))
++      expect(a).not.toEqual(b)
++    }
++  })
+   it('replays the same frame after out-of-order seeks without inventing a physical result', () => {
+-    const paused = pressureAnimationFrame(48)
++    const paused = pressureAnimationFrame(55.2)
+     pressureAnimationFrame(70); pressureAnimationFrame(0)
+-    expect(pressureAnimationFrame(48)).toEqual(paused)
++    expect(pressureAnimationFrame(55.2)).toEqual(paused)
+     const run = createRun(freshPanel('pressure', 'pressure-only'))
+     for (let time = 0; time <= 90; time += .25) pressureAnimationFrame(time)
+     expect(run.advanceTo(60)).toEqual({ timeS: 60, metrics: null })
++    expect(pressureAnimationFrame(NaN)).toEqual(pressureAnimationFrame(0))
++    expect(pressureAnimationFrame(Infinity)).toEqual(pressureAnimationFrame(0))
+   })
+ })
+diff --git a/tests/alternatives/pressure-pulse-pressure-only/model.test.ts b/tests/alternatives/pressure-pulse-pressure-only/model.test.ts
+index 7ec4791..b9d773c 100644
+--- a/tests/alternatives/pressure-pulse-pressure-only/model.test.ts
++++ b/tests/alternatives/pressure-pulse-pressure-only/model.test.ts
+@@ -41,12 +41,13 @@ describe('4.2.3.2 pressure-only child', () => {
+     const config = configured(); config.medium = 'unspecified'
+     expect(createRun(config).advanceTo(60)).toEqual({ timeS: 60, metrics: null })
+   })
+-  it('never displays injection, waves, collapse displacement or liquid contact', () => {
++  it('never models injection, waves, physical displacement or liquid contact', () => {
+     for (let time = 0; time <= 90; time += .5) expect(pressureOnlyPresentation('pressure-only', time)).toMatchObject({ waves: false, injection: false, contacts: 0, vibration: 0 })
+     expect(pressureOnlyPresentation('pressure-only', 37).pulse).toBe(false)
+-    expect(pressureOnlyPresentation('pressure-only', 38).pulse).toBe(true)
+-    expect(pressureOnlyPresentation('pressure-only', 66).pulse).toBe(false)
+-    expect(pressureCueEnvelope(48)).toBe(0); expect(pressureCueEnvelope(51)).toBeCloseTo(1); expect(pressureCueEnvelope(54)).toBeCloseTo(0)
++    expect(pressureOnlyPresentation('pressure-only', 55).pulse).toBe(true)
++    expect(pressureOnlyPresentation('pressure-only', 58).pulse).toBe(false)
++    expect(pressureOnlyPresentation('pressure-only', 90).contextTime).toBe(57)
++    expect(pressureCueEnvelope(55)).toBe(0); expect(pressureCueEnvelope(55.1)).toBeGreaterThan(.5); expect(pressureCueEnvelope(58)).toBe(0)
+     expect(pressureOnlyPresentation('pressure-only', NaN).pulse).toBe(false)
+   })
+ })

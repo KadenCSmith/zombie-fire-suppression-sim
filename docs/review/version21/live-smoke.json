@@ -1,0 +1,83 @@
+{
+  "initialTwo": {
+    "panels": 2,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.299999999999272,
+    "samples": 120,
+    "window": 2,
+    "physicalTimes": [
+      7.5,
+      8
+    ]
+  },
+  "two": {
+    "panels": 2,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.300000000000182,
+    "samples": 120,
+    "window": 3,
+    "physicalTimes": [
+      17,
+      17
+    ]
+  },
+  "initialFour": {
+    "panels": 4,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.100000000000364,
+    "samples": 120,
+    "window": 1,
+    "physicalTimes": [
+      8.5,
+      8,
+      8.5,
+      8
+    ]
+  },
+  "four": {
+    "panels": 4,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.299999999999272,
+    "samples": 120,
+    "window": 2,
+    "physicalTimes": [
+      17.5,
+      17.5,
+      17.5,
+      17.5
+    ]
+  },
+  "performanceTarget": {
+    "p95Ms": 50,
+    "passed": true,
+    "enforced": true,
+    "scope": "Measured native fixture"
+  },
+  "performanceProtocol": "First completed frame window after start retained as warm-up; next complete120-frame window tests the existing adaptive display budget. No stale paused window or best-of sampling.",
+  "pauseMs": 50.700000047683716,
+  "workerCleanup": true,
+  "tests": [
+    "default rapid mode",
+    "implicit render and five secondary sections under every method",
+    "selected method refresh URL",
+    "read-only original fire/drilling reuse before treatment",
+    "prominent method animation after original introduction",
+    "pressure variants",
+    "independent pause/reset",
+    "configuration-only duplicate",
+    "removal cleanup",
+    "supported new variants",
+    "vibration-only render without numerical jobs",
+    "unsupported vibration comparison rejected",
+    "original comparison unavailable",
+    "bounded particle computation",
+    "linked physical time",
+    "two/four panel performance",
+    "worker crash retains accepted state/history",
+    "reset after failure",
+    "stale terminated-worker error rejected"
+  ],
+  "date": "2026-10-12T10:41:30.523Z",
+  "environment": "darwin arm64",
+  "scope": "software/numerical checks only; no physical validation"
+}

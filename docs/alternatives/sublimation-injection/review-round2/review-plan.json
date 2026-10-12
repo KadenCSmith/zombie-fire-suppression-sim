@@ -1,0 +1,18 @@
+{
+  "publishedBeforeExecutionUtc": "2026-10-12T09:20:17.791509+00:00",
+  "snapshot": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+  "scoredPass": 3,
+  "revisionRetry": 2,
+  "weights": [
+    0.3,
+    0.2,
+    0.2,
+    0.2,
+    0.1
+  ],
+  "cap": 6,
+  "protocol": "Current A tests + scene composition/registry/contact accuracy and unchanged reviewer CURRENT_W1/DEFAULT tests in isolated snapshot, maxWorkers=1. Reuse prior independently executed 99 numerical tests only for unchanged source/dependencies/config. Actual normal Chrome checks after all setup:55/60/63/66/69/72/75/86, fast seek0/75/0/75 and immediate4.2.2 navigation, remount/reset/resize/leave.",
+  "benchmarkSpec": "round-1/benchmark-spec.json and retry-execution-spec.json unchanged",
+  "tolerancesUnchanged": true,
+  "separateAestheticEvaluation": true
+}

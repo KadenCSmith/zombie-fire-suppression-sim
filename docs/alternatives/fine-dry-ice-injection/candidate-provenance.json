@@ -1,0 +1,115 @@
+{
+  "frozenCommit": "f40a31e0d24e047a9c86d5d26423cec3a410b01e",
+  "base": "9a7350cfdc52e7b160e77dd8f30f01db826ee2c7",
+  "readyPublication": "44aa38f277d71d8d7d21f84070e02379edf1fc08",
+  "branch": "feature/v21-particle-injection",
+  "api": "v21.3",
+  "executor": "D implementer; independent review recorded separately",
+  "sourceHashes": {
+    "src/alternatives/fine-dry-ice-injection/comparison.tsx": "30255bb6d976af66bf591f0bcd4f7513e510c6c5b896f219a61bc27135918d7f",
+    "src/alternatives/fine-dry-ice-injection/config.ts": "fd727834432a2d6e94c0fa25d348fd3bc33b7143ece1e3013ebd97673f92948d",
+    "src/alternatives/fine-dry-ice-injection/index.ts": "64f5e04583a0962437a09bd0dc83d2eab91f793f83927df04d9ef5f354ae533d",
+    "src/alternatives/fine-dry-ice-injection/physics.ts": "8acaca97bc446f2d2cdefc0261647564eed49dbfb362a9da560c49e5c5ed0f6a",
+    "src/alternatives/fine-dry-ice-injection/scenarios.ts": "22ff3af0f5a95670a600690a1b8a65ec99ea32d8f287c9144e486c72cc9ce25f",
+    "src/alternatives/fine-dry-ice-injection/scene.tsx": "25a5c9276279f39c39f6219ccfcc1d45be5beff0e1823fa622e85b476688a288",
+    "src/alternatives/fine-dry-ice-injection/science.tsx": "acb1bc03c077386fdd463123867665892d52229f943cd81e8e841806a1b32a48",
+    "src/alternatives/fine-dry-ice-injection/style.css": "c70aad1c5cabb825e9f2a8188a129d74617b4fbd0781a81ebcda357a7ef3d6ec",
+    "src/alternatives/fine-dry-ice-injection/types.ts": "336bc4bb8f3294aea7f3c5def68094a34fdf6987e795396caf09f97fadc6b544",
+    "src/alternatives/fine-dry-ice-injection/workspace.tsx": "3efcc299d6799c82e02deffaedeabd5fa4c22201d2e6d9a8ba0c63aec44bb92a",
+    "tests/alternatives/fine-dry-ice-injection/benchmarks.ts": "206e9286c435e54f1dd47f8de55452bfe85858a61c66d675ea4b2253cbab9d87",
+    "tests/alternatives/fine-dry-ice-injection/numerics.test.ts": "b80437bc104f2fc2656ab12fea2e0535b26ff50a33099cf7573c2de090e02461",
+    "tests/alternatives/fine-dry-ice-injection/physics.test.ts": "f51eea4362dddf9cca8aa87350bfbd55bb7da4859753b0eafdc816eae883b37f"
+  },
+  "packageLockSha256": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d",
+  "packageSha256": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83",
+  "viteConfigSha256": "228c2a56f103ee9cc741a1a3db72f8a200243191f6f98faf9b7c459022ad260b",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "node": "v26.8.2",
+  "npm": "11.19.1",
+  "scenarioSeed": 21,
+  "criteriaSha256": "e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d",
+  "commands": {
+    "typecheck": "PASS",
+    "lint": "PASS;16 inherited warnings",
+    "ownedTests": "13 PASS in2 files",
+    "build": "PASS; inherited large chunk/use-client warnings",
+    "originalGuard": "57/57 PASS",
+    "whitespace": "PASS",
+    "actualCandidateUi": "UNVERIFIED in D; browser security policy verification denied; no workaround",
+    "fullSuiteAtOwnedSourceFreeze": "1905 PASS /3 FAIL of1908;113 PASS /3 FAIL files of116. Three coordinator-owned obsolete D placeholder assertions, retained in full-suite-4d780df.log.",
+    "affectedSeamTestsAtFinalFreeze": "35 PASS /3 FAIL of38 in5 files; D13/13 PASS, three same stale assertions; see seam-tests-0937d7b.log.",
+    "typecheckAtFinalFreeze": "PASS",
+    "lintAtFinalFreeze": "PASS;16 inherited warnings",
+    "buildAtFinalFreeze": "PASS; inherited large chunk/use-client warnings",
+    "originalGuardAtFinalFreeze": "57/57 PASS"
+  },
+  "ownedSourceFrozenCommit": "4d780df7d8ef963d1abc95ff4c8f5486782586af",
+  "coordinatorCheckpointMerged": "fcd1776909af93477133afec1b4fb70941b2064c",
+  "freezeHistory": [
+    {
+      "commit": "4d780df7d8ef963d1abc95ff4c8f5486782586af",
+      "purpose": "first implemented candidate; retry1 began; full suite recorded"
+    },
+    {
+      "commit": "0937d7b60db98d1ef1ed544bd745660c10e94f7c",
+      "purpose": "ordinary coordinator checkpoint merge before retry1 signed; D-owned committed bytes identical"
+    },
+    {
+      "commit": "fd8e7a0c3b3596c2ee439d7aec52c2bc71f92440",
+      "purpose": "retry2 onset-only guard; signed5.1FAIL for pre-onset clipping bypass"
+    },
+    {
+      "commit": "f40a31e0d24e047a9c86d5d26423cec3a410b01e",
+      "purpose": "finalretry3 conservative extinction bound; signed5.3FAIL; both demonstrated false-zero defects corrected"
+    }
+  ],
+  "checkArtifactHashes": {
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/build-0937d7b.log": "cc6321b48dc09299a7a69c997f96a72b853763ffb5e9301dfd3280acf9f3aad1",
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/full-suite-4d780df.log": "3c7cc5122b64db3a8034cd8a8cea5e3c88dfd90f392c71f7c1024aa5edfed75b",
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/seam-tests-0937d7b.log": "e91deb85e4bbf63f5dab4b0e44860c8bc5f0dcb687abf9e9533f9ebae0694dbe"
+  },
+  "checkArtifactStorage": "Verbatim log bytes stored at their named implementer-checks paths inside implementer-checks.tar.gz; not normalized to satisfy source whitespace checks.",
+  "previousCandidateProvenanceFrozenCommit": "0937d7b60db98d1ef1ed544bd745660c10e94f7c",
+  "sourceHashesScope": "Final frozen implementation/test bytes; delivery modifies documentation/evidence only.",
+  "finalReview": {
+    "reviewer": "/root/d_realism_reviewer",
+    "frozenCommit": "f40a31e0d24e047a9c86d5d26423cec3a410b01e",
+    "criteriaSHA256": "e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d",
+    "scores": {
+      "physics": 7,
+      "soil": 3,
+      "numerics": 6,
+      "mechanism": 5,
+      "visual": 4
+    },
+    "unroundedTotal": 5.3,
+    "passed": false,
+    "initialAuditsUsed": 1,
+    "retriesUsed": 3,
+    "scoredPassesUsed": 4,
+    "remainingRetries": 0,
+    "actualIndependentUIInspected": false,
+    "experimentalValidation": false,
+    "boundedStop": "exhausted4/4; unsupported central physical coupling and required independent UI evidence unavailable",
+    "reportSHA256": "48be095aeb5b0175e3bcec1636b4c6211499cbd88a1e20542a194c6503825019",
+    "signatureManifestVerified": true
+  },
+  "finalImplementerChecks": {
+    "ownedTests": "16/16 PASS",
+    "typecheck": "PASS",
+    "lint": "PASS,16 inherited warnings",
+    "build": "PASS,inherited warnings",
+    "preservation": "57/57 PASS",
+    "diffCheck": "PASS",
+    "logs": "retry3-implementer-checks.tar.gz",
+    "fullIntegrationSuite": "Historical3 stale-placeholder failures remain in archived evidence; coordinator owns updated shared assertions and final combined checks."
+  },
+  "evidenceArchiveHashes": {
+    "implementer-checks.tar.gz": "6d598db7c923ebc6ae29d844ce91f8d5314737ebf096880d85842b132328c736",
+    "initial-review-evidence.tar.gz": "99434b22cfd3cb3e4f703f176f4c8448ef8d2dc2e2ef21a86c60abfba0c8d9fe",
+    "retry1-review-evidence.tar.gz": "9c701afca35fbaa1c6e8ce5f0b54b550b107b636337a35b894bb74fe7e805d72",
+    "retry2-review-evidence.tar.gz": "1f7fe73f120850a7d1de4bdc31370c6f9d315b5bf168c407158f2258f96bab03",
+    "retry3-implementer-checks.tar.gz": "1e7bd829175c304f6762168e59b14f85e89f7b6783d8aca31ec157f72c227e5e",
+    "retry3-review-evidence.tar.gz": "c1c7ddb46dd5256cc1142bbf148ec64fe8df448e70c7125f1f231a034f158097"
+  }
+}

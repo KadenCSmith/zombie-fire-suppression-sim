@@ -1,0 +1,1127 @@
+{
+  "executor": "D implementer; independent reviewer re-execution required",
+  "runId": "D-owned-benchmarks-2026-10-12",
+  "rows": [
+    {
+      "scenario": "conduction-reference",
+      "config": {
+        "id": "D-evidence",
+        "variantId": "nanoparticles",
+        "engine": "particle",
+        "medium": "co2-water",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 333.15,
+          "waterKg": 1,
+          "flowKgS": 0.1,
+          "inletK": 293.15,
+          "contactStartS": 1,
+          "conductanceWK": 2,
+          "dryIceKg": 0.01,
+          "endS": 30,
+          "enabled": true,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        },
+        "particleInjection": {
+          "particleDiameterM": 0.0001,
+          "sizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "effectiveConductivityWmK": 0.6,
+          "heatTransferProvenance": "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "solidDensityKgM3": 1560,
+          "hoseResidenceS": 1,
+          "probeResidenceS": 0.1,
+          "residenceProvenance": "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "dryPeatMassKg": 0.5,
+          "initialMoistureDryBasis": 0.1,
+          "dryPeatCpJkgK": 1500,
+          "soilProvenance": "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "initialPhase": "solid",
+          "stepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      },
+      "summary": {
+        "schema": "particle-delivery-d1",
+        "timeS": 30,
+        "modelTier": "Unvalidated finite-inventory saturated-film thermal/entrainment sensitivity; nominated underground calorimeter only",
+        "locations": {
+          "source": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "hose": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "probe": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "soil": {
+            "waterKg": 0.9999999999999897,
+            "solidKg": 0,
+            "gasKg": 0.009999999999999868,
+            "enthalpyJ": 413090.4816809982,
+            "temperatureK": 292.1187138531526
+          }
+        },
+        "releases": [
+          {
+            "location": "source",
+            "fromS": 0,
+            "toS": 0.025,
+            "massKg": 0.01,
+            "latentJ": 5726.03642395392
+          }
+        ],
+        "solidEnteringGroundKg": 0,
+        "co2EnteringGroundKg": 0.009999999999999868,
+        "waterEnteringGroundKg": 0.9999999999999897,
+        "upstreamSublimatedKg": 0.01,
+        "undergroundSublimatedKg": 0,
+        "initialCO2Kg": 0.01,
+        "upstreamFractionInitialCO2": 1,
+        "undergroundFractionInitialCO2": 0,
+        "probeSurvivalFractionArrivedCO2": 0,
+        "peatTemperatureK": 330.82061223704176,
+        "retainedMoistureDryBasis": 2.099999999999979,
+        "heatFromPeatJ": 2234.5816810057845,
+        "waterMassResidualKg": -1.0325074129013956e-14,
+        "co2MassResidualKg": -1.3183898417423734e-16,
+        "energyResidualJ": -7.450580596923828e-9,
+        "initialEnthalpyJ": 543383.1949999998,
+        "additionalColdResourceJ": 6560.31142395392,
+        "meanSolidDiameterM": {
+          "source": null,
+          "hose": null,
+          "probe": null,
+          "soil": null
+        },
+        "pressurePa": null,
+        "oxygenMoleFraction": null,
+        "extinction": null,
+        "penetrationM": null,
+        "unavailable": [
+          "Aqueous film/ice-shell and blockage coupling",
+          "Particle slip, filtration, deposition and peat penetration",
+          "Pressure-driven liquid flow and spatial wetting",
+          "Gas/O2 mixture and boundary exchange fields",
+          "Tank pressure",
+          "Reacting fire, extinction and re-ignition",
+          "Ambient reheating and drainage"
+        ],
+        "assumptions": [
+          "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.",
+          "Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.",
+          "Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.",
+          "Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.",
+          "Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios."
+        ],
+        "review": "No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.",
+        "metadata": {
+          "panelId": "D-evidence",
+          "seed": 21,
+          "observationS": 30,
+          "particleSizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "units": "SI; kelvin; mass fractions use stated denominators",
+          "numericalStepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      }
+    },
+    {
+      "scenario": "film-sensitivity",
+      "config": {
+        "id": "D-evidence",
+        "variantId": "nanoparticles",
+        "engine": "particle",
+        "medium": "co2-water",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 333.15,
+          "waterKg": 1,
+          "flowKgS": 0.1,
+          "inletK": 293.15,
+          "contactStartS": 0,
+          "conductanceWK": 2,
+          "dryIceKg": 0.01,
+          "endS": 30,
+          "enabled": true,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        },
+        "particleInjection": {
+          "particleDiameterM": 0.0001,
+          "sizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "effectiveConductivityWmK": 0.006,
+          "heatTransferProvenance": "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "solidDensityKgM3": 1560,
+          "hoseResidenceS": 0.01,
+          "probeResidenceS": 0.01,
+          "residenceProvenance": "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "dryPeatMassKg": 0.5,
+          "initialMoistureDryBasis": 0.1,
+          "dryPeatCpJkgK": 1500,
+          "soilProvenance": "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "initialPhase": "solid",
+          "stepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      },
+      "summary": {
+        "schema": "particle-delivery-d1",
+        "timeS": 30,
+        "modelTier": "Unvalidated finite-inventory saturated-film thermal/entrainment sensitivity; nominated underground calorimeter only",
+        "locations": {
+          "source": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "hose": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "probe": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "soil": {
+            "waterKg": 0.9999999999999897,
+            "solidKg": 0,
+            "gasKg": 0.00999999999999987,
+            "enthalpyJ": 413248.66917926224,
+            "temperatureK": 292.1564269293867
+          }
+        },
+        "releases": [
+          {
+            "location": "source",
+            "fromS": 0,
+            "toS": 0.25,
+            "massKg": 0.0016551384862146714,
+            "latentJ": 947.7383258753159
+          },
+          {
+            "location": "hose",
+            "fromS": 0.025,
+            "toS": 0.23500000000000001,
+            "massKg": 0.0000015045042007714468,
+            "latentJ": 0.8614845853608984
+          },
+          {
+            "location": "probe",
+            "fromS": 0.035,
+            "toS": 0.245,
+            "massKg": 0.0000015006793708267823,
+            "latentJ": 0.8592944738030406
+          },
+          {
+            "location": "soil",
+            "fromS": 0.045,
+            "toS": 0.25,
+            "massKg": 0.00001562955440154042,
+            "latentJ": 8.949539779338973
+          },
+          {
+            "location": "source",
+            "fromS": 0.25,
+            "toS": 0.5,
+            "massKg": 0.001508373468700374,
+            "latentJ": 863.7001422704061
+          },
+          {
+            "location": "hose",
+            "fromS": 0.25,
+            "toS": 0.485,
+            "massKg": 0.0000015682265352484313,
+            "latentJ": 0.8979722261843573
+          },
+          {
+            "location": "soil",
+            "fromS": 0.25,
+            "toS": 0.5,
+            "massKg": 0.00005344772980559048,
+            "latentJ": 30.604364764445858
+          },
+          {
+            "location": "probe",
+            "fromS": 0.26,
+            "toS": 0.495,
+            "massKg": 0.0000015637517958550365,
+            "latentJ": 0.8954099741089293
+          },
+          {
+            "location": "source",
+            "fromS": 0.5,
+            "toS": 0.75,
+            "massKg": 0.0013608388461344946,
+            "latentJ": 779.221280009754
+          },
+          {
+            "location": "hose",
+            "fromS": 0.5,
+            "toS": 0.735,
+            "massKg": 0.0000014529468546752106,
+            "latentJ": 0.8319626611939539
+          },
+          {
+            "location": "soil",
+            "fromS": 0.5,
+            "toS": 0.75,
+            "massKg": 0.00008575674461140583,
+            "latentJ": 49.10462432446238
+          },
+          {
+            "location": "probe",
+            "fromS": 0.51,
+            "toS": 0.745,
+            "massKg": 0.0000014481751629234915,
+            "latentJ": 0.8292303731165314
+          },
+          {
+            "location": "source",
+            "fromS": 0.75,
+            "toS": 1,
+            "massKg": 0.0012113209675919286,
+            "latentJ": 693.606798153049
+          },
+          {
+            "location": "hose",
+            "fromS": 0.75,
+            "toS": 0.985,
+            "massKg": 0.000001329239055124307,
+            "latentJ": 0.7611271245783872
+          },
+          {
+            "location": "soil",
+            "fromS": 0.75,
+            "toS": 1,
+            "massKg": 0.00011155224219541054,
+            "latentJ": 63.87522019846501
+          },
+          {
+            "location": "probe",
+            "fromS": 0.76,
+            "toS": 0.995,
+            "massKg": 0.0000013240804182694756,
+            "latentJ": 0.7581732703255158
+          },
+          {
+            "location": "source",
+            "fromS": 1,
+            "toS": 1.25,
+            "massKg": 0.0010579463259536939,
+            "latentJ": 605.7839196999078
+          },
+          {
+            "location": "hose",
+            "fromS": 1,
+            "toS": 1.235,
+            "massKg": 0.0000011943132784858223,
+            "latentJ": 0.6838681334221641
+          },
+          {
+            "location": "soil",
+            "fromS": 1,
+            "toS": 1.25,
+            "massKg": 0.00012988093013132284,
+            "latentJ": 74.3702936708969
+          },
+          {
+            "location": "probe",
+            "fromS": 1.01,
+            "toS": 1.245,
+            "massKg": 0.0000011886272071850564,
+            "latentJ": 0.6806122682844256
+          },
+          {
+            "location": "source",
+            "fromS": 1.25,
+            "toS": 1.5,
+            "massKg": 0.0008975501280695599,
+            "latentJ": 513.9404725650805
+          },
+          {
+            "location": "hose",
+            "fromS": 1.25,
+            "toS": 1.485,
+            "massKg": 0.000001043593365625954,
+            "latentJ": 0.5975653623370873
+          },
+          {
+            "location": "soil",
+            "fromS": 1.25,
+            "toS": 1.5,
+            "massKg": 0.00013925553137260702,
+            "latentJ": 79.73822448766053
+          },
+          {
+            "location": "probe",
+            "fromS": 1.26,
+            "toS": 1.495,
+            "massKg": 0.0000010371370114994118,
+            "latentJ": 0.5938684304476347
+          },
+          {
+            "location": "source",
+            "fromS": 1.5,
+            "toS": 1.75,
+            "massKg": 0.0007239897742835752,
+            "latentJ": 414.5591818117927
+          },
+          {
+            "location": "hose",
+            "fromS": 1.5,
+            "toS": 1.735,
+            "massKg": 8.685029934020192e-7,
+            "latentJ": 0.4973079774532973
+          },
+          {
+            "location": "soil",
+            "fromS": 1.5,
+            "toS": 1.75,
+            "massKg": 0.00013705149250039855,
+            "latentJ": 78.47618380145296
+          },
+          {
+            "location": "probe",
+            "fromS": 1.51,
+            "toS": 1.745,
+            "massKg": 8.607803665907763e-7,
+            "latentJ": 0.4928859732123192
+          },
+          {
+            "location": "source",
+            "fromS": 1.75,
+            "toS": 2,
+            "massKg": 0.0005218135438752382,
+            "latentJ": 298.792335874209
+          },
+          {
+            "location": "hose",
+            "fromS": 1.75,
+            "toS": 1.985,
+            "massKg": 6.484215728584708e-7,
+            "latentJ": 0.37128855442650943
+          },
+          {
+            "location": "soil",
+            "fromS": 1.75,
+            "toS": 2,
+            "massKg": 0.00011738379983953332,
+            "latentJ": 67.21439134632841
+          },
+          {
+            "location": "probe",
+            "fromS": 1.76,
+            "toS": 1.995,
+            "massKg": 6.380072939330962e-7,
+            "latentJ": 0.36532530038091837
+          },
+          {
+            "location": "source",
+            "fromS": 2,
+            "toS": 2.195,
+            "massKg": 0.0002020177995560347,
+            "latentJ": 115.67612785448763
+          },
+          {
+            "location": "hose",
+            "fromS": 2,
+            "toS": 2.185,
+            "massKg": 2.70904510405118e-7,
+            "latentJ": 0.15512090939931092
+          },
+          {
+            "location": "soil",
+            "fromS": 2,
+            "toS": 2.195,
+            "massKg": 0.00005136224929632776,
+            "latentJ": 29.41021102869743
+          },
+          {
+            "location": "probe",
+            "fromS": 2.01,
+            "toS": 2.195,
+            "massKg": 2.4849447260967784e-7,
+            "latentJ": 0.14228884013142348
+          }
+        ],
+        "solidEnteringGroundKg": 0.000841320274154137,
+        "co2EnteringGroundKg": 0.009999999999999868,
+        "waterEnteringGroundKg": 0.9999999999999897,
+        "upstreamSublimatedKg": 0.009158679725845855,
+        "undergroundSublimatedKg": 0.0008413202741541361,
+        "initialCO2Kg": 0.01,
+        "upstreamFractionInitialCO2": 0.9158679725845855,
+        "undergroundFractionInitialCO2": 0.08413202741541362,
+        "probeSurvivalFractionArrivedCO2": 0.08413202741541481,
+        "peatTemperatureK": 330.6557133542489,
+        "retainedMoistureDryBasis": 2.099999999999979,
+        "heatFromPeatJ": 2392.76917926917,
+        "waterMassResidualKg": -1.0325074129013956e-14,
+        "co2MassResidualKg": -1.3010426069826053e-16,
+        "energyResidualJ": -6.6356733441352844e-9,
+        "initialEnthalpyJ": 543383.1949999998,
+        "additionalColdResourceJ": 6560.31142395392,
+        "meanSolidDiameterM": {
+          "source": null,
+          "hose": null,
+          "probe": null,
+          "soil": null
+        },
+        "pressurePa": null,
+        "oxygenMoleFraction": null,
+        "extinction": null,
+        "penetrationM": null,
+        "unavailable": [
+          "Aqueous film/ice-shell and blockage coupling",
+          "Particle slip, filtration, deposition and peat penetration",
+          "Pressure-driven liquid flow and spatial wetting",
+          "Gas/O2 mixture and boundary exchange fields",
+          "Tank pressure",
+          "Reacting fire, extinction and re-ignition",
+          "Ambient reheating and drainage"
+        ],
+        "assumptions": [
+          "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.",
+          "Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.",
+          "Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.",
+          "Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.",
+          "Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios."
+        ],
+        "review": "No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.",
+        "metadata": {
+          "panelId": "D-evidence",
+          "seed": 21,
+          "observationS": 30,
+          "particleSizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "units": "SI; kelvin; mass fractions use stated denominators",
+          "numericalStepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      }
+    },
+    {
+      "scenario": "water-only",
+      "config": {
+        "id": "D-evidence",
+        "variantId": "nanoparticles",
+        "engine": "particle",
+        "medium": "water",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 333.15,
+          "waterKg": 1,
+          "flowKgS": 0.1,
+          "inletK": 293.15,
+          "contactStartS": 1,
+          "conductanceWK": 2,
+          "dryIceKg": 0,
+          "endS": 30,
+          "enabled": true,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        },
+        "particleInjection": {
+          "particleDiameterM": 0.0001,
+          "sizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "effectiveConductivityWmK": 0.6,
+          "heatTransferProvenance": "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "solidDensityKgM3": 1560,
+          "hoseResidenceS": 1,
+          "probeResidenceS": 0.1,
+          "residenceProvenance": "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "dryPeatMassKg": 0.5,
+          "initialMoistureDryBasis": 0.1,
+          "dryPeatCpJkgK": 1500,
+          "soilProvenance": "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "initialPhase": "solid",
+          "stepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      },
+      "summary": {
+        "schema": "particle-delivery-d1",
+        "timeS": 30,
+        "modelTier": "Unvalidated finite-inventory saturated-film thermal/entrainment sensitivity; nominated underground calorimeter only",
+        "locations": {
+          "source": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "hose": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "probe": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "soil": {
+            "waterKg": 0.9999999999999897,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 413006.36365143856,
+            "temperatureK": 293.66372758037335
+          }
+        },
+        "releases": [],
+        "solidEnteringGroundKg": 0,
+        "co2EnteringGroundKg": 0,
+        "waterEnteringGroundKg": 0.9999999999999897,
+        "upstreamSublimatedKg": 0,
+        "undergroundSublimatedKg": 0,
+        "initialCO2Kg": 0,
+        "upstreamFractionInitialCO2": null,
+        "undergroundFractionInitialCO2": null,
+        "probeSurvivalFractionArrivedCO2": null,
+        "peatTemperatureK": 330.90829912285477,
+        "retainedMoistureDryBasis": 2.099999999999979,
+        "heatFromPeatJ": 2150.4636514444846,
+        "waterMassResidualKg": -1.0325074129013956e-14,
+        "co2MassResidualKg": 0,
+        "energyResidualJ": -6.752088665962219e-9,
+        "initialEnthalpyJ": 543383.1949999998,
+        "additionalColdResourceJ": 0,
+        "meanSolidDiameterM": {
+          "source": null,
+          "hose": null,
+          "probe": null,
+          "soil": null
+        },
+        "pressurePa": null,
+        "oxygenMoleFraction": null,
+        "extinction": null,
+        "penetrationM": null,
+        "unavailable": [
+          "Aqueous film/ice-shell and blockage coupling",
+          "Particle slip, filtration, deposition and peat penetration",
+          "Pressure-driven liquid flow and spatial wetting",
+          "Gas/O2 mixture and boundary exchange fields",
+          "Tank pressure",
+          "Reacting fire, extinction and re-ignition",
+          "Ambient reheating and drainage"
+        ],
+        "assumptions": [
+          "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.",
+          "Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.",
+          "Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.",
+          "Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.",
+          "Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios."
+        ],
+        "review": "No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.",
+        "metadata": {
+          "panelId": "D-evidence",
+          "seed": 21,
+          "observationS": 30,
+          "particleSizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "units": "SI; kelvin; mass fractions use stated denominators",
+          "numericalStepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      }
+    },
+    {
+      "scenario": "pre-sublimated",
+      "config": {
+        "id": "D-evidence",
+        "variantId": "nanoparticles",
+        "engine": "particle",
+        "medium": "co2-water",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 333.15,
+          "waterKg": 1,
+          "flowKgS": 0.1,
+          "inletK": 293.15,
+          "contactStartS": 1,
+          "conductanceWK": 2,
+          "dryIceKg": 0.01,
+          "endS": 30,
+          "enabled": true,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        },
+        "particleInjection": {
+          "particleDiameterM": 0.0001,
+          "sizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "effectiveConductivityWmK": 0.6,
+          "heatTransferProvenance": "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "solidDensityKgM3": 1560,
+          "hoseResidenceS": 1,
+          "probeResidenceS": 0.1,
+          "residenceProvenance": "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "dryPeatMassKg": 0.5,
+          "initialMoistureDryBasis": 0.1,
+          "dryPeatCpJkgK": 1500,
+          "soilProvenance": "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "initialPhase": "pre-sublimated",
+          "stepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      },
+      "summary": {
+        "schema": "particle-delivery-d1",
+        "timeS": 30,
+        "modelTier": "Unvalidated finite-inventory saturated-film thermal/entrainment sensitivity; nominated underground calorimeter only",
+        "locations": {
+          "source": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "hose": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "probe": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "soil": {
+            "waterKg": 0.9999999999999897,
+            "solidKg": 0,
+            "gasKg": 0.009999999999999868,
+            "enthalpyJ": 413090.4816809982,
+            "temperatureK": 292.1187138531526
+          }
+        },
+        "releases": [
+          {
+            "location": "source",
+            "fromS": 0,
+            "toS": 0,
+            "massKg": 0.01,
+            "latentJ": 5726.036423953919
+          }
+        ],
+        "solidEnteringGroundKg": 0,
+        "co2EnteringGroundKg": 0.009999999999999868,
+        "waterEnteringGroundKg": 0.9999999999999897,
+        "upstreamSublimatedKg": 0.01,
+        "undergroundSublimatedKg": 0,
+        "initialCO2Kg": 0.01,
+        "upstreamFractionInitialCO2": 1,
+        "undergroundFractionInitialCO2": 0,
+        "probeSurvivalFractionArrivedCO2": 0,
+        "peatTemperatureK": 330.82061223704176,
+        "retainedMoistureDryBasis": 2.099999999999979,
+        "heatFromPeatJ": 2234.5816810057845,
+        "waterMassResidualKg": -1.0325074129013956e-14,
+        "co2MassResidualKg": -1.3183898417423734e-16,
+        "energyResidualJ": -7.450580596923828e-9,
+        "initialEnthalpyJ": 543383.1949999998,
+        "additionalColdResourceJ": 6560.31142395392,
+        "meanSolidDiameterM": {
+          "source": null,
+          "hose": null,
+          "probe": null,
+          "soil": null
+        },
+        "pressurePa": null,
+        "oxygenMoleFraction": null,
+        "extinction": null,
+        "penetrationM": null,
+        "unavailable": [
+          "Aqueous film/ice-shell and blockage coupling",
+          "Particle slip, filtration, deposition and peat penetration",
+          "Pressure-driven liquid flow and spatial wetting",
+          "Gas/O2 mixture and boundary exchange fields",
+          "Tank pressure",
+          "Reacting fire, extinction and re-ignition",
+          "Ambient reheating and drainage"
+        ],
+        "assumptions": [
+          "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.",
+          "Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.",
+          "Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.",
+          "Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.",
+          "Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios."
+        ],
+        "review": "No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.",
+        "metadata": {
+          "panelId": "D-evidence",
+          "seed": 21,
+          "observationS": 30,
+          "particleSizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "units": "SI; kelvin; mass fractions use stated denominators",
+          "numericalStepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      }
+    },
+    {
+      "scenario": "off",
+      "config": {
+        "id": "D-evidence",
+        "variantId": "nanoparticles",
+        "engine": "particle",
+        "medium": "co2-water",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 333.15,
+          "waterKg": 1,
+          "flowKgS": 0.1,
+          "inletK": 293.15,
+          "contactStartS": 1,
+          "conductanceWK": 2,
+          "dryIceKg": 0.01,
+          "endS": 30,
+          "enabled": false,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        },
+        "particleInjection": {
+          "particleDiameterM": 0.0001,
+          "sizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "effectiveConductivityWmK": 0.6,
+          "heatTransferProvenance": "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "solidDensityKgM3": 1560,
+          "hoseResidenceS": 1,
+          "probeResidenceS": 0.1,
+          "residenceProvenance": "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "dryPeatMassKg": 0.5,
+          "initialMoistureDryBasis": 0.1,
+          "dryPeatCpJkgK": 1500,
+          "soilProvenance": "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "initialPhase": "solid",
+          "stepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      },
+      "summary": {
+        "schema": "particle-delivery-d1",
+        "timeS": 30,
+        "modelTier": "Unvalidated finite-inventory saturated-film thermal/entrainment sensitivity; nominated underground calorimeter only",
+        "locations": {
+          "source": {
+            "waterKg": 1,
+            "solidKg": 0.01,
+            "gasKg": 0,
+            "enthalpyJ": 410855.8999999999,
+            "temperatureK": 293.15
+          },
+          "hose": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "probe": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          },
+          "soil": {
+            "waterKg": 0,
+            "solidKg": 0,
+            "gasKg": 0,
+            "enthalpyJ": 0,
+            "temperatureK": null
+          }
+        },
+        "releases": [],
+        "solidEnteringGroundKg": 0,
+        "co2EnteringGroundKg": 0,
+        "waterEnteringGroundKg": 0,
+        "upstreamSublimatedKg": 0,
+        "undergroundSublimatedKg": 0,
+        "initialCO2Kg": 0.01,
+        "upstreamFractionInitialCO2": 0,
+        "undergroundFractionInitialCO2": 0,
+        "probeSurvivalFractionArrivedCO2": null,
+        "peatTemperatureK": 333.15,
+        "retainedMoistureDryBasis": 0.1,
+        "heatFromPeatJ": 0,
+        "waterMassResidualKg": 0,
+        "co2MassResidualKg": 0,
+        "energyResidualJ": 0,
+        "initialEnthalpyJ": 543383.1949999998,
+        "additionalColdResourceJ": 6560.31142395392,
+        "meanSolidDiameterM": {
+          "source": 0.00010000000000000002,
+          "hose": null,
+          "probe": null,
+          "soil": null
+        },
+        "pressurePa": null,
+        "oxygenMoleFraction": null,
+        "extinction": null,
+        "penetrationM": null,
+        "unavailable": [
+          "Aqueous film/ice-shell and blockage coupling",
+          "Particle slip, filtration, deposition and peat penetration",
+          "Pressure-driven liquid flow and spatial wetting",
+          "Gas/O2 mixture and boundary exchange fields",
+          "Tank pressure",
+          "Reacting fire, extinction and re-ignition",
+          "Ambient reheating and drainage"
+        ],
+        "assumptions": [
+          "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.",
+          "Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.",
+          "Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.",
+          "Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.",
+          "Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.",
+          "Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.",
+          "Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.",
+          "Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios."
+        ],
+        "review": "No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.",
+        "metadata": {
+          "panelId": "D-evidence",
+          "seed": 21,
+          "observationS": 30,
+          "particleSizeProvenance": "User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.",
+          "units": "SI; kelvin; mass fractions use stated denominators",
+          "numericalStepS": 0.005,
+          "parcelStepS": 0.025
+        }
+      }
+    }
+  ],
+  "convergence": [
+    {
+      "stepS": 0.02,
+      "solidEnteringGroundKg": 0.0008413087118624211,
+      "undergroundSublimatedKg": 0.0008413087118624214,
+      "peatTemperatureK": 330.65571768951907,
+      "energyResidualJ": -5.3551048040390015e-9
+    },
+    {
+      "stepS": 0.01,
+      "solidEnteringGroundKg": 0.0008413131147174634,
+      "undergroundSublimatedKg": 0.0008413131147174631,
+      "peatTemperatureK": 330.65571626353994,
+      "energyResidualJ": -5.704350769519806e-9
+    },
+    {
+      "stepS": 0.005,
+      "solidEnteringGroundKg": 0.000841320274154137,
+      "undergroundSublimatedKg": 0.0008413202741541361,
+      "peatTemperatureK": 330.6557133542489,
+      "energyResidualJ": -6.6356733441352844e-9
+    },
+    {
+      "stepS": 0.0025,
+      "solidEnteringGroundKg": 0.0008413290222600592,
+      "undergroundSublimatedKg": 0.0008413290222600585,
+      "peatTemperatureK": 330.65570974573876,
+      "energyResidualJ": -8.149072527885437e-9
+    },
+    {
+      "stepS": 0.00125,
+      "solidEnteringGroundKg": 0.0008413333953464751,
+      "undergroundSublimatedKg": 0.0008413333953464744,
+      "peatTemperatureK": 330.65570794232207,
+      "energyResidualJ": -6.05359673500061e-9
+    }
+  ],
+  "parcels": [
+    {
+      "parcelStepS": 0.2,
+      "rejected": "Underresolved solid delivery before withdrawal: pre-onset aging/parcel resolution cannot establish source loss. Solid entry is unavailable; zero delivery cannot be inferred. Changed scenarios require refinement."
+    },
+    {
+      "parcelStepS": 0.1,
+      "rejected": "Underresolved solid delivery before withdrawal: pre-onset aging/parcel resolution cannot establish source loss. Solid entry is unavailable; zero delivery cannot be inferred. Changed scenarios require refinement."
+    },
+    {
+      "parcelStepS": 0.05,
+      "rejected": "Underresolved solid delivery before withdrawal: pre-onset aging/parcel resolution cannot establish source loss. Solid entry is unavailable; zero delivery cannot be inferred. Changed scenarios require refinement."
+    },
+    {
+      "parcelStepS": 0.025,
+      "solidEnteringGroundKg": 0.0008413333953464751,
+      "undergroundSublimatedKg": 0.0008413333953464744,
+      "peatTemperatureK": 330.65570794232207,
+      "energyResidualJ": -6.05359673500061e-9
+    },
+    {
+      "parcelStepS": 0.0125,
+      "solidEnteringGroundKg": 0.0008474701750129431,
+      "undergroundSublimatedKg": 0.0008474701750129428,
+      "peatTemperatureK": 330.65475467221904,
+      "energyResidualJ": -2.0954757928848267e-9
+    },
+    {
+      "parcelStepS": 0.00625,
+      "solidEnteringGroundKg": 0.0008505452737452055,
+      "undergroundSublimatedKg": 0.0008505452737452049,
+      "peatTemperatureK": 330.65427894248296,
+      "energyResidualJ": -2.491287887096405e-8
+    }
+  ]
+}

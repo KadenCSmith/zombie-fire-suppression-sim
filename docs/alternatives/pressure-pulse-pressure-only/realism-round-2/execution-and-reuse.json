@@ -1,0 +1,71 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "runId": "B-pressure-only-retry2-2d6ab8f",
+  "source": "2d6ab8f0a4d74b7aee9c6a449533afb4c5343911",
+  "command": "npm test -- tests/alternatives/pressure-pulse-pressure-only/model.test.ts tests/alternatives/pressure-pulse-pressure-only/animation.test.ts tests/alternativeSceneComposition.test.tsx --maxWorkers=1 --reporter=json --outputFile=pressure-only-retry2.report.json",
+  "executor": "Node v26.8.2/Vitest5.0.2, cwd isolated snapshot-2d6",
+  "independentResults": {
+    "tests": 16,
+    "passed": 16,
+    "failed": 0,
+    "files": 3,
+    "privateModelGuards": 7,
+    "privateAnimation": 3,
+    "actualSceneFactoryComposition": 6
+  },
+  "criticalDependencyCloneHashes": {
+    "vitest/package.json": {
+      "expected": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+      "privateClone": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+      "pass": true
+    },
+    "vitest/vitest.mjs": {
+      "expected": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "privateClone": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "pass": true
+    },
+    "vite/package.json": {
+      "expected": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "privateClone": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "pass": true
+    },
+    "vite/dist/node/index.js": {
+      "expected": "8b142bd1231a46bf2cad4c05b3f76de5b183064ee771b9934fbaffb70b914652",
+      "privateClone": "8b142bd1231a46bf2cad4c05b3f76de5b183064ee771b9934fbaffb70b914652",
+      "pass": true
+    },
+    "esbuild/package.json": {
+      "expected": "9ce21c976ffbbb95001f460e9e8af7c6d719f748eb70441e617a14dd0b68a5b8",
+      "privateClone": "9ce21c976ffbbb95001f460e9e8af7c6d719f748eb70441e617a14dd0b68a5b8",
+      "pass": true
+    },
+    "@esbuild/darwin-arm64/bin/esbuild": {
+      "expected": "b82c6243eb58d520d0bc55cddcf6993dd0f5572f3ab8dc2ba6d77058be043e62",
+      "privateClone": "b82c6243eb58d520d0bc55cddcf6993dd0f5572f3ab8dc2ba6d77058be043e62",
+      "pass": true
+    },
+    "typescript/package.json": {
+      "expected": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+      "privateClone": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+      "pass": true
+    },
+    "react/package.json": {
+      "expected": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+      "privateClone": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+      "pass": true
+    },
+    "three/package.json": {
+      "expected": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+      "privateClone": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+      "pass": true
+    }
+  },
+  "reused": "Prior independent concept/null/source guards through exact adapter-function+computational-descriptor+numerical closure mappings; old calorimeter proofs retained unchanged, not new pressure physical evidence.",
+  "newActualUI": "Unverified: single admin-policy-denied CUA attempt; no retry/bypass/routes/screenshots/logs.",
+  "unrun": [
+    "Numerical/analytical benchmarks",
+    "Pressure/soil/reactive model or empirical validation",
+    "Full suite/type/lint/build/native/integration/FPS"
+  ],
+  "priorSignedRound1ReportSha256": "2d13a86aa74391b9bc37eb9b1e824991a1b9ad5879a33697bafdc943e7bd065f"
+}

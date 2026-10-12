@@ -1,0 +1,30 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "capturedAtUTC": "2026-10-12T08:27:40.453307+00:00",
+  "unchangedFrozenBenchmarkSha256": "b1126c1ade7bc50d11279c380357822b852b6572a53c2fa31de521aa153957e9",
+  "reused": [
+    {
+      "evidence": "prior/results.json groups C/D/E: exact bolus, sensible/boiling/depletion, non-grid arrival/bypass",
+      "validity": "Exact protected contactCooling.ts bytes and its story/fireSequence.ts dependency match initial; package and lock match; runtime critical package files clone-verified. These direct-reference scenarios explicitly use 0.05 s and do not invoke changed new-alternative policy. No empirical validation inferred."
+    },
+    {
+      "evidence": "prior/results.json historical group B failure at explicit 0.05 s",
+      "validity": "Retained as historical direct-reference failures. They are not labeled as new-production failures or newly passing checks."
+    },
+    {
+      "evidence": "Initial signed ROUND_0_B.md model/source/primary-context assessment",
+      "validity": "Confirmed actual current adapter/contract/registry/worker/composition and both private source trees. Unsupported central equations/material data unchanged. Current official NIST/IAPWS pages rechecked narrowly."
+    }
+  ],
+  "newlyExecuted": [
+    "new-policy-review.test.ts: actual createRun production adapter; same analytical solution/inlets/times/tolerance; temporal halving 0.025..0.0015625 s; default/source-off/finite/zero limits; raw accepted-state mass/enthalpy; snapshot/config/checkpoint/visual independence; pressure-only null metrics and source/engine rejection",
+    "independent-balances.test.ts: same 33 default/material/resource scenarios through changed production adapter",
+    "current private B animation/model tests: 26 tests",
+    "actual Chrome own tab 862380280: pressure-only representative/end/backward-seek states and both completed comparison panels; final asset visual observation pending"
+  ],
+  "notNewlyExecuted": [
+    "general full suite/typecheck/lint/build/native fixtures/integrated final candidate; implementer reports only, coordinator integration gates",
+    "unaffected exact bolus/phase/bypass proofs (valid reused evidence)",
+    "pressure PDE/mesh convergence/soil response/reaction suppression/empirical validation (models/data absent)"
+  ]
+}

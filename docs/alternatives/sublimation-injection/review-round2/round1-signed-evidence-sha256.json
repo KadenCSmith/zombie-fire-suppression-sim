@@ -1,0 +1,29 @@
+{
+  "signedBy": "/root/realism_a_review",
+  "signedAtUtc": "2026-10-12T08:44:27.250177+00:00",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "outputs": {
+    "transitive-source-provenance.json": "e520944cbf1a8e1e91bf28859cd7fe540e8baede374bd5bf16b8367ca4417bdd",
+    "primary-source-digest.md": "cfc9403b5f640392a2d86de43011325a55e30c72ed7d9738df6aff63e6ad2905",
+    "resource-conditions.json": "f7c5bdd9d0f8ef61b02829ae64c92a53907e07289aacac4ce18b8fd003e663ce",
+    "browser-observations.json": "86b6fd7e0a7438b44b40b60027bd776f478365a8441c7a1c69d3fe8cbda5ba33",
+    "report.json": "bbad0389f3e0f10698bd5dbcd10ca5d864730c4966549b99a3a103a19f64a69e",
+    "current-numerical-results-final.json": "33f78c8c3b03e7ab52752abfcda7983789c5f7c50643e25479d752bfaeebaf08",
+    "independent-tests-current.log": "95287a789e0e0be91dcc41db5e9cfe48ed6ca301feacee4a155f7fb63ac739b7",
+    "preservation-results.json": "cfc57101e00a7a4dc5bd706d1862740b070f2b1821860e6c73550f80ced88a1a",
+    "local-check-provenance-303a594.json": "29774330db80a985a3b071927222bec43063d361c3f6b33b9ff67da6b0a0663a",
+    "review-plan.json": "cadef450436bc292fefa790eb6d652b3da5ac0f5f8d165c290ef3ab5234351d6",
+    "report.md": "79aa3384a400d83e01e5632449014511d1ca54a121b3121f58b8641f6ae1cebf",
+    "frozen-copy-sha256.json": "6337b57def9ecdd4280153a31061075ef15c7ad366a45fed90f35ae2bba5c19e",
+    "benchmark-results-final.json": "287147e271040c195cad40d6f828d41ccb34d85222c072e8a4638d136805ba1e",
+    "independent-run-metadata-attempt1.json": "940518abab818f97bc1a463112e79a8157b31a9c52c100cc1cbe90ca1c73c400",
+    "provenance-plan.md": "ca5adfe1bc82f3a75513571a9d4132d824bc9b14d2e0f5a7057e1fd18c64b666",
+    "independent-tests-attempt1.log": "8ed820f9ee8725fede93b61beb76267a5d48a98da476b46cc7475021c6cc84cb",
+    "independent-current-run-metadata.json": "3b2f7be80f0db518941c7f2ef0cedc88dcfd4c7675868ff8f23d7dc1fe36a4db",
+    "frozen-review-provenance.json": "71ef1744497c350205b7668600b0a52c02f6dde21c537f5759ca4ce000884d0c",
+    "LEDGER.md": "eff70daad23996ab2e4c7eed06251e6e863150f4494107fac6229dc3a73d26e2",
+    "local-check-provenance.json": "cadc912610def750dd15b72531bcfc330123293518452bcc10ec35f9c512e1e8",
+    "retry-execution-spec.json": "6c3fb64fe1ffc2b3248a87de134013be06e2e0dbddc415cb42e552f08abe6dc7",
+    "benchmark-spec.json": "a958a214cf3e39e54c4e0787198cdd64f7016f905dddedb4aa01dcdfef94daf3"
+  }
+}

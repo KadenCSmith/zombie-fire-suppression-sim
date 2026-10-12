@@ -1,0 +1,107 @@
+{
+  "snapshot": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+  "coordinateBasis": "Authored truck-local display coordinates, not equipment specifications",
+  "sourceDeltaVsSignedPass2": [
+    "src/alternatives/sublimation-injection/visuals.ts",
+    "src/alternatives/sublimation-injection/supply.tsx",
+    "src/alternatives/sublimation-injection/loading.tsx",
+    "src/alternatives/sublimation-injection/vehicle.tsx",
+    "src/alternatives/sublimation-injection/index.ts",
+    "src/alternatives/sublimation-injection/scene.tsx",
+    "tests/alternatives/sublimation-injection/supply.test.ts",
+    "tests/alternatives/sublimation-injection/visuals.test.ts"
+  ],
+  "transitiveImportClosureFiles": 75,
+  "originalProtectedFilesVerified": 57,
+  "newVehicleAuthorship": "New private procedural vehicle; no protected FireWaterTruck asset import/extraction/copy found in full diff and import closure",
+  "verifiedSourceObservations": [
+    "Six wheel groups on three axles; nominal torus radius .23+.092=.322 equals wheel-center height, ground y0; complete parked artwork footprint on unchanged grass domain by source/test coordinates. Actual perceived grounding/proportions unverified.",
+    "Rear payload base lower face1.312+.68*(-.81-.06)=.7204 matches deck upper face.65+.14/2=.72 within .0004 display units; boom base lower face matches same support.",
+    "Rigid two-link authored boom lengths1.55 and1.1 are finite and attached to wrist for deterministic0..90s pose samples; no calculated forces/hydraulics.",
+    "Supply and delivery curves use same transformed declared ports as payload placement. No conservative hydraulic source/transport or pressure computation follows.",
+    "Loading release/impact times precede lidStart68.5; bucket retracts before lid motion; lidClosed71.3 precedes boostStart71.5; quench72..85 and host fireoff86 remain authored. Bubbles precede closure after authored water contact.",
+    "Wheel roll now -travel/.322; all six wheel nodes use corrected helper and forward/reverse seeking invariant passes.",
+    "New FillHose/reel geometries are locally memoized with disposal cleanup; unchanged owned no-DOM annotation uses fresh effect-owned textures and matching-binding cleanup. Unit/resource checks pass; browser/StrictMode/GPU behavior not established."
+  ],
+  "findings": [
+    {
+      "id": "A2-GEOM-1",
+      "type": "Confirmed source geometry overlap",
+      "file": "src/alternatives/sublimation-injection/vehicle.tsx",
+      "description": "Pump motor intersects the front reel flange. Point[-.95,.97,.75] belongs to both solid meshes in the same truck-local coordinate system.",
+      "point": [
+        -0.95,
+        0.97,
+        0.75
+      ],
+      "reelFlange": {
+        "center": [
+          -0.88,
+          0.78,
+          0.75
+        ],
+        "axis": "Z",
+        "radius": 0.235,
+        "thickness": 0.035,
+        "radialDistanceAtPoint": 0.2024845673131658
+      },
+      "pumpMotor": {
+        "center": [
+          -1.02,
+          1.02,
+          0.68
+        ],
+        "axis": "X",
+        "radius": 0.11,
+        "length": 0.27,
+        "axialDistanceAtPoint": 0.07000000000000006,
+        "radialDistanceAtPoint": 0.08602325267042625
+      },
+      "affects": "Authored appearance/assembly only; no physical source or conservation state",
+      "actualVisualSeverity": "UNVERIFIED because Chrome access denied",
+      "reportedPromptlyToImplementer": true
+    },
+    {
+      "id": "A2-GEOM-2",
+      "type": "Minor source-only contact detail",
+      "description": "Nominal tire torus meets y0. At parked angle the bottom boxed tread extends to y=-.0045 in authored display units; grass/actual perceived contact is unverified. No severe grounding failure inferred."
+    },
+    {
+      "id": "A2-PLUMB-1",
+      "type": "Confirmed source visual-plumbing issue",
+      "description": "The single continuous FILL_ROUTE passes through pump motor and pump-head solid interiors without explicit pump inlet/outlet ports. It is not wholly disconnected.",
+      "motorWorldCenter": [
+        0.43,
+        1.02,
+        -0.27
+      ],
+      "fillRouteMotorPoint": [
+        0.5,
+        1.02,
+        -0.27
+      ],
+      "motorPointAxialDistance": 0.07,
+      "motorHalfLength": 0.135,
+      "motorPointRadialDistance": 0,
+      "motorRadius": 0.11,
+      "pumpHeadWorldCenter": [
+        0.2,
+        1.02,
+        -0.27
+      ],
+      "fillRouteHeadPoint": [
+        0.2,
+        1.02,
+        -0.27
+      ],
+      "tubeRadius": 0.036,
+      "ports": "Only declared tank outlet/preparation inlet, no pump inlet/outlet seam",
+      "affects": "Authored visual mechanism/assembly only; no physical source computation",
+      "actualVisibleSeverity": "UNVERIFIED",
+      "reportedPromptly": true
+    }
+  ],
+  "aestheticScore": null,
+  "aestheticStatus": "UNVERIFIED; no actual new-truck frame observed, so no candid perceived-coherence/occlusion judgment can be made",
+  "scientificVisualMapping": "MethodSceneProps carries onlyid/time; display does not consume accepted surface/outlet/soil state. New truck/boom and cap cannot establish physical correspondence."
+}

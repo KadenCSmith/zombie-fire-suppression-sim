@@ -1,0 +1,20 @@
+import {it,expect} from 'vitest'
+import {writeFileSync} from 'node:fs'
+import {createRun,freshPanel} from './src/alternatives/model'
+it('recomputes raw phase mass and enthalpy from accepted patch states and input constants',()=>{
+ const configs=[{}]
+ for(const inletK of[273.15,350])for(const waterKg of[.05,5])for(const flowKgS of[.005,.2])for(const conductanceWK of[1,100])for(const contactStartS of[0,50])configs.push({initialK:1000,inletK,waterKg,flowKgS,conductanceWK,contactStartS,endS:120})
+ const outputs=configs.map((changes,i)=>{
+  const config=freshPanel('balance-'+i,'liquid-waves');Object.assign(config.thermal,changes)
+  const {thermal:c}=config,s=createRun(config).advanceTo(c.endS).contact!,p=s.patches,l=s.ledger
+  const initialJ=p.reduce((sum,q)=>sum+q.peatMassKg*1840*(c.initialK-c.inletK),0)
+  const peatJ=p.reduce((sum,q)=>sum+q.peatMassKg*1840*(q.temperatureK-c.inletK),0)
+  const liquidJ=p.reduce((sum,q)=>sum+q.liquidWaterKg*4186*(q.waterTemperatureK-c.inletK),0)
+  const vaporJ=p.reduce((sum,q)=>sum+q.waterVaporKg*(4186*(373.15-c.inletK)+2260000),0)
+  const massResidualKg=c.waterKg-l.waterRemainingSupplyKg-l.waterBypassKg-p.reduce((sum,q)=>sum+q.liquidWaterKg+q.waterVaporKg,0)
+  const energyResidualJ=initialJ-peatJ-liquidJ-vaporJ
+  return{config:c,initialJ,peatJ,liquidJ,vaporJ,massResidualKg,energyResidualJ,massToleranceKg:1e-9+1e-9*c.waterKg,energyToleranceJ:1e-4+1e-9*Math.abs(initialJ),pass:Math.abs(massResidualKg)<=1e-9+1e-9*c.waterKg&&Math.abs(energyResidualJ)<=1e-4+1e-9*Math.abs(initialJ)}
+ })
+ writeFileSync('independent-balances.json',JSON.stringify({kind:'Independent recomputation from patch temperatures and phase masses; frozen default/variation scenarios',outputs,summary:{cases:outputs.length,passed:outputs.filter(q=>q.pass).length,maxMassResidualKg:Math.max(...outputs.map(q=>Math.abs(q.massResidualKg))),maxEnergyResidualJ:Math.max(...outputs.map(q=>Math.abs(q.energyResidualJ)))}},null,2)+'\n')
+ expect(outputs.every(q=>q.pass)).toBe(true)
+})

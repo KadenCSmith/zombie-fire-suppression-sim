@@ -46,9 +46,9 @@ function Field({mesh,frame,field,wireframe,nodes,range,onProbe}:{mesh:Mesh;frame
     {nodes&&<points geometry={geo.nodes}><pointsMaterial size={.001} color="#fff" sizeAttenuation/></points>}
   </>
 }
-export function PeatFemScene(props:Parameters<typeof Field>[0]){
+export function PeatFemScene(props:Parameters<typeof Field>[0] & {renderBudget?: 'comparison'}){
   const L=props.mesh.lengthM
-  return <><Canvas key={props.mesh.n} frameloop="always" dpr={[1,1.5]} camera={{position:[L*1.85,L*1.6,L*2.2],fov:42,near:L/100,far:L*30}} gl={{antialias:true}}>
+  return <><Canvas key={props.mesh.n} frameloop={props.renderBudget ? 'demand' : 'always'} dpr={props.renderBudget ? 1 : [1,1.5]} camera={{position:[L*1.85,L*1.6,L*2.2],fov:42,near:L/100,far:L*30}} gl={{antialias:true}}>
     <color attach="background" args={['#020606']}/><Field {...props}/><OrbitControls makeDefault target={[L/2,L/2,L/4]} minDistance={L*.6} maxDistance={L*5} enableDamping={false}/>
     <axesHelper args={[L*.15]}/>
   </Canvas>{props.overlay&&<div className="fem-temperature-grid" aria-label="Front-face temperature sample table"><small>Front face · x → / z ↑ · K</small>{Array.from({length:25},(_,i)=>{const x=(i%5)*L/4,z=(4-Math.floor(i/5))*L/4;return <span key={i} className="fem-grid-value" title={`FE sample (${x},0,${z}) m at ${props.frame.timeS} s`}>{sample(props.mesh,props.frame.temperature,x,0,z).toFixed(0)} K</span>})}</div>}</>

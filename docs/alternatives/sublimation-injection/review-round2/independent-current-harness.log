@@ -1,0 +1,25 @@
+import { afterAll, describe, expect, it } from 'vitest'
+import { writeFileSync } from 'node:fs'
+import { simulateContactCooling, type ContactPatchSpec, type ContactCoolingState } from '../src/story/contactCooling'
+import { createRun, freshPanel } from '../src/alternatives/model'
+import { ALTERNATIVE_CONTACT_STEP_S } from '../src/alternatives/contactAdapter'
+const result: { states: unknown[]; refinement: unknown[]; residuals: {massKg:number;energyJ:number} } = {states:[],refinement:[],residuals:{massKg:0,energyJ:0}}
+const times=[8,8.5,9,18,28,60]
+const patches: ContactPatchSpec[]=Array.from({length:3},(_,i)=>({id:`specimen-${i}`,xM:0,yM:-(i+1)*.1,radiusM:.04,peatMassKg:.5,dryIceConductanceWK:0,waterConductanceWK:24,waterArrivalTimeS:8,waterShare:1/3}))
+function exact(t:number){const u=Math.max(0,t-8),delta=350-293.15,C=920,r=.025/3,c=4186,UA=24,b=UA/(r*c),k=UA/C,te=20;
+ const fill=(v:number)=>{const z=k*v;let term=1,sum=1;for(let n=1;n<200;n++){term*=z/n;const a=term*b/(b+n);sum+=a;if(a<1e-16*sum)break}return delta*Math.exp(-z)*sum};
+ if(u===0) return 350;const cw=.5/3*c,eq=C*delta/(C+cw);return 293.15+ (u<=te?fill(u):eq+(fill(te)-eq)*Math.exp(-UA*(1/C+1/cw)*(u-te)))}
+function balance(s:ContactCoolingState){const l=s.ledger;result.residuals.massKg=Math.max(result.residuals.massKg,Math.abs(l.waterMassResidualKg),Math.abs(l.dryIceMassResidualKg));result.residuals.energyJ=Math.max(result.residuals.energyJ,Math.abs(l.energyResidualJ));expect(Math.abs(l.energyResidualJ)).toBeLessThanOrEqual(1e-4+1e-9*Math.max(1,Math.abs(l.initialPeatEnergyJ)));expect(Math.abs(l.waterMassResidualKg)).toBeLessThanOrEqual(1e-9+1e-9*l.waterInitialKg);expect(Math.abs(l.dryIceMassResidualKg)).toBeLessThanOrEqual(1e-9+1e-9*l.dryIceInitialKg)}
+afterAll(()=>writeFileSync('current-numerical-results.json',JSON.stringify(result,null,2)+'\n'))
+describe('Independent frozen retry checks for A',()=>{
+ it('CURRENT_W1 checks actual adapter against original exact solution and finer steps',()=>{
+  expect(ALTERNATIVE_CONTACT_STEP_S).toBe(.00625)
+  const p=freshPanel('independent-current-w1','sublimation-injection');p.medium='water';Object.assign(p.thermal,{initialK:350,inletK:293.15,waterKg:.5,flowKgS:.025,contactStartS:8,conductanceWK:24,dryIceKg:0,endS:60})
+  const run=createRun(p);let currentMax=0;for(const t of times){const s=run.advanceTo(t),actual=s.contact!.patches[0].temperatureK,expected=exact(t),errorK=actual-expected;currentMax=Math.max(currentMax,Math.abs(errorK));result.states.push({id:'CURRENT_W1',t,actual,expected,errorK,state:s});balance(s.contact!)}
+  const maxima:number[]=[];for(const h of [.05,.00625,.003125]){let max=0;const rows=[];for(const t of times){const s=simulateContactCooling(t,'gradual',{startTimeS:0,endTimeS:60,rapidRemovalTimeS:60,waterStartTimeS:8,stepS:h,initialTemperatureK:350,waterInletK:293.15,dryIceInitialKg:0,waterInitialKg:.5,waterFlowKgS:.025},patches);const errorK=s.patches[0].temperatureK-exact(t);max=Math.max(max,Math.abs(errorK));rows.push({t,errorK});balance(s)}maxima.push(max);result.refinement.push({stepS:h,maximumErrorK:max,rows})}
+  expect(currentMax).toBeLessThanOrEqual(.15);expect(currentMax).toBeCloseTo(maxima[1],12);expect(maxima[1]).toBeLessThan(maxima[0]);expect(maxima[2]).toBeLessThan(maxima[1]);expect(maxima[2]).toBeLessThanOrEqual(.05)
+ })
+ it('CURRENT_DEFAULT independently records finite default/on/off ledger states',()=>{
+  for(const medium of ['water','co2-water'] as const)for(const enabled of [true,false]){const p=freshPanel(`independent-${medium}-${enabled}`,'sublimation-injection');p.medium=medium;p.thermal.enabled=enabled;const run=createRun(p);for(const t of [0,.5,8,8.5,20,30,60]){const s=run.advanceTo(t);result.states.push({id:'CURRENT_DEFAULT',medium,enabled,t,state:s});balance(s.contact!);if(!enabled){expect(s.metrics!.energyJ).toBe(0);expect(s.metrics!.maximumK).toBe(823.15);expect(s.contact!.ledger.waterSuppliedKg).toBe(0);expect(s.contact!.ledger.dryIceSublimatedKg).toBe(0)}}}
+ })
+})

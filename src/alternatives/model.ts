@@ -1,0 +1,98 @@
+import { findMethodModule } from './modules'
+import type { ParticleInjectionSettings, ParticleInjectionState } from './fine-dry-ice-injection/types'
+import { defaultParticleInjectionSettings, particleLinkedCompatibility, particleObservationWindowS } from './fine-dry-ice-injection/config'
+import { type ContactCoolingState, type ContactPatchSpec } from '../story/contactCooling'
+import { ALTERNATIVE_CONTACT_STEP_S, createContactCoolingSession } from './contactAdapter'
+import { compatible, defaultThermal, variant, type VariantId, type EngineId, type MediumId, type ThermalSettings } from './registry'
+import { DEFAULT_SETTINGS, PeatSolver, totals, type Settings, type Frame } from '../peatfem/coupled'
+export interface PanelConfig { id: string; variantId: VariantId; engine: EngineId; medium: MediumId; sourceStatus: 'unspecified' | 'known-contact-properties'; thermal: ThermalSettings; fem: Settings; particleInjection?: ParticleInjectionSettings }
+export interface Metrics { maximumK: number; waterUsedKg: number; dryIceUsedKg: number; energyJ: number; energyResidualJ: number; massResidualKg: number; oxygenKg: number | null; fuelKg: number | null; reactionW: number | null }
+export interface AcceptedState { timeS: number; contact?: ContactCoolingState; fem?: Frame; particleInjection?: ParticleInjectionState; metrics: Metrics | null }
+export interface RunMessage { panelId: string; runId: string; type: 'ready' | 'state' | 'paused' | 'complete' | 'failed'; state?: AcceptedState; running: boolean; solveMs: number; wallMs: number; error?: string }
+export interface WorkerCommand { panelId: string; runId: string; type: 'init' | 'run' | 'pause' | 'advance'; config?: PanelConfig; targetS?: number }
+export function acceptsMessage(panelId: string, runId: string, message: Pick<RunMessage, 'panelId' | 'runId'>) { return message.panelId === panelId && message.runId === runId }
+export function buildContact(config: PanelConfig) {
+  const { thermal: s } = config, active = s.enabled && config.variantId !== 'baseline'
+  const water = active && (config.medium === 'water' || config.medium === 'co2-water')
+  const dry = active && config.medium === 'co2-water'
+  const count = 3
+  const patches: ContactPatchSpec[] = Array.from({ length: count }, (_, i) => ({
+    id: `specimen-${i}`, xM: 0, yM: -(i + 1) * .1, radiusM: .04, peatMassKg: .5,
+    dryIceConductanceWK: dry && i === 0 ? 8 : 0, waterConductanceWK: water ? s.conductanceWK : 0,
+    waterArrivalTimeS: s.contactStartS, waterShare: 1 / count,
+  }))
+  return createContactCoolingSession({ startTimeS: 0, endTimeS: s.endS, rapidRemovalTimeS: s.endS,
+    waterStartTimeS: s.contactStartS, stepS: ALTERNATIVE_CONTACT_STEP_S, initialTemperatureK: s.initialK, waterInletK: s.inletK,
+    dryIceInitialKg: dry ? s.dryIceKg : 0, waterInitialKg: water ? s.waterKg : 0, waterFlowKgS: water ? s.flowKgS : 0 }, patches)
+}
+function createSupportedRun(config: PanelConfig) {
+  const reason = compatible(config.variantId, config.engine, config.medium)
+  if (reason) throw new Error(reason)
+  const windowS = config.engine === 'peat-fem' ? config.fem.endS : config.thermal.endS
+  if (!Number.isFinite(windowS) || windowS <= 0) throw new Error('Observation window must be finite and positive.')
+  const contact = config.engine === 'contact' ? buildContact(config) : undefined
+  const fem = config.engine === 'peat-fem' ? new PeatSolver(config.fem) : undefined
+  const base = fem ? totals(fem.mesh, fem.frame) : undefined
+  let timeS = 0, contactState = contact?.snapshot()
+  const endS = fem ? config.fem.endS : config.thermal.endS
+  function snapshot(): AcceptedState {
+    if (contactState) {
+      const l = contactState.ledger
+      return { timeS, contact: structuredClone(contactState), metrics: { maximumK: Math.max(...contactState.patches.map(p => p.temperatureK)), waterUsedKg: l.waterSuppliedKg,
+        dryIceUsedKg: l.dryIceSublimatedKg, energyJ: l.heatToWaterJ + l.heatToDryIceJ, energyResidualJ: l.energyResidualJ,
+        massResidualKg: Math.max(Math.abs(l.waterMassResidualKg), Math.abs(l.dryIceMassResidualKg)), oxygenKg: null, fuelKg: null, reactionW: null } }
+    }
+    if (fem && base) {
+      const f = structuredClone(fem.snapshot()), t = totals(fem.mesh, f)
+      const lastReactionJ = reactionPreviousJ, lastTimeS = reactionPreviousTimeS
+      return { timeS: f.timeS, fem: f, metrics: { maximumK: t.maximumK, waterUsedKg: 0, dryIceUsedKg: 0, energyJ: t.energyJ,
+        energyResidualJ: t.energyJ - base.energyJ - f.ledger.ignitionJ - f.ledger.reactionJ + f.ledger.heatOutJ + f.ledger.gasEnthalpyOutJ,
+        massResidualKg: t.componentsKg - base.componentsKg + f.ledger.gasBoundaryKg.reduce((a, b) => a + b, 0), oxygenKg: t.oxygenKg, fuelKg: t.peatKg,
+        reactionW: f.timeS > lastTimeS ? (f.ledger.reactionJ - lastReactionJ) / (f.timeS - lastTimeS) : 0 } }
+    }
+    return { timeS, metrics: null }
+  }
+  let reactionPreviousJ = 0, reactionPreviousTimeS = 0
+  return {
+    endS, snapshot,
+    advanceTo(targetS: number) {
+      if (!Number.isFinite(targetS) || targetS < timeS - 1e-8 || targetS > endS + 1e-8) throw new Error('Invalid physical target')
+      if (fem) {
+        reactionPreviousJ = fem.frame.ledger.reactionJ; reactionPreviousTimeS = fem.frame.timeS
+        while (fem.frame.timeS < targetS - 1e-8) fem.advance(Math.min(fem.settings.maxStepS, targetS - fem.frame.timeS))
+        timeS = fem.frame.timeS
+      } else {
+        if (contact) contactState = contact.advanceTo(targetS)
+        timeS = targetS
+      }
+      return snapshot()
+    },
+  }
+}
+export function createRun(config: PanelConfig) {
+  const module = findMethodModule(config.variantId)
+  return module ? module.createRun(config, {supportedRun:createSupportedRun}) : createSupportedRun(config)
+}
+export function freshPanel(id: string, variantId: VariantId): PanelConfig {
+  const v = variant(variantId)
+  return { id, variantId, engine: v.defaultEngine, medium: v.defaultMedium, sourceStatus: 'unspecified',
+    thermal: defaultThermal(variantId), fem: { ...DEFAULT_SETTINGS }, ...(variantId === 'nanoparticles' ? { particleInjection: defaultParticleInjectionSettings() } : {}) }
+}
+export function duplicatePanel(panel: PanelConfig, id: string): PanelConfig { return { ...structuredClone(panel), id } }
+export function observationWindowS(config: PanelConfig): number { return config.variantId === 'nanoparticles' ? particleObservationWindowS(config) : config.engine === 'peat-fem' ? config.fem.endS : config.thermal.endS }
+export function linkedCompatibility(configs: PanelConfig[]): string | null {
+  if (configs.length < 2) return 'Select at least two panels.'
+  if (configs.some(c => compatible(c.variantId, c.engine, c.medium))) return 'Resolve incompatible selections first.'
+  if (configs.some(c => c.engine === 'concept')) return 'Concept stage time is presentation time, not physical time.'
+  if (configs.some(c => c.engine !== configs[0].engine)) return 'Select the same engine before linking physical time.'
+  if (configs.some(c => observationWindowS(c) !== observationWindowS(configs[0]))) return 'Match observation windows first.'
+  const first = configs[0]
+  if (first.engine === 'particle') return particleLinkedCompatibility(configs)
+  if (configs.some(c => c.thermal.seed !== first.thermal.seed)) return 'Match seeds before linking physical time.'
+  if (first.engine === 'contact' && configs.some(c => c.thermal.initialK !== first.thermal.initialK || c.thermal.inletK !== first.thermal.inletK)) return 'Match initial and inlet temperatures before linking physical time.'
+  if (first.engine === 'peat-fem') {
+    const keys = [...new Set(configs.flatMap(c => Object.keys(c.fem)))] as (keyof Settings)[]
+    if (configs.some(c => keys.some(key => c.fem[key] !== first.fem[key]))) return 'Match FEM geometry, initial/boundary conditions and numerical settings before linking physical time.'
+  }
+  return null
+}

@@ -1,3 +1,4 @@
+import { VARIANTS, type VariantId } from './alternatives/registry'
 import { ToolboxPortal, useCinematicUI } from './ui/CinematicUI'
 import type { FireSequenceSession } from './ui/FireSequenceWorkspace'
 import { version as applicationVersion } from '../package.json'
@@ -52,7 +53,11 @@ type Tab = 'setup' | 'simulation' | 'results' | 'event' | 'developer'
 type SetupSection = 'source' | 'ground' | 'fire' | 'boundary' | 'advanced'
 type ScenarioPreset = 'custom' | 'untreated' | 'cold' | 'heated' | 'wet' | 'pathway'
 type SimClient = ReturnType<typeof createSimulationClient>
+const AlternativesWorkspace = lazy(() => import('./ui/AlternativesWorkspace'))
 const FireSequenceWorkspace = lazy(() => import('./ui/FireSequenceWorkspace'))
+const AlternativeRenderWorkspace = lazy(() => import('./ui/AlternativeRenderWorkspace'))
+const VibratoryWorkspace = lazy(() => import('./alternatives/vibratory-injection/workspace'))
+const ParticleWorkspace = lazy(() => import('./alternatives/fine-dry-ice-injection/workspace'))
 const FormulaReferenceWorkspace = lazy(() => import('./ui/FormulaReferenceWorkspace'))
 const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
 const PeatFemWorkspace = lazy(() => import('./ui/PeatFemWorkspace'))
@@ -196,10 +201,15 @@ function MiniChart({ points, color = '#ec946a', label, unit, accessor }: { point
 function App() {
   const cinematicUI = useCinematicUI()
 
+  const [referenceVariant,setReferenceVariant]=useState<VariantId|undefined>()
+  const [selectedAlternative, setSelectedAlternative] = useState<VariantId>(()=>VARIANTS.find(v=>v.id===new URLSearchParams(window.location.search).get('alternative'))?.id??'pressure-pulse')
+  useEffect(()=>{const url=new URL(window.location.href);url.searchParams.set('alternative',selectedAlternative);window.history.replaceState(window.history.state,'',url)},[selectedAlternative])
+  useEffect(()=>{const selected=VARIANTS.find(v=>v.id===selectedAlternative)!;document.title=`Zombie Fire · Version21 · ${selected.number} ${selected.label}`},[selectedAlternative])
+  const [alternativeNavigation,setAlternativeNavigation]=useState({tab:'alternatives' as 'alternatives'|'compare',revision:0})
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
   const [workspace, setWorkspace] = useState<PhysicsWorkspace>(() => {
     const requested = new URLSearchParams(window.location.search).get('workspace')
-    return requested === 'peat-fem' || requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
+    return requested === 'alternatives' || requested === 'peat-fem' || requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
   })
   const [layout, setLayout] = useState<LayoutMode>(() => readLayout(window.localStorage.getItem('zombie-fire-cinematic-layout')))
   const [selectedVersions, setSelectedVersions] = useState<string[]>(() => {
@@ -683,7 +693,7 @@ function App() {
   useEffect(() => {
     const switchWorkspace = (event: Event) => {
       const target = (event as CustomEvent<unknown>).detail
-      if (target !== 'peat-fem' && target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
+      if (target !== 'alternatives' && target !== 'peat-fem' && target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
       clientRef.current?.pause()
       comparisonClientRef.current?.pause()
       setPlaying(false)
@@ -696,9 +706,12 @@ function App() {
     return () => window.removeEventListener('workspace-request', switchWorkspace)
   }, [])
 
-  const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
+  const openComparison=()=>{setReferenceVariant(undefined);setAlternativeNavigation(old=>({tab:'compare',revision:old.revision+1}));changeWorkspace('alternatives')}
+  const openMethodDetails=()=>{setReferenceVariant(undefined);setAlternativeNavigation(old=>({tab:'alternatives',revision:old.revision+1}));changeWorkspace('alternatives')}
+  const chrome = <AppChrome selectedAlternative={selectedAlternative} referenceVariant={referenceVariant} onClearReference={()=>setReferenceVariant(undefined)} onAlternativeView={(id,next)=>{setSelectedAlternative(id);setReferenceVariant(id);changeWorkspace(next)}} onAlternative={id => { setReferenceVariant(undefined);setSelectedAlternative(id);changeWorkspace('sequence') }} onCompare={openComparison} workspace={workspace} compactSequence={workspace==='sequence'&&selectedAlternative==='vibratory-injection'} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
+  if (workspace === 'alternatives') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening Version21 alternatives…</div>}><AlternativesWorkspace navigation={alternativeNavigation} selectedVariant={selectedAlternative} onSelectedVariant={setSelectedAlternative}/></Suspense></>
   if (workspace === 'peat-fem') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening Peat Fire FEM…</div>}><PeatFemWorkspace session={peatFemSession}/></Suspense></>
-  if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
+  if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}>{selectedAlternative==='pressure-pulse'?<FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} />:selectedAlternative==='vibratory-injection'?<VibratoryWorkspace onCompare={openComparison} onDetails={openMethodDetails}/>:selectedAlternative==='nanoparticles'?<ParticleWorkspace onCompare={openComparison} onDetails={openMethodDetails}/>:<AlternativeRenderWorkspace key={selectedAlternative} id={selectedAlternative} onCompare={openComparison} onDetails={openMethodDetails}/>}</Suspense></>
   if (workspace === 'formulas') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the formula reference…</div>}><FormulaReferenceWorkspace onWorkspace={changeWorkspace} /></Suspense></>
   if (workspace === 'comparison') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening version comparison…</div>}><SimulationComparisonWorkspace onWorkspace={changeWorkspace} selected={selectedVersions} onSelected={setSelectedVersions} /></Suspense></>
   if (workspace === 'coupled') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening coupled continuum…</div>}><CoupledWorkspace onWorkspace={changeWorkspace} session={coupledSession} /></Suspense></>

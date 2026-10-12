@@ -1,0 +1,36 @@
+{
+  "checkedAtUTC": "2026-10-12T08:27:40.454063+00:00",
+  "sources": [
+    {
+      "title": "NIST Chemistry WebBook water phase data",
+      "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Mask=4",
+      "newlyChecked": true,
+      "boundedFinding": "Normal boiling temperature 373.17 +/- 0.04 K; supports only near-atmospheric plateau approximation, not pressure response or peat calibration."
+    },
+    {
+      "title": "IAPWS IF97 revised release",
+      "url": "https://iapws.org/technical-guidance/release/IF97-Rev",
+      "newlyChecked": true,
+      "boundedFinding": "Formulation for ordinary-water fluid phases and vapor-liquid equilibrium; constant-property calorimeter does not implement this EOS."
+    },
+    {
+      "title": "van Genuchten 1980",
+      "url": "https://www.ars.usda.gov/arsuserfiles/20360500/pdf_pubs/p0682.pdf",
+      "newlyChecked": false,
+      "boundedFinding": "Reused initial signed digest only: retention/conductivity context requiring fitted material inputs; supplies no measured peat inputs here."
+    },
+    {
+      "title": "Biot 1956",
+      "url": "https://doi.org/10.1121/1.1908239",
+      "newlyChecked": false,
+      "boundedFinding": "Reused initial signed digest only: primary indexed abstract for coupled fluid/solid wave context; initial full text retrieval failed. Not a validated peat implementation."
+    },
+    {
+      "title": "Lin and Huang 2020",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7289759/",
+      "newlyChecked": false,
+      "boundedFinding": "Reused initial signed digest only: measured interior thermal/suppression observations; no numerical match by current implementation."
+    }
+  ],
+  "scope": "No new broad pressure research, source/device design, or guessed peat model."
+}

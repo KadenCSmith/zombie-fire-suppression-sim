@@ -1,0 +1,5 @@
+
+> zombie-fire-suppression-sim@0.21.0 test
+> vitest run new-policy-review.test.ts independent-balances.test.ts tests/alternatives/pressure-pulse-liquid-waves tests/alternatives/pressure-pulse-pressure-only --maxWorkers=1 --reporter=json --outputFile=final-tests.report.json
+
+JSON report written to /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/docs/alternatives/pressure-pulse-liquid-waves/review-runtime/round-1/final-snapshot/final-tests.report.json

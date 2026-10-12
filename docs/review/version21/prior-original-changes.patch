@@ -1,0 +1,91 @@
+diff --git a/src/App.tsx b/src/App.tsx
+index 680e36e..80219c5 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -0,0 +1 @@
++import { VARIANTS, type VariantId } from './alternatives/registry'
+@@ -4,0 +6 @@ import type { CoupledSession } from './ui/CoupledWorkspace'
++import type { PeatFemSession } from './ui/PeatFemWorkspace'
+@@ -53,0 +56 @@ type SimClient = ReturnType<typeof createSimulationClient>
++const AlternativesWorkspace = lazy(() => import('./ui/AlternativesWorkspace'))
+@@ -54,0 +58 @@ const FireSequenceWorkspace = lazy(() => import('./ui/FireSequenceWorkspace'))
++const AlternativeRenderWorkspace = lazy(() => import('./ui/AlternativeRenderWorkspace'))
+@@ -56,0 +61 @@ const CoupledWorkspace = lazy(() => import('./ui/CoupledWorkspace'))
++const PeatFemWorkspace = lazy(() => import('./ui/PeatFemWorkspace'))
+@@ -196,0 +202,4 @@ function App() {
++  const [referenceVariant,setReferenceVariant]=useState<VariantId|undefined>()
++  const [selectedAlternative, setSelectedAlternative] = useState<VariantId>(()=>VARIANTS.find(v=>v.id===new URLSearchParams(window.location.search).get('alternative'))?.id??'sublimation-injection')
++  useEffect(()=>{const selected=VARIANTS.find(v=>v.id===selectedAlternative)!;document.title=`Zombie Fire · Version21 · ${selected.number} ${selected.label}`},[selectedAlternative])
++  const [alternativeNavigation,setAlternativeNavigation]=useState({tab:'alternatives' as 'alternatives'|'compare',revision:0})
+@@ -200 +209 @@ function App() {
+-    return requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
++    return requested === 'alternatives' || requested === 'peat-fem' || requested === 'coupled' || requested === 'mechanics' || requested === 'simulation' || requested === 'study' || requested === 'comparison' || requested === 'formulas' ? requested : 'sequence'
+@@ -219,0 +229 @@ function App() {
++  const peatFemSession = useRef<PeatFemSession | undefined>(undefined)
+@@ -683 +693 @@ function App() {
+-      if (target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
++      if (target !== 'alternatives' && target !== 'peat-fem' && target !== 'study' && target !== 'simulation' && target !== 'mechanics' && target !== 'coupled' && target !== 'sequence' && target !== 'comparison' && target !== 'formulas') return
+@@ -696,2 +706,6 @@ function App() {
+-  const chrome = <AppChrome workspace={workspace} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
+-  if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}><FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} /></Suspense></>
++  const openComparison=()=>{setReferenceVariant(undefined);setAlternativeNavigation(old=>({tab:'compare',revision:old.revision+1}));changeWorkspace('alternatives')}
++  const openMethodDetails=()=>{setReferenceVariant(undefined);setAlternativeNavigation(old=>({tab:'alternatives',revision:old.revision+1}));changeWorkspace('alternatives')}
++  const chrome = <AppChrome selectedAlternative={selectedAlternative} referenceVariant={referenceVariant} onClearReference={()=>setReferenceVariant(undefined)} onAlternativeView={(id,next)=>{setSelectedAlternative(id);setReferenceVariant(id);changeWorkspace(next)}} onAlternative={id => { setReferenceVariant(undefined);setSelectedAlternative(id);changeWorkspace('sequence') }} onCompare={openComparison} workspace={workspace} layout={layout} onLayout={setLayout} onWorkspace={changeWorkspace} selectedVersions={selectedVersions} onSelectedVersions={setSelectedVersions} />
++  if (workspace === 'alternatives') return <>{chrome}<Suspense fallback={<div className="study-boot">Opening Version21 alternatives…</div>}><AlternativesWorkspace navigation={alternativeNavigation} selectedVariant={selectedAlternative} onSelectedVariant={setSelectedAlternative}/></Suspense></>
++  if (workspace === 'peat-fem') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening Peat Fire FEM…</div>}><PeatFemWorkspace session={peatFemSession}/></Suspense></>
++  if (workspace === 'sequence') return <>{chrome}<Suspense fallback={<div className="study-boot" role="status">Opening the peat-fire sequence…</div>}>{selectedAlternative==='sublimation-injection'&&!new URLSearchParams(window.location.search).has('method-preview')?<FireSequenceWorkspace onWorkspace={changeWorkspace} session={fireSequenceSession} />:<AlternativeRenderWorkspace key={selectedAlternative} id={selectedAlternative} onCompare={openComparison} onDetails={openMethodDetails}/>}</Suspense></>
+diff --git a/src/story/contactCooling.ts b/src/story/contactCooling.ts
+index 3a285ac..7a59427 100644
+--- a/src/story/contactCooling.ts
++++ b/src/story/contactCooling.ts
+@@ -197,0 +198,17 @@ export function contactCoolingState(storyTimeS: number, mode: FireSourceMode): C
++
++
++/** Independent incremental calorimeter. Uses the same fixed physical step and
++ * event boundaries as the reference, without the presentation cache. */
++export function createContactCoolingSession(overrides: Partial<ContactCoolingConfig>, patches: readonly ContactPatchSpec[]) {
++  const config: ContactCoolingConfig = { ...CONTACT_COOLING_CONFIG, ...overrides }
++  validate(config, patches)
++  let state = initialState(config, patches)
++  return {
++    advanceTo(timeS: number) {
++      if (!Number.isFinite(timeS) || timeS < state.storyTimeS) throw new Error('Contact time must advance monotonically.')
++      state = advance(state, timeS, config, 'gradual')
++      return structuredClone(state)
++    },
++    snapshot: () => structuredClone(state),
++  }
++}
+diff --git a/src/ui/FireSequenceScene.tsx b/src/ui/FireSequenceScene.tsx
+index 7987a14..d51a705 100644
+--- a/src/ui/FireSequenceScene.tsx
++++ b/src/ui/FireSequenceScene.tsx
+@@ -0,0 +1 @@
++import { AlternativeMethodCues } from './AlternativeMethodModules'
+@@ -18,0 +20,2 @@ import { FireWaterTruck } from './FireWaterTruck'
++import { methodPresentation } from '../alternatives/presentation'
++import type { VariantId } from '../alternatives/registry'
+@@ -22 +25 @@ export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolea
+-interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean; cinematic?: boolean; cameraDistance?: number; connectedSupply?: boolean }
++interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean; cinematic?: boolean; cameraDistance?: number; connectedSupply?: boolean; alternative?: VariantId }
+@@ -244,0 +248,2 @@ export function FireSequenceScene(props:SceneProps){
++  const method=props.alternative?methodPresentation(props.alternative,props.time):undefined
++  const contextTime=method?.contextTime??props.time
+@@ -248 +253 @@ export function FireSequenceScene(props:SceneProps){
+-    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
++    <Ground time={contextTime} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
+@@ -250,4 +255,8 @@ export function FireSequenceScene(props:SceneProps){
+-      <StoryAggregates time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+-      <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+-      {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
+-      <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
++      <StoryAggregates time={contextTime} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
++      <SequenceGrass time={contextTime} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
++      {props.layers.anatomy&&<Tree time={contextTime} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
++      <SurfaceFire time={contextTime} visible={props.layers.fire}/><SurfaceConnection time={contextTime} visible={props.layers.fire}/>
++      {method?<>
++        {method.access&&<group position={[method.vibration,0,0]}><SequenceExcavator time={contextTime} openPit={false}/></group>}
++        <AlternativeMethodCues id={props.alternative!} time={props.time}/>
++      </>:<>
+@@ -259,0 +269 @@ export function FireSequenceScene(props:SceneProps){
++      </>}

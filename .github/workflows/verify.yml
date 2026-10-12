@@ -21,9 +21,12 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Preserve original 4.2.3 byte identities
+        run: node scripts/check-original-preservation.mjs
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm test
+      # Bound CPU contention on hosted runners; keep every test and its timeout.
+      - run: npm test -- --maxWorkers=2
       - run: npm run build
       - name: Desktop startup and worker smoke (macOS / Windows)
         if: runner.os != 'Linux'
@@ -51,3 +54,23 @@ jobs:
       - name: Version comparison (Linux CI display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npx electron --no-sandbox scripts/smoke-comparison.cjs
+      - name: Version21 independent alternatives (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-alternatives.cjs
+      - name: Version21 alternatives functional checks (Linux software display; frame target observational)
+        if: runner.os == 'Linux'
+        env:
+          ZOMBIE_PERFORMANCE_OBSERVATION_ONLY: '1'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-alternatives.cjs
+      - name: Vibration-only scene and unavailable prediction (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-vibration.cjs
+      - name: Vibration-only scene (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-vibration.cjs
+      - name: Particle delivery, counterfactuals and exports (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-particle.cjs
+      - name: Particle delivery, counterfactuals and exports (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-particle.cjs
