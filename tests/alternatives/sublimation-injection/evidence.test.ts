@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from 'vitest'
 import { writeFileSync } from 'node:fs'
 import { createRun, freshPanel, type AcceptedState } from '../../../src/alternatives/model'
+import { ALTERNATIVE_CONTACT_STEP_S } from '../../../src/alternatives/contactAdapter'
 
 const records: unknown[] = []
 describe('4.2.1 physical-checkpoint ledger evidence', () => {
@@ -25,11 +26,11 @@ describe('4.2.1 physical-checkpoint ledger evidence', () => {
 
 afterAll(() => {
   // Explicit private capture only; ordinary test runs do not write evidence.
-  if (process.env.V21_CAPTURE_SUBLIMATION_EVIDENCE === '1') writeFileSync(new URL('../../../docs/alternatives/sublimation-injection/numerical-evidence.json', import.meta.url), JSON.stringify({
+  if (process.env.V21_CAPTURE_SUBLIMATION_EVIDENCE === '1') writeFileSync(new URL('../../../docs/alternatives/sublimation-injection/numerical-evidence-round1.json', import.meta.url), JSON.stringify({
     scope: 'Numerical verification of the finite-contact proxy; no experimental or field validation',
     apiVersion: 'v21.2', originalCommit: '161e7a4a1f8c35765e1878c132db79977be1f5ea',
     units: { time: 's', temperature: 'K', mass: 'kg of each pure material', energy: 'J' },
-    physicalStepS: .05, method: 'External unchanged reference evaluated independently at accepted checkpoints',
+    physicalStepS: ALTERNATIVE_CONTACT_STEP_S, method: 'External unchanged reference with additive alternative timestep policy; evaluated independently at accepted checkpoints',
     records,
   }, null, 2) + '\n')
 })

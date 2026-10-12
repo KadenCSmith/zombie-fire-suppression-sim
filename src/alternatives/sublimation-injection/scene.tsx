@@ -1,23 +1,14 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { Html } from '@react-three/drei/web/Html.js'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
 import type { MethodSceneProps } from '../contract'
-import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from './visuals'
+import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals } from './visuals'
 import { IllustrativeQuench } from './quench'
+import { Annotation } from './annotation'
+import { LoadingAssembly, WaterContact } from './loading'
 
 const TEAL = '#78bac2'
 const SILVER = '#9aa9a1'
-const labelStyle = {
-  display: 'block', width: 124, textAlign: 'center', color: '#c0cec6',
-  fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: 11,
-  fontWeight: 400, letterSpacing: '.035em', lineHeight: 1.5,
-  textShadow: '0 1px 8px #000, 0 1px 2px #000', pointerEvents: 'none',
-} as const
-
-function Annotation({ position, children }: { position: [number, number, number]; children: string }) {
-  return <Html center position={position} zIndexRange={[4, 0]}><span style={labelStyle}>{children}</span></Html>
-}
 
 function Rim({ y, radius = .72 }: { y: number; radius?: number }) {
   return <mesh position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -54,21 +45,7 @@ function MediaCutaway({ time }: { time: number }) {
     <mesh position={[0, visual.surfaceOffset, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <circleGeometry args={[.685, 64]}/><meshPhysicalMaterial color={TEAL} transparent opacity={.83} metalness={.26} roughness={.17} side={THREE.DoubleSide}/>
     </mesh>
-    {[0, 1, 2].map(i => <mesh key={i} position={[-.15, visual.surfaceOffset + .005, .13]} rotation={[-Math.PI / 2, 0, 0]} scale={1 + .06 * Math.sin(time * .7 + i)}>
-      <ringGeometry args={[.12 + i * .13, .124 + i * .13, 56]}/>
-      <meshBasicMaterial color="#c4e3e0" transparent opacity={.16 - i * .035} side={THREE.DoubleSide} depthWrite={false}/>
-    </mesh>)}
-    {Array.from({ length: 9 }, (_, i) => {
-      return <mesh key={i} position={solidCuePosition(time, i)} castShadow
-        rotation={[i * .37, i * .71, i * .23]} scale={visual.solidScale * (.12 + (i % 3) * .035)}>
-        <dodecahedronGeometry args={[1, 0]}/>
-        <meshPhysicalMaterial color="#d6e3dc" metalness={.06} roughness={.37} clearcoat={.4} clearcoatRoughness={.22}/>
-      </mesh>
-    })}
-    <group position={[.88, -.45 + visual.lift * 1.48, 0]} rotation={[0, 0, visual.loading * .48]}>
-      <mesh><boxGeometry args={[.43, .045, .45]}/><meshStandardMaterial color="#68786e" metalness={.45} roughness={.5}/></mesh>
-      {[-.22, .22].map(z => <mesh key={z} position={[0, .1, z]}><boxGeometry args={[.43, .2, .025]}/><meshStandardMaterial color="#7d8b80" metalness={.5} roughness={.45}/></mesh>)}
-    </group>
+    <WaterContact time={time}/>
   </group>
 }
 
@@ -90,12 +67,15 @@ function PhaseChange({ time }: { time: number }) {
   useEffect(() => () => texture.dispose(), [texture])
   const amount = preparationVisuals(time).phaseChange
   return <group userData={{ scientificRole: 'Authored phase-change cue; no calculated pressure, cooling or gas transport' }}>
-    {Array.from({ length: 18 }, (_, i) => {
-      const age = (time * .11 + i / 18) % 1, angle = i * 2.39996
-      const width = .19 + age * .48
-      return <sprite key={i} position={[Math.cos(angle) * (.19 + age * .22), .37 + age * 1.1, Math.sin(angle) * .22]}
+    {Array.from({ length: 26 }, (_, i) => {
+      const age = (time * .15 + i / 26) % 1, angle = i * 2.39996
+      const overflow = Math.max(0, (age - .35) / .65)
+      const radius = age < .35 ? .15 + age * 1.5 : .675 + overflow * .65
+      const height = age < .35 ? .04 + age * 1.8 : .67 - overflow * .72
+      const width = .13 + age * .4
+      return <sprite key={i} position={[Math.cos(angle) * radius, height, Math.sin(angle) * radius]}
         scale={[width, width, 1]}>
-        <spriteMaterial map={texture} color="#c0d7d0" transparent opacity={amount * Math.sin(age * Math.PI) * .32} depthWrite={false}/>
+        <spriteMaterial map={texture} color="#d5ddd6" transparent opacity={amount * Math.sin(age * Math.PI) * .21} depthWrite={false}/>
       </sprite>
     })}
   </group>
@@ -112,13 +92,13 @@ function DeliveryPath({ time }: { time: number }) {
   }, [geometry, water, visual.hose, visual.delivery])
   useEffect(() => () => { geometry.dispose(); water.dispose() }, [geometry, water])
   return <group userData={{ scientificRole: 'Illustrative prescribed delivery path; no infiltration, soil response or suppression' }}>
-    <mesh geometry={geometry} castShadow><meshStandardMaterial color="#56756b" transparent opacity={.48} depthWrite={false} metalness={.3} roughness={.5}/></mesh>
-    <mesh geometry={water}><meshStandardMaterial color={TEAL} emissive="#4093a3" emissiveIntensity={.18 + visual.boost * .25} transparent opacity={.5 + visual.boost * .25}/></mesh>
-    {Array.from({ length: 24 }, (_, i) => {
-      const position = (visual.flowTravel + i / 24) % 1
+    <mesh geometry={geometry} castShadow><meshStandardMaterial color="#283a32" transparent opacity={.62} depthWrite={false} metalness={.08} roughness={.8}/></mesh>
+    <mesh geometry={water}><meshStandardMaterial color="#649ba8" emissive="#4093a3" emissiveIntensity={.06 + visual.boost * .08} transparent opacity={.42 + visual.boost * .18}/></mesh>
+    {Array.from({ length: 16 }, (_, i) => {
+      const position = (visual.flowTravel + i / 16) % 1
       const point = curve.getPointAt(position)
       return <mesh key={i} position={point} visible={position <= visual.delivery && visual.delivery > 0}>
-        <sphereGeometry args={[.038, 8, 6]}/><meshStandardMaterial color="#a5dcdf" emissive="#4c9da8" emissiveIntensity={.6} roughness={.25} transparent opacity={i % 2 ? visual.boost : .85}/>
+        <sphereGeometry args={[.018, 8, 6]}/><meshStandardMaterial color="#a5c9cc" emissive="#4c9da8" emissiveIntensity={.08} roughness={.25} transparent opacity={i % 2 ? visual.boost * .6 : .6}/>
       </mesh>
     })}
   </group>
@@ -155,6 +135,7 @@ function SupplyTruck({ time }: { time: number }) {
     </group>))}
     <group position={[...MEDIA_MOUNT]}>
       <MediaCutaway time={time}/>
+      <LoadingAssembly time={time}/>
       <PhaseChange time={time}/>
     </group>
   </group>

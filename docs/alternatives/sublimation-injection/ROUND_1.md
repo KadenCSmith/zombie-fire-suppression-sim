@@ -1,0 +1,32 @@
+# 4.2.1 revision 1 — open loading and scene-owned labels
+
+The human requested a more convincing dry-ice addition. The flatbed now carries a visibly connected loading support and open bucket. The bucket lifts beside the tank, traverses above its rim, tips, releases nine separate chunks through its opening, returns upright, retracts and lowers. The chunks stay attached to the bucket before release, accelerate along authored falling paths, then settle below the water surface. Matte blocks replace shiny polyhedra. Ripples and bubbles begin only after each impact; the mist spreads over the rim rather than forming a tall chimney. Hose particles are smaller and less emissive. Existing truck, hose, flow-boost and quenching stage boundaries are preserved. Original fire spread, drilling, ground, camera and lighting are reused unchanged.
+
+This is artwork, not a calculated loading or pressure mechanism. The surface remains open and there is no containment, trigger, pressure specification or device design. [Kuntzleman et al., J. Chem. Educ. (2015)](https://doi.org/10.1021/ed400754n) discusses the fog associated with dry ice in water; [NIOSH's CO₂ reference](https://www.cdc.gov/niosh/npg/npgd0103.html) lists a gas denser than air. These are qualitative background for the visual treatment, not calibration or validation of the authored particles, bubbles or liquid speed.
+
+Private Annotation now uses an owned Three sprite/CanvasTexture drawn on an unattached canvas. It has no DOM portal, secondary React root, node insertion or removeChild path. Each layout-effect setup creates a fresh texture, binds it to the captured owned material and disposes that exact texture on cleanup, clearing only a matching binding. A missing canvas context leaves it hidden. The previous broad native navigation failure is associated with A's transition; replacing the private portal removes one plausible failure path but does not establish root cause or a clean integrated runtime without actual navigation verification.
+
+## Numerical policy and evidence
+
+The exact authorized coordinator checkpoint d07d03fe54b453677c2cd8684e8e2c5eb97112a6 was fetched, identity-verified and ordinarily merged. API v21.2 is unchanged. Only the additive alternative adapter changes its step to 0.00625 s; the protected public reference and original 0.05 s defaults/cache are unchanged. Private descriptions now state the distinction. Historical 0.05 s numerical-evidence.json and the signed initial audit remain intact. Current accepted states are captured separately in numerical-evidence-round1.json.
+
+At physical 60 s, the new water capture gives 489.04318585703544 K maximum, 922134.807034599 J contact heat, −2.0372681319713593e−8 J energy residual and 2.0095036745715333e−14 kg maximum mass residual. The separate direct-CO₂ option gives 929517.4074691252 J combined heat, −1.9441358745098114e−8 J energy residual and 2.0261570199409107e−14 kg maximum mass residual. Supply/solid totals differ from their exact finite inventories by floating-point roundoff only. Source-off retains 823.15 K and zero sources/heat/residual. These are conservative contact specimens, not surface-water pre-cooling or fire suppression.
+
+## Implementer checks
+
+- Targeted A, external composition, alternative isolation and continuous-inflow accuracy tests: 73/73, ten files, 1.88 s, one worker.
+- Typecheck PASS. An initially implicit callback type was corrected before this pass.
+- Lint PASS with 16 inherited warnings; production build PASS, 2.65 s, inherited lucide/chunk warnings.
+- All 57 protected SHA-256 identities PASS against original161e7a4a1f8c35765e1878c132db79977be1f5ea; whitespace PASS.
+- Seven new tests cover bucket/rim clearance, carried solids, downward release, continuous accelerated fall/settling, contact effects, arbitrary seeking and owned annotation replay/binding cleanup. Tests are authored-geometry/resource regressions, not mechanics or GPU validation.
+- Preview http://127.0.0.1:5174/?alternative=sublimation-injection&method-preview=1 returned HTTP200; detached owned Node PID23895, /tmp/v21-agent-sublimation-preview.log. No other server was changed.
+
+Exact source/dependency/lock hashes, runtime and local-check provenance accompany the frozen reviewer handoff under ignored work/realism-review/round-1. Direct implementer browser inspection remains unavailable after the prior admin-policy check failure; no bypass was attempted. The dedicated reviewer independently inspects the actual app where available. Coordinator owns final combined native/GPU/fast-navigation/full-suite checks. No full-suite or native PASS is claimed here.
+
+## Parallel independent review and remaining needs
+
+The human's revised V21_Realism_Review_Loop (1).md supersedes the shared serial counter/barrier. A owns this local ledger and reuses the signed independent initial audit: 4.1/10, initial scored pass 1. This first revision is unscored until /root/realism_a_review signs the frozen snapshot; at most three scored retries/four total are allowed. Visual polish and labels earn no central-physics credit. The original rubric, independent solutions, tolerances and central-mechanism cap6 remain unchanged.
+
+The current adapter only returns finite isolated contact states. A predictive surface stage needs a new additive configuration/state/outlet seam: finite solid/liquid inventories, measured initial temperatures/loading history, defensible contact-area/UA and ambient-loss inputs, phase bounds/freezing handling, gas export enthalpy and computed liquid outlet enthalpy. Downstream delivery must debit that same outlet mass/enthalpy once. These quantities are not supplied by existing MethodSceneProps or the v21.2 source hook.
+
+Predictive field response additionally needs conservative liquid/CO₂ transport into a reacting porous medium, supported source geometry/boundaries, peat density/porosity/moisture basis, measured retention/permeability/relative-permeability relations, thermal/reaction properties and independent matched validation. No calibrated values can be inferred from this animation. Pressure-assisted acceleration and suppression/re-ignition remain unavailable; original/protected code cannot be changed to fill the gap. The coordinator decides additional shared seams; no extra physics implementation is claimed by this revision.

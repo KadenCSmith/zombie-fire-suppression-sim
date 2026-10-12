@@ -1,5 +1,7 @@
 # Worker A handoff · 4.2.1
 
+Historical initial delivery record. Its 0.05 s calculations and 22.5/45/67.5 s cues are preserved below; current additive alternative timestep is 0.00625 s and the world choreography is described in ROUND_1.md. These old values are not current verification results.
+
 Branch: `feature/v21-sublimation-injection`.
 
 Draft PR: [#13](https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/13), targeting `integration/v21-alternatives`. No worker merge to integration/main or release was performed.
