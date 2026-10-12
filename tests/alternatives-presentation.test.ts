@@ -11,17 +11,23 @@ describe('method render scope', () => {
     }
     expect(methodPresentation('nanoparticles', 90).access).toBe(false)
   })
-  it('distinguishes multi-depth, wave-first and simultaneous injection timing', () => {
+  it('distinguishes original pressure, intermittent pumping and simultaneous injection timing', () => {
     expect(methodPresentation('pressure-pulse', 50).pulse).toBe(true)
     expect(methodPresentation('pressure-pulse', 70).contacts).toBe(3)
-    expect(methodPresentation('liquid-waves', 50).waves).toBe(true)
+    expect(methodPresentation('liquid-waves', 50).waves).toBe(false)
     expect(methodPresentation('liquid-waves', 50).injection).toBe(false)
-    expect(methodPresentation('liquid-waves', 70).contacts).toBe(1)
+    expect(methodPresentation('liquid-waves', 70).contacts).toBe(0)
+    expect(methodPresentation('liquid-waves', 75).injection).toBe(true)
+    expect(methodPresentation('liquid-waves', 75).waves).toBe(false)
+    expect(methodPresentation('liquid-waves', 77).waves).toBe(true)
+    expect(methodPresentation('liquid-waves', 77).contacts).toBe(1)
+    expect(methodPresentation('liquid-waves', 79).waves).toBe(false)
     expect(methodPresentation('vibratory-injection', 28).injection).toBe(true)
     expect(methodPresentation('vibratory-injection', 28).vibration).not.toBe(0)
   })
-  it('holds the shared environment before legacy source, cap and quenching stages', () => {
-    for (const id of ['pressure-pulse','liquid-waves','pressure-only','vibratory-injection'] as const) {
+  it('replays the explicitly requested original base only for the liquid child', () => {
+    expect(methodPresentation('liquid-waves', 90).contextTime).toBe(90)
+    for (const id of ['pressure-pulse','pressure-only','vibratory-injection'] as const) {
       expect(methodPresentation(id, 90).contextTime).toBe(36)
     }
   })

@@ -77,9 +77,9 @@ describe('4.2.3.1 liquid-waves child', () => {
     expect(() => a.advanceTo(19)).toThrow(); expect(() => a.advanceTo(NaN)).toThrow(); expect(() => a.advanceTo(61)).toThrow()
   })
   it('separates authored stages and unavailable conceptual outcomes', () => {
-    expect(liquidWavesPresentation('liquid-waves', 44).waves).toBe(true)
+    expect(liquidWavesPresentation('liquid-waves', 77).waves).toBe(true)
     expect(liquidWavesPresentation('liquid-waves', 55).injection).toBe(false)
-    expect(liquidWavesPresentation('liquid-waves', 64)).toMatchObject({ waves: false, injection: true, contacts: 1 })
+    expect(liquidWavesPresentation('liquid-waves', 75)).toMatchObject({ waves: false, injection: true, contacts: 1 })
     expect(liquidWavesPresentation('liquid-waves', NaN).waves).toBe(false)
     const config = configured(); config.engine = 'concept'; config.medium = 'unspecified'
     expect(createRun(config).advanceTo(30)).toEqual({ timeS: 30, metrics: null })

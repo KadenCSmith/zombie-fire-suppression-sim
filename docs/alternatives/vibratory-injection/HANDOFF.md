@@ -1,5 +1,7 @@
 # Worker C handoff — 4.2.4
 
+**Historical first delivery.** The user's requested visual/field follow-up is documented in [REVISION_V2.md](./REVISION_V2.md); it supersedes the original scene descriptions below while preserving the v21.2 comparison model.
+
 Owner `/root/vibration`; exclusively owned branch `feature/v21-vibratory-injection` and checkout `/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-vibration`.
 
 Frozen source base `c1adb47da0daf72c22eb5ec30020524139629e10` and documentation publication `0f52bc2ece39f0c9f90ae7067c9539f5fcc519c4` were fetched, verified as commits and ordinarily merged in that order before private edits. The publication diff contained only READY/launch documents. API **v21.2** is acknowledged without changes. Implementation/evidence commit **`0e4dd55cfe3ae1cc86f02ee8a5cecda30aea0585`** is published. [Draft PR 11](https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/11) targets `integration/v21-alternatives` and is attached to the task. The final frozen review HEAD includes only this subsequent handoff/publication documentation update; its exact SHA is supplied in the coordinator handoff message.

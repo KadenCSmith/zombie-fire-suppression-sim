@@ -1,0 +1,75 @@
+{
+  "method": "4.2.4",
+  "scope": "Experimental prescribed-liquid source on inherited reacting peat grid; no infiltration/vibration mechanics or validation.",
+  "settings": {
+    "enabled": true,
+    "waterKg": 0.5,
+    "flowKgS": 0.025,
+    "inletK": 293.15,
+    "endS": 60,
+    "stepS": 0.125
+  },
+  "grid": {
+    "nx": 16,
+    "ny": 8,
+    "nz": 10
+  },
+  "checkpoints": [
+    {
+      "timeS": 0,
+      "deliveredKg": 0,
+      "remainingKg": 0.5,
+      "maximumK": 543.1500000000001,
+      "oxygenKg": 25.72376273032511,
+      "reactedFuelKg": 0,
+      "reactionW": 0,
+      "massResidualKg": 0,
+      "energyResidualJ": 0,
+      "waterSpeciesResidualKg": 0,
+      "inletEnergyJ": 0,
+      "liquidFlowWorkJ": 0
+    },
+    {
+      "timeS": 10,
+      "deliveredKg": 0.2499999999999996,
+      "remainingKg": 0.2500000000000004,
+      "maximumK": 543.2304892250296,
+      "oxygenKg": 25.71105187499756,
+      "reactedFuelKg": 0.005051003072367166,
+      "reactionW": 7563.509750903582,
+      "massResidualKg": 2.910421903479232e-11,
+      "energyResidualJ": -0.000005813137249788269,
+      "waterSpeciesResidualKg": 4.7674864056546085e-11,
+      "inletEnergyJ": 20955.359228702084,
+      "liquidFlowWorkJ": 25.359228702082678
+    },
+    {
+      "timeS": 20,
+      "deliveredKg": 0.4999999999999988,
+      "remainingKg": 1.2212453270876722e-15,
+      "maximumK": 543.3132846946814,
+      "oxygenKg": 25.69690618823191,
+      "reactedFuelKg": 0.010084553865453927,
+      "reactionW": 7537.14884710568,
+      "massResidualKg": 5.82088821587945e-11,
+      "energyResidualJ": -0.0000011303054634481668,
+      "waterSpeciesResidualKg": 1.98490113234584e-11,
+      "inletEnergyJ": 41910.769916711055,
+      "liquidFlowWorkJ": 50.76991671105194
+    },
+    {
+      "timeS": 60,
+      "deliveredKg": 0.5,
+      "remainingKg": 0,
+      "maximumK": 543.6406751695652,
+      "oxygenKg": 25.649701459761886,
+      "reactedFuelKg": 0.03003193008589733,
+      "reactionW": 7420.9738745451905,
+      "massResidualKg": 0,
+      "energyResidualJ": -0.000006852453225292265,
+      "waterSpeciesResidualKg": 3.069766663088558e-12,
+      "inletEnergyJ": 41910.76991671116,
+      "liquidFlowWorkJ": 50.769916711052055
+    }
+  ]
+}

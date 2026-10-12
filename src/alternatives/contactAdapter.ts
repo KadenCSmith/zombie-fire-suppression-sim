@@ -1,5 +1,9 @@
 import { simulateContactCooling, type ContactCoolingConfig, type ContactPatchSpec } from '../story/contactCooling'
 
+/** New-alternative policy, independently checked against continuous filling.
+ * The protected original retains its own 0.05 s defaults and cached history. */
+export const ALTERNATIVE_CONTACT_STEP_S = .00625
+
 /** External adapter over the original's existing public, deterministic API.
  * Re-evaluates from the initial condition at accepted targets; never patches or
  * copies the protected integrator, its cache, or its presentation defaults. */
