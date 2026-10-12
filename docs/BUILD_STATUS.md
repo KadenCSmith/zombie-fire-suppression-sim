@@ -1,3 +1,7 @@
+## Comparison redraw correction (2026-10-12)
+
+The c42daa1 rerun passed every macOS/Windows check. Linux still failed the unchanged strict four-panel p95<50ms gate at measured p95=50ms (120frames), with successful independent solver/control checks up to that point. Shared comparison panels now use React memoization and stable callbacks so a result from one worker does not redraw all other panels. No solver steps, accepted-state retention, charts, or controls were removed. Local typecheck/lint/build2.53s and the complete alternatives native lifecycle fixture pass: two/four-panel p95 both9.3ms (120samples), pause51.5ms includes50ms polling. All57 protected original hashes pass. New exact-head CI and final combined/D checks are pending.
+
 ## Current integration check follow-up (2026-10-12)
 
 GitHub run38233329756 at b0c6b74 failed its vibration fixture on macOS/Windows and the four-panel frame target on Linux. The fixture had assumed initial vibration ON despite honoring the OS reduced-motion preference; it now explicitly establishes ON before testing OFF. Production animation is unchanged. The Linux performance failure remains unresolved; the next fixture records both measured windows in its failure output, preserving the 50ms target. These are not new scientific scores. D's separately reviewed numerical guard remains pending. Final combined checks, main merge, release and installation are pending.
