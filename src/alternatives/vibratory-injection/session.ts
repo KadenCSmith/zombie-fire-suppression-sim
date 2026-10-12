@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 import type { FieldSettings, FieldState } from './field'
 import type { FieldMessage } from './field.worker'
 

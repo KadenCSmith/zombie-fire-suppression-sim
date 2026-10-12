@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 import { CoupledTransport, coupledScenario, DEFAULT_COUPLED, type CoupledFrame } from '../../coupled/model'
 import { MOLAR, T0, saturationPressure } from '../../coupled/thermodynamics'
 import { fireSequencePose } from '../../story/fireSequence'

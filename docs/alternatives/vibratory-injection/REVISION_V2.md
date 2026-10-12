@@ -1,3 +1,5 @@
+> **Current revision:** [V3 — vibration only, requested authored compaction/fire-out](./REVISION_V3.md). The liquid/contact content below is retained historical, inactive and off-scope for current vibration validation.
+
 # 4.2.4 visual and reacting-field revision
 
 This supersedes the first C visual delivery described in HANDOFF.md. The user's follow-up asks for the original 4.2.3 initial fire animation, visible shaking/disrupted ground, visible extinguishment, and the supplied sketch's excavator/tree arrangement and outward injection at multiple depths.

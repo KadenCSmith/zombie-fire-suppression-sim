@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 import { VibratoryFieldRun, type FieldSettings, type FieldState } from './field'
 
 export type FieldMessage = { jobId: string; type: 'state' | 'complete' | 'failed'; state?: FieldState; error?: string }

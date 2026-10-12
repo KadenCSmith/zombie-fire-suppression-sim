@@ -8,7 +8,7 @@ describe('external original-scene composition', () => {
   it('retains the original Canvas props and authored children, adding world objects in the same scene', () => {
     const composed = AlternativeScene({id:'pressure-only',time:65,resetToken:7,cameraDistance:12})
     const scene = composed.props.children
-    const baseline = FireSequenceScene({time:38,mode:'rapid',view:'natural',layers:{fire:true,gas:false,water:false,anatomy:true},resetToken:7,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:12})
+    const baseline = FireSequenceScene({time:57,mode:'rapid',view:'natural',layers:{fire:true,gas:true,water:false,anatomy:true},resetToken:7,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:12})
     expect(scene.type).toBe(Canvas)
     const {children:actualChildren,...actualProps} = scene.props
     const {children:originalChildren,...originalProps} = baseline.props
@@ -22,7 +22,7 @@ describe('external original-scene composition', () => {
 
   it('reuses the original introduction only, without entering its treatment sequence', () => {
     for (const [time,context] of [[-1,0],[12,12],[38,38],[90,38]]) {
-      const composed = AlternativeScene({id:'pressure-only',time,resetToken:0,cameraDistance:14})
+      const composed = AlternativeScene({id:'sublimation-injection',time,resetToken:0,cameraDistance:14})
       expect(composed.props['data-original-context-time']).toBe(context)
       const originalChildren = composed.props.children.props.children[0]
       const timed = originalChildren.filter((child: {props?:{time?:number}}) => typeof child?.props?.time === 'number')
@@ -42,7 +42,18 @@ describe('external original-scene composition', () => {
     expect(composed.props['data-original-replay']).toBe('full-authored-base')
     expect(composed.props['data-original-context-time']).toBe(75)
     expect(composed.props.children.props.children[0]).toEqual(baseline.props.children)
-    expect(AlternativeScene({id:'pressure-only',time:75,resetToken:0,cameraDistance:15.75}).props['data-original-context-time']).toBe(38)
+    expect(AlternativeScene({id:'pressure-only',time:75,resetToken:0,cameraDistance:15.75}).props['data-original-context-time']).toBe(57)
+  })
+
+  it('reuses the pressure-only gas-release context without entering original water treatment', () => {
+    for (const time of [0, 38, 44, 51.5, 55, 57, 90]) {
+      const composed = AlternativeScene({id:'pressure-only',time,resetToken:0,cameraDistance:14})
+      const context = Math.min(time, 57)
+      const original = FireSequenceScene({time:context,mode:'rapid',view:'natural',layers:{fire:true,gas:true,water:false,anatomy:true},resetToken:0,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:14})
+      expect(composed.props['data-original-replay']).toBe('authored-gas-release-no-water')
+      expect(composed.props['data-original-context-time']).toBe(context)
+      expect(composed.props.children.props.children[0]).toEqual(original.props.children)
+    }
   })
 
   it('uses public fire-layer control only at the requested authored endings of new liquid alternatives', () => {
