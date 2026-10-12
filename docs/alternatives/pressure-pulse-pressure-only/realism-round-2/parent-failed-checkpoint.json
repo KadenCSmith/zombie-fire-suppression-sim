@@ -1,0 +1,12 @@
+{
+  "source": "6137a45bd3608806ad7010d594c101f67e84f874",
+  "kind": "Supplied implementer/root status, not independent test execution",
+  "hostInclusiveRun": {
+    "pass": 61,
+    "fail": 3,
+    "causeReported": "Reserved alternativeSceneComposition stale38/gasfalse expectations vs changed pressure57/gastrue"
+  },
+  "sourceFrozen": true,
+  "expectedNextChange": "Root-owned composition expectations + owned handoff docs only",
+  "reviewCounter": "Still in-progress pressure-only retry2; no scored report yet."
+}

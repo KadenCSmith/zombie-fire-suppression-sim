@@ -1,0 +1,12 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "attemptedAtUTC": "2026-10-12T09:18:11.188800+00:00",
+  "source": "6137a45bd3608806ad7010d594c101f67e84f874",
+  "attempt": "cua.createBrowserTab chrome, fresh own audit tab, http://127.0.0.1:5175/?alternative=pressure-only&method-preview=1",
+  "result": "Denied before opening: browser security check unavailable; admin-enforced policy could not be verified.",
+  "freshSceneObserved": false,
+  "screenshotsCaptured": false,
+  "retryOrBypassUsed": false,
+  "historicalEvidence": "Prior03 pressure-only observations remain historical; no fresh jolt/settling/backseek/no-liquid geometry observation claimed.",
+  "rootNotice": "Parent acknowledged no retry/bypass/alternate UI route. Root separately owns final native/Chrome integration checks."
+}

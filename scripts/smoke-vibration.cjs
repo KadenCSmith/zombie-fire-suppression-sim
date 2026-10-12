@@ -85,6 +85,9 @@ async function check() {
   assert(workspace().textContent.includes('Original fire & inserted drill · vibration off'), 'Ending caption still claims illustrated fire-out when display is off');
   assert(workspace().querySelector('canvas') === canvas && alive.size === 0, 'Display toggle replaced scene or started computation');
   click('See vibration ↗'); await wait(() => toggle.checked && button('Pause earthquake animation'), 'vibration shortcut enables display and playback');
+  // A same-value input produces no React change event. Move away from the
+  // shortcut's exact38s value before testing the actual seek/pause behavior.
+  setRange('Earthquake animation time', 54); await wait(() => displayedTime() === 54 && button('Play earthquake animation'), 'seek away from shortcut pauses playback');
   setRange('Earthquake animation time', 38); await wait(() => displayedTime() === 38 && button('Play earthquake animation'), 'seek pauses shortcut playback');
   click('Play earthquake animation'); await wait(() => displayedTime() > 38, 'authored playback advances');
   click('Restart earthquake animation'); await wait(() => displayedTime() === 0 && button('Play earthquake animation'), 'restart stops and restores opening');

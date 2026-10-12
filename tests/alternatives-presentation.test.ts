@@ -26,11 +26,10 @@ describe('method render scope', () => {
     expect(methodPresentation('vibratory-injection', 28).contacts).toBe(0)
     expect(methodPresentation('vibratory-injection', 28).vibration).not.toBe(0)
   })
-  it('replays the explicitly requested original base only for the liquid child', () => {
+  it('reuses each approved original context without starting later treatments', () => {
     expect(methodPresentation('liquid-waves', 90).contextTime).toBe(90)
-    for (const id of ['pressure-pulse','pressure-only'] as const) {
-      expect(methodPresentation(id, 90).contextTime).toBe(36)
-    }
+    expect(methodPresentation('pressure-pulse', 90).contextTime).toBe(36)
+    expect(methodPresentation('pressure-only', 90).contextTime).toBe(57)
     expect(methodPresentation('vibratory-injection', 90).contextTime).toBe(33)
   })
 })

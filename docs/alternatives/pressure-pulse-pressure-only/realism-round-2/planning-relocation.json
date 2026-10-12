@@ -1,0 +1,15 @@
+{
+  "from": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/docs/alternatives/pressure-pulse-liquid-waves/review-runtime/round-1/pressure-only-visual-followup",
+  "to": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/docs/alternatives/pressure-pulse-pressure-only/review-runtime/round-2",
+  "files": [
+    {
+      "file": "accounting-amendment.json",
+      "sha256": "27b60e1286d614e4a2fa99ed9f9bb1c4f0df1a2306207229fd81d7a02a022546"
+    },
+    {
+      "file": "baseline.json",
+      "sha256": "7adb2432f38c53c9db504460bd986db49b86b5d29c6de52c398a4903f27dfc34"
+    }
+  ],
+  "signedRound1ArtifactsTouched": false
+}

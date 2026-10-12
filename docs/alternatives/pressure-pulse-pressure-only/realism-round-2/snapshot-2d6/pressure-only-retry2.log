@@ -1,0 +1,8 @@
+
+> zombie-fire-suppression-sim@0.21.0 test
+> vitest run tests/alternatives/pressure-pulse-pressure-only/model.test.ts tests/alternatives/pressure-pulse-pressure-only/animation.test.ts tests/alternativeSceneComposition.test.tsx --maxWorkers=1 --reporter=json --outputFile=pressure-only-retry2.report.json
+
+(node:38586) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+JSON report written to /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/docs/alternatives/pressure-pulse-pressure-only/review-runtime/round-2/snapshot-2d6/pressure-only-retry2.report.json

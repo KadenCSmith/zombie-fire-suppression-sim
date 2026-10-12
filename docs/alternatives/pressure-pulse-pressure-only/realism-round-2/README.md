@@ -1,0 +1,11 @@
+# Pressure-only independent retry 2
+
+[Signed report](REVIEW_PRESSURE_ONLY_RETRY_2.md), [signature](REVIEW_PRESSURE_ONLY_RETRY_2.signature.json), [separate-variation ledger](LOCAL_REVIEW_LEDGER.json) and [portable artifact map](published-artifacts.json). Reviewed source:2d6ab8f0a4d74b7aee9c6a449533afb4c5343911. Report SHA256:70632e01d78a29c8053742a1f54439f10607ba37dc5c55b73a8c87e2042b44ba.
+
+Pressure-only criteria1/1/2/1/2 at30/20/20/20/10% yield unrounded/effective1.3/10, cap6 and verified≥7No. It has3scoredpasses/2retriesused/1unused. Liquid was not rescored:4.1,2passes/1retryused/2unused. No counters reset. The new human visual follow-up was explicitly counted as pressure-only retry2 before scoring.
+
+Independent16/16software checks pass (7private guards,3animation/finite geometry/seek checks,6actual original-factory composition checks). All57protected paths match original Git bytes, established manifest and live/final source. Nine cloned runtime dependency hashes match, the pressure concept adapter function remains byte-identical, and all51 prior signed round1 artifacts remain unchanged. No pressure PDE, physical conservation/stability, calibrated soil response or experimental validation was added or inferred.
+
+Fresh actual UI is unverified: one approved browser attempt was denied before opening because the admin-enforced policy could not be verified. There was no retry, alternate route, screenshot or fresh console observation. The source-limited visual criterion receives no new observation/aesthetic credit. Root owns final combined/native/UI checks. Original57s context includes inherited authored gas quench/fracture/dimming despite fire layerON; the private scene adds no extinction switch.
+
+All16 signed artifacts and the signature are preserved byte-for-byte. The report retains original absolute runtime paths; use the publication map for portable copies. Published harnesses already have `.source.txt` names and are archival text. The signed report's PR20 link is historical; the latest follow-up draft PR and docs-only delivery commit are supplied in the handoff. Follow the signed scientific-stop recommendation below7 until measured inputs, coupled mechanisms and independent validation are available.
