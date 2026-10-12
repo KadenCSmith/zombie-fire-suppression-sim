@@ -21,6 +21,7 @@ export function vibrationPose(time: number, enabled = true) {
     toolPosition: [amount * .024 * Math.sin(t * 35), amount * .022 * Math.sin(t * 29), 0] as [number, number, number],
   }
 }
-export function vibrationStage(time: number) {
+export function vibrationStage(time: number, enabled = true) {
+  if (!enabled) return time < 10 ? 'Surface ignition' : time < 18 ? 'Fire enters the peat' : time < 24 ? 'Excavator approaches' : time < 33 ? 'Original drilling · vibration off' : 'Original fire & inserted drill · vibration off'
   return time < 10 ? 'Surface ignition' : time < 18 ? 'Fire enters the peat' : time < 24 ? 'Excavator approaches' : time < 33 ? 'Drilling · vibration builds' : time < 44 ? 'Fractures open' : time < 62 ? 'Soil compresses & rearranges' : time < 74 ? 'Embers fade as the soil settles' : 'Illustrated fire-out · inspect the peat'
 }
