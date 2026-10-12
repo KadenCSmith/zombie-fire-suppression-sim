@@ -19,4 +19,5 @@ it('verifies the complete default physical window without fabricated extinction'
   const evidence={method:'4.2.4',scope:'Experimental prescribed-liquid source on inherited reacting peat grid; no infiltration/vibration mechanics or validation.',settings:run.settings,grid:run.snapshot().grid,checkpoints}
   console.log('VIBRATORY_FIELD_EVIDENCE',JSON.stringify({...evidence,runtimeMs:performance.now()-start}))
   if(process.env.V21_C_FIELD_EVIDENCE_PATH)writeFileSync(process.env.V21_C_FIELD_EVIDENCE_PATH,JSON.stringify(evidence,null,2)+'\n')
-},30000)
+// Full 60 s / 480+ accepted-step solve measured 31.7–35.1 s in bounded CI.
+},60000)

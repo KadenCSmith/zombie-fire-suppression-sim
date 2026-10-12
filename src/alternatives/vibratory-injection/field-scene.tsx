@@ -60,15 +60,15 @@ function FieldGround({state,view,time,enabled,vibration}:{state:FieldState;view:
     m.customProgramCacheKey=()=> 'vibratory-owned-field-v2'
     return m
   },[uniforms])
-  useLayoutEffect(()=>{uniforms.uVibField.value=texture;uniforms.uVibView.value=['natural','temperature','oxygen','water'].indexOf(view);uniforms.uVibDepth.value=state.sourceDepthM;uniforms.uVibClock.value=time;uniforms.uVibShake.value=view==='natural'?pose.shake:0;uniforms.uVibWet.value=pose.wet;invalidate()},[state,texture,view,time,pose.shake,pose.wet,uniforms,invalidate])
+  useLayoutEffect(()=>{uniforms.uVibField.value=texture;uniforms.uVibView.value=['natural','temperature','oxygen','water'].indexOf(view);uniforms.uVibDepth.value=view==='natural'?state.sourceDepthM:0;uniforms.uVibClock.value=time;uniforms.uVibShake.value=view==='natural'?pose.shake:0;uniforms.uVibWet.value=pose.wet;invalidate()},[state,texture,view,time,pose.shake,pose.wet,uniforms,invalidate])
   useEffect(()=>()=>texture.dispose(),[texture])
   useEffect(()=>()=>{geometry.dispose();material.dispose()},[geometry,material])
   return <mesh geometry={geometry} material={material} receiveShadow/>
 }
-function Vegetation(){
+function Vegetation({natural}:{natural:boolean}){
   const soil=useMemo(createSoilTexture,[])
   useEffect(()=>()=>soil.dispose(),[soil])
-  return <><OakTree soilTexture={soil} natural/><SequenceGrass time={31} mode="gradual" realistic straightBore/></>
+  return <><OakTree soilTexture={soil} natural/><SequenceGrass time={natural?31:0} mode="gradual" realistic straightBore/></>
 }
 function Equipment({state,time,vibration}:{state:FieldState;time:number;vibration:boolean}) {
   const inFeed=state.timeS<14, rotorTime=31+((time*6.5)%(Math.PI*2))/6.5
@@ -94,13 +94,13 @@ function Camera({distance,resetToken}:{distance:number;resetToken:number}){
   return <OrbitControls makeDefault target={[0,-.05,-1.1]} enableDamping={false} enableZoom={false} minDistance={5} maxDistance={19}/>
 }
 export function VibratoryFieldScene({time,state,view,resetToken,cameraDistance,vibration,enabled}:{time:number;state?:FieldState;view:FieldView;resetToken:number;cameraDistance:number;vibration:boolean;enabled:boolean}) {
-  const opacity=Math.max(0,Math.min(1,(time-24)/2))
-  return <div className="vib-scene" data-original-intro={time<26} data-field-time={state?.timeS??0}>
-    {opacity<1&&<div className="vib-scene-layer" style={{opacity:1-opacity}}><FireSequenceScene time={Math.min(time,24)} mode="rapid" view="natural" layers={{fire:true,gas:false,water:false,anatomy:true}} resetToken={resetToken} cameraDistance={cameraDistance} realistic straightBore cinematic connectedSupply/></div>}
-    {state&&time>=24&&<div className="vib-scene-layer" style={{opacity}}><Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4,12.3],fov:38,near:.05,far:60}}>
+  const opacity=view==='natural'?Math.max(0,Math.min(1,(time-24)/2)):1
+  return <div className="vib-scene" data-original-intro={view==='natural'&&time<26} data-field-time={state?.timeS??0} data-authored-equipment={view==='natural'}>
+    {view==='natural'&&opacity<1&&<div className="vib-scene-layer" style={{opacity:1-opacity}}><FireSequenceScene time={Math.min(time,24)} mode="rapid" view="natural" layers={{fire:true,gas:false,water:false,anatomy:true}} resetToken={resetToken} cameraDistance={cameraDistance} realistic straightBore cinematic connectedSupply/></div>}
+    {state&&(view!=='natural'||time>=24)&&<div className="vib-scene-layer" style={{opacity}}><Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4,12.3],fov:38,near:.05,far:60}}>
       <color attach="background" args={['#000000']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
       <directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[1024,1024]}/>
-      <FieldGround state={state} view={view} time={time} enabled={enabled} vibration={vibration}/><Vegetation/><Equipment state={state} time={time} vibration={vibration}/>
+      <FieldGround state={state} view={view} time={time} enabled={enabled} vibration={vibration}/><Vegetation natural={view==='natural'}/>{view==='natural'&&<Equipment state={state} time={time} vibration={vibration}/>}
       {view==='natural'&&<TreatmentEffects time={time} depth={state.sourceDepthM} enabled={enabled} vibration={vibration}/>}
       <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>
       <Camera distance={cameraDistance} resetToken={resetToken}/>

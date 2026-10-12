@@ -52,7 +52,8 @@ describe('4.2.4 experimental reacting field source',()=>{
     for(const state of states)expect(state.deliveredKg).toBeCloseTo(.05,12)
     expect(states[0].rawMassResidualKg-states[0].deliveredKg).toBe(states[0].massResidualKg)
     expect(states[0].rawEnergyResidualJ-states[0].inletEnergyJ).toBe(states[0].energyResidualJ)
-  })
+    // Three atlas preparations plus 112+ physical steps exceeded 5 s on CI.
+  },20000)
   it('checks mesh and deposition-support sensitivity without asserting a treatment benefit',()=>{
     const configurations=[{nx:8,ny:4,nz:5,supportCells:1},{nx:16,ny:8,nz:10,supportCells:1},{nx:16,ny:8,nz:10,supportCells:2}]
     const runs=configurations.map(grid=>new VibratoryFieldRun({endS:1},grid))
