@@ -38,6 +38,11 @@ app.on('browser-window-created',(_event,win)=>{
           if(id!=='pressure-pulse'){
             await wait(()=>document.querySelector('[data-original-animation="fire-spread-and-drilling"] canvas'),'read-only original animation reused');
             assert(Number(document.querySelector('[data-original-animation]').dataset.originalContextTime)<=38,'Alternative context replayed original treatment');
+            if(id!=='nanoparticles'){
+              const seek=document.querySelector('input[aria-label="Method render time"]');
+              Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(seek,'45');seek.dispatchEvent(new Event('input',{bubbles:true}));
+              await wait(()=>document.querySelector('[data-presentation-active="true"]'),'method animation promoted after original introduction');
+            }
           }
         }
         button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="4.2.3"]').click();await wait(()=>document.querySelector('.fire-sequence-shell:not(.method-render)'),'original rapid render restored');
@@ -76,7 +81,7 @@ app.on('browser-window-created',(_event,win)=>{
         failedWorker.dispatchEvent(new ErrorEvent('error',{message:'Stale terminated worker failure',cancelable:true}));await delay(50);
         assert(!failedPanel.textContent.includes('Stale terminated worker failure'),'Stale worker error replaced current run');
         button('Fire Simulation home').click();await wait(()=>document.querySelector('.fire-sequence-shell')&&alive.size===0,'navigation disposes all live jobs and preserves rapid renderer');
-        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','selected method refresh URL','read-only original fire/drilling reuse before treatment','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance','worker crash retains accepted state/history','reset after failure','stale terminated-worker error rejected']};
+        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','selected method refresh URL','read-only original fire/drilling reuse before treatment','prominent method animation after original introduction','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance','worker crash retains accepted state/history','reset after failure','stale terminated-worker error rejected']};
       })()`);
       assertNoErrors(errors);fs.mkdirSync(path.resolve(__dirname,'../docs/review/version21'),{recursive:true});fs.writeFileSync(path.resolve(__dirname,'../docs/review/version21/live-smoke.json'),JSON.stringify({...result,date:new Date().toISOString(),environment:process.platform+' '+process.arch,scope:'software/numerical checks only; no physical validation'},null,2));
       clearTimeout(timeout);console.log('ALTERNATIVES_SMOKE_PASS '+JSON.stringify(result));app.exit(0);
