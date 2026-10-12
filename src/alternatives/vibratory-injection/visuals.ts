@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 /** Authored treatment choreography. These values never enter the field solver.
  * Seconds, amplitudes and wetting extent are display choices, not predictions. */
 const smooth=(a:number,b:number,t:number)=>{const x=Math.max(0,Math.min(1,(t-a)/(b-a)));return x*x*(3-2*x)}

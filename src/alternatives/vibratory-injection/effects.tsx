@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 import { Line } from '@react-three/drei/core/Line.js'
 import { injectionLevels, treatmentVisual } from './visuals'
 

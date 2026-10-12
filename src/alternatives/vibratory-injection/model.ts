@@ -1,45 +1,29 @@
-import type { AlternativeRun, MethodPresentation, SupportedAdapterHooks } from '../contract'
+import type { AlternativeRun, MethodPresentation } from '../contract'
 import type { PanelConfig } from '../model'
 import type { ThermalSettings, VariantId } from '../registry'
+import { vibrationPose } from './vibration'
 
-/** Explanatory metadata only. Shared ranges and numerical defaults stay authoritative. */
+export const PREDICTION_UNAVAILABLE = 'Vibration-only prediction is unavailable: forcing, mechanical work, cyclic peat constitutive response and independent validation are missing.'
 export const parameterProvenance = [
-  { key: 'contactStartS', unit: 's', default: 0, basis: 'Prescribed continuous specimen contact from physical time zero; editable assumption.' },
-  { key: 'waterKg', unit: 'kg', default: .5, basis: 'Finite total liquid supply; no recharge or predicted pore inventory.' },
-  { key: 'flowKgS', unit: 'kg/s', default: .025, basis: 'Prescribed total allocation to three independent specimens, not a hydraulic flow solution.' },
-  { key: 'conductanceWK', unit: 'W/K', default: 24, basis: 'Assumed per-specimen UA; uncalibrated, independent of vibration.' },
-  { key: 'initialK', unit: 'K', default: 823.15, basis: 'Isolated hot-specimen initial condition, not a solved fire field.' },
-  { key: 'inletK', unit: 'K', default: 293.15, basis: 'Prescribed liquid boundary temperature; no source prechilling.' },
-  { key: 'endS', unit: 's', default: 60, basis: 'Observation window; no claim about sustained suppression or re-ignition.' },
+  { key: 'contextHold', unit: 'presentation s', default: 33, basis: 'Hold the original inserted auger before unrelated later treatment; authored timing, not a physical boundary.' },
+  { key: 'vibrationStart', unit: 'presentation s', default: 27, basis: 'Smooth authored motion onset during original drilling; no calibrated forcing.' },
 ] as const
-
 export const capabilities = {
-  modeled: ['Finite liquid inventory', 'Continuous prescribed thermal contact', 'Liquid sensible heat and boiling enthalpy', 'Owned mass and energy ledgers'],
-  illustrative: ['Excavator-drilled access concept', 'Simultaneous drill vibration and liquid markers'],
-  unavailable: ['Field infiltration', 'Vibration-dependent permeability', 'Compaction or loosening', 'Mechanical energy consumption', 'Oxygen, reactive fuel and suppression/re-ignition outcomes'],
+  modeled: [] as string[],
+  illustrative: ['Original fire and drilling context', 'Bounded ground and auger vibration', 'Soil grains and dust', 'Requested fractures, compression/rearrangement and fire-out narrative'],
+  unavailable: ['Vibration forces and mechanical work', 'Cyclic peat constitutive response and damping', 'Compaction, loosening and permeability changes', 'Coupled transport and reaction response', 'Suppression, re-ignition and treatment comparison'],
   experimentallyValidated: false,
 } as const
+export const defaultSettings: Partial<ThermalSettings> = { enabled: false, waterKg: 0, flowKgS: 0, dryIceKg: 0, conductanceWK: 0, contactStartS: 0 }
 
-export const defaultSettings: Partial<ThermalSettings> = { contactStartS: 0 }
-
-/** Owns the serializable input and snapshots; shared worker owns job lifecycle.
- * The unchanged public contact reference supplies all numerical physics. */
-export function createVibratoryRun(config: PanelConfig, hooks: SupportedAdapterHooks): AlternativeRun {
+/** Fail closed even for saved configurations that previously selected liquid.
+ * The direct authored scene has its own presentation clock and needs no run. */
+export function createVibratoryRun(config: PanelConfig): AlternativeRun {
   if (config.variantId !== 'vibratory-injection') throw new Error('Vibratory adapter requires its own variant identity.')
-  const run = hooks.supportedRun(structuredClone(config))
-  return {
-    endS: run.endS,
-    snapshot: () => structuredClone(run.snapshot()),
-    advanceTo: targetS => structuredClone(run.advanceTo(targetS)),
-  }
+  throw new Error(PREDICTION_UNAVAILABLE)
 }
-
-/** Independent authored presentation seconds, never physical solver inputs.
- * These small display motions have no calibrated physical amplitude/frequency. */
 export function vibratoryPresentation(id: VariantId, timeS: number): MethodPresentation {
   if (id !== 'vibratory-injection') throw new Error('Vibratory presentation requires its own variant identity.')
-  const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
-  const active = time >= 24 && time < 60
-  return { contextTime: Math.min(time, 36), access: time >= 18, pulse: false, waves: false,
-    injection: active, vibration: active ? Math.sin(time * 24) * .006 : 0, contacts: active ? 3 : 0 }
+  const pose = vibrationPose(timeS)
+  return { contextTime: pose.contextTime, access: pose.time >= 24, pulse: false, waves: false, injection: false, vibration: pose.groundPosition[0], contacts: 0 }
 }
