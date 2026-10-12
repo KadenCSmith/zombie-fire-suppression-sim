@@ -1,7 +1,7 @@
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
-import { DoubleSide, Quaternion, Shape, Vector3 } from 'three'
+import { CatmullRomCurve3, DoubleSide, Quaternion, Shape, Vector3 } from 'three'
 import { FIRE_SEQUENCE_GEOMETRY as G } from '../../story/fireSequence'
-import { pipeTruckFrame } from './animation'
+import { DRILL_SECTION_STARTS, liquidAnimationFrame, pipeTruckFrame } from './animation'
 
 type Point = [number, number, number]
 const STEEL = '#8e9b98'
@@ -21,6 +21,10 @@ sideWindow.lineTo(1.45, 1.08)
 sideWindow.lineTo(1.32, 1.4)
 sideWindow.lineTo(.65, 1.4)
 sideWindow.closePath()
+const drillFlute = new CatmullRomCurve3(Array.from({ length: 49 }, (_, i) => {
+  const t = i / 48, angle = t * Math.PI * 6
+  return new Vector3(Math.cos(angle) * .064, .06 + t * .34, Math.sin(angle) * .064)
+}))
 
 function Block({ at, size, color, metal = .5, rough = .5, rounded = false }: {
   at: Point; size: Point; color: string; metal?: number; rough?: number; rounded?: boolean
@@ -49,7 +53,7 @@ function RoadWheel({ x, side, travel }: { x: number; side: number; travel: numbe
 
 /** Generic exposed machinery, with no operating values or dimensional design. */
 function PumpDeck({ time }: { time: number }) {
-  const running = time >= 72
+  const pumping = liquidAnimationFrame(time)
   return <group>
     <Block at={[-.52, .56, 0]} size={[1.72, .12, 1.03]} color="#555e57"/>
     {/* Separate engine, guarded driveline and pump replace the solid equipment box. */}
@@ -75,11 +79,10 @@ function PumpDeck({ time }: { time: number }) {
       <MetalSegment from={[.07, .7, z * 1.22]} to={[.38, .7, z * 1.22]} radius={.048} color="#97684e"/>
     </group>)}
     {/* Visible outlet meets the existing world-space rigid delivery line. */}
-    <MetalSegment from={[.36, .7, .44]} to={[1.18, .7, .37]} radius={.042} color="#97684e"/>
-    <MetalSegment from={[1.18, .7, .37]} to={[1.18, .7, .46]} radius={.046}/>
+    <MetalSegment from={[.07, .7, -.44]} to={[-1.38, .7, -.37]} radius={.042} color="#97684e"/>
     <mesh position={[.4, .79, .47]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.072, .013, 6, 16]}/><meshStandardMaterial color="#8d4835" metalness={.5} roughness={.55}/></mesh>
     {/* Low-amplitude engine motion is timestamp-driven and purely illustrative. */}
-    <group position={[-.36, .88, .31]} rotation={[0, 0, running ? (time - 72) * 8 : 0]}>
+    <group position={[-.36, .88, .31]} rotation={[0, 0, pumping.flowClock * 8]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.11, .11, .035, 16]}/><meshStandardMaterial color="#646d63" metalness={.6} roughness={.45}/></mesh>
       <Block at={[0, .075, 0]} size={[.1, .018, .045]} color="#b2b9ab"/>
     </group>
@@ -92,6 +95,12 @@ function PumpDeck({ time }: { time: number }) {
       <MetalSegment from={[-1.38, .89, z]} to={[-.43, .89, z]} radius={.014}/>
     </group>)}
     {[-.03, .12].map(y => <Block key={y} at={[-1.46, .39 + y, .39]} size={[.22, .04, .27]} color={STEEL}/>)}
+    {/* Sections leave the rear rack individually during the drilling sequence. */}
+    <Block at={[-1.25, .66, 0]} size={[.22, .07, .63]} color="#485a4b"/>
+    {DRILL_SECTION_STARTS.map((start, i) => time < start && <group key={start}>
+      <MetalSegment from={[-1.25, .7, -.2 + i * .2]} to={[-1.25, 1.7, -.2 + i * .2]} radius={.055}/>
+      <MetalSegment from={[-1.25, 1.64, -.2 + i * .2]} to={[-1.25, 1.7, -.2 + i * .2]} radius={.069} color="#617366"/>
+    </group>)}
   </group>
 }
 
@@ -132,7 +141,49 @@ function TruckBody({ time, travel }: { time: number; travel: number }) {
     {[-.38, .38].map(z => <mesh key={z} position={[.6, 1.57, z]}><cylinderGeometry args={[.035, .045, .065, 10]}/><meshStandardMaterial color="#bb8634" roughness={.3}/></mesh>)}
     <Block at={[-1.46, .49, 0]} size={[.09, .16, 1.09]} color="#6c786b"/>
     <PumpDeck time={time}/>
-    <mesh position={[-.35, 1.22, 0]}><cylinderGeometry args={[.12, .12, .5, 16]}/><meshStandardMaterial color="#bd863d" metalness={.5} roughness={.5}/></mesh>
+  </group>
+}
+
+function DrillRig({ frame: f }: { frame: ReturnType<typeof pipeTruckFrame> }) {
+  const pipeX = G.sourceX - .11
+  return <group>
+    {[-.12, .12].map(z => <group key={z}>
+      <MetalSegment from={[f.position[0] + 1.23, .65, f.position[2] + .15 + z]} to={[f.rigPosition[0], f.rigPosition[1] + .15, f.rigPosition[2] + z]} radius={.058} color="#68786b"/>
+      <MetalSegment from={[f.position[0] + .67, .66, f.position[2] + z]} to={[f.rigPosition[0], f.rigPosition[1] + 1.25, f.rigPosition[2] + z]} radius={.033}/>
+    </group>)}
+    <group position={f.rigPosition} rotation={[0, 0, f.mastAngle]}>
+      {[-.14, .14].map(x => <MetalSegment key={x} from={[x, 0, -.08]} to={[x, 3.15, -.08]} radius={.035} color="#7d8c7d"/>)}
+      {[0, .45, .9, 1.35, 1.8, 2.25, 2.7, 3.15].map((y, i) => <group key={y}>
+        <MetalSegment from={[-.14, y, -.08]} to={[.14, y, -.08]} radius={.022} color="#68796a"/>
+        {i < 7 && <MetalSegment from={[i % 2 ? -.14 : .14, y, -.08]} to={[i % 2 ? .14 : -.14, y + .45, -.08]} radius={.013} color="#68796a"/>}
+      </group>)}
+      <Block at={[0, 3.16, -.07]} size={[.43, .12, .24]} color="#667e6c" rounded/>
+    </group>
+    {f.pipeVisible && <group>
+      <Block at={[pipeX, f.pipeTop + .08, .09]} size={[.29, .2, .27]} color="#586f60" rounded/>
+      <MetalSegment from={[pipeX, 3.61, -.01]} to={[pipeX, f.pipeTop + .16, -.01]} radius={.012} color="#303d32"/>
+      {Array.from({ length: f.sectionCount }, (_, i) => {
+        const incoming = i === f.sectionCount - 1 && f.joining > 0
+        const at: Point = incoming ? f.incomingPosition : [pipeX, f.pipeBottom + i, .09]
+        return <group key={i} position={at} rotation={[0, incoming ? 0 : f.drillRotation, 0]}>
+          <MetalSegment from={[0, 0, 0]} to={[0, 1, 0]} radius={.055}/>
+          {[.035, .965].map(y => <mesh key={y} position={[0, y, 0]}><cylinderGeometry args={[.069, .069, .065, 12]}/><meshStandardMaterial color="#616f6e" metalness={.8} roughness={.3}/></mesh>)}
+          <Block at={[.055, .74, 0]} size={[.005, .12, .027]} color="#788f79"/>
+          {i === 0 && <group>
+            <mesh castShadow><tubeGeometry args={[drillFlute, 48, .012, 5, false]}/><meshStandardMaterial color="#a8b3a7" metalness={.8} roughness={.3}/></mesh>
+            <mesh position={[0, .025, 0]} rotation={[Math.PI, 0, 0]}><coneGeometry args={[.075, .065, 6]}/><meshStandardMaterial color="#718575" metalness={.8} roughness={.4}/></mesh>
+          </group>}
+        </group>
+      })}
+      {f.joining > 0 && <MetalSegment from={[pipeX, 3.61, .09]} to={[f.incomingPosition[0], f.incomingPosition[1] + 1, f.incomingPosition[2]]} radius={.009} color="#344439"/>}
+      {f.drilling && Array.from({ length: 12 }, (_, i) => {
+        const phase = (f.drillRotation * .2 + i / 12) % 1, angle = i * 2.4
+        const radius = .12 + phase * .23
+        return <mesh key={i} position={[pipeX + Math.cos(angle) * radius, .025 + Math.sin(phase * Math.PI) * .13, .09 + Math.sin(angle) * radius]} rotation={[angle, phase * 3, angle]}>
+          <icosahedronGeometry args={[.018 + (i % 3) * .006, 0]}/><meshStandardMaterial color="#99876b" roughness={1}/>
+        </mesh>
+      })}
+    </group>}
   </group>
 }
 
@@ -150,24 +201,10 @@ function MetalSegment({ from, to, radius = .045, color = '#aab5b4' }: { from: Po
 export function PipeTruck({ time }: { time: number }) {
   const f = pipeTruckFrame(time)
   if (!f.visible) return null
-  const pipeX = G.sourceX - .11
   return <group userData={{ scientificRole: 'Authored opposite-side service truck and rigid pipe installation; no equipment or pressure design' }}>
-    <group position={f.position}>
+    <group position={f.position} rotation={[0, f.heading, 0]}>
       <TruckBody time={time} travel={f.travel}/>
     </group>
-    {time >= 65 && time < 74 && <group>
-      <MetalSegment from={[-2.7, 1.42, -.95]} to={[-2.25 + f.arm * (pipeX + 2.25), 1.6 + f.arm * 2.02, -.95 + f.arm * 1.04]} radius={.075} color="#bd863d"/>
-      {f.pipeVisible && <MetalSegment from={[pipeX, 3.6, .09]} to={[pipeX, f.pipeBottom + 1.56, .09]} radius={.009} color="#39423d"/>}
-    </group>}
-    {f.pipeVisible && <group>
-      <MetalSegment from={[pipeX, f.pipeBottom, .09]} to={[pipeX, f.pipeBottom + 1.56, .09]} radius={.055}/>
-      {[.04, .82, 1.5].map(y => <mesh key={y} position={[pipeX, f.pipeBottom + y, .09]}><cylinderGeometry args={[.069, .069, .055, 16]}/><meshStandardMaterial color="#616f6e" metalness={.8} roughness={.3}/></mesh>)}
-    </group>}
-    {f.connected && <group>
-      <MetalSegment from={[-1.17, .7, -.58]} to={[pipeX, .7, -.58]}/>
-      <MetalSegment from={[pipeX, .7, -.58]} to={[pipeX, .7, .09]}/>
-      <MetalSegment from={[pipeX, .7, .09]} to={[pipeX, .23, .09]}/>
-      <mesh position={[pipeX, .23, .09]}><sphereGeometry args={[.067, 12, 8]}/><meshStandardMaterial color="#9daaa9" metalness={.8} roughness={.3}/></mesh>
-    </group>}
+    <DrillRig frame={f}/>
   </group>
 }
