@@ -1,0 +1,8 @@
+{
+  "atUTC": "2026-10-12T08:29:10.068501+00:00",
+  "oldPath": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/tests/alternatives/pressure-pulse-liquid-waves/review-runtime",
+  "newPath": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure/docs/alternatives/pressure-pulse-liquid-waves/review-runtime",
+  "reason": "Parent authorized move outside src/tests to exclude isolated full source/harness from production recursive test/typecheck discovery. All prior artifact bytes preserved. Parent failed commands remain parent evidence.",
+  "byteIdenticalFilesExcludingClonedDependencies": 349,
+  "allArtifactHashesBeforeAndAfterMatch": true
+}

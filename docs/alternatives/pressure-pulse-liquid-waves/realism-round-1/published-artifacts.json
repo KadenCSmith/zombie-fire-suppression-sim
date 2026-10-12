@@ -1,0 +1,312 @@
+{
+  "reviewedSource": "03bae79560d893f716dca9dc8f7fdc80f4f3c747",
+  "note": "Independent files and signed report preserved byte-for-byte. Harness .test.ts publication names use .source.txt to avoid production test discovery; hashes and original command identities are unchanged. Signed report retains original absolute artifact paths; this map gives portable publication paths.",
+  "artifacts": {
+    "REVIEW_B_ROUND_1.md": {
+      "publishedPath": "REVIEW_B_ROUND_1.md",
+      "sha256": "2d13a86aa74391b9bc37eb9b1e824991a1b9ad5879a33697bafdc943e7bd065f",
+      "bytes": 17901,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "snapshot.json": {
+      "publishedPath": "snapshot.json",
+      "sha256": "5cc8a7b4e55302d3fce0f9e0e2dc43304b445649faa6408cf0677bf7d3bada09",
+      "bytes": 60927,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot.json": {
+      "publishedPath": "final-snapshot.json",
+      "sha256": "03a51cfc3a2e402db0fca671170820169e928a48eca01ab33add0af3eca65701",
+      "bytes": 42761,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-provenance.json": {
+      "publishedPath": "final-03-provenance.json",
+      "sha256": "62b7b1f319ae0cd5857d9b2a0c17cfc535c1b609b767b19a37f02e18c0527d3b",
+      "bytes": 61476,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "preservation.json": {
+      "publishedPath": "preservation.json",
+      "sha256": "d7b800ced6331c6e7b3917dea5a1a9300acf93912ed54d0ef87f8a1cff7faf23",
+      "bytes": 25749,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "original-dependency-closure.json": {
+      "publishedPath": "original-dependency-closure.json",
+      "sha256": "d5cc4991fd02285bd3f273cc3193bc5b9eef4a97c762fde6c6fd2b29a21933f7",
+      "bytes": 8137,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "instructions-provenance.json": {
+      "publishedPath": "instructions-provenance.json",
+      "sha256": "f165218989131f8ab2ce6e8b5bb5e3b5f6c66bb9878ec374eff671d381d4b4d5",
+      "bytes": 870,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "benchmarks.md": {
+      "publishedPath": "benchmarks.md",
+      "sha256": "b1126c1ade7bc50d11279c380357822b852b6572a53c2fa31de521aa153957e9",
+      "bytes": 8035,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "benchmarks.freeze.json": {
+      "publishedPath": "benchmarks.freeze.json",
+      "sha256": "111820501f183c518cfb5b2bbcd1d9ea20a786bc9989b0c888065725e6ab0428",
+      "bytes": 179,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "new-policy-review.test.ts": {
+      "publishedPath": "new-policy-review.source.txt",
+      "sha256": "4f542980582df365677f6e57a92af2b37b2493d2a90457fb115e62a5e5823ea1",
+      "bytes": 11418,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "new-policy-results.json": {
+      "publishedPath": "new-policy-results.json",
+      "sha256": "61505e4c460acddf688514260aa3aa15e100a6a76f3b3f02b5443b1e55f3ea25",
+      "bytes": 119803,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "round1-tests.report.json": {
+      "publishedPath": "round1-tests.report.json",
+      "sha256": "a4877b7c76c783d26f8aa9fb0998266c7a396fe782c6debfd2f8cdcb1bfbac32",
+      "bytes": 14011,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "independent-balances.json": {
+      "publishedPath": "independent-balances.json",
+      "sha256": "2370415712bbb3daecdfe4e50584d0fbfabd2fe09e78470e51ed2e6cad04c395",
+      "bytes": 19912,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "evidence-reuse.json": {
+      "publishedPath": "evidence-reuse.json",
+      "sha256": "19a6e3a00a7c9eb2f9046b62ab831d87212c43d3e73a4bac6be039a33a690068",
+      "bytes": 2326,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "primary-source-digest.json": {
+      "publishedPath": "primary-source-digest.json",
+      "sha256": "f77b359fbb08ed27a635826e8b3a4b0244aa86bff94467f22528af9a434426b1",
+      "bytes": 1771,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "relocation.json": {
+      "publishedPath": "relocation.json",
+      "sha256": "4e69e868773f0cfc67b813d93bf82389c593cc0b2b974798d8d3a73d78530af6",
+      "bytes": 778,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-visual.diff": {
+      "publishedPath": "final-visual.diff",
+      "sha256": "45ac959088b6ac99dadb7791bb2847f7fa1d5b04807cd1a573e57dfceb66c07a",
+      "bytes": 36199,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-asset.diff": {
+      "publishedPath": "final-03-asset.diff",
+      "sha256": "5103008b479fb4699778f045145be48c2eb0fbc9ed32de9fc2dac3147d0886b2",
+      "bytes": 6914,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-ui-evidence.json": {
+      "publishedPath": "final-ui-evidence.json",
+      "sha256": "7d0c9d413e64e2a339614fa6a915494f8e3ff6233719c6ecf662426fb23e6b65",
+      "bytes": 16543,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/new-policy-review.test.ts": {
+      "publishedPath": "final-snapshot/new-policy-review.source.txt",
+      "sha256": "e37046d748892dbd15cf354a4c58c4e4fd4adc9fcbae6804770b25a8505647b4",
+      "bytes": 11413,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/new-policy-results.json": {
+      "publishedPath": "final-snapshot/new-policy-results.json",
+      "sha256": "86983636ddb12bf43cb4dd9d42ec1a61dafc58854f32a723b14b62db5ea70d42",
+      "bytes": 119799,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/independent-balances.test.ts": {
+      "publishedPath": "final-snapshot/independent-balances.source.txt",
+      "sha256": "8db18acc0eefee6db4881dcd28ff31114f485debd365887ca2f8a28d8d3971ff",
+      "bytes": 1995,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/independent-balances.json": {
+      "publishedPath": "final-snapshot/independent-balances.json",
+      "sha256": "2370415712bbb3daecdfe4e50584d0fbfabd2fe09e78470e51ed2e6cad04c395",
+      "bytes": 19912,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/final-tests.report.json": {
+      "publishedPath": "final-snapshot/final-tests.report.json",
+      "sha256": "4b09a11c237bb41397e64b1ceb4c64118cc3838da5852dec4b228fec16c33d8d",
+      "bytes": 14562,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-snapshot/final-execution.log": {
+      "publishedPath": "final-snapshot/final-execution.log",
+      "sha256": "261db938a6fb6abf9dcd0dafa04b32d6dfe56ef6a37e9c0ad6c1ec4ff51775ee",
+      "bytes": 525,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-snapshot/final-03-animation.report.json": {
+      "publishedPath": "final-03-snapshot/final-03-animation.report.json",
+      "sha256": "5033a9b75f242d0e6b3f9334c5a807d569a8be549c857bfa34e2b3318655b226",
+      "bytes": 3872,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-snapshot/final-03-animation.log": {
+      "publishedPath": "final-03-snapshot/final-03-animation.log",
+      "sha256": "82bc07354a7e8af4aa28c6cfc3a51eef8bef102964a1cec0ead68d00f5da9462",
+      "bytes": 457,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-58.jpg": {
+      "publishedPath": "final-03-58.jpg",
+      "sha256": "ab9d441f08297070cb966f508187d1c693e5de62dff99a28015e1dbce3828d9b",
+      "bytes": 112819,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-65.jpg": {
+      "publishedPath": "final-03-65.jpg",
+      "sha256": "efb67338cbb181838c5a84aac06bf95c2b8fc8147eb982b9c46ade2306212182",
+      "bytes": 108881,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-66.jpg": {
+      "publishedPath": "final-03-66.jpg",
+      "sha256": "8a23e4bfb3761bb8014580e7d1f105a04f42aefab65d4b052c0be319408b9df8",
+      "bytes": 109311,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-67.jpg": {
+      "publishedPath": "final-03-67.jpg",
+      "sha256": "a93273e5acd28155acdd9b643d5f7977898deab5a714a1d4ad5bb9d362d84b70",
+      "bytes": 108754,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-68.2.jpg": {
+      "publishedPath": "final-03-68.2.jpg",
+      "sha256": "bb7bfadebd7cd027fb55772fdf88e3656f96000a3152ca05059255fc8b42ef1f",
+      "bytes": 107622,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-68.8.jpg": {
+      "publishedPath": "final-03-68.8.jpg",
+      "sha256": "6604c66dad1ffbe961f17ef3e68d33e3aec8eac1808dad11442b3024a66ac32b",
+      "bytes": 107504,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-69.5.jpg": {
+      "publishedPath": "final-03-69.5.jpg",
+      "sha256": "60eaa355314bac1a7239c7e716aae9bd1620ccafe16a5369e3daeb632d4ed5a8",
+      "bytes": 107537,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-69.6.jpg": {
+      "publishedPath": "final-03-69.6.jpg",
+      "sha256": "55a85ac99c168059c6f9455268b0be8715b195bbfef1a6d20b6983887425089b",
+      "bytes": 107574,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-70.9.jpg": {
+      "publishedPath": "final-03-70.9.jpg",
+      "sha256": "898fada8f1051ac0b2b282095b39f45c27ba64ba477d9ada25c26b0d47b795f8",
+      "bytes": 107578,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-70.jpg": {
+      "publishedPath": "final-03-70.jpg",
+      "sha256": "0bea9e0304bc2d31567d2989384dc54e84dca75b9319ee73bd09a0d3d1829052",
+      "bytes": 107552,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-71.5.jpg": {
+      "publishedPath": "final-03-71.5.jpg",
+      "sha256": "b8aef5aff7f472c6ec68b6d214f55a03f46b73a4af1a4d1e46d2a7f21b03bb0f",
+      "bytes": 107641,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-72.jpg": {
+      "publishedPath": "final-03-72.jpg",
+      "sha256": "51483520c61a5e62fd15f7826ecee4e1995f55ff8fc29eba946244a0e47f2dec",
+      "bytes": 107682,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-76.1.jpg": {
+      "publishedPath": "final-03-76.1.jpg",
+      "sha256": "23f42dc88722538033a98330bf42f010ef3c646bde42e3a1b2d26006266a65ab",
+      "bytes": 107359,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-76.2.jpg": {
+      "publishedPath": "final-03-76.2.jpg",
+      "sha256": "42ffe6af4dc53eaa86f485643277b51e52888cceafaedf08641b6da14bde98b6",
+      "bytes": 107315,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-77.jpg": {
+      "publishedPath": "final-03-77.jpg",
+      "sha256": "ade6837e576aa9d443fa417922443d3abb237b680e30313cd9c730e11e43a4a2",
+      "bytes": 106896,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-78.jpg": {
+      "publishedPath": "final-03-78.jpg",
+      "sha256": "7c8e0d3ab4739e4ac5ada8f904073178104491bee9275c47a3b8619b92febd69",
+      "bytes": 105894,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-89.5.jpg": {
+      "publishedPath": "final-03-89.5.jpg",
+      "sha256": "e88afe88cd464a79470358f9d3bb10a2f976da79d242fc0584cddb633b397bdd",
+      "bytes": 101169,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-89.jpg": {
+      "publishedPath": "final-03-89.jpg",
+      "sha256": "ddef21d04bc52a6de5edd862644296e0cc0dea806f82dc3369bca8e9e1a1f214",
+      "bytes": 101213,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-backward-70.9.jpg": {
+      "publishedPath": "final-03-backward-70.9.jpg",
+      "sha256": "898fada8f1051ac0b2b282095b39f45c27ba64ba477d9ada25c26b0d47b795f8",
+      "bytes": 107578,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-03-feet-77-close.jpg": {
+      "publishedPath": "final-03-feet-77-close.jpg",
+      "sha256": "2f379ce8b56228cd1f5ed07cd1bcc9b77ea867e4978d60225f7f0293b2a7d535",
+      "bytes": 158566,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "parent-discovery-output/independent-balances.json": {
+      "publishedPath": "parent-discovery-output/independent-balances.json",
+      "sha256": "2370415712bbb3daecdfe4e50584d0fbfabd2fe09e78470e51ed2e6cad04c395",
+      "bytes": 19912,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "parent-discovery-output/new-policy-results.json": {
+      "publishedPath": "parent-discovery-output/new-policy-results.json",
+      "sha256": "7e7560a86acd1d904897869a43718a9737237896986ed0b700ced829de5ce3b2",
+      "bytes": 119811,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "parent-discovery-output/provenance.json": {
+      "publishedPath": "parent-discovery-output/provenance.json",
+      "sha256": "0976adf9ff68050db97c3a49e4850e3cc32eca726585c4e74ba56de6dfd0320e",
+      "bytes": 632,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "parent-discovery-output/remediation-diagnostic.json": {
+      "publishedPath": "parent-discovery-output/remediation-diagnostic.json",
+      "sha256": "67180d437551273f1ea9a9e5bec08e7aa00b60f6f5c1766fd8902ff1cdeae3af",
+      "bytes": 1889,
+      "executor": "/root/pressure_realism_reviewer"
+    }
+  }
+}

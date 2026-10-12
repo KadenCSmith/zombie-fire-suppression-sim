@@ -1,0 +1,10 @@
+{
+  "atUTC": "2026-10-12T08:29:26.336921+00:00",
+  "executor": "parent accidental recursive harness discovery, not independent reviewer execution",
+  "reason": "Moved only the three named unintended root JSON outputs, without overwriting independent review artifacts. Preserve failed parent command evidence.",
+  "files": {
+    "independent-balances.json": "2370415712bbb3daecdfe4e50584d0fbfabd2fe09e78470e51ed2e6cad04c395",
+    "new-policy-results.json": "7e7560a86acd1d904897869a43718a9737237896986ed0b700ced829de5ce3b2",
+    "remediation-diagnostic.json": "67180d437551273f1ea9a9e5bec08e7aa00b60f6f5c1766fd8902ff1cdeae3af"
+  }
+}
