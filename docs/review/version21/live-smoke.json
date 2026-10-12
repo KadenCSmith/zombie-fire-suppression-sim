@@ -2,7 +2,7 @@
   "two": {
     "panels": 2,
     "p50Ms": 8.300000000000182,
-    "p95Ms": 9.300000000000182,
+    "p95Ms": 9,
     "samples": 120,
     "physicalTimes": [
       20.5,
@@ -12,20 +12,22 @@
   "four": {
     "panels": 4,
     "p50Ms": 8.300000000000182,
-    "p95Ms": 8.799999999999272,
+    "p95Ms": 8.5,
     "samples": 120,
     "physicalTimes": [
       21.5,
       21.5,
-      21.5,
+      22,
       21.5
     ]
   },
-  "pauseMs": 51.5,
+  "pauseMs": 51.300000071525574,
   "workerCleanup": true,
   "tests": [
     "default rapid mode",
     "implicit render and five secondary sections under every method",
+    "selected method refresh URL",
+    "read-only original fire/drilling reuse before treatment",
     "pressure variants",
     "independent pause/reset",
     "configuration-only duplicate",
@@ -34,9 +36,12 @@
     "original comparison unavailable",
     "unspecified rejection",
     "linked physical time",
-    "two/four panel performance"
+    "two/four panel performance",
+    "worker crash retains accepted state/history",
+    "reset after failure",
+    "stale terminated-worker error rejected"
   ],
-  "date": "2026-10-12T05:56:07.494Z",
+  "date": "2026-10-12T06:33:22.545Z",
   "environment": "darwin arm64",
   "scope": "software/numerical checks only; no physical validation"
 }

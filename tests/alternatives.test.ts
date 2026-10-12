@@ -86,6 +86,22 @@ describe('Version21 alternatives contract', () => {
     const run = createRun(freshPanel('a', 'pressure-only')); run.advanceTo(30)
     expect(run.snapshot().metrics).toBeNull(); expect(run.snapshot().contact).toBeUndefined()
   })
+  it('owns nested FEM diagnostic snapshots as well as field arrays', () => {
+    const p=freshPanel('fem','baseline');p.engine='peat-fem';p.fem.n=2
+    const run=createRun(p);run.advanceTo(.5)
+    const expected=run.snapshot(), exposed=run.snapshot()
+    exposed.fem!.heatSolve.relativeResidual=9999
+    exposed.fem!.oxygenSolve.relativeResidual=9999
+    exposed.fem!.pressureSolve.relativeResidual=9999
+    expect(run.snapshot()).toEqual(expected)
+  })
+  it('repairs duplicate IDs even when saved IDs collide with migration fallbacks', () => {
+    const panels=['migrated-1','migrated-1','migrated-3','migrated-3'].map(id=>freshPanel(id,'baseline'))
+    const restored=readComparison(serializeComparison(panels))
+    expect(new Set(restored.map(p=>p.id)).size).toBe(4)
+    expect(restored[0].id).toBe('migrated-1')
+    expect(restored[2].id).toBe('migrated-3')
+  })
   it('links accepted physical time only for compatible models/windows', () => {
     const a = freshPanel('a', 'baseline'), b = freshPanel('b', 'sublimation-injection')
     expect(linkedCompatibility([a,b])).toBeNull()

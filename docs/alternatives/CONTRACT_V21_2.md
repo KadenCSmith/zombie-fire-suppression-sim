@@ -40,7 +40,11 @@ Physical contact integration is the existing fixed 0.05 s/event-boundary referen
 
 Snapshots/exports include accepted physical time (s), temperature (K), inventories/species (kg), energy/residuals (J), reaction power (W), solve/wall times (ms), settings, seed, method/engine/media, source status, version, and resource disclosure. Missing oxygen/fuel/reaction values are null/N/A for the contact proxy. Contact ledger tracks finite supply/remaining/contacted/bypass/liquid/vapor water; dry ice remaining/sublimated/exported; peat, water sensible and vapor/latent enthalpy; residuals. External heat cannot enter twice, and CO₂ is never oxygen. Intervention off removes all modeled sources. Do not add the separate calorimeter's heat to the original accepted field history.
 
-## Independent new scene and preview harnesses
+## Scene and preview harnesses
+
+**Coordinator composition update requested after launch:** the typed v21.2 API is unchanged. The current additive AlternativeScene host now invokes the unchanged FireSequenceScene export for the original pre-treatment 0–38 s fire/drilling animation, and mounts private cues in a separate illustrative diagram. No protected source is edited or copied. This supersedes the independent-host description below, which records the frozen c1adb47 launch implementation. Worker branches and private cue ownership remain unchanged. Final integrated Chrome previews use the coordinator app; worker development servers keep their independent ports.
+
+### Frozen launch implementation
 
 `src/ui/AlternativeScene.tsx` is a small independently authored concept Canvas, outside the original. It mounts private cues through `AlternativeMethodModules.tsx`. It does not import/copy the original scene, equipment, timeline, camera, textures or defaults. Private MethodPresentation fields are authored contextTime, access/pulse/waves/injection booleans, vibration displacement and contact count; they do not enter numerical state. Workers may replace their private cues while preserving this boundary. Do not mount new method cues inside the original scene.
 

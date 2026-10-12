@@ -1,14 +1,22 @@
 import { ALTERNATIVE_API_VERSION, type AlternativeModule } from '../contract'
 import type { Variant } from '../registry'
-import { methodPresentationBase } from '../presentationBase'
-const status = (modeled: string) => ({ illustrative: true, modeled, experimentallyValidated: false as const })
-const provenance = 'User-supplied Version21 work pack; capstone concepts, not measured performance'
-export const variants: readonly Variant[] = [
-  { id: 'liquid-waves', method: '4.2.3', number: '4.2.3.1', label: 'Liquid-pressure waves then injection', subtitle: 'Descriptive draft label · supplied subsection untitled', draft: true, engines: ['contact', 'concept'], media: ['water', 'unspecified'], defaultMedium: 'water', defaultEngine: 'contact', stages: ['Excavator-drilled access', 'Illustrative liquid-pressure waves', 'Ordinary prescribed liquid contact'], limitation: 'Waves have no numerical source term or credited thermal benefit. A later contact start is an editable scenario assumption, not measured wave behavior.', status: status('Ordinary liquid contact only'), provenance },
-]
+import { createLiquidWavesRun, liquidWavesPresentation } from './model'
+
+export const variants: readonly Variant[] = [{
+  id: 'liquid-waves', method: '4.2.3', number: '4.2.3.1',
+  label: 'Liquid-pressure waves then injection',
+  subtitle: 'Descriptive draft label · supplied subsection untitled', draft: true,
+  engines: ['contact', 'concept'], media: ['water', 'unspecified'],
+  defaultMedium: 'water', defaultEngine: 'contact',
+  stages: ['Excavator-drilled access', 'Illustrative liquid-pressure waves', 'Ordinary prescribed liquid contact'],
+  limitation: 'Pressure-wave propagation, infiltration and structural response are unavailable. Only finite ordinary water contact is modeled; wave cues add no source, cooling or permeability benefit. The editable 12 s contact arrival is a scenario assumption, separate from the presentation clock.',
+  status: { illustrative: true, modeled: 'Finite liquid-water contact calorimeter only', experimentallyValidated: false },
+  provenance: 'User capstone subsection; unchanged external contact reference with constant-property approximations. See method evidence for assumptions and official water-property references.',
+}]
+
 export const methodModule: AlternativeModule = {
   apiVersion: ALTERNATIVE_API_VERSION, method: '4.2.3', variants,
-  defaultSettings: () => ({contactStartS: 12}),
-  createRun: (config, hooks) => hooks.supportedRun(config),
-  presentation: methodPresentationBase,
+  defaultSettings: () => ({ contactStartS: 12 }),
+  createRun: createLiquidWavesRun,
+  presentation: liquidWavesPresentation,
 }

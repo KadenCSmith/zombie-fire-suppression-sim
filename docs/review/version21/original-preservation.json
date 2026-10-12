@@ -612,5 +612,18 @@
     "alternativesNativeSmoke": "ALTERNATIVES_SMOKE_PASS",
     "originalDefaultRouting": "pressure-pulse -> original FireSequenceWorkspace; method-preview query cannot override original route",
     "scope": "software/numerical/preservation evidence, not physical validation"
+  },
+  "integratedVerification": {
+    "protectedFiles": "57/57 SHA-256 match after every reviewed worker merge",
+    "unitTests": 1848,
+    "testFiles": 101,
+    "fullSuiteSeconds": 15.64,
+    "typecheck": "PASS",
+    "lint": "PASS (16 inherited warnings)",
+    "build": "PASS",
+    "unchangedOriginalNative": "PASS",
+    "alternativesNative": "PASS including read-only original fire/drilling reuse and lifecycle",
+    "animationReuse": "additive host calls unchanged FireSequenceScene for pre-treatment0\u201338s; full original4.2.3 unchanged",
+    "scope": "software/numerical verification only, no experimental validation"
   }
 }
