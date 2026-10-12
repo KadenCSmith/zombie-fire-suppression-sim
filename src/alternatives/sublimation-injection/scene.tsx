@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { Html } from '@react-three/drei/web/Html.js'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
 import type { MethodSceneProps } from '../contract'
-import { preparationVisuals } from './visuals'
+import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from './visuals'
 
 const TEAL = '#78bac2'
 const SILVER = '#9aa9a1'
@@ -58,15 +58,16 @@ function MediaCutaway({ time }: { time: number }) {
       <meshBasicMaterial color="#c4e3e0" transparent opacity={.16 - i * .035} side={THREE.DoubleSide} depthWrite={false}/>
     </mesh>)}
     {Array.from({ length: 9 }, (_, i) => {
-      const angle = i * 2.39996, radius = .12 + (i % 3) * .14
-      return <mesh key={i} position={[Math.cos(angle) * radius, .12 + (i % 3) * .105, Math.sin(angle) * radius]}
+      return <mesh key={i} position={solidCuePosition(time, i)} castShadow
         rotation={[i * .37, i * .71, i * .23]} scale={visual.solidScale * (.12 + (i % 3) * .035)}>
         <dodecahedronGeometry args={[1, 0]}/>
         <meshPhysicalMaterial color="#d6e3dc" metalness={.06} roughness={.37} clearcoat={.4} clearcoatRoughness={.22}/>
       </mesh>
     })}
-    <Annotation position={[-1.1, .35, .05]}>Solid medium</Annotation>
-    <Annotation position={[-1.1, -.3, .3]}>Liquid medium</Annotation>
+    <group position={[.88, -.45 + visual.lift * 1.48, 0]} rotation={[0, 0, visual.loading * .48]}>
+      <mesh><boxGeometry args={[.43, .045, .45]}/><meshStandardMaterial color="#68786e" metalness={.45} roughness={.5}/></mesh>
+      {[-.22, .22].map(z => <mesh key={z} position={[0, .1, z]}><boxGeometry args={[.43, .2, .025]}/><meshStandardMaterial color="#7d8b80" metalness={.5} roughness={.45}/></mesh>)}
+    </group>
   </group>
 }
 
@@ -101,44 +102,73 @@ function PhaseChange({ time }: { time: number }) {
 
 function DeliveryPath({ time }: { time: number }) {
   const visual = preparationVisuals(time)
-  const curve = useMemo(() => new THREE.CatmullRomCurve3([
-    new THREE.Vector3(.56, -.38, .4), new THREE.Vector3(.98, -.48, .48),
-    new THREE.Vector3(1.45, -.49, .55), new THREE.Vector3(1.63, -.81, .58),
-    new THREE.Vector3(1.63, -1.55, .58),
-  ], false, 'centripetal'), [])
-  const geometry = useMemo(() => new THREE.TubeGeometry(curve, 56, .035, 10, false), [curve])
-  useEffect(() => () => geometry.dispose(), [geometry])
+  const curve = useMemo(() => new THREE.CatmullRomCurve3(DELIVERY_ROUTE.map(p => new THREE.Vector3(...p)), false, 'centripetal'), [])
+  const geometry = useMemo(() => new THREE.TubeGeometry(curve, 80, .053, 10, false), [curve])
+  const water = useMemo(() => new THREE.TubeGeometry(curve, 80, .033, 10, false), [curve])
+  useLayoutEffect(() => {
+    geometry.setDrawRange(0, Math.floor(visual.hose * 80) * 10 * 6)
+    water.setDrawRange(0, Math.floor(visual.delivery * 80) * 10 * 6)
+  }, [geometry, water, visual.hose, visual.delivery])
+  useEffect(() => () => { geometry.dispose(); water.dispose() }, [geometry, water])
   return <group userData={{ scientificRole: 'Illustrative prescribed delivery path; no infiltration, soil response or suppression' }}>
-    <mesh geometry={geometry}><meshStandardMaterial color="#3c514d" metalness={.4} roughness={.5}/></mesh>
-    {Array.from({ length: 14 }, (_, i) => {
-      const position = (time * .19 + i / 14) % 1
+    <mesh geometry={geometry} castShadow><meshStandardMaterial color="#56756b" transparent opacity={.48} depthWrite={false} metalness={.3} roughness={.5}/></mesh>
+    <mesh geometry={water}><meshStandardMaterial color={TEAL} emissive="#4093a3" emissiveIntensity={.18 + visual.boost * .25} transparent opacity={.5 + visual.boost * .25}/></mesh>
+    {Array.from({ length: 24 }, (_, i) => {
+      const position = (visual.flowTravel + i / 24) % 1
       const point = curve.getPointAt(position)
       return <mesh key={i} position={point} visible={position <= visual.delivery && visual.delivery > 0}>
-        <sphereGeometry args={[.043, 8, 6]}/><meshStandardMaterial color="#a5dcdf" emissive="#4c9da8" emissiveIntensity={.6} roughness={.25}/>
+        <sphereGeometry args={[.038, 8, 6]}/><meshStandardMaterial color="#a5dcdf" emissive="#4c9da8" emissiveIntensity={.6} roughness={.25} transparent opacity={i % 2 ? visual.boost : .85}/>
       </mesh>
     })}
-    <group position={[1.63, -1.6, .58]}>
-      <mesh><cylinderGeometry args={[.17, .17, .055, 40]}/><meshStandardMaterial color="#54685e" metalness={.6} roughness={.3}/></mesh>
-      <mesh position={[0, .031, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[.075, .12, 40]}/><meshStandardMaterial color={TEAL} emissive={TEAL} emissiveIntensity={visual.contact * .35} roughness={.25}/>
-      </mesh>
-    </group>
-    <Annotation position={[1.43, -1.95, .58]}>{visual.delivery > 0 ? 'Prescribed contact' : 'Subsurface access'}</Annotation>
   </group>
 }
 
-/** Private, presentation-only close-up. Existing fire/excavator animation is
- * composed read-only by the coordinator host, never reconstructed here. */
+function SupplyTruck({ time }: { time: number }) {
+  const visual = preparationVisuals(time)
+  return <group position={[TRUCK_PARKED[0] + visual.truckTravel, TRUCK_PARKED[1], TRUCK_PARKED[2]]}
+    userData={{ scientificRole: 'Authored flatbed arrival with open demonstration payload; no vehicle or pressure-system dynamics' }}>
+    <RoundedBox position={[.03, .5, 0]} args={[2.9, .18, 1.22]} radius={.055} smoothness={3} castShadow>
+      <meshStandardMaterial color="#354139" metalness={.45} roughness={.6}/>
+    </RoundedBox>
+    <RoundedBox position={[.46, .73, 0]} args={[2.12, .12, 1.35]} radius={.025} smoothness={2} castShadow>
+      <meshStandardMaterial color="#77897b" metalness={.55} roughness={.47}/>
+    </RoundedBox>
+    <RoundedBox position={[-1.01, 1.06, 0]} args={[.91, 1, 1.23]} radius={.1} smoothness={3} castShadow>
+      <meshStandardMaterial color="#899a85" metalness={.28} roughness={.52}/>
+    </RoundedBox>
+    <mesh position={[-1.476, 1.25, 0]} rotation={[0, 0, -.12]}><boxGeometry args={[.022, .4, .99]}/><meshStandardMaterial color="#304e4d" metalness={.3} roughness={.18}/></mesh>
+    {[-.628, .628].map(z => <group key={z}>
+      <mesh position={[-.99, 1.28, z]}><boxGeometry args={[.62, .38, .018]}/><meshStandardMaterial color="#3e5d57" metalness={.3} roughness={.2}/></mesh>
+      <mesh position={[-.92, .93, z * 1.015]}><boxGeometry args={[.15, .025, .025]}/><meshStandardMaterial color="#b3c0af" metalness={.8} roughness={.3}/></mesh>
+      <mesh position={[-1.48, .8, z * .77]}><boxGeometry args={[.022, .12, .15]}/><meshStandardMaterial color="#dedbc2" emissive="#d9cc9c" emissiveIntensity={.17}/></mesh>
+    </group>)}
+    <mesh position={[-1.49, .6, 0]}><boxGeometry args={[.1, .12, 1.33]}/><meshStandardMaterial color="#8a9888" metalness={.7} roughness={.4}/></mesh>
+    {[-.97, 1.02].flatMap(x => [-.67, .67].map(z => <group key={x + ':' + z} position={[x, .32, z]} rotation={[Math.PI / 2, 0, 0]}>
+      <group rotation={[0, visual.truckTravel / .3, 0]}>
+        <mesh castShadow><cylinderGeometry args={[.3, .3, .2, 28]}/><meshStandardMaterial color="#151c17" roughness={.92}/></mesh>
+        <mesh><cylinderGeometry args={[.15, .15, .215, 18]}/><meshStandardMaterial color="#a3afa0" metalness={.8} roughness={.35}/></mesh>
+        {[0, 1, 2, 3, 4].map(i => <mesh key={i} position={[Math.cos(i * Math.PI * .4) * .095, z > 0 ? -.112 : .112, Math.sin(i * Math.PI * .4) * .095]}>
+          <sphereGeometry args={[.02, 6, 4]}/><meshStandardMaterial color="#46554a" metalness={.7} roughness={.4}/>
+        </mesh>)}
+      </group>
+    </group>))}
+    <group position={[...MEDIA_MOUNT]}>
+      <MediaCutaway time={time}/>
+      <PhaseChange time={time}/>
+    </group>
+  </group>
+}
+
+/** Mounted in the shared world by the external coordinator adapter. Original
+ * fire, grass, excavator, lighting, camera and depth buffer are reused unchanged. */
 export function MethodCues({ time }: MethodSceneProps) {
   const visual = preparationVisuals(time)
-  return <group position={[.22, .2, 0]} rotation={[.12, -.26, 0]}
-    userData={{ scientificRole: '4.2.1 illustrative method close-up; not dimensioned equipment or a physical outcome' }}>
-    <pointLight position={[-2.6, 3, 3]} intensity={13} color="#e0d5b7" distance={9}/>
-    <pointLight position={[2.6, 2.2, -1.8]} intensity={12} color="#8dbfbd" distance={8}/>
-    <group position={[-.25, .12, 0]}>
-      <MediaCutaway time={visual.time}/>
-      <PhaseChange time={visual.time}/>
-      <DeliveryPath time={visual.time}/>
-    </group>
+  if (visual.time < WORLD_STAGING.arrive) return null
+  return <group userData={{ scientificRole: '4.2.1 world-space authored truck, dry-ice loading and faster liquid cues; no predicted pressure or suppression' }}>
+    <SupplyTruck time={visual.time}/>
+    <DeliveryPath time={visual.time}/>
+    {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TRUCK_PARKED[0] + MEDIA_MOUNT[0], 3, TRUCK_PARKED[2]]}>
+      {visual.boost > 0 ? 'Faster flow · illustrative' : 'Dry ice added to water'}
+    </Annotation>}
   </group>
 }
