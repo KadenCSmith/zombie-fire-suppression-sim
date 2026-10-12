@@ -1,6 +1,6 @@
 import { findMethodModule } from './modules'
 import { type ContactCoolingState, type ContactPatchSpec } from '../story/contactCooling'
-import { createContactCoolingSession } from './contactAdapter'
+import { ALTERNATIVE_CONTACT_STEP_S, createContactCoolingSession } from './contactAdapter'
 import { compatible, defaultThermal, variant, type VariantId, type EngineId, type MediumId, type ThermalSettings } from './registry'
 import { DEFAULT_SETTINGS, PeatSolver, totals, type Settings, type Frame } from '../peatfem/coupled'
 export interface PanelConfig { id: string; variantId: VariantId; engine: EngineId; medium: MediumId; sourceStatus: 'unspecified' | 'known-contact-properties'; thermal: ThermalSettings; fem: Settings }
@@ -20,7 +20,7 @@ export function buildContact(config: PanelConfig) {
     waterArrivalTimeS: s.contactStartS, waterShare: 1 / count,
   }))
   return createContactCoolingSession({ startTimeS: 0, endTimeS: s.endS, rapidRemovalTimeS: s.endS,
-    waterStartTimeS: s.contactStartS, stepS: .05, initialTemperatureK: s.initialK, waterInletK: s.inletK,
+    waterStartTimeS: s.contactStartS, stepS: ALTERNATIVE_CONTACT_STEP_S, initialTemperatureK: s.initialK, waterInletK: s.inletK,
     dryIceInitialKg: dry ? s.dryIceKg : 0, waterInitialKg: water ? s.waterKg : 0, waterFlowKgS: water ? s.flowKgS : 0 }, patches)
 }
 function createSupportedRun(config: PanelConfig) {

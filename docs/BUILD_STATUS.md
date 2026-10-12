@@ -410,3 +410,8 @@ Natural/scientific comparison UI and Blender integration are complete for the st
 `feat/peat-fire-fem` adds the active Peat Fire FEM route with a genuine 3D Q1 reduced dry-oxidation fixture, worker stepping, accepted-state probes, sampled temperature grid and recorded replay. The main menu has Latest render, Peat Fire FEM and Previous simulations; historical identifiers and workspaces remain available. v20 main is published at `161e7a4a1f8c35765e1878c132db79977be1f5ea`, with all three hosted CI platforms passing.
 
 This first fixture is intermediate. The accepted follow-up requires full five-step chemistry and conservative Darcy mixture transport. See `docs/review/peat-fem/PROGRESS.md` for current gates and `docs/PEAT_FIRE_FEM_MODEL.md` for scope. Feature-branch milestone uploads are authorized; further main publication is not.
+
+
+## Scientific-realism revision round1 in progress — 2026-10-12
+
+Initial independent audits completed before new implementation: A4.1, liquid3.9, pressure-only1.3, latest vibration-only intent2.3; none verified7. Signed reports/rubric/counter are in docs/review/version21/realism. New-alternative contact step is now0.00625s through the unchanged original public reference, correcting the independently observed early-fill temporal error while retaining frozen analytical answers and0.2K tolerance. Targeted87tests/9files and typecheck PASS at this coordinator checkpoint; final full/native checks remain pending. Original4.2.3 source/default/cache remain unchanged;57-hash gate is repeated before publication. Private visual/scope changes and independent round1 re-score are pending. No experimental validation or central mechanism has been added; main/release/Mac installation remain pending.
