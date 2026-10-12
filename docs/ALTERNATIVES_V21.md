@@ -20,14 +20,14 @@ The V20 four-column header remains: Fire Simulation, Simulation Version, finder 
 | Method | Current render and numerical scope | Missing prediction |
 | --- | --- | --- |
 | 00 No-treatment baseline | Untreated context; isolated hot contact specimens or existing reacting Peat Fire FEM | Contact reference has no combustion; FEM has no capstone suppression sources |
-| 4.2.1 Extinguishing Medium Sublimation and Injection | Separate new concept scene; finite liquid/optional solid CO₂ direct-contact calorimeter | Surface tank cooling/pressurization, injection transport, penetration and savings |
+| 4.2.1 Extinguishing Medium Sublimation and Injection | Original fire/drilling context with separate concept diagram; finite liquid/optional solid CO₂ direct-contact calorimeter | Surface tank cooling/pressurization, injection transport, penetration and savings |
 | 4.2.2 Solid Inert Gas Nano Particles | Visible TBD entry and untreated context; predictive execution disabled | Material, particle distribution, mechanism, transport, chemistry and boundary inputs |
 | 4.2.3 Subsurface Pressure Pulse | Unchanged original V20 rapid cutaway, accepted field history and separate original contact readout; new live-comparison execution unavailable | Pressure propagation, soil rearrangement, fracture or permeability benefit |
 | 4.2.3.1 Liquid-pressure waves then injection | Draft title; wave cue before ordinary contact; later prescribed thermal arrival | Wave physics or any credited wave benefit |
 | 4.2.3.2 Rapid pressure change without liquid | Draft title; abstract disturbance with no liquid; conceptual stage clock only | Collapse, cooling, suppression and all physical outcome curves |
 | 4.2.4 Earthquake Extinguisher | Bounded illustrative drill motion with simultaneous contact markers; continuous liquid thermal contact | Vibration/compaction/loosening effects on transport or suppression |
 
-New method renders reuse the original fire-spreading and drilling animation through the unchanged read-only FireSequenceScene export. The additive host limits its separate context to pre-treatment seconds 0–36; private method cues appear in a separate illustrative diagram. Original 4.2.3 retains its complete original timeline, scene, assets, defaults and camera. Ring radii, drill motion and blue markers are presentation choices. They do not change temperature, oxygen, soil, permeability or a solver. The original 4.2.3 rapid scene and all historical assets are unchanged. No method is experimentally validated. The implementation supplies no physical pressure-source design or operating specification.
+New method renders reuse the original fire-spreading and drilling animation through the unchanged read-only FireSequenceScene export. The additive host limits its separate context to pre-treatment seconds 0–38; private method cues appear in a separate illustrative diagram. Original 4.2.3 retains its complete original timeline, scene, assets, defaults and camera. Ring radii, drill motion and blue markers are presentation choices. They do not change temperature, oxygen, soil, permeability or a solver. The original 4.2.3 rapid scene and all historical assets are unchanged. No method is experimentally validated. The implementation supplies no physical pressure-source design or operating specification.
 
 ## Implemented equations and inputs
 
@@ -68,7 +68,7 @@ Settings schema 2 uses `zombie-fire-alternatives-v21`, migrates schema 1, valida
 
 ## Verification and measured performance
 
-Current local commands: typecheck passed; lint passed with 16 existing physics-next warnings; **1784 tests in 94 files passed** (6.03 s); production build passed. Existing Three.js CommonJS deprecation, dependency `use client` and >500 kB chunk warnings remain. No new failing checks were observed.
+Final integrated local commands: typecheck passed; lint passed with 16 existing physics-next warnings; **1848 tests in 101 files passed** (15.64 s, two workers); production build passed. All three frozen worker deliveries are integrated; see BUILD_STATUS.md for exact SHAs and current verification. Existing Three.js CommonJS deprecation, dependency `use client` and >500 kB chunk warnings remain. Concurrent worker timeouts were resolved by the quiet integrated full run; no test timeouts were changed.
 
 Electron smoke checks passed for alternatives, fire sequence, archived comparison and Peat Fire FEM. The alternatives check exercises direct parent-to-render navigation, nested destinations/variants, all four new variants, unavailable original-comparison execution and nanoparticles, simultaneous workers, individual pause/reset, duplication, removal, linked accepted time, navigation cleanup and two/four-panel performance. Chrome review exercised the real pointer corridor, ArrowRight/ArrowLeft/Escape/focus return and a 700 px stacked comparison without page overflow. At 1508×885 Chrome, the live display measured approximately 33.3 ms median / 34.2 ms p95 and activated the compact budget. Unrelated browser-extension console messages were observed; no app errors were observed.
 
