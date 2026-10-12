@@ -40,6 +40,10 @@ describe('original-based liquid method animation regressions', () => {
     expect(pipeTruckFrame(80)).toEqual(parked)
   })
   it('joins separate pipe sections with rotation paused, then leaves the assembled string embedded for every pulse', () => {
+    expect(pipeTruckFrame(64.9)).toMatchObject({ outriggerSpread: 0, feetPlanted: 0 })
+    expect(pipeTruckFrame(66).outriggerSpread).toBe(1)
+    expect(pipeTruckFrame(66).feetPlanted).toBeLessThan(1)
+    expect(pipeTruckFrame(67)).toMatchObject({ outriggerSpread: 1, feetPlanted: 1, pipeVisible: false })
     for (const [i, start] of DRILL_SECTION_STARTS.entries()) {
       const joining = pipeTruckFrame(start + .2), drilling = pipeTruckFrame(start + .7)
       expect(joining.sectionCount).toBe(i + 1)
@@ -57,6 +61,7 @@ describe('original-based liquid method animation regressions', () => {
       expect(pumping.pipeBottom).toBe(installed.pipeBottom)
       expect(pumping.pipeTop).toBe(installed.pipeTop)
       expect(pumping.drillRotation).toBe(installed.drillRotation)
+      expect(pumping.feetPlanted).toBe(1)
     }
     const pausedJoin = pipeTruckFrame(DRILL_SECTION_STARTS[1] + .2)
     pipeTruckFrame(0); pipeTruckFrame(90)

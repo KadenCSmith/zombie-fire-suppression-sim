@@ -144,6 +144,21 @@ function TruckBody({ time, travel }: { time: number; travel: number }) {
   </group>
 }
 
+function StabilizerFeet({ frame: f }: { frame: ReturnType<typeof pipeTruckFrame> }) {
+  const reach = .43 + f.outriggerSpread * .43
+  const padY = .34 * (1 - f.feetPlanted) + .025 * f.feetPlanted
+  return <group>
+    {[-1.32, .37].flatMap(x => [-1, 1].map(side => <group key={x + ':' + side}>
+      <Block at={[x, .53, side * reach / 2]} size={[.13, .12, reach]} color="#536458"/>
+      <Block at={[x, .59, side * reach]} size={[.12, .36, .12]} color="#293a30" rounded/>
+      {[.44, .74].map(y => <Block key={y} at={[x, y, side * reach]} size={[.14, .035, .14]} color="#728578"/>)}
+      <MetalSegment from={[x, .41, side * reach]} to={[x, padY + .045, side * reach]} radius={.03} color="#a8b6a6"/>
+      <Block at={[x, padY, side * reach]} size={[.34, .05, .27]} color="#566a58" rounded/>
+      <MetalSegment from={[x, .68, side * .38]} to={[x, .53, side * reach]} radius={.016} color="#819483"/>
+    </group>))}
+  </group>
+}
+
 function DrillRig({ frame: f }: { frame: ReturnType<typeof pipeTruckFrame> }) {
   const pipeX = G.sourceX - .11
   return <group>
@@ -204,6 +219,7 @@ export function PipeTruck({ time }: { time: number }) {
   return <group userData={{ scientificRole: 'Authored opposite-side service truck and rigid pipe installation; no equipment or pressure design' }}>
     <group position={f.position} rotation={[0, f.heading, 0]}>
       <TruckBody time={time} travel={f.travel}/>
+      <StabilizerFeet frame={f}/>
     </group>
     <DrillRig frame={f}/>
   </group>

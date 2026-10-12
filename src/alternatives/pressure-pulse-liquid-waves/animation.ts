@@ -51,6 +51,8 @@ export function pipeTruckFrame(presentationS: number) {
   return {
     visible: time >= 57,
     position, heading: Math.PI, travel, deployment,
+    outriggerSpread: smooth(time, 65, 65.8),
+    feetPlanted: smooth(time, 65.8, 67),
     rigPosition: [position[0] + 1.4 + (G.sourceX - .11 - position[0] - 1.4) * deployment,
       1.58 - deployment * 1.08, position[2] + .15 + (.09 - position[2] - .15) * deployment] as [number, number, number],
     mastAngle: (1 - deployment) * Math.PI / 2,
