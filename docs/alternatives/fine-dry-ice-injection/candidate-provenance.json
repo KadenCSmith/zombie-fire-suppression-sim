@@ -68,5 +68,6 @@
     "docs/alternatives/fine-dry-ice-injection/implementer-checks/build-0937d7b.log": "cc6321b48dc09299a7a69c997f96a72b853763ffb5e9301dfd3280acf9f3aad1",
     "docs/alternatives/fine-dry-ice-injection/implementer-checks/full-suite-4d780df.log": "3c7cc5122b64db3a8034cd8a8cea5e3c88dfd90f392c71f7c1024aa5edfed75b",
     "docs/alternatives/fine-dry-ice-injection/implementer-checks/seam-tests-0937d7b.log": "e91deb85e4bbf63f5dab4b0e44860c8bc5f0dcb687abf9e9533f9ebae0694dbe"
-  }
+  },
+  "checkArtifactStorage": "Verbatim log bytes stored at their named implementer-checks paths inside implementer-checks.tar.gz; not normalized to satisfy source whitespace checks."
 }

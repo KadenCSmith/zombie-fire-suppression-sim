@@ -28,7 +28,7 @@ Bulk carrier temperatures below 273.15 K or above 350 K reject execution. Initia
 
 ## Numerical and integration evidence
 
-`candidate-provenance.json` records source/dependency/criteria hashes, runtime/environment, scenarios, executors, exact freezes and evidence hashes. `numerical-evidence.json` contains reproducible scenarios/refinement. Implementer logs remain under `implementer-checks/`.
+`candidate-provenance.json` records source/dependency/criteria hashes, runtime/environment, scenarios, executors, exact freezes and evidence hashes. `numerical-evidence.json` contains reproducible scenarios/refinement. Implementer logs are archived verbatim in `implementer-checks.tar.gz`, retaining the `implementer-checks/` paths inside it.
 
 At the final source freeze:
 
