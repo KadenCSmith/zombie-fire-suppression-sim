@@ -5,7 +5,7 @@ import { createLiquidWavesRun, liquidWavesPresentation } from './model'
 export const variants: readonly Variant[] = [{
   id: 'liquid-waves', method: '4.2.3', number: '4.2.3.1',
   label: 'Liquid-pressure waves then injection',
-  subtitle: 'Original 4.2.3 sequence · normal pumping with intermittent hydraulic pulses', draft: true,
+  subtitle: 'Original 4.2.3 sequence · opposing trucks, rigid pipe and intermittent ground pulses', draft: true,
   engines: ['contact', 'concept'], media: ['water', 'unspecified'],
   defaultMedium: 'water', defaultEngine: 'contact',
   stages: ['Original fire and access sequence', 'Original dry-ice release and truck deployment', 'Normal pumping with hydraulic pulses'],

@@ -1,38 +1,57 @@
-# Worker B — final pressure-variant animation handoff
+# Worker B — shared realism round 1 and opposing-truck animation
 
-Current implementation follows the user's latest direct instructions: use unchanged 4.2.3 as the liquid child's base, retain its dry-ice event and truck/hose deployment, alternate normal pumping with hydraulic ground-opening pulses, and visibly extinguish the illustrated peat. Earlier inset and 38–56 s liquid-wave deliveries are superseded.
+## Current change
 
-## Delivered behavior
+The user's latest selected-liquid request replaces fake expanding pressure rings with sharp ground jolts and progressively opening fissures, and adds two trucks approaching from opposite sides. The unchanged original water truck enters from the right at 57–65 presentation seconds and retains its original hose. The independently authored service truck enters from the left over the same interval; its lifting arm deploys a rigid silver pipe into the existing bore during 67–72 s. No additional original scene, source, water truck or hose is copied.
 
-4.2.3.1 uses the actual original rapid animation through the coordinator's external same-Canvas composition: dry ice/source contact44s, cap51.5s, pressure release55s, truck57–65s, hose65–72s and water72s onward. B adds moving liquid, hydraulic pulse fronts76–78/82–84/87–89s, widening independently authored fissure ribbons and tiny soil specks, with normal pumping between pulses. An owned peat-mask wet/char material progressively covers glowing peat72–89s. The alternative host's public fire layer ends at89s. B does not implement/copy the original scene, source, truck, hose, shader or timeline.
+Original fire spread, drilling, dry-ice placement, cap and release remain the actual protected 4.2.3 exports through the unchanged external same-Canvas host. Normal water pumping starts at72s. At76–78/82–84/87–89s, private crack-bank meshes separate briefly, soil fragments and small turf pieces lift and settle, and the authored fissures remain wider/longer after each pulse. There are no private liquid ring or shell meshes. Existing wet/char coverage progresses72–89s and the alternative-only host ending remains89s.
 
-4.2.3.2 remains independent: gold pressure-transient contours in the reused initial cutaway, no liquid/solid/thermal source, truck/hose or invented suppression. Its concept snapshots have null physical metrics. Its delivered source was integrated with the earlier pressure revision and is unchanged by this liquid-only follow-up.
+These are explicitly authored visual outcomes, excluded from scientific realism credit. No calculated pressure, destructive setting, charge, dose, trigger, containment, permeability, cooling, oxygen removal, reaction, soil response or suppression claim is added. Pipe/vehicle geometry is display choreography, not equipment specifications. The finite-water calorimeter remains separate.
 
-Fracture, pressure, wetting and extinguishing are expressly **authored concept visuals**, not solved mechanics, field infiltration, calibrated suppression or experimental validation. Numerical adapters, reference equations, water/enthalpy ledgers and physical source inventories remain unchanged. The base dry-ice depiction is not an added calorimeter mass/energy term.
+4.2.3.2 is unchanged by the direct visual follow-up: concept only, no liquid, solid or thermal source, no truck/hose or extinguishing, and physical metrics unavailable.
 
-## Interface, ownership and preservation
+## Independent audit and shared counter
 
-Branch: feature/v21-pressure-pulse. Checkout: /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-pressure. API v21.2 unchanged. Each child exports methodModule/variants from index.ts, MethodCues from scene.tsx and MethodScience from science.tsx. Private animation.ts derives deterministic frame transforms from presentation timestamps. Liquid extinguish.tsx owns and disposes its texture/material; no render loop, renderer mutation or shared live state.
+The signed coordinator record docs/review/version21/realism/ROUND_0_B.md identifies independent reviewer /root/realism_b_round0, baseline snapshot9ebda6fa plus frozen patch25c643abe579096acc7a401cc27aced343f1bd738660bc05d5209ba102a52062 and integrated B5373e535918c9f2ddd300d58cc48c3e449013cdc. Initial scores:
 
-Only B's two source/test/docs subtrees were authored. Exact coordinator-approved ordinary checkpoints merged:476e4a982c1dd26fe65c9c7ffe83180e9815e063, d5f487f286062912fa9c422cb6696633b81d95e0 and1ef3cf120b6ed85d52f60b748b0a97e6a3add616. No conflicts, reset, clean, rebase, package/lock modification, main merge or protected/shared-code edit. Source revision7bc4832860438f71c340a4b081291e329bcc7efe is followed only by approved host merge and final evidence/docs. Exact final frozen pushed HEAD is supplied in the final handoff message.
+| Criterion weight | Liquid | Pressure only |
+| --- | ---: | ---: |
+| Physics/conservation30% |5|1|
+| Materials/constitutive20% |3|1|
+| Numerical verification/validation20% |5|2|
+| Method coupling20% |2|1|
+| Computed visual correspondence10% |4|2|
+| Weighted total |3.9|1.3|
 
-All57 original SHA-256 identities match verified V20 baseline161e7a4a1f8c35765e1878c132db79977be1f5ea. The original callable route, defaults, camera, assets, timeline and results remain unchanged. Numerical off-equivalence, finite inventory, mass residual<1e-12kg, energy residual<1e-7J, independent instances/snapshots and no-source pressure-only checks pass. No empirical experiments were performed. Equations, official property references, limits and proposed unperformed validation remain in README/science.
+Both have an unsupported-central-mechanism cap6 and neither has verified7. Initial audit used one scored pass per alternative. This is assigned shared implementation round1; independent round1 scoring is pending. The shared counter permits at most rounds1–3 after round0, four scored passes total; it is never reset or self-scored.
 
-## Verification and exact limits
+Reviewer-executed evidence: 809/811 numerical assertions pass; two frozen early-fill water-temperature checks fail at0.05s. Worst error0.7737119256911456K exceeds0.2K. Independent conservation checks across33cases pass, maximum raw mass residual7.529532553007812e-13kg and raw energy residual1.4761462807655334e-7J. Fixed-water exchange, phase/depletion limits, finite inventories and guards pass. No empirical validation or pressure response model exists.
 
-- Focused private tests plus shared scene composition:29/29 PASS,5 files,0.437s. This includes24 private checks and5 coordinator composition checks.
-- Typecheck PASS; full lint PASS with16 inherited warnings in existing files; private lint clean.
-- Production build PASS after exact ending-host merge:2.53s, inherited dependency/chunk warnings.
-- Whitespace PASS; original preservation57/57 PASS before and after merges.
-- Full suite was not rerun during parallel follow-ups, as coordinated. The historical initial worker run had six unchanged-test timeouts; it is not claimed as a new pass.
-- Coordinator's unchanged original native smoke passed at the world-host milestone; earlier alternatives smoke passed same-Canvas seeking/lifecycle. These are coordinator records, not a new B claim for the final wetting shader.
-- Final main-movie screenshots/Chrome visual signoff for55.3s burst,77s pulse,80s normal pumping and89.5s dark ending remain coordinator-owned. B's Chrome browser connection fails initialization; native foreground selection was interrupted by the user's working-window changes. No visual pass is fabricated.
+Coordinator owns a supported nonprotected alternative-only step-policy correction to0.00625s; independent diagnostic worst early-fill error0.1054885099070475K passes the same frozen0.2K tolerance. The original protected reference/defaults must remain unchanged. Exact published checkpoint will be ordinary-merged when supplied; no private source changes the numerical step. The initial failed checks are retained, never relabeled as passes.
 
-## Review and preview
+Essential blockers to verified7 remain measured generic environmental pressure history/domain/boundaries, calibrated peat constitutive and transport properties, supported pressure/momentum/soil/liquid coupling, and independently validated thermal/oxygen/moisture/fuel/reaction behavior over a suppression/re-ignition observation window. Graphics and disclosures cannot supply these.
 
-Current draft PR: https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/17, into integration/v21-alternatives. Earlier PR12/16 deliveries remain preserved. Coordinator alone integrates exact accepted SHAs and performs final integrated/main/Mac publication.
+## Implementation and verification
 
-Live liquid preview: http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1
-Live pressure-only preview: http://127.0.0.1:5175/?alternative=pressure-only&method-preview=1
+Branch feature/v21-pressure-pulse, exclusive checkout outputs/v21-agent-pressure, APIv21.2. Existing narrow exports remain unchanged. New owned equipment.tsx and groundPulse.tsx implement the vehicle/rigid-pipe choreography and disposable crack-bank geometries. All poses derive from presentation timestamps, with no private timer or numerical source. Tests exercise opposing arrival, pipe lowering before flow, actual mesh displacement/extension, settling, deterministic seeking and numerical independence.
 
-The assigned Vite server remains on5175 (PID99796 at the original launch; later config reload may replace its child). No additional dependency installation, top-level output folder, port, native profile or background watcher was created in this follow-up. No Finder tagging applies.
+Round1 scoped checks:31/31PASS in5files,0.660s; typecheckPASS; lintPASS with16 inherited warnings outside B; production buildPASS2.67s; whitespacePASS; all57protected identitiesPASS against established161e7a4a1f8c35765e1878c132db79977be1f5ea. No full-suite/performance/FPS/experimental claim is made; coordinator owns final integrated suite and native/GPU gates.
+
+Reproduce:
+- npm test -- tests/alternatives/pressure-pulse-liquid-waves tests/alternatives/pressure-pulse-pressure-only tests/alternativeSceneComposition.test.tsx
+- npm run typecheck
+- npm run lint
+- npm run build
+- node scripts/check-original-preservation.mjs
+- git diff --check
+
+B browser access is denied because the admin-enforced browser security policy could not be verified. No bypass or indirect browser automation was attempted. B does not claim final visual verification; independently authorized coordinator/reviewer inspection is required. Prior round0 reviewer actually inspected the app; it does not establish this new animation's visual pass.
+
+## Delivery and ownership
+
+Only B's owned source/test/doc trees are authored. Original/shared code, package/lock, assets, timeline, camera, defaults and routes remain untouched. Current source/checkpoint identity and draftPR are supplied in the frozen delivery message. Earlier PR12/16/17 are historical merged deliveries.
+
+Live user-selected preview: http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1
+Independent pressure-only preview: http://127.0.0.1:5175/?alternative=pressure-only&method-preview=1
+
+The existing5175server is retained. No new top-level folder, dependency, port, background watcher, release or permission change was created. Finder tagging does not apply.

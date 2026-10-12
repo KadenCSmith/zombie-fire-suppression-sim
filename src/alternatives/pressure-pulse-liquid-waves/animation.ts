@@ -1,11 +1,13 @@
 import { FIRE_SEQUENCE_GEOMETRY as G } from '../../story/fireSequence'
 import { PRESENTATION_TIMING } from '../../story/firePresentation'
 
-/** Authored additions to the unchanged original animation. These are
- * presentation seconds and dimensionless effects, never pump settings,
- * pressure, fracture mechanics, permeability or a physical source schedule. */
+/** Authored presentation only. No pump, pressure, fracture or source settings. */
 const clamp = (n: number) => Math.max(0, Math.min(1, n))
 const cycle = (n: number) => n - Math.floor(n)
+const smooth = (time: number, start: number, end: number) => {
+  const u = clamp((time - start) / (end - start))
+  return u * u * (3 - 2 * u)
+}
 export const HYDRAULIC_PULSES = [[76, 78], [82, 84], [87, 89]] as const
 export const LIQUID_SEQUENCE = { injectionStart: PRESENTATION_TIMING.waterStart, end: 90 } as const
 
@@ -14,19 +16,18 @@ export function liquidAnimationFrame(presentationS: number) {
   const injection = time >= PRESENTATION_TIMING.waterStart
   const pulseIndex = HYDRAULIC_PULSES.findIndex(([start, end]) => time >= start && time < end)
   const waves = pulseIndex >= 0
-  const progress = waves ? (time - HYDRAULIC_PULSES[pulseIndex][0]) / 2 : 0
-  const strength = Math.sin(Math.PI * progress) ** 2
-  const opening = HYDRAULIC_PULSES.reduce((sum, [start, end]) => sum + clamp((time - start) / (end - start)), 0) / HYDRAULIC_PULSES.length
+  const age = waves ? time - HYDRAULIC_PULSES[pulseIndex][0] : 0
+  const progress = age / 2
+  // A fast jolt followed by settling, replacing the old expanding circles.
+  const strength = waves ? clamp((1 - Math.exp(-age * 30)) * Math.exp(-age * 4) * 1.8) : 0
+  const tremor = waves ? Math.sin(age * 34) * Math.exp(-age * 4) * .035 : 0
+  const opening = HYDRAULIC_PULSES.reduce((sum, [start]) => sum + smooth(time, start, start + .55), 0) / HYDRAULIC_PULSES.length
   const accelerated = HYDRAULIC_PULSES.reduce((sum, [start, end]) => sum + Math.max(0, Math.min(time, end) - start), 0)
   const flowClock = Math.max(0, time - PRESENTATION_TIMING.waterStart) * .55 + accelerated * .65
   const arrival = clamp(time - PRESENTATION_TIMING.waterStart)
   return {
-    time, waves, injection, pulseIndex, progress, strength, opening,
-    stage: time < 44 ? 'Original fire and drilled access' : time < 57 ? 'Original dry-ice pressure release' : time < 72 ? 'Original truck and hose deployment' : waves ? 'Illustrative hydraulic pulse' : 'Normal pumping',
-    fronts: waves ? Array.from({ length: 3 }, (_, i) => {
-      const front = clamp(progress * 1.5 - i * .18)
-      return { radius: .18 + front * 2.15, opacity: Math.sin(Math.PI * front) * .8 }
-    }) : [],
+    time, waves, injection, pulseIndex, progress, strength, tremor, opening,
+    stage: time < 44 ? 'Original fire and drilled access' : time < 57 ? 'Original dry-ice pressure release' : time < 65 ? 'Two trucks approach' : time < 72 ? 'Rigid pipe and water hose deployment' : waves ? 'Illustrative ground pulse' : 'Normal water pumping',
     drops: injection ? Array.from({ length: 32 }, (_, i) => {
       const progress = cycle(flowClock + i / 32)
       const below = clamp((progress - .84) / .16)
@@ -39,8 +40,22 @@ export function liquidAnimationFrame(presentationS: number) {
   }
 }
 
-/** Independently authored branch routes, not cracks computed by a solver.
- * The base scene's original crack and water paths remain unchanged. */
+/** Independently authored service vehicle and installation choreography.
+ * Positions and lengths are display geometry, never equipment specifications. */
+export function pipeTruckFrame(presentationS: number) {
+  const time = Number.isFinite(presentationS) ? Math.max(0, Math.min(90, presentationS)) : 0
+  const travel = 6 * (1 - smooth(time, 57, 65))
+  const lower = smooth(time, 68, 72)
+  return {
+    visible: time >= 57,
+    position: [-2.35 - travel, 0, -.95] as [number, number, number],
+    travel, arm: smooth(time, 65, 68) * (1 - smooth(time, 72, 74)),
+    pipeVisible: time >= 67, pipeBottom: 1.8 * (1 - lower) - G.sourceDepthM * lower,
+    connected: time >= 72,
+  }
+}
+
+/** Independently authored branch routes, not cracks computed by a solver. */
 export function liquidContactPath(branch: number, fraction: number): [number, number, number] {
   const u = clamp(fraction), side = branch < 0 ? -1 : 1
   const reach = .8 + Math.abs(branch) * .43
