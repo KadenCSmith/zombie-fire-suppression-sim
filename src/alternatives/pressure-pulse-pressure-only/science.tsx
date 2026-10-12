@@ -1,4 +1,11 @@
-import { variants } from './index'
 export function MethodScience() {
-  return <section data-method-science="4.2.3.2"><h3>4.2.3.2 · Method evidence</h3>{variants.map(v=><p key={v.id}><strong>{v.number} {v.label}.</strong> {v.limitation}</p>)}</section>
+  return <section data-method-science="4.2.3.2">
+    <h3>4.2.3.2 · Rapid pressure change without liquid</h3>
+    <p>The transient gold marker represents an abstract environmental disturbance. It has no pressure amplitude, wave speed, source material, energy or equipment interpretation. Existing soil geometry stays fixed. Rearrangement or collapse remains an unresolved hypothesis.</p>
+    <p><strong>No liquid source.</strong> This child rejects contact/FEM engines and liquid/solid treatment media. Its private adapter removes stale inventory, flow and thermal-contact settings from an owned copy before invoking the concept lifecycle. It creates no calorimeter or transport state. Water, heat, oxygen, fuel, reaction, displacement and suppression outcomes are N/A, rather than invented zero-valued predictions.</p>
+    <p><strong>Missing equations.</strong> A quantitative result would require measured environmental pressure boundary data, compressible multiphase transport, an appropriate stress/effective-stress and deformation law, material calibration and validated coupling to reaction/thermal behavior. These hooks are absent. No heat or species source, pressure law, permeability multiplier or outcome curve is implemented.</p>
+    <p>The preview uses a dimensionless authored visibility envelope only, <code>opacity ∝ sin²(πu)</code>, where <code>u</code> spans the 48–54 s presentation interval. It never advances a physical solver. Concept checkpoints support independent playback/controls with null metrics; linked physical comparisons are unavailable.</p>
+    <p><strong>Proposed, unperformed validation.</strong> A qualified laboratory would first document soil composition, water content, density, boundaries and uncertainty, then independently measure a prescribed generic disturbance and soil response against matched untreated controls. Thermal/reactive validation would be a separate later task. No pressure-generation apparatus, operating settings or construction procedure is specified here, and no experiments have been performed.</p>
+    <p><strong>Evidence and cost.</strong> The capstone subsection supplies a concept, not measured data or material properties. No cited water or gas properties can fill those missing inputs. Pressure-source, access, instrumentation and operation costs remain unavailable until a safe, defined study and supplier quotations exist. This child consumes no modeled liquid; that is not a claim of zero operating cost.</p>
+  </section>
 }
