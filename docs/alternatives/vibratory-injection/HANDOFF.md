@@ -1,3 +1,5 @@
+> **Current revision:** [V3 — vibration only, requested authored compaction/fire-out](./REVISION_V3.md). The liquid/contact content below is retained historical, inactive and off-scope for current vibration validation.
+
 # Worker C handoff — 4.2.4
 
 **Historical first delivery.** The user's requested visual/field follow-up is documented in [REVISION_V2.md](./REVISION_V2.md); it supersedes the original scene descriptions below while preserving the v21.2 comparison model.

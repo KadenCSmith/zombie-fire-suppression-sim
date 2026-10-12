@@ -1,3 +1,5 @@
+> **Current revision:** [V3 — vibration only, requested authored compaction/fire-out](./REVISION_V3.md). The liquid/contact content below is retained historical, inactive and off-scope for current vibration validation.
+
 # 4.2.4 Earthquake Extinguisher
 
 **Vibratory drilling + continuous injection.** API v21.2; private module authored alongside the protected original 4.2.3. The original scene, equipment, timing, camera, defaults, results and dependencies are read-only. No original implementation is copied or mounted here.

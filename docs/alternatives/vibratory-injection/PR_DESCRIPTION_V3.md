@@ -1,0 +1,5 @@
+The4.2.4 preview replaced the original world with a second ground/Canvas at24–26s, visibly jumping the fire, equipment and materials. The latest user direction also removes water and requests an illustrated fracture/compaction/fire-out sequence.
+
+Keep one externally composed unchanged original Canvas, retain its opening/ground/drill/camera, and add bounded vibration, authored cracks/settling and gradual ember fading. Remove all active liquid UI/worker/truck/hose/jets/wetting. Keep prior liquid files/evidence explicitly inactive. No vibration physics, soil-failure prediction or calculated suppression is claimed; predictive engines are unavailable and stale liquid configurations fail closed.
+
+Scoped tests cover scene/source boundaries, deterministic seeking, fracture continuity, resource disposal and renderer-state restoration. Type/lint/build/57 protected hash results and independent review identities/status are in the private V3 handoff. Root retains shared routing/tests/final native checks; original4.2.3 and APIv21.2 are preserved.
