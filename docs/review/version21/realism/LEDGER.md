@@ -1,5 +1,7 @@
 # Scientific-realism shared round ledger
 
+> Historical shared ledger, superseded on2026-10-12 by [PARALLEL_HANDOFF.md](PARALLEL_HANDOFF.md). Use independent per-alternative ledgers/local retries from that handoff. Existing initial scores/passes remain; no coordinator-wide barrier or shared counter applies. Historical entries below are preserved, not reset.
+
 The fixed rubric is [RUBRIC.md](RUBRIC.md). Every score is an engineering assessment, not experimental validation. Initial audits completed before any realism implementation edit. The pre-request source/diff and two native fixtures were preserved unchanged in coordinator commit `fb8a539`; audit reports record the original exact source/diff identities.
 
 | Alternative | Round 0 criterion scores (physics/properties/numerics/mechanism/visual) | Unrounded total | Verified ≥7 | Scored passes used |
