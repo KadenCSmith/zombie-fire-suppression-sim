@@ -1,0 +1,1099 @@
+diff --git a/src/alternatives/vibratory-injection/compaction-effects.tsx b/src/alternatives/vibratory-injection/compaction-effects.tsx
+new file mode 100644
+index 0000000..8185416
+--- /dev/null
++++ b/src/alternatives/vibratory-injection/compaction-effects.tsx
+@@ -0,0 +1,39 @@
++import { Line } from '@react-three/drei/core/Line.js'
++import type { StoryPoint } from '../../story/fireSequence'
++import { eased, pointAlongStoryPath } from '../../story/fireSequence'
++import { vibrationPose } from './vibration'
++
++/** Requested fracture/rearrangement narrative; no failure criterion or material
++ * composition is calculated. These paths are authored display geometry. */
++const cracks: StoryPoint[][] = [
++  [[.4,-1.3,.08],[.77,-1.13,.08],[1.18,-1.28,.08],[1.48,-.96,.08],[2.05,-1.07,.08]],
++  [[.4,-1.3,.08],[.03,-1.46,.08],[-.42,-1.35,.08],[-.84,-1.62,.08],[-1.49,-1.49,.08]],
++  [[.4,-1.3,.08],[.63,-1.65,.08],[.38,-1.89,.08],[.75,-2.18,.08],[.91,-2.65,.08]],
++  [[.4,-1.3,.08],[.17,-.91,.08],[.39,-.62,.08],[.12,-.31,.08],[.23,-.02,.08]],
++  [[1.18,-1.28,.08],[1.49,-1.62,.08],[1.83,-1.56,.08],[2.24,-1.89,.08]],
++  [[-.42,-1.35,.08],[-.64,-.99,.08],[-1.05,-.81,.08],[-1.15,-.39,.08]],
++  [[.23,.015,.02],[-.13,.015,-.25],[-.40,.015,-.19],[-.73,.015,-.61],[-1.19,.015,-.76]],
++  [[.55,.015,-.06],[.89,.015,-.38],[1.23,.015,-.24],[1.65,.015,-.54],[2.10,.015,-.73]],
++]
++export function fracturePathAt(path: StoryPoint[], progress: number) {
++  const lengths = path.slice(1).map((p, i) => Math.hypot(...p.map((v, k) => v - path[i][k])))
++  const target = Math.max(0, Math.min(1, progress)) * lengths.reduce((a, b) => a + b, 0)
++  const shown = [path[0]]
++  let distance = 0
++  for (let i = 0; i < lengths.length; i++) {
++    if (distance + lengths[i] >= target) break
++    shown.push(path[i + 1]); distance += lengths[i]
++  }
++  return [...shown, pointAlongStoryPath(path, Math.max(0, Math.min(1, progress)))]
++}
++export function CompactionEffects({ time, enabled = true }: { time: number; enabled?: boolean }) {
++  const pose = vibrationPose(time, enabled)
++  return <group position={pose.surfacePosition} scale={pose.groundScale} rotation={[0, 0, pose.groundTilt]} userData={{ role: 'illustrative fractures, compression and soil rearrangement; not predicted damage' }}>
++    {cracks.map((path, i) => {
++      const progress = enabled ? eased(pose.time, 33 + i * .6, 42 + i * .6) : 0
++      if (progress === 0) return null
++      const shown = fracturePathAt(path, progress)
++      return <Line key={i} points={shown} color="#100d08" lineWidth={.7 + 2.7 * pose.fracture * (1 - pose.compression * .75)} transparent opacity={.85}/>
++    })}
++  </group>
++}
+diff --git a/src/alternatives/vibratory-injection/compaction-pass.tsx b/src/alternatives/vibratory-injection/compaction-pass.tsx
+new file mode 100644
+index 0000000..e0aef6a
+--- /dev/null
++++ b/src/alternatives/vibratory-injection/compaction-pass.tsx
+@@ -0,0 +1,83 @@
++import { useEffect, useLayoutEffect, useRef } from 'react'
++import { useFrame } from '@react-three/fiber'
++import * as THREE from 'three'
++
++export const COMPACTION_GROUPS = { burning: 'vibration-burning-ground', settled: 'vibration-settled-ground', fireOnly: 'vibration-fire-only' } as const
++
++/** Owned output illustration. Blend the original public fire-on/off appearances
++ * at identical geometry/camera, rather than guessing which colors are embers.
++ * Original materials, fields and shaders are never touched. This is not a
++ * temperature, oxygen, mechanical work or physical extinction calculation. */
++export function createCompactionPass() {
++  const depth = new THREE.DepthTexture(1, 1, THREE.UnsignedIntType)
++  const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true, depthTexture: depth })
++  const reference = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true })
++  const uniforms = {
++    image: { value: target.texture }, settledImage: { value: reference.texture }, depth: { value: depth }, progress: { value: 0 },
++    inverseProjection: { value: new THREE.Matrix4() }, cameraWorld: { value: new THREE.Matrix4() },
++  }
++  const material = new THREE.ShaderMaterial({
++    uniforms, depthTest: false, depthWrite: false,
++    vertexShader: 'varying vec2 uvImage; void main(){uvImage=uv;gl_Position=vec4(position.xy,0.,1.);}',
++    fragmentShader: `varying vec2 uvImage;
++      uniform sampler2D image,settledImage,depth; uniform float progress;
++      uniform mat4 inverseProjection,cameraWorld;
++      void main(){
++        vec4 color=texture2D(image,uvImage);
++        float d=texture2D(depth,uvImage).r;
++        vec4 view=inverseProjection*vec4(uvImage*2.-1.,d*2.-1.,1.);
++        vec3 world=(cameraWorld*vec4(view.xyz/view.w,1.)).xyz;
++        float front=1.-smoothstep(progress*5.-.3,progress*5.+.1,length(world.xy-vec2(.4,-1.3)));
++        float fade=mix(front*progress,1.,smoothstep(.9,1.,progress));
++        gl_FragColor=mix(color,texture2D(settledImage,uvImage),fade);
++        #include <tonemapping_fragment>
++        #include <colorspace_fragment>
++      }`,
++  })
++  const geometry = new THREE.PlaneGeometry(2, 2), output = new THREE.Scene(), camera = new THREE.Camera()
++  const quad = new THREE.Mesh(geometry, material); quad.frustumCulled = false; output.add(quad)
++  const size = new THREE.Vector2(), viewport = new THREE.Vector4(), scissor = new THREE.Vector4()
++  let disposed = false
++  return {
++    target, reference, material, geometry, depth,
++    render(gl: THREE.WebGLRenderer, scene: THREE.Scene, viewCamera: THREE.Camera, progress: number) {
++      if (disposed) throw new Error('Compaction output pass is disposed.')
++      if (progress <= 0) { gl.render(scene, viewCamera); return }
++      const burning = scene.getObjectByName(COMPACTION_GROUPS.burning), settled = scene.getObjectByName(COMPACTION_GROUPS.settled), fireOnly = scene.getObjectByName(COMPACTION_GROUPS.fireOnly)
++      if (!burning || !settled || !fireOnly) throw new Error('Compaction appearance groups are missing.')
++      const visibility = [burning.visible, settled.visible, fireOnly.visible]
++      const appearance = (showSettled: boolean) => { burning.visible = !showSettled; settled.visible = showSettled; fireOnly.visible = !showSettled }
++      gl.getDrawingBufferSize(size)
++      if (target.width !== size.x || target.height !== size.y) target.setSize(Math.max(1, size.x), Math.max(1, size.y))
++      if (reference.width !== size.x || reference.height !== size.y) reference.setSize(Math.max(1, size.x), Math.max(1, size.y))
++      uniforms.progress.value = progress
++      const previous = gl.getRenderTarget(), autoClear = gl.autoClear, scissorTest = gl.getScissorTest()
++      gl.getViewport(viewport); gl.getScissor(scissor)
++      try {
++        // The endpoint is the same original public fire-off appearance approached
++        // by the blend, with no React fire-prop switch or final color-mask jump.
++        if (progress >= 1) { appearance(true); gl.render(scene, viewCamera); return }
++        appearance(false)
++        gl.autoClear = true; gl.setScissorTest(false); gl.setRenderTarget(target); gl.render(scene, viewCamera)
++        uniforms.inverseProjection.value.copy(viewCamera.projectionMatrixInverse)
++        uniforms.cameraWorld.value.copy(viewCamera.matrixWorld)
++        appearance(true); gl.setRenderTarget(reference); gl.render(scene, viewCamera)
++        gl.setRenderTarget(previous); gl.setViewport(viewport); gl.setScissor(scissor); gl.setScissorTest(scissorTest)
++        gl.render(output, camera)
++      } finally {
++        burning.visible = visibility[0]; settled.visible = visibility[1]; fireOnly.visible = visibility[2]
++        gl.setRenderTarget(previous); gl.setViewport(viewport); gl.setScissor(scissor); gl.setScissorTest(scissorTest); gl.autoClear = autoClear
++      }
++    },
++    dispose() { if (disposed) return; disposed = true; output.clear(); geometry.dispose(); material.dispose(); depth.dispose(); target.dispose(); reference.dispose() },
++  }
++}
++
++export function CompactionPass({ progress }: { progress: number }) {
++  const pass = useRef<ReturnType<typeof createCompactionPass> | null>(null), current = useRef(progress)
++  useLayoutEffect(() => { current.current = progress }, [progress])
++  // Allocate inside the effect so StrictMode cleanup/setup gets fresh resources.
++  useEffect(() => { const owned = createCompactionPass(); pass.current = owned; return () => { pass.current = null; owned.dispose() } }, [])
++  useFrame(({ gl, scene, camera }) => { if (pass.current) pass.current.render(gl, scene, camera, current.current); else gl.render(scene, camera) }, 1)
++  return null
++}
+diff --git a/src/alternatives/vibratory-injection/effects.tsx b/src/alternatives/vibratory-injection/effects.tsx
+index 1bb3fdf..9f82951 100644
+--- a/src/alternatives/vibratory-injection/effects.tsx
++++ b/src/alternatives/vibratory-injection/effects.tsx
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ import { Line } from '@react-three/drei/core/Line.js'
+ import { injectionLevels, treatmentVisual } from './visuals'
+ 
+diff --git a/src/alternatives/vibratory-injection/field-scene.tsx b/src/alternatives/vibratory-injection/field-scene.tsx
+index 7b4c112..f891866 100644
+--- a/src/alternatives/vibratory-injection/field-scene.tsx
++++ b/src/alternatives/vibratory-injection/field-scene.tsx
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ import { useEffect, useLayoutEffect, useMemo } from 'react'
+ import { Canvas, useThree } from '@react-three/fiber'
+ import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
+diff --git a/src/alternatives/vibratory-injection/field.ts b/src/alternatives/vibratory-injection/field.ts
+index 0078694..dbd16e3 100644
+--- a/src/alternatives/vibratory-injection/field.ts
++++ b/src/alternatives/vibratory-injection/field.ts
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ import { CoupledTransport, coupledScenario, DEFAULT_COUPLED, type CoupledFrame } from '../../coupled/model'
+ import { MOLAR, T0, saturationPressure } from '../../coupled/thermodynamics'
+ import { fireSequencePose } from '../../story/fireSequence'
+diff --git a/src/alternatives/vibratory-injection/field.worker.ts b/src/alternatives/vibratory-injection/field.worker.ts
+index 5722a70..223dfed 100644
+--- a/src/alternatives/vibratory-injection/field.worker.ts
++++ b/src/alternatives/vibratory-injection/field.worker.ts
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ import { VibratoryFieldRun, type FieldSettings, type FieldState } from './field'
+ 
+ export type FieldMessage = { jobId: string; type: 'state' | 'complete' | 'failed'; state?: FieldState; error?: string }
+diff --git a/src/alternatives/vibratory-injection/index.ts b/src/alternatives/vibratory-injection/index.ts
+index 8e7f63b..071119b 100644
+--- a/src/alternatives/vibratory-injection/index.ts
++++ b/src/alternatives/vibratory-injection/index.ts
+@@ -1,11 +1,11 @@
+ import { ALTERNATIVE_API_VERSION, type AlternativeModule } from '../contract'
+ import type { Variant } from '../registry'
+-import { createVibratoryRun, defaultSettings, vibratoryPresentation } from './model'
++import { createVibratoryRun, defaultSettings, PREDICTION_UNAVAILABLE, vibratoryPresentation } from './model'
+ export { capabilities, parameterProvenance } from './model'
+ const status = (modeled: string) => ({ illustrative: true, modeled, experimentallyValidated: false as const })
+ const provenance = 'User-supplied Version21 work pack; capstone concepts, not measured performance'
+ export const variants: readonly Variant[] = [
+-  { id: 'vibratory-injection', method: '4.2.4', number: '4.2.4', label: 'Earthquake Extinguisher', subtitle: 'Vibratory drilling + continuous injection', engines: ['contact', 'concept'], media: ['water', 'unspecified'], defaultMedium: 'water', defaultEngine: 'contact', stages: ['Access concept', 'Simultaneous vibration and liquid delivery', 'Review competing soil hypotheses'], limitation: 'Drilling and vibration are illustrative. Loosening and compaction compete; neither changes calculated permeability. Only continuous prescribed contact with finite water is modeled. Field penetration, oxygen, suppression and vibration energy are unavailable.', status: status('Finite continuous liquid contact only; unvalidated'), provenance },
++  { id: 'vibratory-injection', method: '4.2.4', number: '4.2.4', label: 'Earthquake Extinguisher', subtitle: 'Vibratory drilling · vibration only', engines: [], media: ['none'], defaultMedium: 'none', defaultEngine: 'concept', stages: ['Original fire and drilling', 'Illustrative vibration', 'Illustrated soil rearrangement and fire-out'], limitation: PREDICTION_UNAVAILABLE, status: status('Unavailable — vibration mechanics unsupported'), provenance },
+ ]
+ export const methodModule: AlternativeModule = {
+   apiVersion: ALTERNATIVE_API_VERSION, method: '4.2.4', variants,
+diff --git a/src/alternatives/vibratory-injection/model.ts b/src/alternatives/vibratory-injection/model.ts
+index 44c9d31..c199dfe 100644
+--- a/src/alternatives/vibratory-injection/model.ts
++++ b/src/alternatives/vibratory-injection/model.ts
+@@ -1,45 +1,29 @@
+-import type { AlternativeRun, MethodPresentation, SupportedAdapterHooks } from '../contract'
++import type { AlternativeRun, MethodPresentation } from '../contract'
+ import type { PanelConfig } from '../model'
+ import type { ThermalSettings, VariantId } from '../registry'
++import { vibrationPose } from './vibration'
+ 
+-/** Explanatory metadata only. Shared ranges and numerical defaults stay authoritative. */
++export const PREDICTION_UNAVAILABLE = 'Vibration-only prediction is unavailable: forcing, mechanical work, cyclic peat constitutive response and independent validation are missing.'
+ export const parameterProvenance = [
+-  { key: 'contactStartS', unit: 's', default: 0, basis: 'Prescribed continuous specimen contact from physical time zero; editable assumption.' },
+-  { key: 'waterKg', unit: 'kg', default: .5, basis: 'Finite total liquid supply; no recharge or predicted pore inventory.' },
+-  { key: 'flowKgS', unit: 'kg/s', default: .025, basis: 'Prescribed total allocation to three independent specimens, not a hydraulic flow solution.' },
+-  { key: 'conductanceWK', unit: 'W/K', default: 24, basis: 'Assumed per-specimen UA; uncalibrated, independent of vibration.' },
+-  { key: 'initialK', unit: 'K', default: 823.15, basis: 'Isolated hot-specimen initial condition, not a solved fire field.' },
+-  { key: 'inletK', unit: 'K', default: 293.15, basis: 'Prescribed liquid boundary temperature; no source prechilling.' },
+-  { key: 'endS', unit: 's', default: 60, basis: 'Observation window; no claim about sustained suppression or re-ignition.' },
++  { key: 'contextHold', unit: 'presentation s', default: 33, basis: 'Hold the original inserted auger before unrelated later treatment; authored timing, not a physical boundary.' },
++  { key: 'vibrationStart', unit: 'presentation s', default: 27, basis: 'Smooth authored motion onset during original drilling; no calibrated forcing.' },
+ ] as const
+-
+ export const capabilities = {
+-  modeled: ['Finite liquid inventory', 'Continuous prescribed thermal contact', 'Liquid sensible heat and boiling enthalpy', 'Owned mass and energy ledgers'],
+-  illustrative: ['Excavator-drilled access concept', 'Simultaneous drill vibration and liquid markers'],
+-  unavailable: ['Field infiltration', 'Vibration-dependent permeability', 'Compaction or loosening', 'Mechanical energy consumption', 'Oxygen, reactive fuel and suppression/re-ignition outcomes'],
++  modeled: [] as string[],
++  illustrative: ['Original fire and drilling context', 'Bounded ground and auger vibration', 'Soil grains and dust', 'Requested fractures, compression/rearrangement and fire-out narrative'],
++  unavailable: ['Vibration forces and mechanical work', 'Cyclic peat constitutive response and damping', 'Compaction, loosening and permeability changes', 'Coupled transport and reaction response', 'Suppression, re-ignition and treatment comparison'],
+   experimentallyValidated: false,
+ } as const
++export const defaultSettings: Partial<ThermalSettings> = { enabled: false, waterKg: 0, flowKgS: 0, dryIceKg: 0, conductanceWK: 0, contactStartS: 0 }
+ 
+-export const defaultSettings: Partial<ThermalSettings> = { contactStartS: 0 }
+-
+-/** Owns the serializable input and snapshots; shared worker owns job lifecycle.
+- * The unchanged public contact reference supplies all numerical physics. */
+-export function createVibratoryRun(config: PanelConfig, hooks: SupportedAdapterHooks): AlternativeRun {
++/** Fail closed even for saved configurations that previously selected liquid.
++ * The direct authored scene has its own presentation clock and needs no run. */
++export function createVibratoryRun(config: PanelConfig): AlternativeRun {
+   if (config.variantId !== 'vibratory-injection') throw new Error('Vibratory adapter requires its own variant identity.')
+-  const run = hooks.supportedRun(structuredClone(config))
+-  return {
+-    endS: run.endS,
+-    snapshot: () => structuredClone(run.snapshot()),
+-    advanceTo: targetS => structuredClone(run.advanceTo(targetS)),
+-  }
++  throw new Error(PREDICTION_UNAVAILABLE)
+ }
+-
+-/** Independent authored presentation seconds, never physical solver inputs.
+- * These small display motions have no calibrated physical amplitude/frequency. */
+ export function vibratoryPresentation(id: VariantId, timeS: number): MethodPresentation {
+   if (id !== 'vibratory-injection') throw new Error('Vibratory presentation requires its own variant identity.')
+-  const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
+-  const active = time >= 24 && time < 60
+-  return { contextTime: Math.min(time, 36), access: time >= 18, pulse: false, waves: false,
+-    injection: active, vibration: active ? Math.sin(time * 24) * .006 : 0, contacts: active ? 3 : 0 }
++  const pose = vibrationPose(timeS)
++  return { contextTime: pose.contextTime, access: pose.time >= 24, pulse: false, waves: false, injection: false, vibration: pose.groundPosition[0], contacts: 0 }
+ }
+diff --git a/src/alternatives/vibratory-injection/preview.html b/src/alternatives/vibratory-injection/preview.html
+index 5cc7205..d97b51b 100644
+--- a/src/alternatives/vibratory-injection/preview.html
++++ b/src/alternatives/vibratory-injection/preview.html
+@@ -1 +1 @@
+-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>4.2.4 · Reacting field revision</title></head><body style="margin:0;background:#000"><div id="root"></div><script type="module" src="./preview.tsx"></script></body></html>
++<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>4.2.4 · Vibration only</title></head><body style="margin:0;background:#000"><div id="root"></div><script type="module" src="./preview.tsx"></script></body></html>
+diff --git a/src/alternatives/vibratory-injection/scene.tsx b/src/alternatives/vibratory-injection/scene.tsx
+index 4f9c969..8434735 100644
+--- a/src/alternatives/vibratory-injection/scene.tsx
++++ b/src/alternatives/vibratory-injection/scene.tsx
+@@ -1,31 +1,8 @@
+-import { Line } from '@react-three/drei/core/Line.js'
+ import type { MethodSceneProps } from '../contract'
+-import { SequenceExcavator } from '../../ui/FireSequenceEquipment'
+-import { FireWaterTruck } from '../../ui/FireWaterTruck'
+-import { eased, pointAlongStoryPath, type StoryPoint } from '../../story/fireSequence'
+-import { TreatmentEffects } from './effects'
+-import { treatmentVisual } from './visuals'
++import { VibrationEffects } from './vibration-effects'
+ 
+-/** World-space continuation after the original introduction. Equipment exports
+- * are invoked read-only. Motion/flow markers do not enter numerical state. */
++/** Source-free fallback cues for the coordinator's external original-world host.
++ * The owned workspace additionally composes motion of the original world/tool. */
+ export function MethodCues({ time }: MethodSceneProps) {
+-  if(time<38)return null
+-  const truckTime=57+Math.min(8,time-38),feed=eased(time,48,54),active=time>=50&&time<78
+-  const visualTime=time-24,pose=treatmentVisual(visualTime)
+-  const rotor=31+((time*6.5)%(2*Math.PI))/6.5,vibration=pose.displacementX,depth=1.385*feed
+-  const route:StoryPoint[]=[[1.08,.63,-.54],[1.02,.28,-.46],[.81,.13,-.39],[.59,.13,-.28],[.4,.29,-.02],[.4,.14,.1],[.4,-depth,.12]]
+-  return <group userData={{method:'4.2.4',role:'world-space illustrative drilling and continuous liquid delivery'}}>
+-    <FireWaterTruck time={truckTime}/>
+-    {time>=46&&<>
+-      <group position={[vibration,0,0]}><SequenceExcavator time={rotor} connectedSupply/></group>
+-      <Line points={route} color="#1c3031" lineWidth={9}/><Line points={route} color="#688b8b" lineWidth={2}/>
+-      <mesh position={[.4,.37,-.02]}><cylinderGeometry args={[.145,.145,.22,24]}/><meshStandardMaterial color="#687d77" metalness={.7} roughness={.35}/></mesh>
+-      {active&&Array.from({length:24},(_,i)=>{
+-        const p=pointAlongStoryPath(route,(time*.48+i/24)%1)
+-        return <mesh key={i} position={p}><sphereGeometry args={[.018,7,5]}/><meshBasicMaterial color="#87e0de"/></mesh>
+-      })}
+-      {active&&<><mesh position={[.4,-depth,.14]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.08,.012,8,32]}/><meshBasicMaterial color="#a3e6dd"/></mesh><pointLight position={[.4,-depth,.2]} color="#9cded4" intensity={.12} distance={.35}/></>}
+-      <TreatmentEffects time={visualTime} depth={depth} showFire={false}/>
+-    </>}
+-  </group>
++  return <VibrationEffects time={time}/>
+ }
+diff --git a/src/alternatives/vibratory-injection/science.tsx b/src/alternatives/vibratory-injection/science.tsx
+index 261ff99..933ec3c 100644
+--- a/src/alternatives/vibratory-injection/science.tsx
++++ b/src/alternatives/vibratory-injection/science.tsx
+@@ -1,20 +1,13 @@
+ import { capabilities, parameterProvenance } from './model'
+ export function MethodScience() {
+   return <section data-method-science="4.2.4">
+-    <h3>4.2.4 · Vibratory drilling + continuous injection</h3>
+-    <p>The revised Site view reuses the original fire opening and illustrates vibrating access, disturbed soil, lateral liquid delivery at four depths and fading embers. Ground disturbance and the fire-out ending are authored cues, not computed mechanical or extinction outcomes.</p>
+-    <p>The separate, unchanged v21.2 comparison supplies finite water continuously to three independent hot specimens. It does not calculate infiltration or predict a treated peat field.</p>
+-    <p>The latest render also offers an experimental 1,280-cell reacting field, initialized from the existing assumed hot-peat scenario rather than the opening animation. Temperature, oxygen mole fraction and positive net liquid change (kg/cell) come from accepted conservative transport, phase-equilibrium and one-step oxidation states. These calculated views display the middle-y slice extruded over the cutaway, without authored equipment or bore geometry; liquid change is not a source tracer. The default 60 s calculation retains hot, reacting peat; the Site ending does not establish extinction.</p>
+-    <p>Private liquid source: Δm = min(remaining supply, prescribed flow × accepted Δt). Add normalized spatial weights of Δm to total water and Δm [4186(Tin − 273.15) + pinterface/1000] joules to thermal energy, then equilibrate. Interface absolute pressure is assumed equal to local gas pressure. Full inlet enthalpy enters once; no second pressure-work credit. Raw core ledgers and source-corrected residuals remain distinct.</p>
+-    <p>The private driver uses an accepted-step post-source split with complete outer rollback, finite depletion and advancing-tip event boundaries. Gas species transport and thermal conduction use the existing solver unchanged. Liquid infiltration, lateral jet flow, vibration energy, changing permeability and soil mechanics are unavailable. Numerical balance and sensitivity tests are not experimental validation.</p>
+-    <p>Modeled: {capabilities.modeled.join('; ')}. Experimentally validated: no. Loosening and compaction are competing hypotheses. No mechanical coupling changes permeability, oxygen or heat transfer.</p>
+-    <p><code>C = m cₚ; Q = (Tₚ − T𝓌)/(1/Cₚ + 1/C𝓌) × [1 − exp(−UA(1/Cₚ + 1/C𝓌) Δt)]</code>. Sensible exchange stops at 373.15 K before finite latent transfer. Water mass and vapor enthalpy remain in separate ledgers; no extra vibration energy or cooling is credited.</p>
+-    <p>Default supply: 0.5 kg at 0.025 kg/s from physical time 0, depleted at 20 s. Water starts at 293.15 K; each 0.5 kg specimen starts at 823.15 K. UA = 24 W/K per specimen is an assumption. Authored scene seconds have no mapping to physical contact seconds.</p>
+-    <details><summary>Parameter assumptions and units</summary><ul>{parameterProvenance.map(p => <li key={p.key}><strong>{p.key}</strong> · {p.default} {p.unit}. {p.basis}</li>)}</ul></details>
+-    <p>Unavailable: {capabilities.unavailable.join('; ')}. Lower specimen temperature cannot establish suppression, re-ignition resistance or an advantage from vibration.</p>
+-    <p>Reference water properties: <a href="https://iapws.org/technical-guidance/release/IAPWS-95" target="_blank" rel="noreferrer">IAPWS-95</a> and <a href="https://www.nist.gov/srd/nistir-5078" target="_blank" rel="noreferrer">NIST water/steam tables</a>. The existing constant-property approximation is retained; a full equation of state is not implemented.</p>
+-    <p><a href="https://doi.org/10.1029/2002WR001302" target="_blank" rel="noreferrer">Price (2003)</a> documents deformation-related hydraulic changes in peat. This is context for testing competing hypotheses, not a vibration calibration.</p>
+-    <p>Proposed, unperformed validation: measure mass and temperature balances first; then compare matched peat specimens with and without vibration, measuring deformation and conductivity separately. Keep calibration and validation data separate. No experimental result is claimed.</p>
+-    <p>Preliminary water-only cost example: <a href="https://www.ebmud.com/water/water-rates" target="_blank" rel="noreferrer">EBMUD other-use rate</a>, USD 9.07 per 100 cubic feet effective July 1, 2026. At approximately 2832 kg per unit, the default 0.5 kg supply costs about USD 0.0016 in volumetric water alone. This excludes service fees, energy, equipment and labor; no drilling-system total or operating-energy saving is available.</p>
++    <h3>4.2.4 · Vibratory drilling</h3>
++    <p>The current method is vibration only. It retains the original fire-spreading and drilling animation in one continuous world. The context holds at the inserted drill; authored oscillation and dust illustrate the concept. The requested ending depicts fractures, compression/rearrangement, settling and fading embers. This is a concept illustration, not calculated soil failure or extinction.</p>
++    <p>No physical vibration calculation or treatment comparison is available. Display motion does not calculate forces, strain, mechanical work, heat, oxygen transport, permeability change or suppression. No calculated extinction or re-ignition result is claimed.</p>
++    <p>A supported model requires a stated physical forcing boundary, work and energy coupling, measured cyclic peat constitutive and damping behavior across moisture, density and frequency ranges, and independent response measurements. These inputs have not been supplied. No constitutive constants or favorable permeability changes are invented.</p>
++    <p><a href="https://doi.org/10.1029/2002WR001302" target="_blank" rel="noreferrer">Price (2003)</a> provides measured peat deformation and hydraulic-conductivity context; it does not calibrate a vibration mechanism.</p>
++    <details><summary>Presentation assumptions</summary><ul>{parameterProvenance.map(p => <li key={p.key}><strong>{p.key}</strong> · {p.default} {p.unit}. {p.basis}</li>)}</ul></details>
++    <p>Unavailable: {capabilities.unavailable.join('; ')}. Experimentally validated: no.</p>
++    <p>The prior liquid/contact experiment and its numerical evidence are retained as inactive historical material. They do not describe the current vibration-only method and do not validate vibration.</p>
+   </section>
+ }
+diff --git a/src/alternatives/vibratory-injection/session.ts b/src/alternatives/vibratory-injection/session.ts
+index 4bb1741..599b545 100644
+--- a/src/alternatives/vibratory-injection/session.ts
++++ b/src/alternatives/vibratory-injection/session.ts
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ import type { FieldSettings, FieldState } from './field'
+ import type { FieldMessage } from './field.worker'
+ 
+diff --git a/src/alternatives/vibratory-injection/vibration-effects.tsx b/src/alternatives/vibratory-injection/vibration-effects.tsx
+new file mode 100644
+index 0000000..2f2c343
+--- /dev/null
++++ b/src/alternatives/vibratory-injection/vibration-effects.tsx
+@@ -0,0 +1,40 @@
++import { useLayoutEffect, useRef } from 'react'
++import { useThree } from '@react-three/fiber'
++import * as THREE from 'three'
++import { vibrationPose } from './vibration'
++
++const seed = (i: number) => { const n = Math.sin(i * 71.17 + 4.9) * 43758.5453; return n - Math.floor(n) }
++/** Bounded soil grains and dust, not a fracture or soil-response calculation.
++ * Declarative GPU resources belong to the reconciler and are disposed on unmount. */
++export function VibrationEffects({ time, enabled = true }: { time: number; enabled?: boolean }) {
++  const grains = useRef<THREE.InstancedMesh>(null), dust = useRef<THREE.InstancedMesh>(null)
++  const invalidate = useThree(s => s.invalidate), pose = vibrationPose(time, enabled)
++  useLayoutEffect(() => {
++    const object = new THREE.Object3D()
++    for (let i = 0; i < 48; i++) {
++      const age = (pose.time * .8 + seed(i)) % 1, angle = seed(i + 70) * Math.PI * 2
++      if (i < 32) {
++        const reach = .25 + age * (.25 + seed(i + 40) * .55)
++        object.position.set(.4 + Math.cos(angle) * reach, .025 + Math.sin(age * Math.PI) * .11 * pose.amount, -.02 + Math.sin(angle) * reach)
++      } else {
++        const side = i % 2 ? 1 : -1
++        object.position.set(.4 + side * (.28 + seed(i + 80) * .7) + Math.sin(pose.time * 28 + i) * .025 * pose.amount, -.28 - seed(i + 10) * 1.15 + Math.sin(pose.time * 31 + i) * .025 * pose.amount, .045)
++      }
++      object.rotation.set(i + pose.time, i * .7, pose.time * 1.2 + i)
++      object.scale.setScalar((.012 + seed(i + 30) * .018) * pose.amount)
++      object.updateMatrix(); grains.current?.setMatrixAt(i, object.matrix)
++    }
++    for (let i = 0; i < 24; i++) {
++      const age = (pose.time * .35 + seed(i + 120)) % 1, angle = seed(i + 150) * Math.PI * 2
++      object.position.set(.4 + Math.cos(angle) * (.25 + age * .55), .04 + age * .55, -.02 + Math.sin(angle) * (.25 + age * .5))
++      object.rotation.set(0, 0, 0); object.scale.setScalar((.035 + age * .10) * (1 - age) * pose.amount)
++      object.updateMatrix(); dust.current?.setMatrixAt(i, object.matrix)
++    }
++    for (const ref of [grains, dust]) if (ref.current) { ref.current.instanceMatrix.needsUpdate = true; ref.current.computeBoundingSphere() }
++    invalidate()
++  }, [pose.time, pose.amount, invalidate])
++  return <group position={pose.surfacePosition} scale={pose.groundScale} rotation={[0, 0, pose.groundTilt]} userData={{ role: 'authored vibration dust and soil grains; no calculated damage or suppression' }}>
++    <instancedMesh ref={grains} args={[undefined, undefined, 48]} raycast={() => null}><icosahedronGeometry args={[1, 0]}/><meshStandardMaterial color="#695237" roughness={1}/></instancedMesh>
++    <instancedMesh ref={dust} args={[undefined, undefined, 24]} raycast={() => null}><icosahedronGeometry args={[1, 1]}/><meshBasicMaterial color="#b0a185" transparent opacity={.10 * pose.amount} depthWrite={false}/></instancedMesh>
++  </group>
++}
+diff --git a/src/alternatives/vibratory-injection/vibration-scene.tsx b/src/alternatives/vibratory-injection/vibration-scene.tsx
+new file mode 100644
+index 0000000..a92533e
+--- /dev/null
++++ b/src/alternatives/vibratory-injection/vibration-scene.tsx
+@@ -0,0 +1,41 @@
++import { Children, cloneElement, Fragment, isValidElement, type ReactElement, type ReactNode } from 'react'
++import { FireSequenceScene } from '../../ui/FireSequenceScene'
++import { SequenceExcavator } from '../../ui/FireSequenceEquipment'
++import { VibrationEffects } from './vibration-effects'
++import { vibrationPose } from './vibration'
++import { CompactionEffects } from './compaction-effects'
++import { COMPACTION_GROUPS, CompactionPass } from './compaction-pass'
++
++export interface VibrationSceneProps { time: number; vibration: boolean; cameraDistance: number; resetToken: number }
++/** External composition of the preservation-locked, hook-free Canvas factory.
++ * Keep its ground, materials, fire, drill and camera. One hidden same-geometry
++ * fire-off reference supports the authored fade; no second Canvas/world,
++ * shader patch, numerical field or treatment source is introduced. */
++export function composeVibrationScene({ time, vibration, cameraDistance, resetToken }: VibrationSceneProps) {
++  const pose = vibrationPose(time, vibration)
++  const original = FireSequenceScene({ time: pose.contextTime, mode: 'rapid', view: 'natural', layers: { fire: true, gas: false, water: false, anatomy: true }, resetToken, realistic: true, straightBore: true, cinematic: true, connectedSupply: true, cameraDistance })
++  const children = Children.map(original.props.children as ReactNode, child => {
++    if (!isValidElement(child)) return child
++    const props = child.props as Record<string, unknown>
++    if (typeof props.fire === 'boolean' && typeof props.water === 'boolean') return <group key="vibration-ground" position={pose.surfacePosition} scale={pose.groundScale} rotation={[0, 0, pose.groundTilt]}>
++      <group name={COMPACTION_GROUPS.burning}>{child}</group>
++      <group name={COMPACTION_GROUPS.settled} visible={false}>{cloneElement(child as ReactElement<{fire:boolean}>, {fire:false})}</group>
++    </group>
++    if (child.type !== Fragment) return child
++    const context = child as ReactElement<{ children: ReactNode }>
++    const fireOnly: ReactNode[] = []
++    const world = Children.map(context.props.children, item => {
++      if (!isValidElement(item)) return item
++      if (item.type === SequenceExcavator) return <group key="vibration-tool" position={pose.toolPosition}>{item}</group>
++      if (typeof (item.props as Record<string,unknown>).visible === 'boolean') { fireOnly.push(item); return null }
++      // Let inherited drilling cuttings finish instead of freezing airborne grains.
++      if ('layers' in (item.props as object)) return cloneElement(item as ReactElement<{time:number}>, {time:Math.min(pose.time,34)})
++      return item
++    })
++    return <group key="vibration-context" position={pose.surfacePosition} rotation={[0, 0, pose.groundTilt]}>{cloneElement(context, undefined, world, <group key="fire-only" name={COMPACTION_GROUPS.fireOnly}>{Children.toArray(fireOnly)}</group>)}</group>
++  })
++  return cloneElement(original, undefined, children, <VibrationEffects key="vibration-effects" time={pose.time} enabled={vibration}/>, <CompactionEffects key="compaction-effects" time={pose.time} enabled={vibration}/>, <CompactionPass key="compaction-pass" progress={pose.emberFade}/>)
++}
++export function VibrationScene(props: VibrationSceneProps) {
++  return <div className="vib-scene" data-original-context-time={vibrationPose(props.time).contextTime} data-scene-continuity="single-original-canvas" data-treatment="vibration-only">{composeVibrationScene(props)}</div>
++}
+diff --git a/src/alternatives/vibratory-injection/vibration.ts b/src/alternatives/vibratory-injection/vibration.ts
+new file mode 100644
+index 0000000..3f47c5c
+--- /dev/null
++++ b/src/alternatives/vibratory-injection/vibration.ts
+@@ -0,0 +1,27 @@
++import { eased } from '../../story/fireSequence'
++
++/** Authored display motion only. No physical forcing, frequency, strain, work,
++ * permeability change or extinction is inferred from these display choices. */
++export const VIBRATION_TIMELINE = { start: 27, rampEnd: 33, holdContext: 33, taperStart: 68, stop: 74, end: 90 } as const
++export function vibrationPose(time: number, enabled = true) {
++  const t = Number.isFinite(time) ? Math.max(0, Math.min(VIBRATION_TIMELINE.end, time)) : 0
++  const amount = enabled ? eased(t, VIBRATION_TIMELINE.start, VIBRATION_TIMELINE.rampEnd) * (1 - eased(t, VIBRATION_TIMELINE.taperStart, VIBRATION_TIMELINE.stop)) : 0
++  const x = amount * (.026 * Math.sin(t * 26) + .009 * Math.sin(t * 39))
++  const y = amount * .014 * Math.sin(t * 31)
++  const fracture = enabled ? eased(t, 33, 46) : 0
++  const compression = enabled ? eased(t, 44, 68) : 0
++  const emberFade = enabled ? eased(t, 50, 74) : 0
++  const shrink = compression * .028
++  return {
++    time: t, contextTime: Math.min(t, VIBRATION_TIMELINE.holdContext), amount, fracture, compression, emberFade,
++    groundScale: [1, 1 - shrink, 1] as [number, number, number],
++    surfacePosition: [x, y - 3.2 * shrink, 0] as [number, number, number],
++    groundPosition: [x, y, 0] as [number, number, number],
++    groundTilt: amount * .0025 * Math.sin(t * 23),
++    toolPosition: [amount * .024 * Math.sin(t * 35), amount * .022 * Math.sin(t * 29), 0] as [number, number, number],
++  }
++}
++export function vibrationStage(time: number, enabled = true) {
++  if (!enabled) return time < 10 ? 'Surface ignition' : time < 18 ? 'Fire enters the peat' : time < 24 ? 'Excavator approaches' : time < 33 ? 'Original drilling · vibration off' : 'Original fire & inserted drill · vibration off'
++  return time < 10 ? 'Surface ignition' : time < 18 ? 'Fire enters the peat' : time < 24 ? 'Excavator approaches' : time < 33 ? 'Drilling · vibration builds' : time < 44 ? 'Fractures open' : time < 62 ? 'Soil compresses & rearranges' : time < 74 ? 'Embers fade as the soil settles' : 'Illustrated fire-out · inspect the peat'
++}
+diff --git a/src/alternatives/vibratory-injection/visuals.ts b/src/alternatives/vibratory-injection/visuals.ts
+index f2efd4e..fec3320 100644
+--- a/src/alternatives/vibratory-injection/visuals.ts
++++ b/src/alternatives/vibratory-injection/visuals.ts
+@@ -1,3 +1,4 @@
++/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
+ /** Authored treatment choreography. These values never enter the field solver.
+  * Seconds, amplitudes and wetting extent are display choices, not predictions. */
+ const smooth=(a:number,b:number,t:number)=>{const x=Math.max(0,Math.min(1,(t-a)/(b-a)));return x*x*(3-2*x)}
+diff --git a/src/alternatives/vibratory-injection/workspace.css b/src/alternatives/vibratory-injection/workspace.css
+index aeca29f..f2d92d8 100644
+--- a/src/alternatives/vibratory-injection/workspace.css
++++ b/src/alternatives/vibratory-injection/workspace.css
+@@ -1,8 +1,3 @@
+-.vib-workspace{position:relative;height:100svh;min-height:650px;background:#000;color:#e4e7dd;overflow:hidden;font-family:Inter,system-ui,sans-serif}.vib-scene,.vib-scene-layer{position:absolute;inset:0}.vib-scene-layer canvas{touch-action:none}.vib-heading{position:absolute;top:93px;left:4.5%;pointer-events:none;max-width:520px}.vib-heading>span,.vib-eyebrow{font-size:10px;letter-spacing:.17em;color:#a6afa5}.vib-heading h1{font-size:clamp(30px,3.2vw,48px);font-weight:450;line-height:1.08;letter-spacing:-.045em;margin:12px 0}.vib-heading p{font-size:13px;color:#b6bcb2;margin:0}.vib-status{position:absolute;top:94px;right:4.5%;display:flex;align-items:center;gap:9px;font-size:10px;color:#a5ada3}.vib-status i{width:5px;height:5px;border-radius:50%;background:#ae976b}.vib-status i.complete{background:#88b6a2}.vib-status i.failed{background:#d29773}.vib-status button{background:none;border:1px solid #ffffff24;color:#c4ccc2;border-radius:5px;padding:8px;cursor:pointer}.vib-view-tabs{position:absolute;left:4.5%;top:220px;display:flex;gap:4px}.vib-view-tabs button{border:1px solid transparent;background:#0e1513c9;color:#9fa99e;font-size:10px;padding:7px 10px;border-radius:4px;cursor:pointer}.vib-view-tabs button[aria-pressed=true]{color:#deebe3;background:#25342d;border-color:#67847380}.vib-readouts{position:absolute;top:177px;right:4.5%;width:206px;padding:16px 18px;background:linear-gradient(110deg,#0a0e0cdc,#0a0d0bc9);border:1px solid #bfcdb31c;border-radius:8px;pointer-events:none}.vib-readouts .vib-eyebrow{font-size:8px;letter-spacing:.12em}.vib-readouts>div{display:flex;flex-direction:column;gap:4px;margin-top:18px}.vib-readouts small{font-size:9px;color:#909e91}.vib-readouts strong{font-size:24px;line-height:1;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:-.035em}.vib-readouts em{font-size:12px;font-style:normal;color:#99a59a;margin-left:3px}.vib-readouts svg{width:100%;height:43px;margin-top:20px}.vib-readouts>small{font-size:8px}.vib-transport{position:absolute;bottom:25px;left:4.5%;right:4.5%;padding:14px 18px 10px;background:#0a100de8;border:1px solid #bfcdb326;border-radius:8px;backdrop-filter:blur(12px)}.vib-transport-head{display:flex;justify-content:space-between;font-size:11px;color:#d6ded2}.vib-transport-head small{font-size:9px;color:#8b988c}.vib-play-row{display:flex;align-items:center;gap:12px;margin-top:12px}.vib-play-row button{background:none;border:none;color:#d4e1d7;padding:5px;cursor:pointer}.vib-play-row input{flex:1;min-width:40px;accent-color:#8ba293;height:3px;cursor:pointer}.vib-play-row>span{min-width:92px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}.vib-play-row small{color:#89968b;font-size:10px}.vib-bottom-note{display:flex;justify-content:space-between;gap:12px;color:#7e8d80;font-size:8px;margin-top:12px}.vib-bottom-note button{background:none;border:none;color:#aebcab;font-size:9px;cursor:pointer;padding:0}.vib-error{position:absolute;left:4.5%;bottom:155px;max-width:500px;font-size:12px;color:#d7b499;background:#201a13e8;padding:12px;border-radius:5px}.vib-error button{color:inherit;background:none;border:1px solid #ffffff30;border-radius:3px;cursor:pointer}.vib-tools{color:#c8d3c9;font-size:12px;line-height:1.7;padding:8px 0}.vib-tools h3{font-size:16px;font-weight:500}.vib-tools h4{font-size:12px}.vib-tools>label{display:block;margin:18px 0;color:#d5ded3}.vib-tools strong{float:right;font-size:11px;font-weight:400;color:#9fae9f}.vib-tools input[type=range]{display:block;width:100%;margin-top:10px;accent-color:#8ca795}.vib-tools .vib-check{display:flex;align-items:center;gap:9px}.vib-tools input[type=checkbox]{accent-color:#8ca795}.vib-tools>button{display:block;background:#1a251d;border:1px solid #a1b19430;color:#cbd9c6;border-radius:5px;padding:9px 12px;margin:10px 0;cursor:pointer}.vib-tools a{color:#b6d1c4}.vib-workspace button:focus-visible,.vib-workspace input:focus-visible,.vib-tools button:focus-visible,.vib-tools input:focus-visible{outline:2px solid #b4d5c6;outline-offset:4px}
+-@media(max-width:800px){.vib-heading{top:83px;left:5%;max-width:72%}.vib-heading h1{font-size:30px}.vib-status{top:188px;right:5%;font-size:8px}.vib-view-tabs{top:224px;left:5%;gap:2px}.vib-view-tabs button{font-size:9px;padding:6px}.vib-readouts{top:270px;right:5%;width:130px;padding:12px}.vib-readouts .vib-eyebrow{font-size:7px}.vib-readouts>div{margin-top:12px}.vib-readouts strong{font-size:20px}.vib-readouts svg,.vib-readouts>small{display:none}.vib-transport{left:4%;right:4%;bottom:16px;padding:12px}.vib-transport-head small{display:none}.vib-bottom-note>span{max-width:70%;line-height:1.4}.vib-play-row{gap:6px}.vib-play-row>span{min-width:72px;font-size:10px}}
+-
+-.vib-site-key{position:absolute;right:4.5%;top:200px;width:190px;padding:15px 18px;border-left:1px solid #7faba250;color:#a7b6aa;background:linear-gradient(90deg,#0a1211c9,transparent);pointer-events:none}.vib-site-key>span{font-size:8px;letter-spacing:.14em;color:#9dc7b9}.vib-site-key p{font-size:12px;line-height:1.8;margin:12px 0}.vib-site-key small{display:block;font-size:9px;line-height:1.6;color:#7f978a}@media(max-width:800px){.vib-site-key{top:270px;right:5%;width:128px;padding:10px}.vib-site-key p{font-size:10px}.vib-site-key small{font-size:8px}}
+-
+-.vib-pending{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);max-width:380px;text-align:center;color:#c2d4c8}.vib-pending strong{font-size:14px;font-weight:400}.vib-pending p{font-size:11px;line-height:1.7;color:#7e9989}.vib-slice-label{font-size:9px;line-height:1.6;color:#a7baad;margin:12px 0 6px}
+-
+-@media(max-height:760px){.vib-readouts svg,.vib-readouts>small:last-child{display:none}.vib-readouts>div{margin-top:11px}.vib-readouts strong{font-size:21px}}
++.vib-workspace{position:relative;height:100svh;min-height:360px;background:#000;color:#e4e7dd;overflow:hidden;font-family:Inter,system-ui,sans-serif}.vib-scene{position:absolute;inset:0}.vib-scene canvas{touch-action:none}.vib-heading{position:absolute;top:82px;left:4.5%;pointer-events:none;max-width:min(480px,76%)}.vib-heading>span{font-size:10px;letter-spacing:.17em;color:#a6afa5}.vib-heading h1{font-size:clamp(28px,3vw,42px);font-weight:450;line-height:1.08;letter-spacing:-.045em;margin:12px 0}.vib-heading p{font-size:13px;color:#b6bcb2;margin:0}.vib-status{position:absolute;top:86px;right:4.5%;display:flex;align-items:center;gap:9px;font-size:10px;color:#a5ada3}.vib-status i{width:5px;height:5px;border-radius:50%;background:#8a8b79}.vib-status i.active{background:#cbb27e}.vib-status button{background:#0b100bc9;border:1px solid #ffffff24;color:#c4ccc2;border-radius:5px;padding:8px;cursor:pointer}.vib-shortcuts{position:absolute;left:4.5%;top:206px;display:flex;align-items:center;gap:14px;font-size:10px;color:#acb5a9}.vib-shortcuts button{background:#172119d9;border:1px solid #8eaa8030;color:#cadbc4;padding:8px 11px;border-radius:4px;cursor:pointer}.vib-shortcuts label{display:flex;align-items:center;gap:5px}.vib-shortcuts input{accent-color:#9bae89}.vib-site-key{position:absolute;right:4.5%;top:200px;width:164px;padding:15px 18px;border-left:1px solid #9f967c50;color:#b4b6a7;background:linear-gradient(90deg,#10120ac9,transparent);pointer-events:none}.vib-site-key>span{font-size:8px;letter-spacing:.14em;color:#c2b890}.vib-site-key p{font-size:12px;line-height:1.8;margin:12px 0}.vib-site-key small{display:block;font-size:9px;line-height:1.6;color:#8d977f}.vib-transport{position:absolute;bottom:25px;left:4.5%;right:4.5%;padding:14px 18px 10px;background:#0a100de8;border:1px solid #bfcdb326;border-radius:8px;backdrop-filter:blur(12px)}.vib-transport-head{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#d6ded2}.vib-transport-head small{font-size:9px;color:#8b988c}.vib-play-row{display:flex;align-items:center;gap:12px;margin-top:12px}.vib-play-row button{background:none;border:none;color:#d4e1d7;padding:5px;cursor:pointer}.vib-play-row input{flex:1;min-width:40px;accent-color:#a7ac89;height:3px;cursor:pointer}.vib-play-row>span{min-width:92px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}.vib-play-row small{color:#89968b;font-size:10px}.vib-bottom-note{display:flex;justify-content:space-between;gap:12px;color:#7e8d80;font-size:8px;margin-top:12px}.vib-bottom-note button{background:none;border:none;color:#aebcab;font-size:9px;cursor:pointer;padding:0}.vib-tools{color:#c8d3c9;font-size:12px;line-height:1.7;padding:8px 0}.vib-tools h3{font-size:16px;font-weight:500}.vib-tools>label{display:block;margin:18px 0;color:#d5ded3}.vib-tools input[type=range]{display:block;width:100%;margin-top:10px;accent-color:#8ca795}.vib-tools .vib-check{display:flex;align-items:center;gap:9px}.vib-tools input[type=checkbox]{accent-color:#8ca795}.vib-tools>button{display:block;background:#1a251d;border:1px solid #a1b19430;color:#cbd9c6;border-radius:5px;padding:9px 12px;margin:10px 0;cursor:pointer}.vib-tools>button:disabled{opacity:.5;cursor:default}.vib-tools a{color:#b6d1c4}.vib-workspace button:focus-visible,.vib-workspace input:focus-visible,.vib-tools button:focus-visible,.vib-tools input:focus-visible{outline:2px solid #b4d5c6;outline-offset:4px}
++@media(max-width:800px){.vib-heading{top:78px;left:5%;max-width:85%}.vib-heading h1{font-size:30px}.vib-heading>span{font-size:8px}.vib-status{top:192px;right:5%;font-size:8px}.vib-shortcuts{top:190px;left:5%;gap:8px;font-size:9px}.vib-shortcuts button{font-size:9px;padding:7px}.vib-site-key{top:250px;right:5%;width:115px;padding:10px}.vib-site-key p{font-size:10px}.vib-site-key small{font-size:8px}.vib-transport{left:4%;right:4%;bottom:16px;padding:12px}.vib-transport-head small{display:none}.vib-play-row{gap:6px}.vib-play-row>span{min-width:72px;font-size:10px}}
++@media(max-height:600px){.vib-heading{top:70px}.vib-heading h1{font-size:28px}.vib-heading p,.vib-site-key{display:none}.vib-status{top:72px}.vib-shortcuts{top:150px}.vib-transport{bottom:10px;padding:9px 12px}.vib-bottom-note{margin-top:6px}}
+diff --git a/src/alternatives/vibratory-injection/workspace.tsx b/src/alternatives/vibratory-injection/workspace.tsx
+index 7489da3..f35c4cd 100644
+--- a/src/alternatives/vibratory-injection/workspace.tsx
++++ b/src/alternatives/vibratory-injection/workspace.tsx
+@@ -1,94 +1,48 @@
+-import { useEffect, useRef, useState } from 'react'
++import { useEffect, useState } from 'react'
+ import { Pause, Play, RotateCcw, SlidersHorizontal } from 'lucide-react'
+ import { FinderPortal, ToolboxPortal, useCinematicUI } from '../../ui/CinematicUI'
+-import { FIELD_DEFAULTS, type FieldSettings } from './field'
+-import type { FieldMessage } from './field.worker'
+-import { VibratoryFieldScene, type FieldView } from './field-scene'
+-import { fieldRequestKey, pendingFieldSession, receiveFieldMessage, visibleFieldSession } from './session'
++import { advancePresentationTime } from '../../story/firePresentation'
++import { VibrationScene } from './vibration-scene'
++import { vibrationPose, vibrationStage, VIBRATION_TIMELINE } from './vibration'
++import { MethodScience } from './science'
+ import './workspace.css'
+ 
+-const number=(value:number,places=2)=>value.toLocaleString(undefined,{maximumFractionDigits:places})
+-const physicalAt=(sceneTime:number)=>Math.min(60,Math.max(0,(sceneTime-24)*2))
+-function stageAt(time:number){return time<10?'Surface ignition':time<24?'Fire enters the peat':time<31?'Vibratory drilling':time<43?'Inject outward at multiple depths':time<54?'Wet peat · fading embers':'Treatment complete · inspect the field'}
+-
+-export default function VibratoryWorkspace({onCompare,onDetails}:{onCompare:()=>void;onDetails:()=>void}) {
+-  const {open,panel}=useCinematicUI()
+-  const [settings,setSettings]=useState<FieldSettings>({...FIELD_DEFAULTS})
+-  const [generation,setGeneration]=useState(0)
+-  const requestKey=fieldRequestKey(settings,generation)
+-  const [session,setSession]=useState(()=>pendingFieldSession(requestKey))
+-  const {history,status,error}=visibleFieldSession(session,requestKey)
+-  const [time,setTime]=useState(0),[playing,setPlaying]=useState(false),[view,setView]=useState<FieldView>('natural')
+-  const [vibration,setVibration]=useState(true),[cameraDistance,setCameraDistance]=useState(15.75),[resetToken,setResetToken]=useState(0)
+-  const available=useRef(24),statusRef=useRef(status),workerRef=useRef<Worker|null>(null)
+-  useEffect(()=>{
+-    const worker=new Worker(new URL('./field.worker.ts',import.meta.url),{type:'module'})
+-    const jobId=crypto.randomUUID();workerRef.current=worker
+-    setSession(pendingFieldSession(requestKey));statusRef.current='calculating';setTime(0);setPlaying(false);available.current=24
+-    worker.onmessage=(event:MessageEvent<FieldMessage>)=>{
+-      const message=event.data
+-      if(message.jobId!==jobId||workerRef.current!==worker)return
+-      setSession(previous=>receiveFieldMessage(previous,requestKey,message))
+-      if(message.state)available.current=Math.max(available.current,24+message.state.timeS/2)
+-      if(message.type==='complete'){statusRef.current='complete';available.current=90;workerRef.current=null;worker.terminate()}
+-      if(message.type==='failed'){statusRef.current='failed';setPlaying(false);workerRef.current=null;worker.terminate()}
+-    }
+-    worker.onerror=event=>{if(workerRef.current!==worker)return;setSession(previous=>receiveFieldMessage(previous,requestKey,{jobId,type:'failed',error:event.message||'The calculation worker stopped.'}));statusRef.current='failed';setPlaying(false);workerRef.current=null;worker.terminate()}
+-    worker.postMessage({jobId,settings})
+-    return()=>{workerRef.current=null;worker.terminate()}
+-  },[settings,generation,requestKey])
+-  useEffect(()=>{if(panel)setPlaying(false)},[panel])
+-  useEffect(()=>{
+-    if(!playing)return
+-    let request=0,last=performance.now(),elapsed=0
+-    const tick=(now:number)=>{
+-      elapsed+=Math.min(.1,(now-last)/1000);last=now
+-      if(elapsed>=1/30){const step=elapsed;elapsed=0;setTime(t=>Math.min(statusRef.current==='complete'?90:available.current,t+step*(t<18?2.8:1.4)))}
+-      request=requestAnimationFrame(tick)
++const number = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 1 })
++export default function VibratoryWorkspace({ onDetails }: { onCompare: () => void; onDetails: () => void }) {
++  const { open, panel } = useCinematicUI()
++  const [time, setTime] = useState(0), [playing, setPlaying] = useState(false)
++  const [vibration, setVibration] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
++  const [cameraDistance, setCameraDistance] = useState(15.75), [resetToken, setResetToken] = useState(0)
++  useEffect(() => { if (panel) setPlaying(false) }, [panel])
++  useEffect(() => {
++    if (!playing) return
++    let request = 0, last = performance.now(), elapsed = 0
++    const tick = (now: number) => {
++      elapsed += Math.min(.1, (now - last) / 1000); last = now
++      if (elapsed >= 1 / 30) { const step = elapsed; elapsed = 0; setTime(t => advancePresentationTime(t, step, 1)) }
++      request = requestAnimationFrame(tick)
+     }
+-    request=requestAnimationFrame(tick)
+-    return()=>cancelAnimationFrame(request)
+-  },[playing])
+-  useEffect(()=>{if(time>=90)setPlaying(false)},[time])
+-  const target=physicalAt(time),state=[...history].reverse().find(s=>s.timeS<=target+1e-8)??history[0]
+-  const latest=history.at(-1),inField=time>=24||view!=='natural'
+-  const config=(key:'waterKg'|'flowKgS'|'inletK',value:number)=>setSettings(s=>({...s,[key]:value}))
+-  const cancel=()=>{workerRef.current?.terminate();workerRef.current=null;setSession(previous=>({...visibleFieldSession(previous,requestKey),status:'cancelled'}));statusRef.current='cancelled';setPlaying(false)}
+-  const chart=history.map(s=>`${s.timeS/60*240},${44-Math.min(1,Math.max(0,(s.maximumK-280)/300))*40}`).join(' ')
+-  return <div className="vib-workspace" data-render-variant="vibratory-injection" data-vibratory-version="2" data-worker-status={status}>
+-    <VibratoryFieldScene time={time} state={state} view={view} vibration={vibration} enabled={settings.enabled&&settings.waterKg>0&&settings.flowKgS>0} cameraDistance={cameraDistance} resetToken={resetToken}/>
+-    <header className="vib-heading"><span>4.2.4 / EARTHQUAKE EXTINGUISHER</span><h1>Drill. Vibrate. Inject.</h1><p>Continuous liquid delivery into reacting peat.</p></header>
+-    <div className="vib-status"><i className={status}/><span>{status==='calculating'?`Calculating · ${number(latest?.timeS??0,0)} / 60 s`:status==='complete'?'Field calculation complete':status==='cancelled'?'Calculation cancelled':'Calculation stopped'}</span><button aria-label="Open earthquake simulation settings" onClick={()=>open('toolbox')}><SlidersHorizontal size={17}/></button></div>
+-    <div className="vib-view-tabs" role="group" aria-label="Earthquake field view">{(['natural','temperature','oxygen','water'] as const).map(id=><button key={id} aria-pressed={view===id} onClick={()=>{setView(id);if(time<24)setTime(24)}}>{id==='natural'?'Site':id==='water'?'Liquid change':id[0].toUpperCase()+id.slice(1)}</button>)}</div>
+-    {inField&&!state&&<div className="vib-pending" role="status" data-field-state={status}><strong>{status==='failed'?'Field calculation failed':status==='cancelled'?'Field calculation cancelled':'Preparing the first accepted field state…'}</strong><p>{status==='calculating'?'The calculated view will appear when a physical state is accepted.':'No accepted field is available. Recalculate to try again.'}</p></div>}
+-    {inField&&view==='natural'&&state&&<aside className="vib-site-key"><span>ILLUSTRATIVE TREATMENT</span><p>Vibrating access<br/>Injection at multiple depths<br/>Wetting and fading embers</p><small>Switch views to inspect the calculated field.</small></aside>}
+-    {inField&&view!=='natural'&&state&&<aside className="vib-readouts" aria-label="Accepted physical field measurements">
+-      <span className="vib-eyebrow">CALCULATED FIELD · EXPERIMENTAL</span>
+-      <p className="vib-slice-label">Middle-y slice · row {Math.floor(state.grid.ny/2)+1}/{state.grid.ny}<br/>{view==='water'?'Positive net liquid change · kg/cell':view==='oxygen'?'Oxygen · gas mole fraction':'Temperature · °C'}</p>
+-      {view==='water'&&<small>0 to ≥0.15 kg/cell · not a source tracer</small>}
+-      <div><small>Physical time</small><strong>{number(state.timeS,1)} <em>s</em></strong></div>
+-      <div><small>Peak field temperature</small><strong>{number(state.maximumK-273.15,1)} <em>°C</em></strong></div>
+-      <div><small>Liquid delivered</small><strong>{number(state.deliveredKg,3)} <em>kg</em></strong></div>
+-      <div><small>Reservoir remaining</small><strong>{number(state.remainingKg,3)} <em>kg</em></strong></div>
+-      <svg viewBox="0 0 240 48" role="img" aria-label="Calculated peak temperature history"><line x1="0" x2="240" y1="46" y2="46" stroke="#ffffff20"/><polyline points={chart} fill="none" stroke="#d99b67" strokeWidth="1.5"/></svg>
+-      <small>Peak temperature · accepted history, 0–60 s</small>
+-    </aside>}
+-    {error&&<div className="vib-error" role="status">{error} {history.length?'Last accepted states are retained.':'No accepted field state is available.'} <button onClick={()=>setGeneration(n=>n+1)}>Recalculate</button></div>}
+-    <footer className="vib-transport"><div className="vib-transport-head"><span>{view==='natural'?stageAt(time):state?`Accepted physical time · ${number(state.timeS,1)} s`:'Waiting for an accepted field'}</span><small>{inField?(view==='natural'?'Illustrative treatment sequence':state?'Calculated reacting peat slice':'Field pending'):'Original 4.2.3 fire animation'}</small></div>
+-      <div className="vib-play-row"><button aria-label={playing?'Pause earthquake animation':'Play earthquake animation'} onClick={()=>{if(time>=90)setTime(0);setPlaying(p=>!p)}}>{playing?<Pause size={20}/>:<Play size={20}/>}</button><button aria-label="Restart earthquake animation" onClick={()=>{setTime(0);setPlaying(false);setResetToken(n=>n+1)}}><RotateCcw size={17}/></button><input aria-label="Earthquake animation time" type="range" min={0} max={90} step={.1} value={time} onChange={e=>{setPlaying(false);setTime(Math.min(Number(e.target.value),available.current))}}/><span>{number(time,1)} <small>/ 90 s</small></span></div>
+-      <div className="vib-bottom-note"><span>{view==='natural'?'Ground motion and fire-out choreography are illustrative.':state?'Middle-y slice extruded for display · authored equipment and bore excluded.':'No calculated field is displayed yet.'}</span><button onClick={()=>open('toolbox')}>Model & limits ↗</button></div>
++    request = requestAnimationFrame(tick)
++    return () => cancelAnimationFrame(request)
++  }, [playing])
++  useEffect(() => { if (time >= VIBRATION_TIMELINE.end) setPlaying(false) }, [time])
++  const pose = vibrationPose(time, vibration)
++  return <div className="vib-workspace" data-render-variant="vibratory-injection" data-vibratory-version="3" data-treatment="vibration-only" data-prediction="unavailable">
++    <VibrationScene time={time} vibration={vibration} cameraDistance={cameraDistance} resetToken={resetToken}/>
++    <header className="vib-heading"><span>4.2.4 / EARTHQUAKE EXTINGUISHER</span><h1>Drill. Shake. Settle.</h1><p>Soil compression & rearrangement.</p></header>
++    <div className="vib-status"><i className={pose.amount > 0 ? 'active' : ''}/><span>{!vibration ? 'Original context · vibration off' : pose.amount > 0 ? 'Vibration active' : time >= 74 ? 'Illustrated fire-out' : 'Fire & drilling sequence'}</span><button aria-label="Open earthquake simulation settings" onClick={() => open('toolbox')}><SlidersHorizontal size={17}/></button></div>
++    <div className="vib-shortcuts"><button onClick={() => { setVibration(true); setTime(38); setPlaying(true) }}>See vibration ↗</button><label><input type="checkbox" checked={vibration} onChange={e => setVibration(e.target.checked)}/>Show vibration</label></div>
++    <aside className="vib-site-key"><span>{vibration ? 'ILLUSTRATIVE MECHANISM' : 'VIBRATION OFF'}</span>{vibration ? <p>Fractures spread<br/>Soil compresses & settles<br/>Embers fade</p> : <p>Original fire & drilling context<br/>No illustrated compression or fire-out</p>}<small>Vibration only · no water.<br/>Suppression is not predicted.</small></aside>
++    <footer className="vib-transport"><div className="vib-transport-head"><span>{vibrationStage(time,vibration)}</span><small>{!vibration || time < 27 ? 'Original fire & drilling animation' : 'Illustrative vibration sequence'}</small></div>
++      <div className="vib-play-row"><button aria-label={playing ? 'Pause earthquake animation' : 'Play earthquake animation'} onClick={() => { if (time >= 90) setTime(0); setPlaying(p => !p) }}>{playing ? <Pause size={20}/> : <Play size={20}/>}</button><button aria-label="Restart earthquake animation" onClick={() => { setTime(0); setPlaying(false); setResetToken(n => n + 1) }}><RotateCcw size={17}/></button><input aria-label="Earthquake animation time" type="range" min={0} max={90} step={.1} value={time} onChange={e => { setPlaying(false); setTime(Number(e.target.value)) }}/><span>{number(time)} <small>/ 90 s</small></span></div>
++      <div className="vib-bottom-note"><span>Concept illustration · suppression unverified</span><button onClick={() => open('toolbox')}>Model & limits ↗</button></div>
+     </footer>
+-    <ToolboxPortal><section className="vib-tools"><h3>Earthquake Extinguisher · version 2</h3><p>Original fire opening, then an independently calculated 1,280-cell peat field with continuous finite liquid delivery. The ignition animation is illustrative; the treatment calculation begins from the inherited hot-peat initial condition.</p>
+-      {status==='calculating'?<button onClick={cancel}>Cancel calculation</button>:<button onClick={()=>setGeneration(n=>n+1)}>Recalculate field</button>}
+-      <label className="vib-check"><input type="checkbox" checked={settings.enabled} onChange={e=>setSettings(s=>({...s,enabled:e.target.checked}))}/>Continuous injection</label>
+-      <label>Total liquid supply <strong>{number(settings.waterKg)} kg</strong><input aria-label="Field liquid inventory" type="range" min={0} max={2} step={.05} value={settings.waterKg} onChange={e=>config('waterKg',Number(e.target.value))}/></label>
+-      <label>Prescribed liquid flow <strong>{number(settings.flowKgS,3)} kg/s</strong><input aria-label="Field liquid flow" type="range" min={0} max={.05} step={.005} value={settings.flowKgS} onChange={e=>config('flowKgS',Number(e.target.value))}/></label>
+-      <label>Inlet temperature <strong>{number(settings.inletK-273.15,1)} °C</strong><input aria-label="Field inlet temperature" type="range" min={273.15} max={323.15} step={1} value={settings.inletK} onChange={e=>config('inletK',Number(e.target.value))}/></label>
+-      <label className="vib-check"><input type="checkbox" checked={vibration} onChange={e=>setVibration(e.target.checked)}/>Show illustrative vibration</label><p>The Site view follows the reference sketch: shaking soil, disturbed clods, four lateral injection levels, wetting and disappearing embers. These are authored motion and treatment cues. Compaction, loosening, permeability changes, lateral liquid migration and drill forces are not calculated. The numerical liquid source is deposited at the prescribed advancing tip.</p>
+-      <label>Camera distance <input aria-label="Earthquake camera distance" type="range" min={5} max={19} step={.05} value={cameraDistance} onChange={e=>setCameraDistance(Number(e.target.value))}/></label><button onClick={()=>setResetToken(n=>n+1)}>Reset camera</button>
+-      <h4>Conservation at the displayed physical time</h4>{state&&<p>Mass residual {state.massResidualKg.toExponential(2)} kg. Energy residual {state.energyResidualJ.toExponential(2)} J. Imported enthalpy {number(state.inletEnergyJ)} J, including {number(state.liquidFlowWorkJ)} J of flow work. Water-species residual {state.waterSpeciesResidualKg.toExponential(2)} kg.</p>}
+-      <p>The calculated default 60 s run retains hot, reacting peat. The illustrative fire-out is not a calculated extinction result. Calculated modes show the middle-y slice extruded over the cutaway, with authored equipment and bore geometry excluded. Liquid change is max(0,current liquid−initial liquid), in kg/cell; it includes phase redistribution and is not a source tracer. No treatment ranking or experimental validation is claimed.</p><button onClick={onCompare}>Compare supported contact components ↗</button><button onClick={onDetails}>Equations and evidence ↗</button>
++    <ToolboxPortal><section className="vib-tools"><h3>Earthquake Extinguisher · vibration only</h3><p>One continuous original scene follows the fire into the peat and drills the bore. Vibration builds smoothly during drilling, with shaking ground, auger motion and dust. Authored fractures spread, the ground settles and ember colors fade during the proposed compression/rearrangement mechanism. The original world holds at the inserted drill before its unrelated later treatment stages.</p>
++      <label className="vib-check"><input type="checkbox" checked={vibration} onChange={e => setVibration(e.target.checked)}/>Show illustrative vibration</label>
++      <label>Camera distance<input aria-label="Earthquake camera distance" type="range" min={5} max={19} step={.05} value={cameraDistance} onChange={e => setCameraDistance(Number(e.target.value))}/></label><button onClick={() => setResetToken(n => n + 1)}>Reset camera</button>
++      <p>The visible shaking and dust are authored. Forces, mechanical work, cyclic peat response, permeability changes and fire suppression are unavailable for prediction. The illustrated fire-out is requested choreography, not a calculated result.</p>
++      <button disabled title="A supported vibration mechanics model is required">Vibration comparison unavailable</button><button onClick={onDetails}>Method details & evidence ↗</button>
+     </section></ToolboxPortal>
+-    <FinderPortal><section className="vib-tools"><h3>4.2.4 · Vibratory drilling + continuous injection</h3><p>This revision uses the original initial fire animation without editing it. The following scene renders accepted spatial temperature, oxygen and liquid fields from the existing conservative gas/thermal/reaction solver with a new external liquid source.</p><p>One-step inherited peat oxidation; constant-property water calorics; ideal-gas/Darcy validity limits. Source mass and inlet enthalpy enter once. The liquid source follows assumed access geometry. Field liquid migration and vibration-induced mechanics remain unavailable.</p><p><a href="https://iapws.org/technical-guidance/release/IAPWS-95" target="_blank" rel="noreferrer">IAPWS reference properties</a> support auditing the inherited simplified water approximation; a full IAPWS equation of state is not implemented. <a href="https://doi.org/10.1071/WF16198" target="_blank" rel="noreferrer">Huang & Rein (2017)</a> provides peat-fire context; this reduced one-step field does not reproduce that multistep experiment.</p><button onClick={onDetails}>Read method evidence ↗</button></section></FinderPortal>
++    <FinderPortal><section className="vib-tools"><MethodScience/></section></FinderPortal>
+   </div>
+ }
+diff --git a/tests/alternativeSceneComposition.test.tsx b/tests/alternativeSceneComposition.test.tsx
+index a7e840b..65c714c 100644
+--- a/tests/alternativeSceneComposition.test.tsx
++++ b/tests/alternativeSceneComposition.test.tsx
+@@ -8,7 +8,7 @@ describe('external original-scene composition', () => {
+   it('retains the original Canvas props and authored children, adding world objects in the same scene', () => {
+     const composed = AlternativeScene({id:'pressure-only',time:65,resetToken:7,cameraDistance:12})
+     const scene = composed.props.children
+-    const baseline = FireSequenceScene({time:38,mode:'rapid',view:'natural',layers:{fire:true,gas:false,water:false,anatomy:true},resetToken:7,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:12})
++    const baseline = FireSequenceScene({time:57,mode:'rapid',view:'natural',layers:{fire:true,gas:true,water:false,anatomy:true},resetToken:7,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:12})
+     expect(scene.type).toBe(Canvas)
+     const {children:actualChildren,...actualProps} = scene.props
+     const {children:originalChildren,...originalProps} = baseline.props
+@@ -22,7 +22,7 @@ describe('external original-scene composition', () => {
+ 
+   it('reuses the original introduction only, without entering its treatment sequence', () => {
+     for (const [time,context] of [[-1,0],[12,12],[38,38],[90,38]]) {
+-      const composed = AlternativeScene({id:'pressure-only',time,resetToken:0,cameraDistance:14})
++      const composed = AlternativeScene({id:'sublimation-injection',time,resetToken:0,cameraDistance:14})
+       expect(composed.props['data-original-context-time']).toBe(context)
+       const originalChildren = composed.props.children.props.children[0]
+       const timed = originalChildren.filter((child: {props?:{time?:number}}) => typeof child?.props?.time === 'number')
+@@ -42,7 +42,18 @@ describe('external original-scene composition', () => {
+     expect(composed.props['data-original-replay']).toBe('full-authored-base')
+     expect(composed.props['data-original-context-time']).toBe(75)
+     expect(composed.props.children.props.children[0]).toEqual(baseline.props.children)
+-    expect(AlternativeScene({id:'pressure-only',time:75,resetToken:0,cameraDistance:15.75}).props['data-original-context-time']).toBe(38)
++    expect(AlternativeScene({id:'pressure-only',time:75,resetToken:0,cameraDistance:15.75}).props['data-original-context-time']).toBe(57)
++  })
++
++  it('reuses the pressure-only gas-release context without entering original water treatment', () => {
++    for (const time of [0, 38, 44, 51.5, 55, 57, 90]) {
++      const composed = AlternativeScene({id:'pressure-only',time,resetToken:0,cameraDistance:14})
++      const context = Math.min(time, 57)
++      const original = FireSequenceScene({time:context,mode:'rapid',view:'natural',layers:{fire:true,gas:true,water:false,anatomy:true},resetToken:0,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:14})
++      expect(composed.props['data-original-replay']).toBe('authored-gas-release-no-water')
++      expect(composed.props['data-original-context-time']).toBe(context)
++      expect(composed.props.children.props.children[0]).toEqual(original.props.children)
++    }
+   })
+ 
+   it('uses public fire-layer control only at the requested authored endings of new liquid alternatives', () => {
+diff --git a/tests/alternatives-host.test.tsx b/tests/alternatives-host.test.tsx
+deleted file mode 100644
+index 02345a7..0000000
+--- a/tests/alternatives-host.test.tsx
++++ /dev/null
+@@ -1,45 +0,0 @@
+-import { describe, expect, it, vi } from 'vitest'
+-import { AlternativeScene } from '../src/ui/AlternativeScene'
+-import { FireSequenceScene } from '../src/ui/FireSequenceScene'
+-
+-vi.mock('../src/ui/FireSequenceScene', async () => {
+-  const { createElement } = await import('react')
+-  return { FireSequenceScene: vi.fn(() => createElement('canvas', { 'data-protected-prop': 'retained' }, createElement('group', { name: 'original-world' }))) }
+-})
+-vi.mock('../src/ui/AlternativeMethodModules', () => ({ AlternativeMethodCues: () => null }))
+-
+-function compose(id: Parameters<typeof AlternativeScene>[0]['id'], time: number) {
+-  const view = AlternativeScene({ id, time, resetToken: 2, cameraDistance: 9 })
+-  const factory = vi.mocked(FireSequenceScene)
+-  return { view, props: factory.mock.calls.at(-1)![0], original: factory.mock.results.at(-1)!.value }
+-}
+-
+-describe('read-only alternative host layer boundaries', () => {
+-  it('reuses original dry-ice release for pressure-only while excluding every water cue', () => {
+-    for (const time of [0, 38, 44, 51.5, 55, 57, 90]) {
+-      const { view, props } = compose('pressure-only', time)
+-      expect(props.time).toBe(Math.min(time, 57))
+-      expect(props.layers).toEqual({ fire: true, gas: true, water: false, anatomy: true })
+-      expect(view.props['data-original-replay']).toBe('authored-gas-release-no-water')
+-      expect(props.mode).toBe('rapid')
+-    }
+-  })
+-  it('retains the existing liquid and surface-method treatment boundaries', () => {
+-    const liquid = compose('liquid-waves', 90).props
+-    expect(liquid.time).toBe(90)
+-    expect(liquid.layers).toEqual({ fire: false, gas: true, water: true, anatomy: true })
+-    const surface = compose('sublimation-injection', 75).props
+-    expect(surface.time).toBe(38)
+-    expect(surface.layers).toEqual({ fire: true, gas: false, water: false, anatomy: true })
+-  })
+-  it('retains the original Canvas props/world and supplied camera controls', () => {
+-    const { view, props, original } = compose('pressure-only', 55)
+-    const canvas = view.props.children
+-    expect(canvas.type).toBe(original.type)
+-    expect(canvas.props['data-protected-prop']).toBe('retained')
+-    expect(canvas.props.children[0]).toBe(original.props.children)
+-    expect(props.cameraDistance).toBe(9)
+-    expect(props.resetToken).toBe(2)
+-    expect(props.connectedSupply).toBe(true)
+-  })
+-})
+diff --git a/tests/alternatives/vibratory-injection/compaction.test.ts b/tests/alternatives/vibratory-injection/compaction.test.ts
+new file mode 100644
+index 0000000..eb57ea1
+--- /dev/null
++++ b/tests/alternatives/vibratory-injection/compaction.test.ts
+@@ -0,0 +1,97 @@
++import { describe, expect, it } from 'vitest'
++import * as THREE from 'three'
++import { COMPACTION_GROUPS, createCompactionPass } from '../../../src/alternatives/vibratory-injection/compaction-pass'
++import { fracturePathAt } from '../../../src/alternatives/vibratory-injection/compaction-effects'
++import { vibrationPose } from '../../../src/alternatives/vibratory-injection/vibration'
++
++describe('authored compaction output lifecycle',()=>{
++  it('owns fresh HDR/depth resources and disposes each once without changing original materials',()=>{
++    const a=createCompactionPass(),b=createCompactionPass(),counts=[0,0,0,0,0]
++    expect(a.target.texture.type).toBe(THREE.HalfFloatType)
++    expect(a.target).not.toBe(b.target);expect(a.depth).not.toBe(b.depth)
++    expect(a.reference.texture.type).toBe(THREE.HalfFloatType)
++    const resources=[a.target,a.depth,a.material,a.geometry,a.reference]
++    resources.forEach((resource,i)=>resource.addEventListener('dispose',()=>counts[i]++))
++    a.dispose();a.dispose()
++    expect(counts).toEqual([1,1,1,1,1])
++    expect(b.target.texture).not.toBe(a.target.texture)
++    b.dispose()
++  })
++  it('passes through the unchanged introduction and restores renderer state after output or failure',()=>{
++    const owned=createCompactionPass(),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera()
++    const burning=new THREE.Group(),settled=new THREE.Group(),fireOnly=new THREE.Group()
++    burning.name=COMPACTION_GROUPS.burning;settled.name=COMPACTION_GROUPS.settled;fireOnly.name=COMPACTION_GROUPS.fireOnly
++    settled.visible=false;scene.add(burning,settled,fireOnly)
++    const original=new THREE.WebGLRenderTarget(4,4)
++    let target:THREE.WebGLRenderTarget|null=original,scissorTest=true,fail:''|'reference'|'output'=''
++    const viewport=new THREE.Vector4(5,6,80,90),scissor=new THREE.Vector4(3,4,70,60),renders:THREE.Scene[]=[]
++    const appearances:boolean[][]=[]
++    const mock={
++      autoClear:false,
++      getDrawingBufferSize:(out:THREE.Vector2)=>out.set(160,120),
++      getRenderTarget:()=>target,setRenderTarget:(value:THREE.WebGLRenderTarget|null)=>{target=value},
++      getViewport:(out:THREE.Vector4)=>out.copy(viewport),setViewport:(value:THREE.Vector4)=>viewport.copy(value),
++      getScissor:(out:THREE.Vector4)=>out.copy(scissor),setScissor:(value:THREE.Vector4)=>scissor.copy(value),
++      getScissorTest:()=>scissorTest,setScissorTest:(value:boolean)=>{scissorTest=value},
++      render:(value:THREE.Scene)=>{
++        renders.push(value)
++        // WebGLRenderer updates camera world matrices during the scene draw.
++        if(value===scene){
++          appearances.push([burning.visible,settled.visible,fireOnly.visible])
++          if(burning.visible){camera.position.x+=1;camera.updateMatrixWorld()}
++          if(fail==='reference'&&target===owned.reference)throw new Error('reference failed')
++        }
++        else {
++          expect(owned.material.uniforms.cameraWorld.value.equals(camera.matrixWorld)).toBe(true)
++          expect(owned.material.uniforms.inverseProjection.value.equals(camera.projectionMatrixInverse)).toBe(true)
++          if(fail==='output')throw new Error('output failed')
++        }
++      },
++    }
++    const renderer=mock as unknown as THREE.WebGLRenderer
++    owned.render(renderer,scene,camera,0)
++    expect(renders).toEqual([scene]);expect(target).toBe(original)
++    owned.render(renderer,scene,camera,.5)
++    expect(renders).toHaveLength(4)
++    expect(appearances).toEqual([[true,false,true],[true,false,true],[false,true,false]])
++    expect([burning.visible,settled.visible,fireOnly.visible]).toEqual([true,false,true])
++    expect(target).toBe(original);expect(mock.autoClear).toBe(false);expect(scissorTest).toBe(true)
++    expect(viewport.toArray()).toEqual([5,6,80,90]);expect(scissor.toArray()).toEqual([3,4,70,60])
++    expect(owned.target.width).toBe(160);expect(owned.target.height).toBe(120)
++    expect(owned.reference.width).toBe(160);expect(owned.reference.height).toBe(120)
++    owned.render(renderer,scene,camera,1)
++    expect(renders.at(-1)).toBe(scene);expect(appearances.at(-1)).toEqual([false,true,false])
++    expect([burning.visible,settled.visible,fireOnly.visible]).toEqual([true,false,true])
++    fail='reference'
++    expect(()=>owned.render(renderer,scene,camera,.8)).toThrow('reference failed')
++    expect([burning.visible,settled.visible,fireOnly.visible]).toEqual([true,false,true])
++    expect(target).toBe(original);expect(mock.autoClear).toBe(false)
++    fail='output'
++    expect(()=>owned.render(renderer,scene,camera,.8)).toThrow('output failed')
++    expect(target).toBe(original);expect(mock.autoClear).toBe(false);expect(scissorTest).toBe(true)
++    expect(viewport.toArray()).toEqual([5,6,80,90]);expect(scissor.toArray()).toEqual([3,4,70,60])
++    expect([burning.visible,settled.visible,fireOnly.visible]).toEqual([true,false,true])
++    owned.dispose();original.dispose()
++    expect(()=>owned.render(renderer,scene,camera,.5)).toThrow('disposed')
++  })
++  it('advances fractures by distance without skipping or disconnecting an unequal-length path',()=>{
++    const path:[number,number,number][]=[[0,0,0],[1,0,0],[1,9,0]],before=structuredClone(path)
++    expect(fracturePathAt(path,.05)).toEqual([[0,0,0],[.5,0,0]])
++    expect(fracturePathAt(path,.2)).toEqual([[0,0,0],[1,0,0],[1,1,0]])
++    expect(fracturePathAt(path,1)).toEqual(path)
++    expect(path).toEqual(before)
++  })
++  it('keeps all compression/extinction authored, deterministic and absent with vibration disabled',()=>{
++    for(const time of [0,27,33,44,50,62,68,74,90]){
++      const on=vibrationPose(time),off=vibrationPose(time,false)
++      expect(off.fracture).toBe(0);expect(off.compression).toBe(0);expect(off.emberFade).toBe(0)
++      expect(off.groundScale).toEqual([1,1,1])
++      expect(on.emberFade).toBeGreaterThanOrEqual(0);expect(on.emberFade).toBeLessThanOrEqual(1)
++    }
++    const final=vibrationPose(90)
++    expect(final.compression).toBe(1);expect(final.emberFade).toBe(1)
++    expect(-3.2*final.groundScale[1]+final.surfacePosition[1]).toBeCloseTo(-3.2,12)
++    const middle=vibrationPose(58);vibrationPose(90);vibrationPose(0)
++    expect(vibrationPose(58)).toEqual(middle)
++  })
++})
+diff --git a/tests/alternatives/vibratory-injection/evidence.test.ts b/tests/alternatives/vibratory-injection/evidence.test.ts
+index 7960ff5..7dde0b4 100644
+--- a/tests/alternatives/vibratory-injection/evidence.test.ts
++++ b/tests/alternatives/vibratory-injection/evidence.test.ts
+@@ -1,21 +1,10 @@
+-import { writeFileSync } from 'node:fs'
++import { readFileSync } from 'node:fs'
+ import { expect, it } from 'vitest'
+ import { createRun, freshPanel } from '../../../src/alternatives/model'
+ 
+-it('records finite continuous-contact checkpoints with closed ledgers', () => {
+-  const config = freshPanel('c-evidence', 'vibratory-injection'), run = createRun(config)
+-  const checkpoints = [0, 10, 20, 60].map(timeS => {
+-    const state = run.advanceTo(timeS)
+-    expect(Math.abs(state.metrics!.energyResidualJ)).toBeLessThan(1e-7)
+-    expect(Math.abs(state.metrics!.massResidualKg)).toBeLessThan(1e-12)
+-    return state
+-  })
+-  expect(checkpoints[1].metrics!.waterUsedKg).toBeCloseTo(.25, 12)
+-  expect(checkpoints[3].metrics!.waterUsedKg).toBeCloseTo(.5, 12)
+-  if (process.env.V21_C_EVIDENCE_PATH) writeFileSync(process.env.V21_C_EVIDENCE_PATH, JSON.stringify({
+-    method: '4.2.4', apiVersion: 'v21.2', numericalVerificationOnly: true, experimentallyValidated: false,
+-    units: { timeS: 's', temperatureK: 'K', waterMass: 'kg', energy: 'J' },
+-    scope: 'Three independent finite-contact specimens; no field transport, combustion, mechanical coupling or suppression prediction.',
+-    config, checkpoints,
+-  }, null, 2) + '\n')
++it('retains historical liquid evidence without treating it as current vibration evidence', () => {
++  const historical=JSON.parse(readFileSync(new URL('../../../docs/alternatives/vibratory-injection/contact-evidence.json',import.meta.url),'utf8'))
++  expect(historical.experimentallyValidated).toBe(false)
++  expect(historical.checkpoints.at(-1).metrics.waterUsedKg).toBeCloseTo(.5,12)
++  expect(() => createRun(freshPanel('current','vibratory-injection'))).toThrow('Vibration-only prediction is unavailable')
+ })
+diff --git a/tests/alternatives/vibratory-injection/model.test.ts b/tests/alternatives/vibratory-injection/model.test.ts
+index 911754d..e2ea61b 100644
+--- a/tests/alternatives/vibratory-injection/model.test.ts
++++ b/tests/alternatives/vibratory-injection/model.test.ts
+@@ -1,108 +1,46 @@
+-import { describe, expect, it } from 'vitest'
++import { describe, expect, it, vi } from 'vitest'
+ import { createRun, duplicatePanel, freshPanel } from '../../../src/alternatives/model'
+ import { compatible } from '../../../src/alternatives/registry'
+ import { methodModule, capabilities } from '../../../src/alternatives/vibratory-injection'
+-
+-describe('4.2.4 continuous-contact component', () => {
+-  it('accounts for continuous delivery and stops at its finite inventory', () => {
+-    const panel = freshPanel('continuous', 'vibratory-injection'), run = createRun(panel)
+-    expect(run.snapshot().contact!.ledger.waterSuppliedKg).toBe(0)
+-    const half = run.advanceTo(10).contact!
+-    expect(half.ledger.waterSuppliedKg).toBeCloseTo(.25, 12)
+-    expect(half.ledger.waterRemainingSupplyKg).toBeCloseTo(.25, 12)
+-    expect(half.ledger.waterBypassKg).toBeCloseTo(0, 12)
+-    expect(half.patches.every(p => Math.abs(p.waterReceivedKg - .25 / 3) < 1e-12)).toBe(true)
+-    const depleted = run.advanceTo(20).contact!, late = run.advanceTo(60).contact!
+-    expect(depleted.ledger.waterRemainingSupplyKg).toBeCloseTo(0, 12)
+-    expect(late.ledger.waterSuppliedKg).toBeCloseTo(.5, 12)
+-    expect(late.ledger.waterSuppliedKg).toBeCloseTo(depleted.ledger.waterSuppliedKg, 12)
+-    expect(late.ledger.waterLiquidKg + late.ledger.waterVaporKg).toBeCloseTo(.5, 12)
+-    expect(late.ledger.dryIceInitialKg).toBe(0)
+-    expect(Math.abs(late.ledger.waterMassResidualKg)).toBeLessThan(1e-12)
+-    expect(Math.abs(late.ledger.energyResidualJ)).toBeLessThan(1e-7)
+-  })
+-
+-  it('treats delayed contact as a prescribed boundary, without early transfer', () => {
+-    const panel = freshPanel('delay', 'vibratory-injection'); panel.thermal.contactStartS = 7.3
+-    const run = createRun(panel)
+-    expect(run.advanceTo(7.3).metrics!.waterUsedKg).toBe(0)
+-    expect(run.snapshot().metrics!.energyJ).toBe(0)
+-    expect(run.advanceTo(7.5).metrics!.waterUsedKg).toBeCloseTo(.005, 12)
+-  })
+-
+-  it('recovers the untreated contact reference when intervention is off', () => {
+-    const panel = freshPanel('off', 'vibratory-injection'); panel.thermal.enabled = false
+-    const reference = freshPanel('reference', 'baseline'); reference.thermal.contactStartS = panel.thermal.contactStartS
+-    const off = createRun(panel), baseline = createRun(reference)
+-    for (const t of [0, 7.3, 20, 60]) {
+-      expect(off.advanceTo(t)).toEqual(baseline.advanceTo(t))
+-      expect(off.snapshot().metrics!.waterUsedKg).toBe(0)
+-    }
+-  })
+-
+-  it.each(['waterKg', 'flowKgS', 'conductanceWK'] as const)('has zero heat transfer when %s is zero', key => {
+-    const panel = freshPanel('limit', 'vibratory-injection'); panel.thermal[key] = 0
+-    const state = createRun(panel).advanceTo(60)
+-    expect(state.metrics!.maximumK).toBe(panel.thermal.initialK)
+-    expect(state.metrics!.energyJ).toBe(0)
+-    expect(Math.abs(state.metrics!.energyResidualJ)).toBeLessThan(1e-7)
+-  })
+-
+-  it('isolates simultaneous runs, serializable inputs, duplicate configuration and returned snapshots', () => {
+-    const panel = freshPanel('first', 'vibratory-injection'), duplicate = duplicatePanel(panel, 'second')
+-    duplicate.thermal.waterKg = .1
+-    const a = createRun(panel), b = createRun(duplicate)
+-    panel.thermal.waterKg = 5; panel.thermal.endS = 10
+-    a.advanceTo(10)
+-    expect(b.snapshot().timeS).toBe(0)
+-    const bs = b.advanceTo(30), as = a.advanceTo(60)
+-    expect(bs.metrics!.waterUsedKg).toBeCloseTo(.1, 12)
+-    expect(as.metrics!.waterUsedKg).toBeCloseTo(.5, 12)
+-    expect(a.endS).toBe(60)
+-    as.contact!.patches[0].temperatureK = 9999
+-    as.contact!.ledger.waterRemainingSupplyKg = 9999
+-    expect(a.snapshot().contact!.patches[0].temperatureK).not.toBe(9999)
+-    expect(a.snapshot().contact!.ledger.waterRemainingSupplyKg).toBeLessThan(1)
+-    expect(b.snapshot()).toEqual(bs)
+-  })
+-
+-  it('reproduces the same accepted state through arbitrary checkpoint partitioning', () => {
+-    const panel = freshPanel('reproducible', 'vibratory-injection'), a = createRun(panel), b = createRun(panel)
+-    for (const t of [.1, 1.17, 7.31, 20, 43.91, 60]) a.advanceTo(t)
+-    expect(a.snapshot()).toEqual(b.advanceTo(60))
+-    expect(() => a.advanceTo(59)).toThrow()
+-    expect(() => a.advanceTo(61)).toThrow()
+-    expect(() => a.advanceTo(Number.NaN)).toThrow()
+-  })
+-
+-  it('cannot credit illustrative vibration, compaction or loosening as physical changes', () => {
+-    const panel = freshPanel('presentation', 'vibratory-injection'), active = createRun(panel), untouched = createRun(panel)
+-    for (let t = 0; t <= 90; t += .125) methodModule.presentation('vibratory-injection', t)
+-    expect(active.advanceTo(60)).toEqual(untouched.advanceTo(60))
+-    expect(active.snapshot().metrics!.oxygenKg).toBeNull()
+-    expect(active.snapshot().metrics!.fuelKg).toBeNull()
+-    expect(active.snapshot().metrics!.reactionW).toBeNull()
++import { PREDICTION_UNAVAILABLE } from '../../../src/alternatives/vibratory-injection/model'
++
++describe('4.2.4 vibration-only prediction boundary', () => {
++  it('has no predictive engine or treatment inventory by default', () => {
++    const panel = freshPanel('vibration', 'vibratory-injection')
++    expect(methodModule.variants[0].engines).toEqual([])
++    expect(panel.engine).toBe('concept')
++    expect(panel.medium).toBe('none')
++    expect(panel.thermal).toMatchObject({enabled:false,waterKg:0,flowKgS:0,dryIceKg:0,conductanceWK:0})
++    expect(capabilities.modeled).toEqual([])
+     expect(capabilities.experimentallyValidated).toBe(false)
++    expect(compatible(panel.variantId,panel.engine,panel.medium)).toBe(PREDICTION_UNAVAILABLE)
++    expect(() => createRun(panel)).toThrow(PREDICTION_UNAVAILABLE)
++  })
++  it('rejects saved liquid configurations without calling the contact core or mutating inputs', () => {
++    const panel = freshPanel('saved-v2', 'vibratory-injection')
++    panel.engine='contact';panel.medium='water';panel.thermal.enabled=true;panel.thermal.waterKg=.5;panel.thermal.flowKgS=.025
++    const before=structuredClone(panel), supportedRun=vi.fn()
++    expect(() => methodModule.createRun(panel,{supportedRun})).toThrow(PREDICTION_UNAVAILABLE)
++    expect(supportedRun).not.toHaveBeenCalled()
++    expect(panel).toEqual(before)
++    expect(() => createRun(duplicatePanel(panel,'duplicate'))).toThrow(PREDICTION_UNAVAILABLE)
++  })
++  it('cannot bypass the unsupported mechanism through any engine/medium combination', () => {
++    for(const engine of ['concept','contact','peat-fem'] as const)for(const medium of ['none','water','co2-water','unspecified'] as const){
++      const panel=freshPanel('guard','vibratory-injection');panel.engine=engine;panel.medium=medium
++      expect(compatible(panel.variantId,engine,medium)).toBe(PREDICTION_UNAVAILABLE)
++      expect(() => createRun(panel)).toThrow(PREDICTION_UNAVAILABLE)
++    }
+   })
+-
+-  it('provides no invented transport, combustion or unspecified-medium prediction', () => {
+-    expect(compatible('vibratory-injection', 'peat-fem', 'water')).toContain('no supported')
+-    expect(compatible('vibratory-injection', 'contact', 'unspecified')).toContain('no thermodynamic')
+-    const panel = freshPanel('concept', 'vibratory-injection'); panel.engine = 'concept'; panel.medium = 'unspecified'
+-    expect(createRun(panel).advanceTo(60).metrics).toBeNull()
+-  })
+-})
+-
+-describe('4.2.4 authored presentation boundary', () => {
+-  it('shows access, simultaneous motion and liquid, then a stationary review', () => {
+-    expect(methodModule.presentation('vibratory-injection', 17.9).access).toBe(false)
+-    const access = methodModule.presentation('vibratory-injection', 23.9)
+-    expect(access.access).toBe(true); expect(access.injection).toBe(false)
+-    const simultaneous = methodModule.presentation('vibratory-injection', 28)
+-    expect(simultaneous.injection).toBe(true); expect(simultaneous.vibration).not.toBe(0)
+-    expect(simultaneous.contacts).toBe(3)
+-    const review = methodModule.presentation('vibratory-injection', 60)
+-    expect(review.vibration).toBe(0); expect(review.injection).toBe(false)
+-    expect(review.pulse).toBe(false); expect(review.waves).toBe(false)
++  it('never presents liquid, contact, pulse or wave sources, including after backwards seeking', () => {
++    for(const t of [0,24,27,28,33,50,68,74,90,33,0,NaN,Infinity,-1]){
++      const p=methodModule.presentation('vibratory-injection',t)
++      expect(p.injection).toBe(false);expect(p.contacts).toBe(0)
++      expect(p.pulse).toBe(false);expect(p.waves).toBe(false)
++      expect(p.contextTime).toBeLessThanOrEqual(33)
++      expect(Number.isFinite(p.vibration)).toBe(true)
++    }
++    expect(methodModule.presentation('vibratory-injection',38).vibration).not.toBe(0)
++    expect(methodModule.presentation('vibratory-injection',90).vibration).toBe(0)
+   })
+ })
+diff --git a/tests/alternatives/vibratory-injection/vibration-scene.test.tsx b/tests/alternatives/vibratory-injection/vibration-scene.test.tsx
+new file mode 100644
+index 0000000..4acebb7
+--- /dev/null
++++ b/tests/alternatives/vibratory-injection/vibration-scene.test.tsx
+@@ -0,0 +1,69 @@
++import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
++import { Canvas } from '@react-three/fiber'
++import { describe, expect, it } from 'vitest'
++import { FireSequenceScene } from '../../../src/ui/FireSequenceScene'
++import { FireWaterTruck } from '../../../src/ui/FireWaterTruck'
++import { SequenceExcavator } from '../../../src/ui/FireSequenceEquipment'
++import { fireSequencePose } from '../../../src/story/fireSequence'
++import { composeVibrationScene } from '../../../src/alternatives/vibratory-injection/vibration-scene'
++import { vibrationPose } from '../../../src/alternatives/vibratory-injection/vibration'
++import { COMPACTION_GROUPS } from '../../../src/alternatives/vibratory-injection/compaction-pass'
++
++type Element=ReactElement<Record<string,unknown>>
++function elements(node:ReactNode):Element[]{
++  const out:Element[]=[]
++  Children.forEach(node,child=>{if(isValidElement(child)){const element=child as Element;out.push(element);out.push(...elements(element.props.children as ReactNode))}})
++  return out
++}
++const options={vibration:true,cameraDistance:15.75,resetToken:0}
++describe('continuous original vibration scene',()=>{
++  it('retains one original Canvas/world and a hidden same-geometry fire-off reference through both boundaries',()=>{
++    for(const time of [0,18,23.9,24,25,26,27,31,33,38,74,90,25]){
++      const scene=composeVibrationScene({...options,time}),all=elements(scene)
++      const contextTime=Math.min(time,33)
++      const original=FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire:true,gas:false,water:false,anatomy:true},resetToken:0,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:15.75})
++      const {children:_actual,...actualProps}=scene.props,{children:_expected,...expectedProps}=original.props
++      expect(all.filter(e=>e.type===Canvas)).toHaveLength(1)
++      expect(actualProps).toEqual(expectedProps)
++      const ground=all.filter(e=>typeof e.props.fire==='boolean'&&typeof e.props.water==='boolean')
++      const originalGround=elements(original).find(e=>typeof e.props.fire==='boolean')!
++      expect(ground).toHaveLength(2)
++      expect(ground[0].type).toBe(originalGround.type)
++      expect(ground[0].props).toEqual(originalGround.props)
++      expect(ground[1].type).toBe(originalGround.type)
++      expect(ground[1].props).toEqual({...originalGround.props,fire:false})
++      expect(all.find(e=>e.props.name===COMPACTION_GROUPS.settled)?.props.visible).toBe(false)
++      expect(all.filter(e=>e.type===SequenceExcavator)).toHaveLength(1)
++      expect(all.filter(e=>e.type===FireWaterTruck)).toHaveLength(0)
++      expect(ground[0].props.fire).toBe(true)
++      expect(ground[0].props.water).toBe(false)
++      expect(fireSequencePose(contextTime,'rapid')).toMatchObject({sourceVisible:false,capVisible:false,gas:0,water:0})
++    }
++  })
++  it('keeps camera and lighting outside the shaking world with stable component identity/keys',()=>{
++    const before=composeVibrationScene({...options,time:25}),after=composeVibrationScene({...options,time:45})
++    const top=(scene:typeof before)=>Children.toArray(scene.props.children).filter(isValidElement) as Element[]
++    const a=top(before),b=top(after)
++    expect(a.map(e=>[e.type,e.key])).toEqual(b.map(e=>[e.type,e.key]))
++    const camera=a.find(e=>'resetToken' in e.props)!,cameraAfter=b.find(e=>'resetToken' in e.props)!
++    expect(camera.props).toMatchObject({resetToken:0,distance:15.75})
++    expect(cameraAfter.type).toBe(camera.type)
++    expect(cameraAfter.props).toEqual(camera.props)
++    expect(a.filter(e=>e.type==='ambientLight'||e.type==='hemisphereLight'||e.type==='directionalLight')).toHaveLength(3)
++    expect(b.filter(e=>e.type==='ambientLight'||e.type==='hemisphereLight'||e.type==='directionalLight').map(e=>e.props)).toEqual(a.filter(e=>e.type==='ambientLight'||e.type==='hemisphereLight'||e.type==='directionalLight').map(e=>e.props))
++  })
++  it('starts/stops continuously and disabling vibration leaves the original context unchanged',()=>{
++    for(const time of [0,26.9,27,33,68,74,90]){
++      const on=vibrationPose(time),off=vibrationPose(time,false)
++      expect(off.amount).toBe(0);expect(Math.hypot(...off.groundPosition)).toBe(0)
++      expect(off.contextTime).toBe(on.contextTime)
++    }
++    for(const boundary of [27,33,68,74]){
++      const a=vibrationPose(boundary-1e-6),b=vibrationPose(boundary+1e-6)
++      expect(Math.abs(a.amount-b.amount)).toBeLessThan(1e-6)
++      expect(Math.hypot(...a.groundPosition.map((v,i)=>v-b.groundPosition[i]))).toBeLessThan(1e-5)
++    }
++    const at=vibrationPose(38);vibrationPose(90);vibrationPose(0)
++    expect(vibrationPose(38)).toEqual(at)
++  })
++})
+diff --git a/tests/alternatives/vibratory-injection/visuals.test.ts b/tests/alternatives/vibratory-injection/visuals.test.ts
+index 8ff9d02..3803702 100644
+--- a/tests/alternatives/vibratory-injection/visuals.test.ts
++++ b/tests/alternatives/vibratory-injection/visuals.test.ts
+@@ -2,7 +2,7 @@ import { describe,expect,it } from 'vitest'
+ import { injectionLevels,treatmentVisual } from '../../../src/alternatives/vibratory-injection/visuals'
+ import { VibratoryFieldRun } from '../../../src/alternatives/vibratory-injection/field'
+ 
+-describe('reference-sketch treatment choreography',()=>{
++describe('historical V2 liquid choreography — off-scope for vibration only',()=>{
+   it('shakes during injection, wets the peat, removes authored embers and settles',()=>{
+     expect(treatmentVisual(24).shake).toBe(0)
+     expect(treatmentVisual(35).active).toBe(true)

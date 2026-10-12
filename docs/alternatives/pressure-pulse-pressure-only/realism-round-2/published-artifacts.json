@@ -1,0 +1,102 @@
+{
+  "source": "2d6ab8f0a4d74b7aee9c6a449533afb4c5343911",
+  "note": "All independent artifact and report bytes are unchanged; original absolute report paths map to these portable copies. Published source text is not an executable test harness.",
+  "artifacts": {
+    "REVIEW_PRESSURE_ONLY_RETRY_2.md": {
+      "publishedPath": "REVIEW_PRESSURE_ONLY_RETRY_2.md",
+      "sha256": "70632e01d78a29c8053742a1f54439f10607ba37dc5c55b73a8c87e2042b44ba",
+      "bytes": 11413,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "baseline.json": {
+      "publishedPath": "baseline.json",
+      "sha256": "7adb2432f38c53c9db504460bd986db49b86b5d29c6de52c398a4903f27dfc34",
+      "bytes": 3863,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "accounting-amendment.json": {
+      "publishedPath": "accounting-amendment.json",
+      "sha256": "27b60e1286d614e4a2fa99ed9f9bb1c4f0df1a2306207229fd81d7a02a022546",
+      "bytes": 895,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "planning-relocation.json": {
+      "publishedPath": "planning-relocation.json",
+      "sha256": "7761f1ec5f90b662b66e19e9fcb08e397d2b902af088ba2ac8316c7f9af57aac",
+      "bytes": 758,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "browser-unverified.json": {
+      "publishedPath": "browser-unverified.json",
+      "sha256": "a1e79c3dd6a7d4eafd6ffb5e72226d9924eff820d6ee87587ba49754d488f17f",
+      "bytes": 797,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "parent-failed-checkpoint.json": {
+      "publishedPath": "parent-failed-checkpoint.json",
+      "sha256": "2a06a7d37a0faf5c4a8b52fdb244a192687b71201cb3d4645ebd28afb88fdde9",
+      "bytes": 514,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "logic-source-provenance.json": {
+      "publishedPath": "logic-source-provenance.json",
+      "sha256": "c4570549b7ba52f1dc8b80e3397330e1fc36fcbc6833d3de942b9889fed79771",
+      "bytes": 71195,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "final-source-provenance.json": {
+      "publishedPath": "final-source-provenance.json",
+      "sha256": "0af21b09367fd570fa6b72b1511fe7e784bb15a5b138542675e7555b1831950a",
+      "bytes": 64996,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "source-03-to-6137.diff": {
+      "publishedPath": "source-03-to-6137.diff",
+      "sha256": "714ffcafaa88cc0a8b40abdc109ba347d78c9ac1ed0d5c3e36ec94f785dc629a",
+      "bytes": 42358,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "source-6137-to-2d6.diff": {
+      "publishedPath": "source-6137-to-2d6.diff",
+      "sha256": "e659b8f53ca2b364b9f66442b43b2f4dccb22a4327dc862651b945b055e92046",
+      "bytes": 98566,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "execution-and-reuse.json": {
+      "publishedPath": "execution-and-reuse.json",
+      "sha256": "da6fcb46f0ff857e01bddc5147a5bf9763682a31664da34fbd643f56c051c2ef",
+      "bytes": 3441,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "snapshot-2d6/pressure-only-retry2.report.json": {
+      "publishedPath": "snapshot-2d6/pressure-only-retry2.report.json",
+      "sha256": "bac10cf2b8fdbccaa46aafbfbf843ce5af32b0ee1a83197e8ef4f0b432da33f4",
+      "bytes": 7690,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "snapshot-2d6/pressure-only-retry2.log": {
+      "publishedPath": "snapshot-2d6/pressure-only-retry2.log",
+      "sha256": "fff4d580b3834cac3a896b6dfb49d9fe8ec979d20131a4b990a94d6187522c37",
+      "bytes": 828,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "model.test.ts.source.txt": {
+      "publishedPath": "model.test.ts.source.txt",
+      "sha256": "55732606c7c58b0cc436d20d68ad8e4f9c8ba77476f4a7bed4a5468209d943fc",
+      "bytes": 4082,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "animation.test.ts.source.txt": {
+      "publishedPath": "animation.test.ts.source.txt",
+      "sha256": "b50869bf7694a33e2ae1c571e315b445559aa9dcfdfa7b8096aa47e861d07fae",
+      "bytes": 2460,
+      "executor": "/root/pressure_realism_reviewer"
+    },
+    "alternativeSceneComposition.test.tsx.source.txt": {
+      "publishedPath": "alternativeSceneComposition.test.tsx.source.txt",
+      "sha256": "c9cd535201f31c3abbb0a6a066b171987cd71b64fde156eb8bdb2ec416a13caf",
+      "bytes": 4830,
+      "executor": "/root/pressure_realism_reviewer"
+    }
+  }
+}

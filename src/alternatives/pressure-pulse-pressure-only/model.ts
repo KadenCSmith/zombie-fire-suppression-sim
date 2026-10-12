@@ -1,6 +1,7 @@
 import type { AlternativeRun, MethodPresentation, SupportedAdapterHooks } from '../contract'
 import type { PanelConfig } from '../model'
 import type { VariantId } from '../registry'
+import { pressureAnimationFrame } from './animation'
 
 export const PRESSURE_ONLY_CAPABILITIES = {
   liquidSource: 'absent', thermalSource: 'absent', pressureTransport: 'unavailable',
@@ -21,12 +22,11 @@ export function createPressureOnlyRun(config: PanelConfig, hooks: SupportedAdapt
 export function pressureOnlyPresentation(id: VariantId, timeS: number): MethodPresentation {
   if (id !== 'pressure-only') throw new Error('4.2.3.2 presentation requires pressure-only identity.')
   const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
-  return { contextTime: Math.min(time, 36), access: true, pulse: time >= 38 && time < 66,
+  return { contextTime: Math.min(time, 57), access: true, pulse: time >= 55 && time < 58,
     waves: false, injection: false, vibration: 0, contacts: 0 }
 }
 
 /** Smooth authored visibility only, with no dimensional pressure quantity. */
 export function pressureCueEnvelope(timeS: number): number {
-  const u = Math.max(0, Math.min(1, (timeS - 48) / 6))
-  return Math.sin(Math.PI * u) ** 2
+  return pressureAnimationFrame(timeS).jolt
 }

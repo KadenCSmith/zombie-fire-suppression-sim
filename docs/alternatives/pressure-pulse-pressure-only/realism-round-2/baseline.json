@@ -1,0 +1,82 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "kind": "Unscored visual/provenance follow-up only",
+  "preparedAtUTC": "2026-10-12T09:11:17.941298+00:00",
+  "signedScientificBaseline": "03bae79560d893f716dca9dc8f7fdc80f4f3c747",
+  "currentHead": "c6dd9ca23b92d7dc378741e42acc803bc2296f00",
+  "priorReportSha256": "2d13a86aa74391b9bc37eb9b1e824991a1b9ad5879a33697bafdc943e7bd065f",
+  "scoresRetained": {
+    "4.2.3.1": "4.1",
+    "4.2.3.2": "1.3"
+  },
+  "countersPerVariant": {
+    "scoredPassesUsed": 2,
+    "retriesUsed": 1,
+    "retriesUnused": 2
+  },
+  "baselineHashes": {
+    "src/alternatives/model.ts": {
+      "signedBase": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "preFollowupHead": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17"
+    },
+    "src/alternatives/contactAdapter.ts": {
+      "signedBase": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "preFollowupHead": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0"
+    },
+    "src/story/contactCooling.ts": {
+      "signedBase": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "preFollowupHead": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622"
+    },
+    "src/alternatives/contract.ts": {
+      "signedBase": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "preFollowupHead": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7"
+    },
+    "src/alternatives/pressure-pulse-pressure-only/model.ts": {
+      "signedBase": "c6235ce6bac115d5f4de85d32161c1944be7c80a72df1052c9dc2220b1fe89ed",
+      "preFollowupHead": "c6235ce6bac115d5f4de85d32161c1944be7c80a72df1052c9dc2220b1fe89ed"
+    },
+    "src/alternatives/pressure-pulse-liquid-waves/model.ts": {
+      "signedBase": "299fe8034ecf804cd432c6dde0a16e4ca6b2cbf07ae5301b90a4168d3cbe9a80",
+      "preFollowupHead": "299fe8034ecf804cd432c6dde0a16e4ca6b2cbf07ae5301b90a4168d3cbe9a80"
+    },
+    "src/worker/alternatives.worker.ts": {
+      "signedBase": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6",
+      "preFollowupHead": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6"
+    },
+    "src/ui/AlternativeScene.tsx": {
+      "signedBase": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "preFollowupHead": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c"
+    },
+    "package.json": {
+      "signedBase": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83",
+      "preFollowupHead": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83"
+    },
+    "package-lock.json": {
+      "signedBase": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d",
+      "preFollowupHead": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d"
+    },
+    "vite.config.ts": {
+      "signedBase": "228c2a56f103ee9cc741a1a3db72f8a200243191f6f98faf9b7c459022ad260b",
+      "preFollowupHead": "228c2a56f103ee9cc741a1a3db72f8a200243191f6f98faf9b7c459022ad260b"
+    },
+    "tsconfig.json": {
+      "signedBase": "c01bd0d5b7475c0459740889e507747788f1185bee35ea070fb68250496fc936",
+      "preFollowupHead": "c01bd0d5b7475c0459740889e507747788f1185bee35ea070fb68250496fc936"
+    }
+  },
+  "plannedBoundedUI": [
+    "Before original55s release",
+    "Single release-aligned soil jolt/fragments",
+    "Settling and later state",
+    "No private rings/shells/trucks/liquid/extinction",
+    "Paused backward seek",
+    "Null physical metrics if applicable/reused unchanged concept evidence"
+  ],
+  "exactTimePolicy": "Observe normal UI supported time increments; bracket unrepresentable requested timestamps and disclose.",
+  "notPlanned": [
+    "Scientific rescoring",
+    "Numerical benchmark rerun",
+    "Full/native/FPS checks",
+    "Model or source edits"
+  ]
+}

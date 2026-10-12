@@ -41,12 +41,13 @@ describe('4.2.3.2 pressure-only child', () => {
     const config = configured(); config.medium = 'unspecified'
     expect(createRun(config).advanceTo(60)).toEqual({ timeS: 60, metrics: null })
   })
-  it('never displays injection, waves, collapse displacement or liquid contact', () => {
+  it('never models injection, waves, physical displacement or liquid contact', () => {
     for (let time = 0; time <= 90; time += .5) expect(pressureOnlyPresentation('pressure-only', time)).toMatchObject({ waves: false, injection: false, contacts: 0, vibration: 0 })
     expect(pressureOnlyPresentation('pressure-only', 37).pulse).toBe(false)
-    expect(pressureOnlyPresentation('pressure-only', 38).pulse).toBe(true)
-    expect(pressureOnlyPresentation('pressure-only', 66).pulse).toBe(false)
-    expect(pressureCueEnvelope(48)).toBe(0); expect(pressureCueEnvelope(51)).toBeCloseTo(1); expect(pressureCueEnvelope(54)).toBeCloseTo(0)
+    expect(pressureOnlyPresentation('pressure-only', 55).pulse).toBe(true)
+    expect(pressureOnlyPresentation('pressure-only', 58).pulse).toBe(false)
+    expect(pressureOnlyPresentation('pressure-only', 90).contextTime).toBe(57)
+    expect(pressureCueEnvelope(55)).toBe(0); expect(pressureCueEnvelope(55.1)).toBeGreaterThan(.5); expect(pressureCueEnvelope(58)).toBe(0)
     expect(pressureOnlyPresentation('pressure-only', NaN).pulse).toBe(false)
   })
 })

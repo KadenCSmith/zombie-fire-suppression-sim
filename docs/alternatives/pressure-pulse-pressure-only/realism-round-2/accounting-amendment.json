@@ -1,0 +1,23 @@
+{
+  "recordedAtUTC": "2026-10-12T09:13:06.888496+00:00",
+  "supersedesPlanningOnly": "baseline.json kind/counter intent; original signed scientific report and initial planning bytes retained",
+  "authority": "Parent relayed coordinator correction for explicit new human pressure-only scope; latest instruction before follow-up source freeze/scoring",
+  "pressureOnlyBefore": {
+    "scoredPassesUsed": 2,
+    "retriesUsed": 1,
+    "retriesUnused": 2
+  },
+  "pressureOnlyAfterThisScoredReport": {
+    "scoredPassesUsed": 3,
+    "retriesUsed": 2,
+    "retriesUnused": 1
+  },
+  "liquidUnchanged": {
+    "score": "4.1",
+    "scoredPassesUsed": 2,
+    "retriesUsed": 1,
+    "retriesUnused": 2
+  },
+  "rubricAndToleranceChanges": false,
+  "scope": "Affected pressure-only presentation visual/provenance review with reuse of unchanged physical/concept proofs; no liquid rescoring or numerical rerun."
+}
