@@ -512,3 +512,8 @@ Natural/scientific comparison UI and Blender integration are complete for the st
 # Peat FEM evidence (2026-10-02)
 
 The new reduced fixture has element/basis, analytic diffusion, boundary, finite ignition, inventory and balance checks in `tests/peatfem.test.ts`. Numerical verification of this reduced fixture does not validate the full five-step smouldering model. Matched measured experiment, physical reaction-front convergence and 40 FPS acceptance are pending. Logs/results belong to `docs/review/peat-fem/`; the follow-up's expanding runtime must earn its own evidence after implementation.
+
+
+## Scientific-realism revision round1 in progress — 2026-10-12
+
+Initial independent audits completed before new implementation: A4.1, liquid3.9, pressure-only1.3, latest vibration-only intent2.3; none verified7. Signed reports/rubric/counter are in docs/review/version21/realism. New-alternative contact step is now0.00625s through the unchanged original public reference, correcting the independently observed early-fill temporal error while retaining frozen analytical answers and0.2K tolerance. Targeted87tests/9files and typecheck PASS at this coordinator checkpoint; final full/native checks remain pending. Original4.2.3 source/default/cache remain unchanged;57-hash gate is repeated before publication. Private visual/scope changes and independent round1 re-score are pending. No experimental validation or central mechanism has been added; main/release/Mac installation remain pending.

@@ -30,8 +30,8 @@ const guides = [
 function Pinwheel() { return <svg className="version-pinwheel" viewBox="0 0 72 136" aria-hidden="true"><path d="M36 38v96"/><g className="pinwheel-rotor">{[0,90,180,270].map(angle => <path key={angle} transform={`rotate(${angle} 36 33)`} d="M39 29C54 29 60 21 55 12C51 5 39 1 37 8C35 14 40 20 36 26"/>)}<circle cx="36" cy="33" r="3.2"/></g></svg> }
 function FinderIcon() { return <svg viewBox="0 0 106 106" aria-hidden="true"><path d="M4 5l35 35V4h6v45H3v-6h31L1 10zM53 4h49v24L77 51H53zM77 51V34q0-7 7-7h18"/><circle cx="29" cy="75" r="18"/><path d="M16 88L3 102l5 4 13-15"/><circle cx="79" cy="80" r="24"/>{Array.from({length:9},(_,i)=>{const a=i*Math.PI*2/9;return <circle key={i} cx={79+17*Math.cos(a)} cy={80+17*Math.sin(a)} r="3.5"/>})}</svg> }
 function ToolboxIcon() { return <svg viewBox="0 0 185 100" aria-hidden="true"><path d="M26 3L55 20 40 47l31 18q15 9 7 23t-24 5L24 75 8 99-18 82 0 50l12 7 8-14-12-7z" transform="translate(22 -2) scale(.9)"/><path d="M131 8h29l21 37-21 37h-42L97 45l21-37z"/><circle cx="139" cy="45" r="18"/></svg> }
-export function AppChrome({ selectedAlternative, onAlternative, onAlternativeView, onCompare, referenceVariant, onClearReference, workspace, layout, onLayout, onWorkspace, selectedVersions, onSelectedVersions }: {
-  selectedAlternative: VariantId; onAlternative: (id: VariantId) => void; onAlternativeView: (id:VariantId, workspace:PhysicsWorkspace)=>void; onCompare: () => void; referenceVariant?: VariantId; onClearReference:()=>void; workspace: PhysicsWorkspace; layout: LayoutMode; onLayout: (layout: LayoutMode) => void; onWorkspace: (workspace: PhysicsWorkspace) => void; selectedVersions: string[]; onSelectedVersions: (versions: string[]) => void
+export function AppChrome({ selectedAlternative, onAlternative, onAlternativeView, onCompare, referenceVariant, onClearReference, workspace, compactSequence=false, layout, onLayout, onWorkspace, selectedVersions, onSelectedVersions }: {
+  selectedAlternative: VariantId; onAlternative: (id: VariantId) => void; onAlternativeView: (id:VariantId, workspace:PhysicsWorkspace)=>void; onCompare: () => void; referenceVariant?: VariantId; onClearReference:()=>void; workspace: PhysicsWorkspace; compactSequence?: boolean; layout: LayoutMode; onLayout: (layout: LayoutMode) => void; onWorkspace: (workspace: PhysicsWorkspace) => void; selectedVersions: string[]; onSelectedVersions: (versions: string[]) => void
 }) {
   const { panel, open, query, finderTab, setFinderTab } = useCinematicUI(), [menu, setMenu] = useState(false), [compact, setCompact] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null), versionTrigger = useRef<HTMLButtonElement>(null), headerRef=useRef<HTMLElement>(null)
@@ -39,13 +39,13 @@ export function AppChrome({ selectedAlternative, onAlternative, onAlternativeVie
   useEffect(() => {
     let request=0
     const update=()=>{request=0;const fraction=window.scrollY/Math.max(1,window.innerHeight),reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      const collapse=workspace!=='sequence'?1:reduced?(fraction>.35?1:0):Math.max(0,Math.min(1,(fraction-.08)/.42))
+      const collapse=workspace!=='sequence'||compactSequence?1:reduced?(fraction>.35?1:0):Math.max(0,Math.min(1,(fraction-.08)/.42))
       headerRef.current?.style.setProperty('--header-collapse',String(collapse));setCompact(collapse>.98)
     }
     const scroll=()=>{if(!request)request=requestAnimationFrame(update)}
     update();window.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',scroll)
     return()=>{cancelAnimationFrame(request);window.removeEventListener('scroll',scroll);window.removeEventListener('resize',scroll)}
-  }, [workspace])
+  }, [workspace,compactSequence])
   useEffect(() => {
     if (!menu) return
     const outside = (event: PointerEvent) => { if (!menuRef.current?.contains(event.target as Node)) setMenu(false) }
