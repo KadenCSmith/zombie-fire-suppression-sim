@@ -6,6 +6,7 @@ import { writeFile } from 'node:fs/promises'
 const server = await createServer({ server: { middlewareMode: true } })
 try {
   const { freshPanel, createRun } = await server.ssrLoadModule('/src/alternatives/model.ts')
+  const { ALTERNATIVE_CONTACT_STEP_S } = await server.ssrLoadModule('/src/alternatives/contactAdapter.ts')
   const config = freshPanel('evidence-liquid-waves', 'liquid-waves')
   const run = createRun(config), beforeArrival = run.advanceTo(config.thermal.contactStartS)
   const final = run.advanceTo(config.thermal.endS)
@@ -16,6 +17,7 @@ try {
   const baseline = createRun(baselineConfig).advanceTo(config.thermal.endS)
   const record = {
     kind: 'numerical verification only; no experiments', apiVersion: 'v21.2',
+    alternativeStepS: ALTERNATIVE_CONTACT_STEP_S, protectedReferenceDefaultStepS: .05,
     reproduction: 'node tests/alternatives/pressure-pulse-liquid-waves/record-evidence.mjs',
     config, beforeArrival: { timeS: beforeArrival.timeS, metrics: beforeArrival.metrics },
     final: { timeS: final.timeS, metrics: final.metrics, ledger: final.contact.ledger },
