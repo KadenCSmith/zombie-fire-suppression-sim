@@ -161,7 +161,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
       <div className="alt-fairness"><label><input type="checkbox" aria-label="Link physical time" checked={linked} disabled={!!linkReason} onChange={e => { command('pause');target.current=null;setLinkedRunning(false);setLinked(e.target.checked) }}/> Link accepted physical time</label><span>{linkReason ?? (linked ? 'Barrier coordination at 0.5 s checkpoints; individual control unlinks all.' : 'Same engine supports linked physical checkpoints.')}</span><button disabled={configs.some(c=>c.engine==='particle')} title={configs.some(c=>c.engine==='particle')?'Match particle settings in each particle panel':undefined} onClick={() => mutate(old => old.map(c => ({ ...c, thermal: { ...c.thermal, initialK: old[0].thermal.initialK, inletK: old[0].thermal.inletK, endS: old[0].thermal.endS, seed: old[0].thermal.seed }, fem: structuredClone(old[0].fem) })))}>Match initial conditions & window</button><button disabled={configs.some(c=>c.engine==='particle')} title={configs.some(c=>c.engine==='particle')?'Match particle budgets in each particle panel':undefined} onClick={() => mutate(old => {
         const reference=old.find(c=>c.variantId!=='baseline')??old[0];return old.map(c=>({...c,thermal:{...c.thermal,waterKg:reference.thermal.waterKg,dryIceKg:reference.thermal.dryIceKg,flowKgS:reference.thermal.flowKgS}}))
       })}>Match finite supply budgets</button><p>{comparisonNotes(configs)}</p><p>Shared temperature scale 293–1000 K; charts clip outside it. Contact samples are independent lumped specimens, not a field mesh. Solver accuracy stays fixed; contact panels use lightweight SVG and FEM panels render on demand at device pixel ratio 1. No success ranking is calculated.</p></div>
-      <p className="alt-performance" data-frame-p50={performanceBudget.p50} data-frame-p95={performanceBudget.p95} data-frame-samples={performanceBudget.samples}>Measured presentation frame intervals: median {fmt(performanceBudget.p50)} ms · p95 {fmt(performanceBudget.p95)} ms · {performanceBudget.samples} samples · {performanceBudget.compact ? 'compact' : 'standard'} display budget. Worker time is recorded per panel; these frame samples are not solver time or a guaranteed FPS.</p>
+      <p className="alt-performance" data-frame-p50={performanceBudget.p50} data-frame-p95={performanceBudget.p95} data-frame-samples={performanceBudget.samples} data-frame-window={performanceBudget.window}>Measured presentation frame intervals: median {fmt(performanceBudget.p50)} ms · p95 {fmt(performanceBudget.p95)} ms · {performanceBudget.samples} samples · {performanceBudget.compact ? 'compact' : 'standard'} display budget. Worker time is recorded per panel; these frame samples are not solver time or a guaranteed FPS.</p>
       <div className="alt-panel-grid">{configs.map(config => <Panel key={config.id} config={config} control={control} onResult={onResult} onIndividual={unlink} coordinated={linkedRunning} compactRender={performanceBudget.compact} canAdd={configs.length < MAX_PANELS} canRemove={configs.length > 1}
         onChange={changePanel} onDuplicate={duplicate} onRemove={remove}/>)}</div>
       <p className="alt-footer-note">Thermal proxies can compare prescribed heat exchange and finite use only. Unknown mechanism, pressure response, fracture, collapse and vibration response have N/A predictions. Contact cooling cannot establish extinguishment or re-ignition prevention.</p>
@@ -177,14 +177,14 @@ function comparisonNotes(configs: PanelConfig[]) {
 }
 
 function useRenderBudget(panelCount: number) {
-  const [result,setResult]=useState({p50:0,p95:0,samples:0,compact:false})
+  const [result,setResult]=useState({p50:0,p95:0,samples:0,window:0,compact:false})
   useEffect(()=>{
     let request=0,last=0; const intervals:number[]=[]
-    setResult({p50:0,p95:0,samples:0,compact:false})
+    setResult({p50:0,p95:0,samples:0,window:0,compact:false})
     const tick=(now:number)=>{
       if(last && !document.hidden && now-last<1000)intervals.push(now-last)
       last=now
-      if(intervals.length===120){const sorted=[...intervals].sort((a,b)=>a-b);const p50=sorted[60],p95=sorted[114];setResult(old=>({p50,p95,samples:120,compact:p95>28?true:p95<20?false:old.compact}));intervals.length=0}
+      if(intervals.length===120){const sorted=[...intervals].sort((a,b)=>a-b);const p50=sorted[60],p95=sorted[114];setResult(old=>({p50,p95,samples:120,window:old.window+1,compact:p95>28?true:p95<20?false:old.compact}));intervals.length=0}
       request=requestAnimationFrame(tick)
     }
     request=requestAnimationFrame(tick);return()=>cancelAnimationFrame(request)

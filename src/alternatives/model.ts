@@ -84,7 +84,7 @@ export function linkedCompatibility(configs: PanelConfig[]): string | null {
   if (configs.length < 2) return 'Select at least two panels.'
   if (configs.some(c => compatible(c.variantId, c.engine, c.medium))) return 'Resolve incompatible selections first.'
   if (configs.some(c => c.engine === 'concept')) return 'Concept stage time is presentation time, not physical time.'
-  if (configs.some(c => c.engine !== configs[0].engine)) return 'Contact and FEM do not represent the same physical system.'
+  if (configs.some(c => c.engine !== configs[0].engine)) return 'Select the same engine before linking physical time.'
   if (configs.some(c => observationWindowS(c) !== observationWindowS(configs[0]))) return 'Match observation windows first.'
   const first = configs[0]
   if (first.engine === 'particle') return particleLinkedCompatibility(configs)

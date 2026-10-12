@@ -1,27 +1,54 @@
 {
+  "initialTwo": {
+    "panels": 2,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.200000000000273,
+    "samples": 120,
+    "window": 1,
+    "physicalTimes": [
+      0,
+      0
+    ]
+  },
   "two": {
     "panels": 2,
     "p50Ms": 8.300000000000182,
+    "p95Ms": 9.199999999999818,
+    "samples": 120,
+    "window": 2,
+    "physicalTimes": [
+      8.5,
+      8.5
+    ]
+  },
+  "initialFour": {
+    "panels": 4,
+    "p50Ms": 8.300000000000182,
     "p95Ms": 9.300000000000182,
     "samples": 120,
+    "window": 1,
     "physicalTimes": [
-      20.5,
-      20
+      8,
+      8,
+      8,
+      8
     ]
   },
   "four": {
     "panels": 4,
     "p50Ms": 8.300000000000182,
-    "p95Ms": 9.300000000000182,
+    "p95Ms": 9.200000000000728,
     "samples": 120,
+    "window": 2,
     "physicalTimes": [
-      21.5,
-      21,
-      21.5,
-      21
+      17.5,
+      17.5,
+      17.5,
+      17.5
     ]
   },
-  "pauseMs": 51.5,
+  "performanceProtocol": "First fixed120-frame window retained; second fixed120-frame window tests the existing adaptive display budget. No best-of sampling.",
+  "pauseMs": 51,
   "workerCleanup": true,
   "tests": [
     "default rapid mode",
@@ -44,7 +71,7 @@
     "reset after failure",
     "stale terminated-worker error rejected"
   ],
-  "date": "2026-10-12T10:15:29.213Z",
+  "date": "2026-10-12T10:21:40.054Z",
   "environment": "darwin arm64",
   "scope": "software/numerical checks only; no physical validation"
 }

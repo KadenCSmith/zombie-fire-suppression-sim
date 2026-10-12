@@ -62,6 +62,14 @@ async function check() {
   click('Export Particle case');
   const oldId = left.dataset.runId; click('Reset Particle case');
   await wait(() => stateTime(left) === -1 && left.dataset.runId !== oldId && stateTime(right) === 30, 'private reset isolates state and identity');
+  const waterId = right.dataset.runId;
+  left.querySelector('.d-comparison details').open = true;
+  input(left.querySelector('[aria-label="Withdrawal start after mixing (s)"]'), 0);
+  await wait(() => left.textContent.includes('withdrawal starts0s'), 'early withdrawal configuration');
+  input(left.querySelector('[aria-label="Particle diameter (µm)"]'), 10);
+  await delay(25); click('Run Particle case');
+  await wait(() => /underresolved/i.test(left.querySelector('[role="alert"]')?.textContent ?? ''), 'underresolved delivery rejected without false zero');
+  assert(stateTime(left) === -1 && stateTime(right) === 30 && right.dataset.runId === waterId, 'Failed particle case changed water control or accepted false delivery');
   select(document.querySelector('[aria-label="Particle scenario"]'), 'freezing-stop');
   await wait(() => left.textContent.includes('Inlet274K') && stateTime(right) === -1, 'freezing scenario replaced both configurations');
   click('Run Particle case');
@@ -94,6 +102,6 @@ async function check() {
   click('Simulation Version'); await wait(() => document.querySelector('[data-parent="4.2.3"]'), 'original return entry');
   document.querySelector('[data-parent="4.2.3"]').click();
   await wait(() => document.querySelector('.fire-sequence-shell:not(.method-render)') && alive.size === 0, 'original restored and particle jobs disposed');
-  return { privatePairIndependent: true, upstreamLossAccepted: true, freezingRejected: true, zeroParticleControl: true, linkedParticleWorkers: true, editInvalidatesOneRun: true, duplicateAndRemoval: true, originalRestored: true, exportCount: 2 };
+  return { privatePairIndependent: true, upstreamLossAccepted: true, underresolvedDeliveryRejected: true, freezingRejected: true, zeroParticleControl: true, linkedParticleWorkers: true, editInvalidatesOneRun: true, duplicateAndRemoval: true, originalRestored: true, exportCount: 2 };
 }
 require('../electron/main.cjs');

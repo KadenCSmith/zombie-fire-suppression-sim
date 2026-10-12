@@ -66,3 +66,9 @@ jobs:
       - name: Vibration-only scene (Linux CI display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npx electron --no-sandbox scripts/smoke-vibration.cjs
+      - name: Particle delivery, counterfactuals and exports (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-particle.cjs
+      - name: Particle delivery, counterfactuals and exports (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-particle.cjs

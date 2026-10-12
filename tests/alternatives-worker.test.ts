@@ -26,8 +26,35 @@ describe('independent alternatives worker lifecycle', () => {
     send('advance','r1','a',{targetS:9});expect(messages.at(-1)!.type).toBe('failed')
   })
   it('does not leave an autonomous timer after replacement with an unavailable method', () => {
-    send('run'); send('init','r2','a',{config:freshPanel('a','nanoparticles')})
+    send('run'); send('init','r2','a',{config:freshPanel('a','pressure-pulse')})
     expect(messages.at(-1)!.type).toBe('failed');const count=messages.length
     vi.advanceTimersByTime(1000);expect(messages).toHaveLength(count)
+  })
+  it('runs particle checkpoints and ignores commands from the replaced contact job', () => {
+    send('init','particle','a',{config:freshPanel('a','nanoparticles')})
+    expect(messages.at(-1)!.type).toBe('ready')
+    expect(messages.at(-1)!.state!.particleInjection!.timeS).toBe(0)
+    send('run','particle'); vi.advanceTimersByTime(100); send('pause','particle')
+    const accepted=messages.at(-1)!
+    expect(accepted.state!.timeS).toBe(1.5)
+    expect(accepted.state!.particleInjection!.timeS).toBe(1.5)
+    const count=messages.length
+    send('run','r1');send('advance','particle','other',{targetS:3});vi.advanceTimersByTime(1000)
+    expect(messages).toHaveLength(count)
+  })
+  it('fails underresolved particle delivery atomically without advancing accepted time', () => {
+    const config=freshPanel('a','nanoparticles')
+    config.thermal.contactStartS=0
+    config.particleInjection!.particleDiameterM=10e-6
+    config.particleInjection!.hoseResidenceS=config.particleInjection!.probeResidenceS=0
+    send('init','particle','a',{config})
+    const initial=structuredClone(messages.at(-1)!.state)
+    send('run','particle')
+    expect(messages.at(-1)!.type).toBe('failed')
+    expect(messages.at(-1)!.error).toMatch(/underresolved/i)
+    expect(messages.at(-1)!.running).toBe(false)
+    expect(messages.at(-1)!.state).toEqual(initial)
+    const count=messages.length;vi.advanceTimersByTime(1000)
+    expect(messages).toHaveLength(count)
   })
 })

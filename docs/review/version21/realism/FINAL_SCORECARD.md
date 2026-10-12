@@ -1,0 +1,31 @@
+# Version21 independent scientific review scorecard
+
+Current animations were accepted by the human on2026-10-12. Acceptance authorizes integration; it does not change scientific scores. Original4.2.3 is outside the alternative redesign and remains byte-identical across57 protected paths to161e7a4a1f8c35765e1878c132db79977be1f5ea. Original fire-spreading/drilling are reused read-only, not recreated.
+
+Criterion order below is **governing physics / soil properties / numerical verification / mechanism coupling / visual correspondence**, with fixed weights30/20/20/20/10%. Totals are unrounded weighted sums. Unsupported central mechanism cap6 applies to every new alternative. Required independent current GUI evidence is unverified where recorded; coordinator UI checks do not replace it. **No alternative has a verified7 or experimental field validation.**
+
+|Alternative|Initial criteria → final criteria|Initial → final total|Scored passes|Retries used / unused|Independent final reviewer and outcome|
+|---|---|---:|---:|---:|---|
+|4.2.1 Sublimation/injection|5/3/6/2/4 →5/3/6/2/3|4.1 →4.0|4|3 /0|`/root/realism_a_review`; exhausted, current GUI unverified|
+|4.2.3.1 Liquid pressure pulses|5/3/5/2/4 →5/3/6/2/4|3.9 →4.1|2|1 /2|`/root/pressure_realism_reviewer`; justified data/mechanism stop|
+|4.2.3.2 Pressure only|1/1/2/1/2 →1/1/2/1/2|1.3 →1.3|3|2 /1|Same B reviewer; justified data/mechanism stop, current GUI unverified|
+|4.2.4 Vibration only|2/3/3/1/3 →1/1/2/1/1|2.3 →1.2|3|2 /1|`/root/vibration_reviewer`; justified data/mechanism stop, live GPU unverified|
+|4.2.2 Particle delivery|1/1/2/1/2 → pending final retry|1.3 → pending|3 before final retry|2 /1 before final retry|`/root/d_realism_reviewer`; two substantive numerical failures retained, final guard under review|
+
+## Accepted source identities and independent evidence
+
+- **A:** reviewed`a0e0826db17d8e06dfc79fa6baeb6850bb9ab383`, docs delivery`6d951802a5aab23c1eeb76b6bc9d2a69c36744d8`, integrated`55d4197eaedee774dbf8a736762bd22ec53e9a1b`. [Signed report](../../../alternatives/sublimation-injection/review-round3/report.md), [counter ledger](../../../alternatives/sublimation-injection/review-round3/LEDGER.md), [final handoff](../../../alternatives/sublimation-injection/FINAL_REVIEW_HANDOFF.md). Independent81checks/12files pass. New truck, rear pump/reel, articulated loader, lid and gradual quench are authored choreography; no pressure/fracture/combustion coupling was added.
+- **B liquid:** reviewed`03bae79560d893f716dca9dc8f7fdc80f4f3c747`, delivery`c6dd9ca23b92d7dc378741e42acc803bc2296f00`, integrated`13c26c8ef8e387657a01b6392e3186013e467b03`. [Signed report and reproducible evidence](../../../alternatives/pressure-pulse-liquid-waves/realism-round-1/REVIEW_B_ROUND_1.md). Independent32numerical tests/239assertions,33raw balance cases and7animation checks pass. Reuses full original sequence with private truck/pipe/pulsing/fissure/wet-char choreography. Pressure-enhanced transport, fracture and extinction remain unavailable predictions.
+- **B pressure only:** reviewed`2d6ab8f0a4d74b7aee9c6a449533afb4c5343911`, delivery`04426bf930c2f0189cf166ea6de29ee09b7a0b74`, integrated`159b5a552e461d99ad32272e93b30d7ac725f098`. [Signed report](../../../alternatives/pressure-pulse-pressure-only/realism-round-2/REVIEW_PRESSURE_ONLY_RETRY_2.md). Independent16critical checks pass. One authored jolt, irregular uplift/fragments and settling; no liquid treatment, numerical pressure/material response or fabricated result curve.
+- **C:** reviewed`95972c98ba1df981df386966a81508b9c52a971e`, delivery`36b08600191c92e7ff2f975cfe2a236048f8993e`, integrated`85f49eb7423f94c68b544e4d9450628d0ccade20`. [Signed report](../../../alternatives/vibratory-injection/ROUND_2_C.md), [final handoff](../../../alternatives/vibratory-injection/FINAL_HANDOFF_V3.md). Independent17critical checks pass. One original Canvas, gradual authored HDR appearance blend, cracks/settling/fire-out; no water, active liquid solver, physical vibration forcing/work/constitutive response or suppression calculation. The removed historical liquid model receives no vibration credit.
+- **D:** pending final signed guard delivery. Initial and both failed scored retries are retained in its exclusive evidence tree. False-zero particle delivery is a substantive numerical failure, not a data gap or unsigned tool retry. No counter reset or animation revision is authorized by this summary.
+
+## Numerical evidence and limits
+
+Only new A/B contact adapters use fixed0.00625s substeps; the protected original public reference/default/cache remain0.05s. Frozen continuous-fill benchmark: three0.5kg peat specimens initially360K,0.025kg/s water, UA24W/K, arrival12s, inlet273.15/293.15/350K, observation60s, checks1/5/20/48s, tolerance0.2K. B maximum early-fill temperature error0.1054885099070475K. Signed B raw-case mass/energy residual maxima2.996380921160835e−12kg /2.366257831454277e−6J. A full-benchmark maxima6.861178292183467e−14kg /3.6694109439849854e−7J. These are verified finite-inventory calorimeters, not field penetration or reacting fire suppression. Pressure-only/C physical conservation residuals are **N/A**, not zero.
+
+D uses assumed particle sizes, conductivity and residence; no dimensions or successful delivery are inferred from “Nano.” Conditional thermal/entrainment results must retain upstream versus underground loss, extra CO₂ cold resource, a matched water control and fail-closed invalid/underresolved regimes. No pressure, peat filtration/penetration, oxygen displacement, combustion or extinction prediction is supported. Detailed frozen configurations, primary citations, raw residuals, execution commands, runtime/dependency identities and failed cases stay in each linked signed packet; this coordinator summary does not replace or upgrade them.
+
+## Integration verification
+
+The coordinator owns shared UI/API/worker integration, direct latest-render navigation, reference subsections, independent run/reset/duplicate/remove/link/export lifecycle, native app checks,57original identities and final three-platform CI. Its observations are software execution, separate from the independent scientific scores. Prior Linux frame and motion-fixture failures remain documented. Final combined candidate and publication/install evidence are pending and will be recorded separately.

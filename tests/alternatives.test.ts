@@ -4,11 +4,14 @@ import { acceptsMessage, createRun, duplicatePanel, freshPanel, linkedCompatibil
 import { readComparison, serializeComparison } from '../src/alternatives/persistence'
 import { PeatSolver } from '../src/peatfem/coupled'
 describe('Version21 alternatives contract', () => {
-  it('retains four methods, nested draft labels and unspecified definition', () => {
+  it('retains four methods, nested draft labels and explicit particle capabilities', () => {
     expect(new Set(VARIANTS.filter(v => v.id !== 'baseline').map(v => v.method)).size).toBe(4)
     expect(VARIANTS.filter(v => v.method === '4.2.3')).toHaveLength(3)
     expect(VARIANTS.filter(v => v.draft)).toHaveLength(2)
-    expect(compatible('nanoparticles', 'concept', 'unspecified')).toContain('reviewed particle model')
+    expect(compatible('nanoparticles', 'concept', 'unspecified')).toContain('no supported')
+    expect(compatible('nanoparticles', 'particle', 'co2-water')).toBeNull()
+    expect(compatible('nanoparticles', 'particle', 'water')).toBeNull()
+    expect(compatible('nanoparticles', 'particle', 'unspecified')).toContain('incompatible')
     expect(VARIANTS.every(v => !v.status.experimentallyValidated)).toBe(true)
   })
   it('rejects unsupported physical coupling and unspecified thermodynamics', () => {

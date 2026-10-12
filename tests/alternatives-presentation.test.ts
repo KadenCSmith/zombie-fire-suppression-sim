@@ -2,14 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { methodPresentation } from '../src/alternatives/presentation'
 
 describe('method render scope', () => {
-  it('gives pressure-only and undefined methods no liquid cues', () => {
+  it('does not invent liquid cues for pressure-only, particle inventory diagrams or baseline', () => {
     for (const time of [0, 28, 50, 70, 90]) {
       for (const id of ['pressure-only', 'nanoparticles', 'baseline'] as const) {
         const p = methodPresentation(id, time)
         expect(p.injection).toBe(false); expect(p.contacts).toBe(0)
       }
     }
-    expect(methodPresentation('nanoparticles', 90).access).toBe(false)
+    expect(methodPresentation('nanoparticles', 90).access).toBe(true)
+    expect(methodPresentation('nanoparticles', 90).contextTime).toBe(38)
   })
   it('distinguishes original pressure, intermittent pumping and source-free vibration timing', () => {
     expect(methodPresentation('pressure-pulse', 50).pulse).toBe(true)
