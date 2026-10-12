@@ -1,4 +1,10 @@
-# Version21 reviewed integration
+# Version21 world-scene follow-up in progress
+
+The latest visual requests supersede the earlier inset diagrams. The coordinator now invokes the original hook-free scene export unchanged and appends private world objects to a separate cloned Canvas element, retaining its camera, controls, lighting, props and authored child order. The independently selected original4.2.3 remains untouched. Every worker must reuse its original fire spreading and initial drilling; no scratch replacements. A, B and C retain exclusive private follow-up ownership; exact checkpoint protocol is in `review/version21/CHECKPOINT_WORLD.md`.
+
+Shared seam checks: typecheck pass; lint pass with16 inherited warnings;3 focused composition checks pass; build pass in2.68s; all57 protected SHA-256 identities match the verified original. The prior integrated1848-test run and native results below are historical evidence for their exact source milestone, not completion of these new visual revisions. The expanded animation/navigation native check and final reviewed worker integration are pending at this checkpoint. Main/GitHub release and installed Mac update remain held for those checks. READY is a coordination handoff, with no unresolved launch fields; finished physics is not a prerequisite.
+
+# Prior Version21 reviewed integration
 
 All three worker deliveries were reviewed and integrated sequentially at their frozen SHAs: A `d0616794815b47c62df1028f51cfe04b5f94c9c8` (PR13), B `c0ef9c37c36c2032fc7754dd576897393acd3824` (PR12), C `80f91a39df5fff82b15dae23951ca3cca408a5dc` (PR11). Each diff was confined to its assigned private source/test/doc roots. Preservation passed after every merge; all **57 original identities** still match verified V20. The original 4.2.3 full workspace, scene, assets, timing, camera, defaults and results are unchanged.
 
