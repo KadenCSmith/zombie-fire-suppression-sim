@@ -1,4 +1,3 @@
-import { AlternativeMethodCues } from './AlternativeMethodModules'
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'
@@ -17,12 +16,10 @@ import { FIRE_SEQUENCE_GEOMETRY as G, fireSequencePose, rapidGasPulse, rapidGasQ
 
 import { currentPeatCoverage, currentEquipmentState } from '../story/firePresentation'
 import { FireWaterTruck } from './FireWaterTruck'
-import { methodPresentation } from '../alternatives/presentation'
-import type { VariantId } from '../alternatives/registry'
 
 export interface FireFieldSnapshot { timeS: number; nx: number; ny: number; nz: number; temperatureK: ArrayLike<number>; oxygen: ArrayLike<number>; co2: ArrayLike<number>; dryIceKg?: number }
 export interface FireSequenceLayers { fire: boolean; gas: boolean; water: boolean; anatomy: boolean }
-interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean; cinematic?: boolean; cameraDistance?: number; connectedSupply?: boolean; alternative?: VariantId }
+interface SceneProps { time: number; mode: FireSourceMode; view: FireSequenceView; layers: FireSequenceLayers; frame?: FireFieldSnapshot; resetToken: number; realistic?: boolean; openPit?: boolean; straightBore?: boolean; cinematic?: boolean; cameraDistance?: number; connectedSupply?: boolean }
 const SOURCE_X = G.sourceX
 const random = (n: number) => { const v = Math.sin(n * 91.713 + 7.157) * 43758.5453; return v - Math.floor(v) }
 
@@ -245,28 +242,21 @@ export function FireSequenceScene(props:SceneProps){
   const realistic=props.realistic??false
   const openPit=props.openPit??false
   const straightBore=props.straightBore??false
-  const method=props.alternative?methodPresentation(props.alternative,props.time):undefined
-  const contextTime=method?.contextTime??props.time
   return <Canvas shadows frameloop="demand" dpr={[1,1.5]} camera={{position:[7.2,4.0,12.3],fov:38,near:.05,far:60}}>
     <color attach="background" args={[props.cinematic?'#000000':'#1c2c2f']}/><ambientLight intensity={.65}/><hemisphereLight args={['#e1eadb','#28322c',1.1]}/>
     <directionalLight castShadow position={[-4,9,5]} intensity={2.5} shadow-mapSize={[2048,2048]} shadow-camera-left={-7} shadow-camera-right={7} shadow-camera-top={7} shadow-camera-bottom={-7} shadow-bias={-.0002}/>
-    <Ground time={contextTime} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
+    <Ground time={props.time} mode={props.mode} view={props.view} frame={props.frame} fire={props.layers.fire} water={props.layers.water} realistic={realistic} openPit={openPit} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
     {props.view==='natural'&&<>
-      <StoryAggregates time={contextTime} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
-      <SequenceGrass time={contextTime} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
-      {props.layers.anatomy&&<Tree time={contextTime} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
-      <SurfaceFire time={contextTime} visible={props.layers.fire}/><SurfaceConnection time={contextTime} visible={props.layers.fire}/>
-      {method?<>
-        {method.access&&<group position={[method.vibration,0,0]}><SequenceExcavator time={contextTime} openPit={false}/></group>}
-        <AlternativeMethodCues id={props.alternative!} time={props.time}/>
-      </>:<>
+      <StoryAggregates time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+      <SequenceGrass time={props.time} mode={realistic?'gradual':props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
+      {props.layers.anatomy&&<Tree time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>}
+      <SurfaceFire time={props.time} visible={props.layers.fire}/><SurfaceConnection time={props.time} visible={props.layers.fire}/>
       {openPit&&<OpenExcavation time={props.time}/>}
       <SequenceExcavator time={props.time} openPit={openPit} connectedSupply={props.connectedSupply}/>{props.connectedSupply&&props.layers.water&&<FireWaterTruck time={props.time}/>}<SourceAndCap time={props.time} mode={props.mode} realistic={realistic} openPit={openPit} straightBore={straightBore}/>
       <Tracers time={props.time} mode={props.mode} layers={props.layers} realistic={realistic} straightBore={straightBore} connectedSupply={props.connectedSupply}/>
       {!realistic&&<><PressureBurst time={props.time} mode={props.mode}/><CrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water}/></>}
       {realistic&&straightBore&&<PressureBurst time={props.time} mode={props.mode} local/>}
       {realistic&&<ConstrainedCrackAndWaterPaths time={props.time} mode={props.mode} showWater={props.layers.water} sourceFracture={straightBore} connectedSupply={props.connectedSupply}/>}
-      </>}
     </>}
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-3.24,-1]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial opacity={.27}/></mesh>
     <Camera resetToken={props.resetToken} cinematic={props.cinematic} distance={props.cameraDistance}/>

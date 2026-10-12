@@ -1,6 +1,6 @@
 # Original 4.2.3 preservation audit
 
-Status: **NOT READY; exact restoration confirmation pending.** Workers remain read-only. No restoration has been attempted.
+Status: **PRESERVATION VERIFIED.** The user explicitly approved the prepared restoration. The two protected source files were restored to their verified original bytes, and additive App routing now selects original 4.2.3. All 57 protected hashes match. New alternative work remains external; original files are read-only again for all agents.
 
 ## Verified identity and history
 
@@ -18,9 +18,9 @@ All changes below were authored in Version21 commit `eae833684ec41475eb6f84e642e
 
 No original assets, source contracts, cached fields/results, timing files, camera code, defaults, original-only worker/solver, or original regression tests were changed. `docs/review/peat-fem/native-smoke.json` changed only the timestamp in a separate FEM check; it is not the original fire sequence's result baseline.
 
-## Specific restoration requested
+## Specifically approved restoration completed
 
-Restore only `src/ui/FireSequenceScene.tsx` and `src/story/contactCooling.ts` to their verified original bytes. Preserve the added alternative code via separate external files: a fresh alternative-only Canvas which does not copy/relabel the original scene, and an external adapter invoking the existing public `simulateContactCooling` unchanged. Correct additive App routing so original 4.2.3 independently calls FireSequenceWorkspace with its original defaults. All other Version21 work stays preserved. No reset, clean, history rewrite or restoration of unrelated changes is proposed.
+Restored only `src/ui/FireSequenceScene.tsx` and `src/story/contactCooling.ts` to their verified original bytes after the user replied “yes” to the exact patch confirmation. Preserve the added alternative code via separate external files: a fresh alternative-only Canvas which does not copy/relabel the original scene, and an external adapter invoking the existing public `simulateContactCooling` unchanged. Corrected additive App routing so original 4.2.3 independently calls FireSequenceWorkspace with its original defaults, even when a method-preview query is present. All other Version21 work stays preserved. No reset, clean, history rewrite or restoration of unrelated changes is proposed.
 
 ## Original callable behavior and defaults
 
@@ -30,7 +30,7 @@ Camera: initial position [7.2,4.0,12.3], target [0,-0.05,-1.1], FOV 38°, near/f
 
 Bundled result: 65 accepted frames, physical 0–86430 s; final dry ice 3.998211470103149 kg, max temperature 795.5505599849323 K, reacted fuel 4.254278857572075 kg, reacting depth 0.16 m, heated depth 0.48 m. Field propagation remains unresolved. Separate contact calorimeter is not added to those field results. Baseline audit `docs/review/unified/fire-sequence-audit.md` records asset identities and scope; it predates V20's later presentation timing and is not a substitute for the actual V20 source timeline. Original movies/history remain unchanged.
 
-## Required preservation gates before READY
+## Completed preservation gates before READY
 
 1. Compare every protected file against the recorded SHA-256; no mismatch allowed.
 2. Run unchanged `tests/fireSequence.test.ts`, `tests/firePresentation.test.ts`, `tests/fireAppearance.test.ts`, `tests/contactCooling.test.ts`, `tests/fireProtocol.test.ts`, and `tests/fireProtocolRunner.test.ts`.
@@ -38,4 +38,4 @@ Bundled result: 65 accepted frames, physical 0–86430 s; final dry ice 3.998211
 4. Test external adapter results against existing public simulateContactCooling, per-instance independence and snapshot ownership. Original source gets no new export.
 5. Test additive mapping/menu: 4.2.3 directly opens the original; 4.2.1 and both children and 4.2.4 use their own separate preview; nanoparticles remains disabled. No standalone-new-preview query may replace original 4.2.3.
 
-Previously verified Version21 state at eae8336: 1777 tests in 93 files passed, typecheck/build passed, lint had 16 inherited warnings; native original/alternative/replay/FEM checks passed before extraction. Those checks do not waive the now-required restoration/hash checks. New gates are pending, not claimed passed.
+Previously verified Version21 state at eae8336: 1777 tests in 93 files passed, typecheck/build passed, lint had 16 inherited warnings; native original/alternative/replay/FEM checks passed before extraction. Those checks do not waive the now-required restoration/hash checks. Current gates passed: all 57 original hashes, full 1784-test/94-file suite (including all six unchanged original test files), typecheck, lint with 16 inherited warnings, build, unchanged native original smoke and updated native alternatives smoke. The latter verifies direct original selection, unsupported original comparison, independent new variants, worker lifecycle/linked time, cleanup and refreshed two/four-panel performance. Original native covers playback/cache/modes/seek, calculation cancellation/completion/restore, archived movies/byte ranges, water ledger and session retention. This is preservation/software verification, not empirical validation.

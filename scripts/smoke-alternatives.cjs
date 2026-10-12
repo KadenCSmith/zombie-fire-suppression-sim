@@ -33,9 +33,9 @@ app.on('browser-window-created',(_event,win)=>{
         if(document.querySelector('#simulation-version-menu'))document.querySelector('#simulation-version-menu').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
         for(const [method,id] of [['4.2.1','sublimation-injection'],['4.2.2','nanoparticles'],['4.2.3','pressure-pulse'],['4.2.4','vibratory-injection']]){
           button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="'+method+'"]').click();
-          await wait(()=>id==='sublimation-injection'?document.querySelector('.fire-sequence-shell:not(.method-render)'):document.querySelector('[data-render-variant="'+id+'"]'),method+' opens latest render directly');
+          await wait(()=>id==='pressure-pulse'?document.querySelector('.fire-sequence-shell:not(.method-render)'):document.querySelector('[data-render-variant="'+id+'"]'),method+' opens latest render directly');
         }
-        button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="4.2.1"]').click();await wait(()=>document.querySelector('.fire-sequence-shell:not(.method-render)'),'rapid render restored');
+        button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="4.2.3"]').click();await wait(()=>document.querySelector('.fire-sequence-shell:not(.method-render)'),'original rapid render restored');
         button('Simulation Version').click();await delay(20);document.querySelector('.version-compare-link').click();
         await wait(()=>panels().length===2&&panels().every(p=>button('Start',p)&&!button('Start',p).disabled),'two independent jobs ready');
         assert(alive.size===2,'Expected exactly two live workers');
@@ -46,10 +46,11 @@ app.on('browser-window-created',(_event,win)=>{
         const rightId=right.dataset.runId;button('Duplicate',right).click();await wait(()=>panels().length===3&&alive.size===3,'duplicate owns separate worker');
         assert(time(panels()[2])===0,'Duplicate copied mutable solver state');button('Remove',panels()[2]).click();await wait(()=>panels().length===2&&alive.size===2,'removed worker disposed');assert(right.dataset.runId===rightId,'Removal replaced another run');
         button('Pause all').click();
-        for(const id of ['sublimation-injection','pressure-pulse','liquid-waves','pressure-only','vibratory-injection']){
+        for(const id of ['sublimation-injection','liquid-waves','pressure-only','vibratory-injection']){
           choose(right,id);await wait(()=>right.dataset.variant===id&&button('Start',right)&&!button('Start',right).disabled,id+' ready');button('Start',right).click();await wait(()=>time(right)>=.5,id+' independently runs');button('Pause',right).click();
           if(id==='pressure-only')assert(!right.querySelector('.alt-history'),'Concept acquired fabricated outcome curve');
         }
+        choose(right,'pressure-pulse');await wait(()=>right.textContent.includes('Protected original render'),'original is unavailable for unsupported live comparison');await wait(()=>button('Start',right)?.disabled&&time(right)===0,'original comparison execution disabled');
         choose(right,'nanoparticles');await wait(()=>right.textContent.includes('Only a heading'),'unspecified mechanism rejects execution');await wait(()=>button('Start',right)?.disabled&&time(right)===0,'nanoparticles start disabled');
         choose(right,'sublimation-injection');await wait(()=>button('Start',right)&&!button('Start',right).disabled,'thermal proxy restored');button('Reset all').click();await delay(100);
         const link=document.querySelector('input[aria-label="Link physical time"]');link.click();await delay(20);button('Start / resume all').click();await wait(()=>panels().every(p=>time(p)>=3),'linked physical barriers advancing');button('Pause all').click();
@@ -62,7 +63,7 @@ app.on('browser-window-created',(_event,win)=>{
         assert(four.p95Ms<50,'Four-panel presentation p95 exceeds 50 ms on this fixture');
         const began=performance.now();button('Pause all').click();await wait(()=>panels().every(p=>p.dataset.running==='false'),'four-panel pause responsive');const pauseMs=performance.now()-began;
         button('Fire Simulation home').click();await wait(()=>document.querySelector('.fire-sequence-shell')&&alive.size===0,'navigation disposes all live jobs and preserves rapid renderer');
-        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined variants','unspecified rejection','linked physical time','two/four panel performance']};
+        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance']};
       })()`);
       assertNoErrors(errors);fs.mkdirSync(path.resolve(__dirname,'../docs/review/version21'),{recursive:true});fs.writeFileSync(path.resolve(__dirname,'../docs/review/version21/live-smoke.json'),JSON.stringify({...result,date:new Date().toISOString(),environment:process.platform+' '+process.arch,scope:'software/numerical checks only; no physical validation'},null,2));
       clearTimeout(timeout);console.log('ALTERNATIVES_SMOKE_PASS '+JSON.stringify(result));app.exit(0);

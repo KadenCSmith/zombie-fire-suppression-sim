@@ -102,6 +102,21 @@ describe('Version21 alternatives contract', () => {
     expect(readComparison('{"schema":99,"panels":[]}')).toHaveLength(2)
     expect(readComparison(JSON.stringify({schema:2,panels:[{variantId:'baseline',thermal:{initialK:NaN}}]}))[0].thermal.initialK).toBe(823.15)
   })
+  it('requires matched initial/boundary conditions and seeds for linked contact time', () => {
+    const a=freshPanel('a','baseline'),b=freshPanel('b','sublimation-injection')
+    b.thermal.initialK+=1;expect(linkedCompatibility([a,b])).toContain('temperatures')
+    b.thermal.initialK=a.thermal.initialK;b.thermal.inletK+=1;expect(linkedCompatibility([a,b])).toContain('temperatures')
+    b.thermal.inletK=a.thermal.inletK;b.thermal.seed+=1;expect(linkedCompatibility([a,b])).toContain('seeds')
+    b.thermal.seed=a.thermal.seed;b.thermal.waterKg=.1
+    expect(linkedCompatibility([a,b])).toBeNull()
+  })
+  it('requires matched FEM geometry and physical/numerical settings for linking', () => {
+    const a=freshPanel('a','baseline'),b=freshPanel('b','baseline');a.engine=b.engine='peat-fem'
+    expect(linkedCompatibility([a,b])).toBeNull()
+    b.fem.lengthM*=2;expect(linkedCompatibility([a,b])).toContain('FEM geometry')
+    b.fem=structuredClone(a.fem);b.fem.oxygenMassFraction=.2;expect(linkedCompatibility([a,b])).toContain('initial/boundary')
+    b.fem=structuredClone(a.fem);b.fem.maxStepS=.5;expect(linkedCompatibility([a,b])).toContain('numerical settings')
+  })
   it('restores validated FEM settings and rejects malformed physical data', () => {
     const p = freshPanel('same', 'baseline'); p.engine = 'peat-fem'; p.fem.n = 8; p.fem.endS = 20
     expect(readComparison(serializeComparison([p]))[0]).toEqual(p)

@@ -195,20 +195,3 @@ export function contactCoolingState(storyTimeS: number, mode: FireSourceMode): C
   const index = Math.max(0, Math.floor((t - CONTACT_COOLING_CONFIG.startTimeS) / .5))
   return advance(structuredClone(states[index]), t, CONTACT_COOLING_CONFIG, mode)
 }
-
-
-/** Independent incremental calorimeter. Uses the same fixed physical step and
- * event boundaries as the reference, without the presentation cache. */
-export function createContactCoolingSession(overrides: Partial<ContactCoolingConfig>, patches: readonly ContactPatchSpec[]) {
-  const config: ContactCoolingConfig = { ...CONTACT_COOLING_CONFIG, ...overrides }
-  validate(config, patches)
-  let state = initialState(config, patches)
-  return {
-    advanceTo(timeS: number) {
-      if (!Number.isFinite(timeS) || timeS < state.storyTimeS) throw new Error('Contact time must advance monotonically.')
-      state = advance(state, timeS, config, 'gradual')
-      return structuredClone(state)
-    },
-    snapshot: () => structuredClone(state),
-  }
-}

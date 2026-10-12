@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "NOT READY: exact restoration awaiting user confirmation",
+  "status": "PRESERVATION VERIFIED: approved restoration completed; all 57 protected identities and native original regression pass",
   "originalCommit": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
   "originalIdentification": "Commit 161e7a4 adds the V20 cinematic interface and connected-supply render; its package version is 0.20.0. All recorded original paths also match inherited 4b2088e. This is source-history identification, not a reset target.",
   "inheritedCommit": "4b2088e926662aee357cde680f2b22c4fbf24f79",
@@ -17,8 +17,8 @@
       "path": "src/ui/FireSequenceScene.tsx",
       "sha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
       "inheritedMatchesOriginal": true,
-      "currentSha256": "275e8d6eac4bcd0ec31b323e5d6bb4d32793c6e0e58b410d432ca7d9a37e8360",
-      "currentMatchesOriginal": false
+      "currentSha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "currentMatchesOriginal": true
     },
     {
       "path": "src/ui/FireSequenceEquipment.tsx",
@@ -101,8 +101,8 @@
       "path": "src/story/contactCooling.ts",
       "sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
       "inheritedMatchesOriginal": true,
-      "currentSha256": "3bfe6194645b30972b8a211affb5cda46e80ccb18543eb952ff72038c49e2078",
-      "currentMatchesOriginal": false
+      "currentSha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "currentMatchesOriginal": true
     },
     {
       "path": "src/coupled/fireProtocol.ts",
@@ -528,10 +528,7 @@
       "currentMatchesOriginal": true
     }
   ],
-  "changedProtectedPaths": [
-    "src/ui/FireSequenceScene.tsx",
-    "src/story/contactCooling.ts"
-  ],
+  "changedProtectedPaths": [],
   "changedSharedPaths": [
     "src/ui/ModelSelector.tsx"
   ],
@@ -578,5 +575,42 @@
       "config",
       "modes"
     ]
+  },
+  "priorChangedProtectedPaths": [
+    "src/ui/FireSequenceScene.tsx",
+    "src/story/contactCooling.ts"
+  ],
+  "restorationApproval": {
+    "evidence": "User replied yes to the specific prepared two-file restoration and App routing correction",
+    "patch": "../version21-proposed-restoration.patch",
+    "scope": [
+      "src/ui/FireSequenceScene.tsx",
+      "src/story/contactCooling.ts",
+      "src/App.tsx"
+    ],
+    "newAlternativeWorkPreservedExternally": true
+  },
+  "verification": {
+    "protectedHashCount": 57,
+    "protectedHashesMatch": true,
+    "typecheck": "pass",
+    "tests": {
+      "files": 94,
+      "tests": 1784,
+      "durationS": 6.03,
+      "result": "pass"
+    },
+    "build": {
+      "durationS": 5.02,
+      "result": "pass"
+    },
+    "lint": {
+      "result": "pass",
+      "inheritedWarnings": 16
+    },
+    "originalNativeSmoke": "FIRE_SEQUENCE_SMOKE_PASS",
+    "alternativesNativeSmoke": "ALTERNATIVES_SMOKE_PASS",
+    "originalDefaultRouting": "pressure-pulse -> original FireSequenceWorkspace; method-preview query cannot override original route",
+    "scope": "software/numerical/preservation evidence, not physical validation"
   }
 }

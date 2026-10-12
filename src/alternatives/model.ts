@@ -81,5 +81,12 @@ export function linkedCompatibility(configs: PanelConfig[]): string | null {
   if (configs.some(c => c.engine === 'concept')) return 'Concept stage time is presentation time, not physical time.'
   if (configs.some(c => c.engine !== configs[0].engine)) return 'Contact and FEM do not represent the same physical system.'
   if (configs.some(c => (c.engine === 'peat-fem' ? c.fem.endS : c.thermal.endS) !== (configs[0].engine === 'peat-fem' ? configs[0].fem.endS : configs[0].thermal.endS))) return 'Match observation windows first.'
+  const first = configs[0]
+  if (configs.some(c => c.thermal.seed !== first.thermal.seed)) return 'Match seeds before linking physical time.'
+  if (first.engine === 'contact' && configs.some(c => c.thermal.initialK !== first.thermal.initialK || c.thermal.inletK !== first.thermal.inletK)) return 'Match initial and inlet temperatures before linking physical time.'
+  if (first.engine === 'peat-fem') {
+    const keys = [...new Set(configs.flatMap(c => Object.keys(c.fem)))] as (keyof Settings)[]
+    if (configs.some(c => keys.some(key => c.fem[key] !== first.fem[key]))) return 'Match FEM geometry, initial/boundary conditions and numerical settings before linking physical time.'
+  }
   return null
 }
