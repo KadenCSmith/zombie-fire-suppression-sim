@@ -527,3 +527,8 @@ Revised human prompt supersedes coordinator-wide barriers/shared counter. Each o
 ## Parallel B integration — 12 October 2026
 
 B signed delivery c6dd9ca was integrated at13c26c8 without waiting for A/C. Source03bae79 adds the requested private reversed service truck, stabilizers, sectioned drill string and retained pumping pipe; removed private droplets/external L-shaped feed. Original57identities PASS. Independent scores: liquid4.1, pressure-only1.3; each used initial+1retry, with2unused retries and a justified missing-mechanism/data stop below7. Independent analytical early-fill error0.105489K passes the unchanged0.2K tolerance; no experimental validation or pressure/soil coupling is claimed. Root checked private ownership/signed evidence and corrected obsolete toolbox cue wording. Full combined verification, main/release/install remain pending A/C deliveries. See review/version21/realism/PARALLEL_HANDOFF.md.
+
+
+## Pressure-only authored release follow-up — 12 October 2026
+
+Latest direct B-chat request asks to improve4.2.3.2 after accepting liquid. Its new private revision is pending. Coordinator host now replays unchanged original rapid dry-ice/cap/release through57presentation seconds, holds there and excludes original water/truck/hose. Original gas quench/soil motion is inherited authored imagery, never a new pressure or suppression prediction. Liquid and surface-method gates are unchanged. Three focused host boundary/composition regressions, typecheck and57original identities PASS; combined checks and the pressure-only second local re-review remain pending. No source/API/physical-state change in the protected original.
