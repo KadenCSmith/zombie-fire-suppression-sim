@@ -27,7 +27,7 @@ Both have an unsupported-central-mechanism cap6 and neither has verified7. Initi
 
 Reviewer-executed evidence: 809/811 numerical assertions pass; two frozen early-fill water-temperature checks fail at0.05s. Worst error0.7737119256911456K exceeds0.2K. Independent conservation checks across33cases pass, maximum raw mass residual7.529532553007812e-13kg and raw energy residual1.4761462807655334e-7J. Fixed-water exchange, phase/depletion limits, finite inventories and guards pass. No empirical validation or pressure response model exists.
 
-Coordinator owns a supported nonprotected alternative-only step-policy correction to0.00625s; independent diagnostic worst early-fill error0.1054885099070475K passes the same frozen0.2K tolerance. The original protected reference/defaults must remain unchanged. Exact published checkpoint will be ordinary-merged when supplied; no private source changes the numerical step. The initial failed checks are retained, never relabeled as passes.
+Coordinator owns a supported nonprotected alternative-only step-policy correction to0.00625s; independent diagnostic worst early-fill error0.1054885099070475K passes the same frozen0.2K tolerance. The original protected reference/defaults must remain unchanged. Exact published checkpoint d07d03fe54b453677c2cd8684e8e2c5eb97112a6 was fetched, verified remotely reachable and ordinary-merged at3aaf63b755e18d353469d833408468661a866a7a, with all57protected hashes passing. No private source changes the numerical step; the external adapter now requests0.00625s. The initial failed checks are retained, never relabeled as passes.
 
 Essential blockers to verified7 remain measured generic environmental pressure history/domain/boundaries, calibrated peat constitutive and transport properties, supported pressure/momentum/soil/liquid coupling, and independently validated thermal/oxygen/moisture/fuel/reaction behavior over a suppression/re-ignition observation window. Graphics and disclosures cannot supply these.
 
@@ -35,10 +35,10 @@ Essential blockers to verified7 remain measured generic environmental pressure h
 
 Branch feature/v21-pressure-pulse, exclusive checkout outputs/v21-agent-pressure, APIv21.2. Existing narrow exports remain unchanged. New owned equipment.tsx and groundPulse.tsx implement the vehicle/rigid-pipe choreography and disposable crack-bank geometries. All poses derive from presentation timestamps, with no private timer or numerical source. Tests exercise opposing arrival, pipe lowering before flow, actual mesh displacement/extension, settling, deterministic seeking and numerical independence.
 
-Round1 scoped checks:31/31PASS in5files,0.660s; typecheckPASS; lintPASS with16 inherited warnings outside B; production buildPASS2.67s; whitespacePASS; all57protected identitiesPASS against established161e7a4a1f8c35765e1878c132db79977be1f5ea. No full-suite/performance/FPS/experimental claim is made; coordinator owns final integrated suite and native/GPU gates.
+After exact shared checkpoint merge:59/59 scoped/private/composition/infusion/worker/comparison checksPASS in9files,0.936s; typecheckPASS; lintPASS with16 inherited warnings outside B; production buildPASS3.08s; whitespacePASS; all57protected identitiesPASS against established161e7a4a1f8c35765e1878c132db79977be1f5ea. No full-suite/performance/FPS/experimental claim is made; coordinator owns final integrated suite and native/GPU gates.
 
 Reproduce:
-- npm test -- tests/alternatives/pressure-pulse-liquid-waves tests/alternatives/pressure-pulse-pressure-only tests/alternativeSceneComposition.test.tsx
+- npm test -- tests/alternatives/pressure-pulse-liquid-waves tests/alternatives/pressure-pulse-pressure-only tests/alternatives-infusion-accuracy.test.ts tests/alternatives.test.ts tests/alternatives-contact-adapter.test.ts tests/alternatives-worker.test.ts tests/alternativeSceneComposition.test.tsx
 - npm run typecheck
 - npm run lint
 - npm run build
@@ -54,4 +54,4 @@ Only B's owned source/test/doc trees are authored. Original/shared code, package
 Live user-selected preview: http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1
 Independent pressure-only preview: http://127.0.0.1:5175/?alternative=pressure-only&method-preview=1
 
-The existing5175server is retained. No new top-level folder, dependency, port, background watcher, release or permission change was created. Finder tagging does not apply.
+The previous5175server had exited; B verified no listener and restarted its own assigned server in session73731 (ready106ms), nodePID23307, leaving it running. No new top-level folder, dependency, port, background watcher, release or permission change was created. Finder tagging does not apply.
