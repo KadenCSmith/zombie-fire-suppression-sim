@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
-import { SUPPLY_OUTLET_LOCAL } from './visuals'
+import { SUPPLY_OUTLET_LOCAL, TRUCK_WHEEL_RADIUS, wheelRollAngle } from './visuals'
 
 const BODY = '#6c7e70', FRAME = '#29352f', METAL = '#aab5aa'
 
 function Wheel({ x, side, roll }: { x: number; side: number; roll: number }) {
-  return <group position={[x, .322, side * .65]} rotation={[0, 0, roll]}>
+  return <group position={[x, TRUCK_WHEEL_RADIUS, side * .65]} rotation={[0, 0, roll]}>
     <mesh castShadow><torusGeometry args={[.23, .092, 12, 36]}/><meshStandardMaterial color="#141b17" roughness={.98}/></mesh>
     <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.166, .166, .145, 24]}/><meshStandardMaterial color={METAL} metalness={.72} roughness={.44}/></mesh>
     <mesh position={[0, 0, side * .08]}><torusGeometry args={[.125, .016, 6, 24]}/><meshStandardMaterial color="#65756a" metalness={.6} roughness={.5}/></mesh>
@@ -53,7 +53,7 @@ export function ServiceVehicle({ travel, payout }: { travel: number; payout: num
     {[-.39, .39].map(z => <mesh key={z} position={[0, .43, z]} castShadow><boxGeometry args={[4.35, .16, .10]}/><meshStandardMaterial color={FRAME} metalness={.55} roughness={.75}/></mesh>)}
     {[-1.35, -.25, 1.62].map(x => <group key={x}>
       <mesh position={[x, .322, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.055, .055, 1.3, 10]}/><meshStandardMaterial color="#354039" metalness={.6} roughness={.7}/></mesh>
-      <Wheel x={x} side={-1} roll={travel / .322}/><Wheel x={x} side={1} roll={travel / .322}/>
+      <Wheel x={x} side={-1} roll={wheelRollAngle(travel)}/><Wheel x={x} side={1} roll={wheelRollAngle(travel)}/>
       {[-.77, .77].map(z => <mesh key={z} position={[x, .322, z]}><torusGeometry args={[.35, .025, 6, 24, Math.PI]}/><meshStandardMaterial color="#4d5f51" metalness={.35} roughness={.75}/></mesh>)}
     </group>)}
     <RoundedBox position={[1.7, 1.20, 0]} args={[1.0, 1.08, 1.23]} radius={.10} smoothness={3} castShadow><meshStandardMaterial color={BODY} metalness={.18} roughness={.58}/></RoundedBox>

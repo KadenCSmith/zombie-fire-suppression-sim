@@ -12,11 +12,13 @@ The signed initial audit remains4.1/10. The first local retry of de48568ef636dce
 
 The physical adapter,0.00625s policy, source configuration and numerical capture are unchanged. The reviewer may reuse numerical evidence only after verifying relevant call-path/dependency hashes and assumptions, and must independently inspect changed presentation/resource/geometry behavior. The same central outlet/transport/reaction/data blockers recorded in ROUND_1.md remain; no measured/calibrated input or new coupling has been invented.
 
+Candidate `57d9bcc7f2b3ff0ccb2bd8763513bb3d3d14f5f1` was explicitly withdrawn during preparation, before any round-2 reviewer test execution, GUI observation or scoring. Both implementer and reviewer identified the wheel-rotation sign error: the bottom contact point moved with the truck instead of remaining stationary. The replacement uses the opposite rotation about +Z, with a forward/backward seeking contact-motion regression. The withdrawn snapshot, finding and provenance remain preserved as an unscored preparation attempt. Counters remain two signed passes/one scored retry; this is still the second implementation/review retry, pending independent execution and score.
+
 ## Implementer checks
 
-- Current maintained A/composition/alternative-isolation/continuous-inflow tests PASS77/77 across11 files, one worker,2.17s;52 are private A tests.
-- Typecheck/lint/build PASS;16 inherited lint warnings, inherited build warnings, build2.93s. Whitespace and57/57 original hashes PASS.
-- New tests cover full vehicle footprint, mounted module/ports, and fixed-length attached boom links. Earlier carried-solid, cap-order, contact, resource and source-off/conservation checks remain.
+- Current maintained A/composition/alternative-isolation/continuous-inflow tests PASS78/78 across11 files, one worker,2.10s;53 are private A tests.
+- Typecheck/lint/build PASS;16 inherited lint warnings, inherited build warnings, build2.87s. Whitespace and57/57 original hashes PASS.
+- New tests cover rolling contact direction, full vehicle footprint, mounted module/ports, and fixed-length attached boom links. Earlier carried-solid, cap-order, contact, resource and source-off/conservation checks remain.
 - Ignored disposable review copies are excluded with `--exclude 'work/**'`; no maintained tests/configuration/tolerance was removed or weakened. A preliminary path-filter run discovered both current and isolated old tests, so its98 count is not used as current verification.
 - Preview5174 remains HTTP200, owned detachedPID23895. Implementer browser access remains unavailable; no policy bypass. The dedicated reviewer uses normal independent Chrome access for the actual new model. Final combined native/production/full-suite checks remain coordinator-owned.
 

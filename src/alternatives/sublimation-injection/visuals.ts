@@ -6,6 +6,9 @@ export const WORLD_STAGING = {
   lidStart: 68.5, lidClosed: 71.3, boostStart: 71.5, boostEnd: 77.5, end: 90,
 } as const
 export const TRUCK_PARKED = [1.45, 0, -.95] as const
+export const TRUCK_WHEEL_RADIUS = .322
+/** Rotation about +Z must oppose +X travel to keep the contact point still. */
+export const wheelRollAngle = (travel: number) => -travel / TRUCK_WHEEL_RADIUS
 export const TREATMENT_PARKED = [-.3, 0, -.95] as const
 export const MEDIA_MOUNT = [0, 1.312, 0] as const
 export const MEDIA_SCALE = .68

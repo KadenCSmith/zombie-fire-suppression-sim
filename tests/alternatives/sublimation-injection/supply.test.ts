@@ -1,7 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { DELIVERY_ROUTE, FILL_ROUTE, MEDIA_MOUNT, MEDIA_SCALE, SUPPLY_OUTLET_LOCAL, TREATMENT_PARKED, TRUCK_PARKED, loadingBoomPose, loadingBucketPose, preparationVisuals } from '../../../src/alternatives/sublimation-injection/visuals'
+import { DELIVERY_ROUTE, FILL_ROUTE, MEDIA_MOUNT, MEDIA_SCALE, SUPPLY_OUTLET_LOCAL, TREATMENT_PARKED, TRUCK_PARKED, TRUCK_WHEEL_RADIUS, loadingBoomPose, loadingBucketPose, preparationVisuals, wheelRollAngle } from '../../../src/alternatives/sublimation-injection/visuals'
 
 describe('new integrated water truck artwork', () => {
+  it('keeps the tire contact point stationary during forward and reverse seeking', () => {
+    const samples = [38, 39, 41, 44, 47, 48, 44, 39, 38]
+    for (let i = 1; i < samples.length; i++) {
+      const before = preparationVisuals(samples[i - 1]).truckTravel
+      const after = preparationVisuals(samples[i]).truckTravel
+      const translation = after - before
+      const rotation = wheelRollAngle(after) - wheelRollAngle(before)
+      // At the bottom of a +Z rotating wheel, tangential motion is +X.
+      expect(translation + TRUCK_WHEEL_RADIUS * rotation).toBeCloseTo(0, 12)
+    }
+    expect(wheelRollAngle(preparationVisuals(48).truckTravel)).toBeCloseTo(0, 12)
+  })
+
   it('parks its complete vehicle and lower rear module on the existing grass', () => {
     expect(TRUCK_PARKED[0] + 2.36).toBeLessThan(4)
     expect(TRUCK_PARKED[0] - 2.65).toBeGreaterThan(-4)
