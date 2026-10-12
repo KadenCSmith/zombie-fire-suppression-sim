@@ -40,6 +40,15 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
   const config = structuredClone(configInput), p = validateParticleConfig(config), t = config.thermal
   if (!Number.isFinite(targetS) || targetS < 0 || targetS > t.endS + 1e-9) throw new Error('Invalid particle observation target.')
   const initialCO2 = config.medium === 'co2-water' ? t.dryIceKg : 0
+  const solidWithdrawal = initialCO2 > 0 && p.initialPhase === 'solid' && t.flowKgS > 0
+  const lifetimeAt = (bathK:number) => p.solidDensityKgM3*(p.particleDiameterM/2)**2*(L+CG*(bathK-TS))/(2*p.effectiveConductivityWmK*(bathK-TS))
+  // For every accepted liquid state, d(r²)/dt is at least its magnitude at
+  // the minimum liquid temperature. Thus even the slowest valid source must
+  // have lost its initial radius by this time. Include checkLiquid's tolerance.
+  const latestLiquidExtinctionS = lifetimeAt(273.15-1e-8)
+  if (t.enabled && solidWithdrawal && targetS > 0 && targetS >= t.contactStartS && t.contactStartS < latestLiquidExtinctionS && Math.max(p.stepS,p.parcelStepS) > lifetimeAt(t.inletK)/64) {
+    throw new Error('Underresolved solid delivery before withdrawal: pre-onset aging/parcel resolution cannot establish source loss. Solid entry is unavailable; zero delivery cannot be inferred. Changed scenarios require refinement.')
+  }
   const source = empty(), soil = empty(), parcels: Parcel[] = [], releases: Release[] = []
   source.water = t.waterKg; source.h = source.water * CW * (t.inletK - TS)
   if (initialCO2 > 0) source.cohorts = [{ count: initialCO2 / (4 * Math.PI / 3 * p.solidDensityKgM3 * (p.particleDiameterM / 2) ** 3), radiusM: p.particleDiameterM / 2 }]
@@ -86,6 +95,9 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
     if (!withdrawalResolutionChecked && clock >= t.contactStartS - 1e-10) {
       withdrawalResolutionChecked = true
       const bath = temperature(source)
+      if (solidWithdrawal && solid(source,p) === 0 && t.contactStartS < latestLiquidExtinctionS) {
+        throw new Error(`Unresolved early source loss: numerical zero before the conservative valid-liquid extinction bound (${latestLiquidExtinctionS.toExponential(4)} s) cannot establish complete upstream sublimation. Solid entry is unavailable; zero delivery cannot be inferred.`)
+      }
       if (t.flowKgS > 0 && source.water > 1e-14 && bath !== null && solid(source,p) > 0) {
         // Check the aged source exactly at withdrawal onset, before right-endpoint
         // parcels can erase short-lived entry. This is a resolution screen, not
@@ -133,7 +145,7 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
     energyResidualJ: all.reduce((a,c) => a + c.enthalpyJ,0) + peatCapacity * (peatK - TS) - initialH,
     initialEnthalpyJ: initialH, additionalColdResourceJ: initialCO2 * (L + CG * (t.inletK - TS)), meanSolidDiameterM: mean,
     pressurePa: null, oxygenMoleFraction: null, extinction: null, penetrationM: null, unavailable: [...UNAVAILABLE],
-    assumptions: [p.sizeProvenance,p.heatTransferProvenance,p.residenceProvenance,p.soilProvenance,'Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.','Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.','Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.','Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.','Active solid withdrawal requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. This fail-closed screen is not an accuracy certificate; refinement evidence applies only to tested scenarios.'],
+    assumptions: [p.sizeProvenance,p.heatTransferProvenance,p.residenceProvenance,p.soilProvenance,'Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.','Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.','Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.','Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.','Before the conservative minimum-liquid-temperature extinction bound, pre-onset resolution must pass and a numerical zero source is unavailable as proof of complete loss. Active solid withdrawal also requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. These fail-closed screens are not accuracy certificates; refinement evidence applies only to tested scenarios.'],
     review: 'No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.',
     metadata: { panelId: config.id, seed: t.seed, observationS: t.endS, particleSizeProvenance: p.sizeProvenance, units: 'SI; kelvin; mass fractions use stated denominators', numericalStepS: p.stepS, parcelStepS: p.parcelStepS } }
 }

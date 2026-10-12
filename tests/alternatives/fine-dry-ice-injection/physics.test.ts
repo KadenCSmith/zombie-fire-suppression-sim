@@ -69,6 +69,24 @@ describe('D finite particle transport', () => {
     expect(delayed.solidEnteringGroundKg).toBe(0)
     expect(delayed.upstreamSublimatedKg).toBeCloseTo(.01,12)
   })
+  it('rejects independently identified coarse pre-onset clipping rather than inferring zero delivery', () => {
+    const c=base();Object.assign(c.thermal,{waterKg:5,dryIceKg:1,inletK:350,contactStartS:.015})
+    Object.assign(c.particleInjection!,{hoseResidenceS:0,probeResidenceS:0,stepS:.02,parcelStepS:.00625})
+    // Independent finite-bath RK4: 0.0261140340 kg solid at onset and
+    // continuous solid entry 6.5726649593e-7 kg; the prior screen accepted zero.
+    const r=createParticleRun(c),before=r.snapshot()
+    expect(()=>r.advanceTo(1)).toThrow(/Underresolved solid delivery before withdrawal/)
+    expect(r.snapshot()).toEqual(before)
+  })
+  it('does not certify early numerical extinction and preserves bounded delayed complete loss', () => {
+    const c=particleScenario(base(),'film-sensitivity')
+    Object.assign(c.particleInjection!,{stepS:.00125,parcelStepS:.00625})
+    c.thermal.contactStartS=2.5
+    expect(()=>simulateParticle(c,30)).toThrow(/Unresolved early source loss/)
+    c.thermal.contactStartS=4
+    const s=simulateParticle(c,30)
+    expect(s.solidEnteringGroundKg).toBe(0);expect(s.upstreamSublimatedKg).toBeCloseTo(.01,12)
+  })
   it('conserves water, CO2 and energy with nonnegative finite inventory across cases', () => {
     for(const scenario of ['conduction-reference','film-sensitivity','water-only','pre-sublimated','off'] as const) {
       const config=particleScenario(base(),scenario)

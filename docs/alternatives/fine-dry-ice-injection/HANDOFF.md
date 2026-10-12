@@ -6,6 +6,8 @@
 
 - Implemented D source: `4d780df7d8ef963d1abc95ff4c8f5486782586af`.
 - Final retry-1 source: `0937d7b60db98d1ef1ed544bd745660c10e94f7c`, an ordinary merge of coordinator checkpoint `fcd1776909af93477133afec1b4fb70941b2064c`. Every D-owned implementation/test byte is unchanged from the first implemented freeze. Both identities remain in review history.
+- Retry2 source: `fd8e7a0c3b3596c2ee439d7aec52c2bc71f92440`; signed5.1/10 FAIL for coarse pre-onset clipping.
+- Final retry3 source is the subsequent conservative-bound correction; immutable identity and signed review will be added in the report-only delivery commit.
 - Initial audited placeholder: `85f49eb7423f94c68b544e4d9450628d0ccade20`; score 1.3/10.
 - Published D seam/base: `9a7350cfdc52e7b160e77dd8f30f01db826ee2c7`; READY publication: `44aa38f277d71d8d7d21f84070e02379edf1fc08`.
 - Branch: `feature/v21-particle-injection`. Draft PR: <https://github.com/KadenCSmith/zombie-fire-suppression-sim/pull/24>, targeting `integration/v21-alternatives`.
@@ -30,7 +32,9 @@ Bulk carrier temperatures below 273.15 K or above 350 K reject execution. Initia
 
 `candidate-provenance.json` records source/dependency/criteria hashes, runtime/environment, scenarios, executors, exact freezes and evidence hashes. `numerical-evidence.json` contains reproducible scenarios/refinement. Implementer logs are archived verbatim in `implementer-checks.tar.gz`, retaining the `implementer-checks/` paths inside it.
 
-At the final source freeze:
+Historical integration checks below refer to their named source freezes. Latest retry3 owned checks:16/16 PASS, typecheck PASS, lint PASS with16 inherited warnings, build PASS,57/57 preservation PASS. Exact command logs are verbatim in `retry3-implementer-checks.tar.gz`; scenarios/refinement in `numerical-evidence-retry3.json`.
+
+At the earlier retry1 source freeze:
 
 - `npm run typecheck`: PASS.
 - `npm run lint`: PASS, 16 inherited warnings.
@@ -46,7 +50,7 @@ Maximum reported absolute mass residual is approximately 1.033e-14 kg; energy re
 
 Dedicated independent reviewer: `/root/d_realism_reviewer`. Frozen criteria SHA-256: `e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d`. Weights: physics 30%, soil 20%, numerics/validation 20%, mechanism 20%, visual 10%. One initial audit plus at most three scored retries; integration cannot reset counters.
 
-Retry-1 signed report is archived verbatim: physics7, soil3, numerics5, mechanism5, visual4, exact5.1/10 FAIL. It found a source-fixable10µm short-life false-zero delivery case. Retry2 adds fail-closed aged-source onset resolution screening and an exact onset event; its independent audit is pending. Initial1 + retry1 =2/4 scored passes, two retries remain before retry2. Initial/retry1 private evidence archives contain all signed top-level harnesses/results/manifests; disposable full-source/dependency copies are recoverable by immutable Git identity and hashes, and are not duplicated in the archives. No passing score is claimed. Unsupported central physical coupling caps the score at 6; labels and numerical tests cannot establish experimental validation.
+Retry-1 signed report is archived verbatim: physics7, soil3, numerics5, mechanism5, visual4, exact5.1/10 FAIL. It found a source-fixable10µm short-life false-zero delivery case. Retry2 added aged-source onset screening but also scored5.1/10 FAIL for coarse pre-onset clipping. Retry3 adds pre-onset screening and a conservative latest-extinction bound at minimum valid liquid temperature; early numerical zero is unavailable as proof of complete loss. Its independent audit is pending. Initial1 + retries1–2 =3/4 scored passes, one final retry remains before retry3. Initial/retry1 private evidence archives contain all signed top-level harnesses/results/manifests; disposable full-source/dependency copies are recoverable by immutable Git identity and hashes, and are not duplicated in the archives. No passing score is claimed. Unsupported central physical coupling caps the score at 6; labels and numerical tests cannot establish experimental validation.
 
 Actual independent candidate UI inspection remains **unverified**. Browser policy verification denied the implementer's attempt; no browser/Electron/CDP workaround was attempted. The initial placeholder UI audit predates that denial and does not establish candidate UI correctness. Any coordinator UI evidence must name its own executor and exact identity, and cannot be substituted for an independent reviewer UI gate.
 
