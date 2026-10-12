@@ -17,8 +17,8 @@ function Rim({ y, radius = .72 }: { y: number; radius?: number }) {
   </mesh>
 }
 
-/** A deliberately open, non-dimensional cutaway: no closure, pressure gauge,
- * containment/trigger mechanism or construction specifications. */
+/** Non-dimensional cutaway with an authored closing cover. No pressure law,
+ * containment/trigger design or equipment construction specifications. */
 function MediaCutaway({ time }: { time: number }) {
   const visual = preparationVisuals(time)
   return <group userData={{ scientificRole: 'Illustrative open solid/liquid cutaway; not a pressure vessel model or design' }}>
@@ -36,6 +36,11 @@ function MediaCutaway({ time }: { time: number }) {
       <meshPhysicalMaterial color="#b2d2c8" transparent opacity={.1} roughness={.13} metalness={.22} depthWrite={false} side={THREE.DoubleSide}/>
     </mesh>
     <Rim y={-.57}/><Rim y={.65}/>
+    <group position={[0, .68, -.72]} rotation={[-1.45 * (1 - visual.lid), 0, 0]}>
+      <mesh position={[0, 0, .72]} castShadow><cylinderGeometry args={[.75, .75, .055, 64]}/>
+        <meshStandardMaterial color="#85938a" metalness={.5} roughness={.5}/>
+      </mesh>
+    </group>
     {[-1, 1].map(side => <mesh key={side} position={[side * .72, .04, 0]}>
       <cylinderGeometry args={[.018, .018, 1.23, 8]}/><meshStandardMaterial color="#b0bab2" metalness={.75} roughness={.24}/>
     </mesh>)}
@@ -65,7 +70,8 @@ function softParticleTexture() {
 function PhaseChange({ time }: { time: number }) {
   const texture = useMemo(softParticleTexture, [])
   useEffect(() => () => texture.dispose(), [texture])
-  const amount = preparationVisuals(time).phaseChange
+  const visual = preparationVisuals(time)
+  const amount = visual.phaseChange * (1 - visual.lid)
   return <group userData={{ scientificRole: 'Authored phase-change cue; no calculated pressure, cooling or gas transport' }}>
     {Array.from({ length: 26 }, (_, i) => {
       const age = (time * .15 + i / 26) % 1, angle = i * 2.39996
@@ -169,7 +175,7 @@ export function MethodCues({ time }: MethodSceneProps) {
     <ContactSteam time={visual.time}/>
     <IllustrativeQuench progress={visual.quench}/>
     {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TRUCK_PARKED[0] + MEDIA_MOUNT[0], 3, TRUCK_PARKED[2]]}>
-      {visual.boost > 0 ? 'Faster flow · illustrative' : 'Dry ice added to water'}
+      {visual.boost > 0 ? 'Faster flow · illustrative' : visual.lid === 1 ? 'Capped preparation · illustrative' : visual.lid > 0 ? 'Closing lid · illustrative' : 'Dry ice added to water'}
     </Annotation>}
     {visual.time >= 75 && <Annotation position={[.4, -.7, .3]}>Illustrative quenching</Annotation>}
   </group>

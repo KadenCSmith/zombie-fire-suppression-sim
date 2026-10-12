@@ -3,6 +3,12 @@ import { SOLID_COUNT, WORLD_STAGING, bucketPoint, loadingBucketPose, solidLoadin
 import { WaterContact } from '../../../src/alternatives/sublimation-injection/loading'
 
 describe('open bucket loading illustration', () => {
+  it('finishes loading and retracts before closing the lid, then increases the illustrated flow', () => {
+    expect(WORLD_STAGING.lidStart).toBeGreaterThan(WORLD_STAGING.iceEnd)
+    expect(loadingBucketPose(WORLD_STAGING.lidStart).position[0]).toBe(1.1)
+    expect(WORLD_STAGING.lidClosed).toBeLessThan(WORLD_STAGING.boostStart)
+    for (let i = 0; i < SOLID_COUNT; i++) expect(solidLoadingPose(90, i).impactS).toBeLessThan(WORLD_STAGING.lidStart)
+  })
   it('clears the tank rim before traversing and returns beside it before lowering', () => {
     for (let time = 55; time <= 71; time += .025) {
       for (const x of [-.275, .275]) for (const y of [-.25, .24]) for (const z of [-.25, .25]) {

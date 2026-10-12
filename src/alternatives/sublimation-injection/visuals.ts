@@ -3,7 +3,7 @@
 export const WORLD_STAGING = {
   arrive: 38, parked: 48, hoseStart: 48, hoseReady: 56,
   liftStart: 55, liftEnd: 59, iceStart: 59, iceEnd: 66,
-  boostStart: 64, boostEnd: 72, end: 90,
+  lidStart: 68.5, lidClosed: 71.3, boostStart: 71.5, boostEnd: 77.5, end: 90,
 } as const
 export const TRUCK_PARKED = [2.15, 0, -2.05] as const
 export const MEDIA_MOUNT = [.4, 1.6, 0] as const
@@ -28,7 +28,7 @@ export function preparationVisuals(timeS: number) {
   const arrival = ease(time, WORLD_STAGING.arrive, WORLD_STAGING.parked)
   const boost = ease(time, WORLD_STAGING.boostStart, WORLD_STAGING.boostEnd)
   const q = clamp((time - WORLD_STAGING.boostStart) / (WORLD_STAGING.boostEnd - WORLD_STAGING.boostStart))
-  const rampIntegral = 8 * (q ** 3 - .5 * q ** 4) + Math.max(0, time - WORLD_STAGING.boostEnd)
+  const rampIntegral = (WORLD_STAGING.boostEnd - WORLD_STAGING.boostStart) * (q ** 3 - .5 * q ** 4) + Math.max(0, time - WORLD_STAGING.boostEnd)
   return {
     time,
     arrival,
@@ -40,7 +40,8 @@ export function preparationVisuals(timeS: number) {
     delivery: ease(time, WORLD_STAGING.hoseReady, 60),
     contact: ease(time, 60, 64),
     boost,
-    quench: ease(time, 68, 85),
+    lid: ease(time, WORLD_STAGING.lidStart, WORLD_STAGING.lidClosed),
+    quench: ease(time, 72, 85),
     steam: Math.sin(Math.PI * ease(time, 60, 87)),
     flowTravel: .08 * Math.max(0, time - WORLD_STAGING.hoseReady) + .18 * rampIntegral,
     surfaceOffset: .006 * Math.sin(time * .8),
