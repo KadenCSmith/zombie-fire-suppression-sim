@@ -45,7 +45,7 @@ export default function AlternativeRenderWorkspace({ id, onCompare, onDetails }:
     <div ref={hero} className="cinematic-hero-scroll" style={{ '--scroll-progress': progress } as CSSProperties}>
       <main className="cinematic-hero-sticky" aria-label={`${v.number} ${v.label} latest render`}>
         <div className="cinematic-render"><AlternativeScene id={id} time={time} resetToken={resetToken} cameraDistance={cameraDistance}/></div>
-        <div className="method-render-caption"><span>{v.number} · LATEST RENDER · ILLUSTRATIVE</span><h1>{v.label}</h1><p>{v.id === 'nanoparticles' ? 'TBD / mechanism unspecified. Context only; execution unavailable.' : v.subtitle}</p></div>
+        <div className="method-render-caption" aria-hidden={progress > .55}><span>{v.number} · LATEST RENDER · ILLUSTRATIVE</span><h1>{v.label}</h1><p>{v.subtitle}</p></div>
         <div className="cinematic-scroll-hint" style={{opacity:1-progress}}><span>SCROLL TO ENTER THE SIMULATION</span><span>↓</span></div>
         <div className="cinematic-scene-meta" style={{opacity:progress}}><span>{v.stages[stage]}</span><span>Presentation time · no predicted pressure, penetration or suppression</span></div>
         <div className="cinematic-transport" style={{transform:`translateY(${(1-progress)*105}%)`,opacity:progress}} inert={progress<.1} aria-label="Method render playback">
