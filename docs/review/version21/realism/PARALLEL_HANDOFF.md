@@ -4,13 +4,14 @@ Human invoked `/Users/kadensmith/Downloads/V21_Realism_Review_Loop (1).md` on202
 
 Each implementer now manages its own dedicated independent read-only reviewer and local loop without waiting for other teams. Reuse the same locally accessible reviewer; replace only if unavailable, preserving evidence and counters. Coordinator-tree reviewers cannot be transferred into the three separate user-owned chat teams. Their completed initial reports remain reusable independent evidence; central A/C review work is finished and central B work was interrupted with artifacts preserved, without a round1 score. Each owner may create/reuse its locally accessible dedicated reviewer. Maximum7active agents: coordinator+3implementers+3reviewers; no recursive delegation or extra active implementers.
 
-| Owner / alternative | Verified completed initial audit | Initial passes used | Scored revision retries used | Current work | Retries remaining |
-|---|---:|---:|---:|---|---:|
-|A /4.2.1|4.1|1|1 reported|Owner reports retry1=4.1; second visual revision underway; signed packet integration pending|2|
-|B /4.2.3.1|3.9|1|1|Signed retry1=4.1, integrated; justified scientific stop for missing mechanism/data|2 unused|
-|B /4.2.3.2|1.3|1|1|Signed retry1=1.3 integrated; latest human visual follow-up enters retry2 with original gas-release host|2 before retry2|
-|C /4.2.4|2.3|1|2|Signed retry2=1.2 integrated at85f49eb; honest scientific stop; owner and reviewer parked|1 unused|
-|D /4.2.2|1.3 reported|1|0|New direct human particle-delivery scope; independent initial85f49eb audit complete; separate seam launch pending|3|
+| Owner / alternative | Initial score | Final accepted score | Scored passes used | Retries used / unused | Status |
+|---|---:|---:|---:|---:|---|
+|A /4.2.1|4.1|4.0|4|3 /0|Integrated55d4197; exhausted, independent currentGUIunverified|
+|B /4.2.3.1|3.9|4.1|2|1 /2|Integrated13c26c8; justified scientific stop|
+|B /4.2.3.2|1.3|1.3|3|2 /1|Integrated159b5a5; justified scientific stop, independent currentGUIunverified|
+|C /4.2.4|2.3|1.2|3|2 /1|Integrated85f49eb; justified scientific stop, independent liveGPUunverified|
+|D /4.2.2|1.3 reported|Pending|1|0 /3 before retry1|New human mechanism, dedicated retry1 review underway; source0937d7b|
+
 
 B delivery `c6dd9ca23b92d7dc378741e42acc803bc2296f00` was integrated independently at `13c26c8ef8e387657a01b6392e3186013e467b03`, without waiting for A/C. Reviewed source is `03bae79560d893f716dca9dc8f7fdc80f4f3c747`; later commits contain owned docs/evidence only. Root verified all63 changed paths remain inside B ownership, the signed report SHA256, and57/57 original identities after merge. [Signed B review](../../../alternatives/pressure-pulse-liquid-waves/realism-round-1/REVIEW_B_ROUND_1.md) and its portable artifact manifest preserve separate scores/counters and the justified below7 stop. Root's shared toolbox wording correction is editorial only; no solver, interface, scene timing or input changes. Combined checks, main, release and Mac installation remain pending.
 
@@ -35,4 +36,6 @@ On the final combined candidate root runs applicable full project suites and rea
 
 C final delivery36b08600191c92e7ff2f975cfe2a236048f8993e, reviewed source95972c98ba1df981df386966a81508b9c52a971e, integrated85f49eb7423f94c68b544e4d9450628d0ccade20. Signed retry2 criterion scores1/1/2/1/1 =>1.2; initial+2retries=3scored passes,1unused; cap6, verified7No. Dedicated reviewer executed17critical checks and verified57original identities. Independent liveGPU remains unverified; root normalChrome execution/four supplied frames are explicitly attributed to root. Supported fade/caption/render-resource corrections earn no physical coupling credit. See private FINAL_HANDOFF_V3.md and ROUND_2_C.md.
 
-B pressure-only follow-up04426bf930c2f0189cf166ea6de29ee09b7a0b74 (reviewed2d6ab8f0a4d74b7aee9c6a449533afb4c5343911) is submitted, not yet integrated. Signedretry2 remains1.3, criteria1/1/2/1/2,3passes/2retries/1unused; liquid remains4.1,2passes/1retry/2unused. Independent liveUIunverified; prior source cannot establish new visual evidence. Coordinator shared83b0ede resolves3stale actualfactory expectations, preserving their failure history.
+B pressure-only follow-up04426bf930c2f0189cf166ea6de29ee09b7a0b74 (reviewed2d6ab8f0a4d74b7aee9c6a449533afb4c5343911) is integrated159b5a552e461d99ad32272e93b30d7ac725f098 after31owned paths/16signed artifacts verified. Signedretry2 remains1.3, criteria1/1/2/1/2,3passes/2retries/1unused; liquid remains4.1,2passes/1retry/2unused. Independent liveUIunverified; prior source cannot establish new visual evidence. Coordinator shared83b0ede resolves3stale actualfactory expectations, preserving their failure history.
+
+A final6d951802a5aab23c1eeb76b6bc9d2a69c36744d8 (revieweda0e0826db17d8e06dfc79fa6baeb6850bb9ab383) integrated55d4197eaedee774dbf8a736762bd22ec53e9a1b. Root verified107A-owned changed paths and25signed artifacts/report77fae05bbc58ebdb1445fddd049254780b85c939dab8b023cdf87c9608469275. Criteria5/3/6/2/3 =>4.0; initial4.1, all4passes/3retries used,0remaining; cap6/verified7No. Independent81tests/12files PASS; visualcriterion unverified after browser-policy denial. Root normalChrome execution is separate. Shared D-only optional payload/restore/window/export hooks retain ABC physical signatures/defaults/numerics; root shared hero-caption fade is a visual change, no physical evidence upgrade. All57preserved after merge.
