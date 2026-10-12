@@ -433,3 +433,11 @@ Latest direct B-chat request asks to improve4.2.3.2 after accepting liquid. Its 
 
 
 Pressure-only test checkpoint: B preserved61/64PASS with3failures from old38s/gas-off expectations after the authorized57s/gas-on host change. Root updated those exact visual-scope expectations, retaining the unchanged38s introduction assertion for A, and added original-factory equality across0/38/44/51.5/55/57/90s with water disabled. All6real composition tests PASS; the3new mock-only checks were consolidated into this existing actual-factory suite. No physical invariant or scientific tolerance was weakened;57original identities PASS. Final combined checks remain pending.
+
+## Coordinator additive D seam / C integration, 2026-10-12
+
+C final36b0860 (reviewed95972c9) integrated85f49eb: vibration-only authored ground/fire-out illustration, no active physical field or water; signed1.2,3passes/1unused. Root source/numerical-presentation checks cover supported shared integration, not physical validation.
+
+D human-supplied4.2.2water/fine-solid-dry-ice delivery is separate. Minimal compiling v21.3 D-only hooks retain legacy v21.2 A/B/C behavior, preserve all57original identities, route private workspace/comparison/payload/restore/units; no guessed sizes/inputs/model. Seed all execution fails closed. Initial scientific audit at85f49eb reports1.3 before edits,1pass/0retries; D owns further scientific implementation/review. Typecheck/lint PASS (16 inherited warnings), production build2.88sPASS,57guardPASS. First targeted invocation accidentally included ignored work copies (184PASS/1FAIL, obsolete pending-particle access expectation); source-free seed access was corrected tofalse and maintained tests rerun separately. Final combined/native/GPU/main/release/install still pending.
+
+Corrected maintained targeted rerun:34/34 in5filesPASS (0.801s); exact final seam buildPASS. Revised native-alternatives/vibration fixtures are syntax-checked but UNRUN until final combined candidate; CI steps are prepared, not passed evidence.

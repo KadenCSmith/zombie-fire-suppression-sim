@@ -54,3 +54,15 @@ jobs:
       - name: Version comparison (Linux CI display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npx electron --no-sandbox scripts/smoke-comparison.cjs
+      - name: Version21 independent alternatives (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-alternatives.cjs
+      - name: Version21 independent alternatives (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-alternatives.cjs
+      - name: Vibration-only scene and unavailable prediction (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: npx electron scripts/smoke-vibration.cjs
+      - name: Vibration-only scene (Linux CI display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npx electron --no-sandbox scripts/smoke-vibration.cjs

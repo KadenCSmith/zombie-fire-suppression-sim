@@ -1,11 +1,13 @@
 import { findMethodModule } from './modules'
+import type { ParticleInjectionSettings, ParticleInjectionState } from './fine-dry-ice-injection/types'
+import { defaultParticleInjectionSettings, particleLinkedCompatibility, particleObservationWindowS } from './fine-dry-ice-injection/config'
 import { type ContactCoolingState, type ContactPatchSpec } from '../story/contactCooling'
 import { ALTERNATIVE_CONTACT_STEP_S, createContactCoolingSession } from './contactAdapter'
 import { compatible, defaultThermal, variant, type VariantId, type EngineId, type MediumId, type ThermalSettings } from './registry'
 import { DEFAULT_SETTINGS, PeatSolver, totals, type Settings, type Frame } from '../peatfem/coupled'
-export interface PanelConfig { id: string; variantId: VariantId; engine: EngineId; medium: MediumId; sourceStatus: 'unspecified' | 'known-contact-properties'; thermal: ThermalSettings; fem: Settings }
+export interface PanelConfig { id: string; variantId: VariantId; engine: EngineId; medium: MediumId; sourceStatus: 'unspecified' | 'known-contact-properties'; thermal: ThermalSettings; fem: Settings; particleInjection?: ParticleInjectionSettings }
 export interface Metrics { maximumK: number; waterUsedKg: number; dryIceUsedKg: number; energyJ: number; energyResidualJ: number; massResidualKg: number; oxygenKg: number | null; fuelKg: number | null; reactionW: number | null }
-export interface AcceptedState { timeS: number; contact?: ContactCoolingState; fem?: Frame; metrics: Metrics | null }
+export interface AcceptedState { timeS: number; contact?: ContactCoolingState; fem?: Frame; particleInjection?: ParticleInjectionState; metrics: Metrics | null }
 export interface RunMessage { panelId: string; runId: string; type: 'ready' | 'state' | 'paused' | 'complete' | 'failed'; state?: AcceptedState; running: boolean; solveMs: number; wallMs: number; error?: string }
 export interface WorkerCommand { panelId: string; runId: string; type: 'init' | 'run' | 'pause' | 'advance'; config?: PanelConfig; targetS?: number }
 export function acceptsMessage(panelId: string, runId: string, message: Pick<RunMessage, 'panelId' | 'runId'>) { return message.panelId === panelId && message.runId === runId }
@@ -74,16 +76,18 @@ export function createRun(config: PanelConfig) {
 export function freshPanel(id: string, variantId: VariantId): PanelConfig {
   const v = variant(variantId)
   return { id, variantId, engine: v.defaultEngine, medium: v.defaultMedium, sourceStatus: 'unspecified',
-    thermal: defaultThermal(variantId), fem: { ...DEFAULT_SETTINGS } }
+    thermal: defaultThermal(variantId), fem: { ...DEFAULT_SETTINGS }, ...(variantId === 'nanoparticles' ? { particleInjection: defaultParticleInjectionSettings() } : {}) }
 }
 export function duplicatePanel(panel: PanelConfig, id: string): PanelConfig { return { ...structuredClone(panel), id } }
+export function observationWindowS(config: PanelConfig): number { return config.variantId === 'nanoparticles' ? particleObservationWindowS(config) : config.engine === 'peat-fem' ? config.fem.endS : config.thermal.endS }
 export function linkedCompatibility(configs: PanelConfig[]): string | null {
   if (configs.length < 2) return 'Select at least two panels.'
   if (configs.some(c => compatible(c.variantId, c.engine, c.medium))) return 'Resolve incompatible selections first.'
   if (configs.some(c => c.engine === 'concept')) return 'Concept stage time is presentation time, not physical time.'
   if (configs.some(c => c.engine !== configs[0].engine)) return 'Contact and FEM do not represent the same physical system.'
-  if (configs.some(c => (c.engine === 'peat-fem' ? c.fem.endS : c.thermal.endS) !== (configs[0].engine === 'peat-fem' ? configs[0].fem.endS : configs[0].thermal.endS))) return 'Match observation windows first.'
+  if (configs.some(c => observationWindowS(c) !== observationWindowS(configs[0]))) return 'Match observation windows first.'
   const first = configs[0]
+  if (first.engine === 'particle') return particleLinkedCompatibility(configs)
   if (configs.some(c => c.thermal.seed !== first.thermal.seed)) return 'Match seeds before linking physical time.'
   if (first.engine === 'contact' && configs.some(c => c.thermal.initialK !== first.thermal.initialK || c.thermal.inletK !== first.thermal.inletK)) return 'Match initial and inlet temperatures before linking physical time.'
   if (first.engine === 'peat-fem') {

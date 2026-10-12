@@ -8,7 +8,7 @@ describe('Version21 alternatives contract', () => {
     expect(new Set(VARIANTS.filter(v => v.id !== 'baseline').map(v => v.method)).size).toBe(4)
     expect(VARIANTS.filter(v => v.method === '4.2.3')).toHaveLength(3)
     expect(VARIANTS.filter(v => v.draft)).toHaveLength(2)
-    expect(compatible('nanoparticles', 'concept', 'unspecified')).toContain('Only a heading')
+    expect(compatible('nanoparticles', 'concept', 'unspecified')).toContain('reviewed particle model')
     expect(VARIANTS.every(v => !v.status.experimentallyValidated)).toBe(true)
   })
   it('rejects unsupported physical coupling and unspecified thermodynamics', () => {
@@ -21,6 +21,22 @@ describe('Version21 alternatives contract', () => {
     const p=freshPanel('original','pressure-pulse')
     expect(compatible(p.variantId,p.engine,p.medium)).toContain('Protected original render')
     expect(()=>createRun(p)).toThrow('Protected original render')
+  })
+  it('rejects historical liquid vibration configurations after persistence restore', () => {
+    // Old saved panels may still select liquid and a physical engine. They must
+    // not revive the removed liquid model or invent a vibration prediction.
+    for (const engine of ['contact', 'peat-fem', 'concept'] as const) {
+      for (const medium of ['water', 'co2-water', 'none'] as const) {
+        const old = freshPanel('historical-vibration', 'vibratory-injection')
+        old.engine = engine; old.medium = medium
+        old.thermal.enabled = true; old.thermal.waterKg = 1
+        const restored = readComparison(serializeComparison([old]))[0]
+        expect(restored.variantId).toBe('vibratory-injection')
+        expect(compatible(restored.variantId, restored.engine, restored.medium)).toMatch(/unavailable/i)
+        expect(() => createRun(restored)).toThrow(/unavailable/i)
+        expect(linkedCompatibility([freshPanel('reference', 'baseline'), restored])).toContain('incompatible')
+      }
+    }
   })
   it('runs two independent computations and copies only configuration', () => {
     const p = freshPanel('a', 'sublimation-injection'), q = duplicatePanel(p, 'b')

@@ -39,8 +39,9 @@ app.on('browser-window-created',(_event,win)=>{
           await wait(()=>id==='pressure-pulse'?document.querySelector('.fire-sequence-shell:not(.method-render)'):document.querySelector('[data-render-variant="'+id+'"]'),method+' opens latest render directly');
           assert(new URL(location.href).searchParams.get('alternative')===id,'Selected method missing from refresh URL');
           if(id==='vibratory-injection'){
-            assert(document.querySelector('[data-vibratory-version="2"]'),'Latest C field workspace missing');
+            assert(document.querySelector('[data-vibratory-version="3"][data-treatment="vibration-only"][data-prediction="unavailable"]'),'Latest vibration-only workspace missing');
             await wait(()=>document.querySelector('.vib-scene canvas'),'original opening in private C workspace');
+            assert(document.querySelectorAll('.vib-scene canvas').length===1&&alive.size===0,'Vibration render must use one Canvas and no numerical jobs');
             button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="4.2.3"]').click();
             await wait(()=>document.querySelector('.fire-sequence-shell:not(.method-render)')&&alive.size===0,'C route disposal restores protected original');
           }else if(id!=='pressure-pulse'){
@@ -68,12 +69,15 @@ app.on('browser-window-created',(_event,win)=>{
         const rightId=right.dataset.runId;button('Duplicate',right).click();await wait(()=>panels().length===3&&alive.size===3,'duplicate owns separate worker');
         assert(time(panels()[2])===0,'Duplicate copied mutable solver state');button('Remove',panels()[2]).click();await wait(()=>panels().length===2&&alive.size===2,'removed worker disposed');assert(right.dataset.runId===rightId,'Removal replaced another run');
         button('Pause all').click();
-        for(const id of ['sublimation-injection','liquid-waves','pressure-only','vibratory-injection']){
+        for(const id of ['sublimation-injection','liquid-waves','pressure-only']){
           choose(right,id);await wait(()=>right.dataset.variant===id&&button('Start',right)&&!button('Start',right).disabled,id+' ready');button('Start',right).click();await wait(()=>time(right)>=.5,id+' independently runs');button('Pause',right).click();
           if(id==='pressure-only')assert(!right.querySelector('.alt-history'),'Concept acquired fabricated outcome curve');
         }
+        choose(right,'vibratory-injection');await wait(()=>right.dataset.variant==='vibratory-injection'&&button('Start',right)?.disabled&&time(right)===0,'vibration prediction unavailable');
+        assert(!right.querySelector('.alt-history'),'Unsupported vibration acquired fabricated outcome history');
+        await wait(()=>alive.size===1,'unsupported vibration disposes its comparison worker');
         choose(right,'pressure-pulse');await wait(()=>right.textContent.includes('Protected original render'),'original is unavailable for unsupported live comparison');await wait(()=>button('Start',right)?.disabled&&time(right)===0,'original comparison execution disabled');
-        choose(right,'nanoparticles');await wait(()=>right.textContent.includes('Only a heading'),'unspecified mechanism rejects execution');await wait(()=>button('Start',right)?.disabled&&time(right)===0,'nanoparticles start disabled');
+        choose(right,'nanoparticles');await wait(()=>right.textContent.includes('reviewed particle model'),'pending reviewed particle model rejects execution');await wait(()=>button('Start',right)?.disabled&&time(right)===0,'nanoparticles start disabled');
         choose(right,'sublimation-injection');await wait(()=>button('Start',right)&&!button('Start',right).disabled,'thermal proxy restored');button('Reset all').click();await delay(100);
         const link=document.querySelector('input[aria-label="Link physical time"]');link.click();await delay(20);button('Start / resume all').click();await wait(()=>panels().every(p=>time(p)>=3),'linked physical barriers advancing');button('Pause all').click();
         await wait(()=>Math.abs(time(left)-time(right))<1e-8,'linked accepted times agree after pause');
@@ -93,7 +97,7 @@ app.on('browser-window-created',(_event,win)=>{
         failedWorker.dispatchEvent(new ErrorEvent('error',{message:'Stale terminated worker failure',cancelable:true}));await delay(50);
         assert(!failedPanel.textContent.includes('Stale terminated worker failure'),'Stale worker error replaced current run');
         button('Fire Simulation home').click();await wait(()=>document.querySelector('.fire-sequence-shell')&&alive.size===0,'navigation disposes all live jobs and preserves rapid renderer');
-        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','selected method refresh URL','read-only original fire/drilling reuse before treatment','prominent method animation after original introduction','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','all defined new variants','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance','worker crash retains accepted state/history','reset after failure','stale terminated-worker error rejected']};
+        return {two,four,pauseMs,workerCleanup:true,tests:['default rapid mode','implicit render and five secondary sections under every method','selected method refresh URL','read-only original fire/drilling reuse before treatment','prominent method animation after original introduction','pressure variants','independent pause/reset','configuration-only duplicate','removal cleanup','supported new variants','vibration-only render without numerical jobs','unsupported vibration comparison rejected','original comparison unavailable','unspecified rejection','linked physical time','two/four panel performance','worker crash retains accepted state/history','reset after failure','stale terminated-worker error rejected']};
       })()`);
       assertNoErrors(errors);fs.mkdirSync(path.resolve(__dirname,'../docs/review/version21'),{recursive:true});fs.writeFileSync(path.resolve(__dirname,'../docs/review/version21/live-smoke.json'),JSON.stringify({...result,date:new Date().toISOString(),environment:process.platform+' '+process.arch,scope:'software/numerical checks only; no physical validation'},null,2));
       clearTimeout(timeout);console.log('ALTERNATIVES_SMOKE_PASS '+JSON.stringify(result));app.exit(0);

@@ -1,4 +1,5 @@
 import type { PanelConfig } from './model'
+import { PARTICLE_RECORD_UNITS } from './fine-dry-ice-injection/config'
 
 /** Never export accepted states under settings that did not produce them. */
 export function currentRecord<T extends { configurationKey?: string }>(config: PanelConfig, result: T | undefined): T | null {
@@ -6,6 +7,7 @@ export function currentRecord<T extends { configurationKey?: string }>(config: P
 }
 
 export const RECORD_UNITS = {
+  particleInjection: PARTICLE_RECORD_UNITS,
   temperature: 'K', time: 's', mass: 'kg', energy: 'J', reactionW: 'W',
   oxygen: 'kg O2', oxygenMassFraction: 'kg O2 / kg total gas',
   runtime: { solveMs: 'ms', wallMs: 'ms' },

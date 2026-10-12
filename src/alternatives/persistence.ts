@@ -1,6 +1,7 @@
 import { PeatSolver } from '../peatfem/coupled'
 import { PARAMETERS, VARIANTS, variant } from './registry'
 import { freshPanel, type PanelConfig } from './model'
+import { restoreParticleInjectionSettings } from './fine-dry-ice-injection/config'
 export const SESSION_KEY = 'zombie-fire-alternatives-v21'
 export const SESSION_SCHEMA = 2
 export function readComparison(raw: string | null): PanelConfig[] {
@@ -17,8 +18,9 @@ export function readComparison(raw: string | null): PanelConfig[] {
       for (let suffix = 1; ids.has(id); suffix++) id = `migrated-${i}-${suffix}`
       const next = freshPanel(id, known.id)
       ids.add(next.id)
-      next.engine = ['contact', 'peat-fem', 'concept'].includes(p.engine ?? '') ? p.engine! : variant(known.id).defaultEngine
+      next.engine = ['contact', 'peat-fem', 'concept', 'particle'].includes(p.engine ?? '') ? p.engine! : variant(known.id).defaultEngine
       next.medium = ['none', 'water', 'co2-water', 'unspecified'].includes(p.medium ?? '') ? p.medium! : next.medium
+      if (known.id === 'nanoparticles') next.particleInjection = restoreParticleInjectionSettings(p.particleInjection)
       // Persist configuration only. A restored tab never resumes a stale job or physical state.
       for (const spec of PARAMETERS) {
         const value = p.thermal?.[spec.key]
