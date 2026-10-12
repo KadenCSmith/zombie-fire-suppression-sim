@@ -1,6 +1,8 @@
 {
   "kind": "numerical verification only; no experiments",
   "apiVersion": "v21.2",
+  "alternativeStepS": 0.00625,
+  "protectedReferenceDefaultStepS": 0.05,
   "reproduction": "node tests/alternatives/pressure-pulse-liquid-waves/record-evidence.mjs",
   "config": {
     "id": "evidence-liquid-waves",
@@ -62,24 +64,24 @@
   "final": {
     "timeS": 60,
     "metrics": {
-      "maximumK": 501.75266005643573,
-      "waterUsedKg": 0.5,
+      "maximumK": 501.78986826987546,
+      "waterUsedKg": 0.5000000000000149,
       "dryIceUsedKg": 0,
-      "energyJ": 887056.6582442669,
-      "energyResidualJ": -2.8405338525772095e-8,
-      "massResidualKg": 4.440892098500626e-16,
+      "energyJ": 886953.9635751667,
+      "energyResidualJ": -2.5262124836444855e-8,
+      "massResidualKg": 8.604228440844963e-15,
       "oxygenKg": null,
       "fuelKg": null,
       "reactionW": null
     },
     "ledger": {
       "initialPeatEnergyJ": 1462800,
-      "peatEnergyJ": 575743.3417557627,
+      "peatEnergyJ": 575846.0364248564,
       "heatToDryIceJ": 0,
-      "heatToWaterJ": 887056.6582442669,
-      "waterStoredSensibleJ": 60809.36879962839,
-      "vaporEnthalpyJ": 826247.2894446374,
-      "energyResidualJ": -2.8405338525772095e-8,
+      "heatToWaterJ": 886953.9635751667,
+      "waterStoredSensibleJ": 60824.58578670649,
+      "vaporEnthalpyJ": 826129.3777884623,
+      "energyResidualJ": -2.5262124836444855e-8,
       "dryIceInitialKg": 0,
       "dryIceRemainingKg": 0,
       "dryIceSublimatedKg": 0,
@@ -87,11 +89,11 @@
       "dryIceMassResidualKg": 0,
       "waterInitialKg": 0.5,
       "waterRemainingSupplyKg": 0,
-      "waterSuppliedKg": 0.5,
+      "waterSuppliedKg": 0.5000000000000149,
       "waterBypassKg": 0,
-      "waterLiquidKg": 0.18158554944943933,
-      "waterVaporKg": 0.3184144505505602,
-      "waterMassResidualKg": 4.440892098500626e-16
+      "waterLiquidKg": 0.1816309895685206,
+      "waterVaporKg": 0.31836901043148796,
+      "waterMassResidualKg": -8.604228440844963e-15
     }
   },
   "offMatchesMatchedReference": true,
