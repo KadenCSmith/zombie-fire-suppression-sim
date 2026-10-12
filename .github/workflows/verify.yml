@@ -21,6 +21,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Preserve original 4.2.3 byte identities
+        run: node scripts/check-original-preservation.mjs
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
