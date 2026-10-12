@@ -1,0 +1,76 @@
+
+> zombie-fire-suppression-sim@0.21.0 test
+> vitest run tests/alternatives/fine-dry-ice-injection/physics.test.ts tests/alternatives/fine-dry-ice-injection/numerics.test.ts tests/alternatives.test.ts tests/alternatives-worker.test.ts tests/alternatives-presentation.test.ts --maxWorkers=2
+
+
+ RUN  v5.0.2 /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-particle-injection
+
+ ❯ tests/alternatives-worker.test.ts (4 tests | 1 failed) 13ms
+   ❯ independent alternatives worker lifecycle (4)
+     × does not leave an autonomous timer after replacement with an unavailable method 4ms
+ ❯ tests/alternatives.test.ts (18 tests | 1 failed) 109ms
+   ❯ Version21 alternatives contract (18)
+     × retains four methods, nested draft labels and unspecified definition 4ms
+ ❯ tests/alternatives-presentation.test.ts (3 tests | 1 failed) 5ms
+   ❯ method render scope (3)
+     × gives pressure-only and undefined methods no liquid cues 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/alternatives-presentation.test.ts > method render scope > gives pressure-only and undefined methods no liquid cues
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/alternatives-presentation.test.ts:12:60
+     10|       }
+     11|     }
+     12|     expect(methodPresentation('nanoparticles', 90).access).toBe(false)
+       |                                                            ^
+     13|   })
+     14|   it('distinguishes original pressure, intermittent pumping and source…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/alternatives-worker.test.ts > independent alternatives worker lifecycle > does not leave an autonomous timer after replacement with an unavailable method
+AssertionError: expected 'ready' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "ready"
+
+ ❯ tests/alternatives-worker.test.ts:30:35
+     28|   it('does not leave an autonomous timer after replacement with an una…
+     29|     send('run'); send('init','r2','a',{config:freshPanel('a','nanopart…
+     30|     expect(messages.at(-1)!.type).toBe('failed');const count=messages.…
+       |                                   ^
+     31|     vi.advanceTimersByTime(1000);expect(messages).toHaveLength(count)
+     32|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/alternatives.test.ts > Version21 alternatives contract > retains four methods, nested draft labels and unspecified definition
+AssertionError: expected '4.2.2 has no supported concept adapte…' to contain 'reviewed particle model'
+
+Expected: "reviewed particle model"
+Received: "4.2.2 has no supported concept adapter. Use conceptual stages."
+
+ ❯ tests/alternatives.test.ts:11:67
+      9|     expect(VARIANTS.filter(v => v.method === '4.2.3')).toHaveLength(3)
+     10|     expect(VARIANTS.filter(v => v.draft)).toHaveLength(2)
+     11|     expect(compatible('nanoparticles', 'concept', 'unspecified')).toCo…
+       |                                                                   ^
+     12|     expect(VARIANTS.every(v => !v.status.experimentallyValidated)).toB…
+     13|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  3 failed | 2 passed (5)
+      Tests  3 failed | 35 passed (38)
+   Start at  02:57:07
+   Duration  554ms (tests 47%, transform 36%, import 15%, worker 2%)
+

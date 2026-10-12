@@ -2,7 +2,7 @@ import type { PanelConfig } from '../model'
 import type { ParticleInjectionSettings } from './types'
 export const PARTICLE_PENDING = 'Conditional thermal/transport diagnostic; unvalidated film, entrainment and peat penetration. No apparatus, pressure, oxygen or suppression prediction.'
 export function defaultParticleInjectionSettings(): ParticleInjectionSettings {
-  return { particleDiameterM: 100e-6, sizeProvenance: 'Configured 100 micrometre monodisperse analytical study; unmeasured, not inferred from Nano.',
+  return { particleDiameterM: 100e-6, sizeProvenance: 'User-configured monodisperse diameter (particleDiameterM, SI metres); unmeasured analytical study, not inferred from Nano.',
     effectiveConductivityWmK: .6, heatTransferProvenance: 'Steady spherical conduction reference; effective film conductivity is an unmeasured sensitivity, not an aqueous-particle correlation.',
     solidDensityKgM3: 1560, hoseResidenceS: 1, probeResidenceS: .1, residenceProvenance: 'Prescribed ideal entrained parcel residence; no pressure, slip, filtration or blockage model.',
     dryPeatMassKg: .5, initialMoistureDryBasis: .1, dryPeatCpJkgK: 1500, soilProvenance: 'Assumed isolated warm peat specimen; finite UA sensitivity. No measured field constitutive law.',

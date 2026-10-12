@@ -14,9 +14,10 @@ for(const stepS of [.02,.01,.005,.0025,.00125]) {
  const s=simulateParticle(c,30);convergence.push({stepS,solidEnteringGroundKg:s.solidEnteringGroundKg,undergroundSublimatedKg:s.undergroundSublimatedKg,peatTemperatureK:s.peatTemperatureK,energyResidualJ:s.energyResidualJ})
 }
 const parcels=[]
-for(const parcelStepS of [.2,.1,.05,.025,.0125]) {
+for(const parcelStepS of [.2,.1,.05,.025,.0125,.00625]) {
  const c=particleScenario(freshPanel('D-parcel-convergence','nanoparticles'),'film-sensitivity');c.particleInjection!.stepS=.00125;c.particleInjection!.parcelStepS=parcelStepS
- const s=simulateParticle(c,30);parcels.push({parcelStepS,solidEnteringGroundKg:s.solidEnteringGroundKg,undergroundSublimatedKg:s.undergroundSublimatedKg,peatTemperatureK:s.peatTemperatureK,energyResidualJ:s.energyResidualJ})
+ try { const s=simulateParticle(c,30);parcels.push({parcelStepS,solidEnteringGroundKg:s.solidEnteringGroundKg,undergroundSublimatedKg:s.undergroundSublimatedKg,peatTemperatureK:s.peatTemperatureK,energyResidualJ:s.energyResidualJ}) }
+ catch(error) { parcels.push({parcelStepS,rejected:String(error instanceof Error?error.message:error)}) }
 }
 const output={executor:'D implementer; independent reviewer re-execution required',runId:'D-owned-benchmarks-2026-10-12',rows,convergence,parcels}
 fs.writeFileSync(process.argv[2]??'/tmp/agent-d-benchmarks.json',JSON.stringify(output,null,2))

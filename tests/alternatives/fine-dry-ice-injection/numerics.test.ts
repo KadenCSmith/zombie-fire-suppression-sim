@@ -11,12 +11,14 @@ it('asymptotic time refinement is stable with shrinking changes',()=>{
  }
 })
 it('parcel refinement approaches a limit and the default is within frozen 2% tolerance',()=>{
- const a=run(.00125,.05),b=run(.00125,.025),c=run(.00125,.0125)
+ // Coarse .05 s parcels now fail the onset resolution screen. Refine from
+ // the unchanged .025 s default rather than bypassing that rejection.
+ const a=run(.00125,.025),b=run(.00125,.0125),c=run(.00125,.00625)
  for(const key of ['solidEnteringGroundKg','peatTemperatureK'] as const) {
    expect(Math.abs(c[key]-b[key])).toBeLessThan(Math.abs(b[key]-a[key]))
    // First-order right-endpoint Richardson estimate; no fitted physical target.
    const extrapolated=2*c[key]-b[key]
-   expect(Math.abs(b[key]-extrapolated)/Math.abs(extrapolated)).toBeLessThan(.02)
+   expect(Math.abs(a[key]-extrapolated)/Math.abs(extrapolated)).toBeLessThan(.02)
  }
 })
 it('source continues aging during a slow withdrawal instead of forcing late solids through',()=>{

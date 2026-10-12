@@ -56,6 +56,19 @@ describe('D finite particle transport', () => {
     const b=base(); b.particleInjection!.sizeProvenance=''; expect(()=>simulateParticle(b,0)).toThrow(/sizeProvenance/)
     const c=base(); c.particleInjection!.particleDiameterM=1e-9; expect(()=>simulateParticle(c,0)).toThrow(/particleDiameterM/)
   })
+  it('rejects the independently identified short-life false-zero case and preserves accepted state', () => {
+    const c=base(); c.thermal.contactStartS=0
+    Object.assign(c.particleInjection!,{particleDiameterM:10e-6,hoseResidenceS:0,probeResidenceS:0,stepS:.0003125,parcelStepS:.0125})
+    // Independent continuous-flow/RK4 reference gives 8.734914832638364e-8 kg
+    // entry; the previous right-endpoint implementation silently returned zero.
+    const r=createParticleRun(c),before=r.snapshot()
+    expect(()=>r.advanceTo(.1)).toThrow(/Underresolved solid delivery.*zero delivery cannot be inferred/)
+    expect(r.snapshot()).toEqual(before)
+    c.thermal.contactStartS=1
+    const delayed=simulateParticle(c,30)
+    expect(delayed.solidEnteringGroundKg).toBe(0)
+    expect(delayed.upstreamSublimatedKg).toBeCloseTo(.01,12)
+  })
   it('conserves water, CO2 and energy with nonnegative finite inventory across cases', () => {
     for(const scenario of ['conduction-reference','film-sensitivity','water-only','pre-sublimated','off'] as const) {
       const config=particleScenario(base(),scenario)

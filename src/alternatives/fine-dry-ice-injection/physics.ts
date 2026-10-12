@@ -26,7 +26,7 @@ export function validateParticleConfig(config: PanelConfig): ParticleInjectionSe
   if (!config.id?.trim() || typeof config.thermal.enabled !== 'boolean' || !Number.isSafeInteger(config.thermal.seed)) throw new Error('Independent panel ID, intervention flag and integer seed are required.')
   const p = config.particleInjection
   if (!p) throw new Error('Explicit particle configuration including size, SI units and provenance is required.')
-  const limits = { particleDiameterM: [10e-6, 500e-6], effectiveConductivityWmK: [.0006,.6], solidDensityKgM3: [800,1650], hoseResidenceS: [0,20], probeResidenceS: [0,10], dryPeatMassKg: [.01,10], initialMoistureDryBasis: [0,1], dryPeatCpJkgK: [500,3000], stepS: [.0003125,.02], parcelStepS: [.0125,.5] } as const
+  const limits = { particleDiameterM: [10e-6, 500e-6], effectiveConductivityWmK: [.0006,.6], solidDensityKgM3: [800,1650], hoseResidenceS: [0,20], probeResidenceS: [0,10], dryPeatMassKg: [.01,10], initialMoistureDryBasis: [0,1], dryPeatCpJkgK: [500,3000], stepS: [.0003125,.02], parcelStepS: [.00625,.5] } as const
   for (const key of Object.keys(limits) as (keyof typeof limits)[]) { const [lo,hi] = limits[key]; if (!Number.isFinite(p[key]) || p[key] < lo || p[key] > hi) throw new Error(`Unsupported ${key}; expected ${lo}–${hi} in SI units.`) }
   for (const key of ['sizeProvenance','heatTransferProvenance','residenceProvenance','soilProvenance'] as const) if (typeof p[key] !== 'string' || !p[key].trim()) throw new Error(`Explicit ${key} required; assumptions are not measurements.`)
   if (!['solid','pre-sublimated'].includes(p.initialPhase)) throw new Error('Unknown initial CO2 phase.')
@@ -72,7 +72,7 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
   }
   function merge(into: Carrier, from: Carrier) { into.water += from.water; into.gas += from.gas; into.h += from.h; into.cohorts.push(...from.cohorts); checkLiquid(temperature(into), 'mixed soil carrier', clock) }
   const duration = t.flowKgS > 0 ? t.waterKg / t.flowKgS : Infinity
-  let dispatchIndex = 1, clock = 0
+  let dispatchIndex = 1, clock = 0, withdrawalResolutionChecked = false
   function dispatchTime() { return t.contactStartS + Math.min(dispatchIndex * p.parcelStepS, duration) }
   function dispatch() {
     const water = Math.min(source.water, t.flowKgS * p.parcelStepS)
@@ -83,7 +83,20 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
     parcels.push({ carrier: out, dispatchedS: clock, hoseEndS: clock + p.hoseResidenceS, groundS: clock + p.hoseResidenceS + p.probeResidenceS }); dispatchIndex++
   }
   while (t.enabled && clock < targetS - 1e-11) {
+    if (!withdrawalResolutionChecked && clock >= t.contactStartS - 1e-10) {
+      withdrawalResolutionChecked = true
+      const bath = temperature(source)
+      if (t.flowKgS > 0 && source.water > 1e-14 && bath !== null && solid(source,p) > 0) {
+        // Check the aged source exactly at withdrawal onset, before right-endpoint
+        // parcels can erase short-lived entry. This is a resolution screen, not
+        // an accuracy certificate. Rechecking near extinction would reject every run.
+        const gap = L + CG * (bath - TS)
+        const life = Math.min(...source.cohorts.filter(b=>b.count>0 && b.radiusM>0).map(b=>p.solidDensityKgM3*b.radiusM**2*gap/(2*p.effectiveConductivityWmK*(bath-TS))))
+        if (Math.max(p.stepS,p.parcelStepS) > life/64) throw new Error(`Underresolved solid delivery at withdrawal onset (${clock.toFixed(6)} s): remaining radius-squared lifetime ${life.toExponential(4)} s requires phase and parcel intervals <= ${(life/64).toExponential(4)} s for this resolution screen. Solid entry is unavailable; zero delivery cannot be inferred. Even screened inputs require scenario-specific refinement.`)
+      }
+    }
     let next = Math.min(targetS, (Math.floor((clock + 1e-10) / p.stepS) + 1) * p.stepS)
+    if (t.contactStartS > clock + 1e-10) next = Math.min(next,t.contactStartS)
     if (source.water > 1e-14 && t.flowKgS > 0 && dispatchTime() > clock + 1e-10) next = Math.min(next, dispatchTime())
     for (const parcel of parcels) for (const boundary of [parcel.hoseEndS, parcel.groundS]) if (boundary > clock + 1e-10) next = Math.min(next, boundary)
     const dt = next - clock
@@ -120,7 +133,7 @@ export function simulateParticle(configInput: PanelConfig, targetS: number): Par
     energyResidualJ: all.reduce((a,c) => a + c.enthalpyJ,0) + peatCapacity * (peatK - TS) - initialH,
     initialEnthalpyJ: initialH, additionalColdResourceJ: initialCO2 * (L + CG * (t.inletK - TS)), meanSolidDiameterM: mean,
     pressurePa: null, oxygenMoleFraction: null, extinction: null, penetrationM: null, unavailable: [...UNAVAILABLE],
-    assumptions: [p.sizeProvenance,p.heatTransferProvenance,p.residenceProvenance,p.soilProvenance,'Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.','Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.','Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.','Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.'],
+    assumptions: [p.sizeProvenance,p.heatTransferProvenance,p.residenceProvenance,p.soilProvenance,'Solid is initially saturated/isothermal at195K; cp-water4186 and cp-gas850J/(kgK) are constant approximations, not full property correlations.','Adiabatic source/transport; water and CO2 gas enthalpy travel together, no vent/slip. Prescribed delivery into a nominated contact specimen; no predicted penetration.','Local ice shells/blockage remain unresolved even when bulk water is273.15–350K.','Parcel withdrawal uses right-endpoint quadrature; phase uses finite-bath explicit r-squared updates and conservative enthalpy, finite-UA pair exchange.','Active solid withdrawal requires phase and parcel intervals no larger than 1/64 of the actual aged-source radius-squared lifetime at withdrawal onset. This fail-closed screen is not an accuracy certificate; refinement evidence applies only to tested scenarios.'],
     review: 'No verified realism pass; initial placeholder1.3/10. Signed candidate scores and frozen identity are in the D REALISM_LEDGER. Experimental validation:false.',
     metadata: { panelId: config.id, seed: t.seed, observationS: t.endS, particleSizeProvenance: p.sizeProvenance, units: 'SI; kelvin; mass fractions use stated denominators', numericalStepS: p.stepS, parcelStepS: p.parcelStepS } }
 }

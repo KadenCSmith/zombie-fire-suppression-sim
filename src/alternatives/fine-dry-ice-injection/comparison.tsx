@@ -46,7 +46,7 @@ export function ParticleComparison({ config, onChange, state, history }: Particl
   ] as const
   return <div className="d-comparison">
     <details><summary>Particle inputs, assumptions & counterfactual</summary>
-      <p>Every default is an explicit unmeasured analytical study case. Size is not inferred from “Nano.” The model requires273.15–350K water and a nonreacting warm specimen.</p>
+      <p>Every default is an explicit unmeasured analytical study case. Size is not inferred from “Nano.” The model requires273.15–350K water and a nonreacting warm specimen. Underresolved solid withdrawal is rejected, not reported as zero delivery. The onset resolution screen does not certify accuracy across the input domain; changed cases need their own refinement.</p>
       <div className="d-inputs">{([
         ['waterKg','Water quantity (kg)'],['flowKgS','Prescribed water flow (kg/s)'],['dryIceKg','Initial CO2 inventory (kg)'],['inletK','Water inlet temperature (K)'],['initialK','Initial warm peat specimen (K)'],['contactStartS','Withdrawal start after mixing (s)'],['conductanceWK','Assumed specimen contact UA (W/K)'],['endS','Observation window (s)'],
       ] as const).map(([key,label])=><label key={key}>{label}<input aria-label={label} type="number" step="any" value={config.thermal[key]} onChange={e=>onChange({...structuredClone(config),thermal:{...config.thermal,[key]:Number(e.target.value)}})}/></label>)}</div>
