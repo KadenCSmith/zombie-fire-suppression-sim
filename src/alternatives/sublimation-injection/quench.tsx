@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -95,8 +95,20 @@ export function renderQuenchFrame(gl: Renderer, scene: THREE.Scene, camera: THRE
 /** Positive R3F render priority is an ordinary owned compositor subscription.
  * R3F removes it on unmount; no renderer methods or original state are patched. */
 export function IllustrativeQuench({ progress }: { progress: number }) {
-  const pass = useMemo(createQuenchPass, [])
-  useEffect(() => () => pass.dispose(), [pass])
-  useFrame(({ gl, scene, camera }) => renderQuenchFrame(gl, scene, camera, pass, progress), 1)
+  const pass = useRef<QuenchPass | null>(null)
+  useEffect(() => {
+    // StrictMode replays setup after cleanup; each setup owns fresh resources.
+    const instance = createQuenchPass()
+    pass.current = instance
+    return () => {
+      if (pass.current === instance) pass.current = null
+      instance.dispose()
+    }
+  }, [])
+  useFrame(({ gl, scene, camera }) => {
+    const current = pass.current
+    if (current) renderQuenchFrame(gl, scene, camera, current, progress)
+    else gl.render(scene, camera)
+  }, 1)
   return null
 }

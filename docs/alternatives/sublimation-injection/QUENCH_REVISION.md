@@ -10,13 +10,21 @@ The private quench.tsx component owns its color/depth render target, fullscreen 
 
 A selectively committed private work at 51e02e7, then fetched and ordinarily merged the exact coordinator-authorized 1ef3cf120b6ed85d52f60b748b0a97e6a3add616 checkpoint. That shared checkpoint supplies only the approved public fire-layer ending and integration tests/documentation. API v21.2 remains unchanged.
 
+## StrictMode lifecycle correction
+
+The coordinator reproduced a black 3D scene at 75 s in actual Chrome on the first frozen delivery, 4ac3a641658f1904e5724db17b830d4f5537d3db. Header/Html remained visible and no shader error was reported. That delivery was rejected before integration. The memoized pass survived StrictMode effect replay, but cleanup had removed its fullscreen quad, so the next setup rendered an empty output scene.
+
+The coordinator's exact published review checkpoint 66e946182fb029de0e419ca450da5bb0b43c9099 authorizes this private lifecycle correction without a checkpoint merge. Each effect setup now creates a fresh pass and stores it in a ref. Cleanup clears the ref only if it still points to that setup's instance, then disposes that instance. The frame callback reads the current ref and directly renders the original scene while the ref is null. Shader logic, timeline, physical histories and original source remain unchanged.
+
+The new component-hook regression captures the actual setup and frame callbacks, then runs setup → cleanup → setup. It failed against the previous implementation because the second output contained zero quads. It now verifies a fresh second quad/material/geometry, disposal of each instance, and direct rendering before setup and after cleanup at nonzero progress. This uses mocked React/R3F hooks and a renderer; it does not claim to mount actual React StrictMode or compile/render on a GPU.
+
 ## Actual checks
 
-After the checkpoint: npm run typecheck PASS; focused A, external scene composition and alternatives tests PASS, 61 tests / six files in 510 ms (39 method tests); npm run lint PASS with 16 inherited warnings; npm run build PASS in 2.48 s with inherited lucide/chunk warnings; whitespace PASS; all 57 protected original SHA-256 identities PASS against verified V20 commit 161e7a4a1f8c35765e1878c132db79977be1f5ea.
+After the lifecycle correction: npm run typecheck PASS; focused A, external scene composition and alternatives tests PASS, 63 tests / seven files in 837 ms (41 method tests); npm run lint PASS with 16 inherited warnings; npm run build PASS in 2.53 s with inherited lucide/chunk warnings; whitespace PASS; all 57 protected original SHA-256 identities PASS against verified V20 commit 161e7a4a1f8c35765e1878c132db79977be1f5ea.
 
 The new renderer tests verify direct zero-mask rendering, independent resources/uniforms, resized color/depth buffers, camera matrices, unchanged scene objects/materials, target restoration on failure, disposal, and stage order. They are unit tests, not GPU shader compilation or visual inspection. Existing tests continue to verify finite/source-off physical ledgers and absence of feedback from authored cue sampling.
 
-Direct browser access in this chat remains blocked by an unavailable admin-policy check, and no bypass was attempted. The preview serves the new code, but native GPU compilation, visual quality and final integrated checks remain pending coordinator review of the frozen delivery. No heavy concurrent full suite was run.
+Direct browser access in this chat remains blocked by an unavailable admin-policy check, and no bypass was attempted. The coordinator will repeat actual Chrome/GPU verification at 0/75/86 s, seek-back, reset, resize and route-away on the corrected frozen delivery before accepting it. Native GPU compilation, visual quality and final integrated checks are not established by the unit tests. No heavy concurrent full suite was run.
 
 Preview: http://127.0.0.1:5174/?alternative=sublimation-injection&method-preview=1
 
