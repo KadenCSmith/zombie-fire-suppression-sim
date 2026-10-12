@@ -38,7 +38,12 @@ app.on('browser-window-created',(_event,win)=>{
           button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="'+method+'"]').click();
           await wait(()=>id==='pressure-pulse'?document.querySelector('.fire-sequence-shell:not(.method-render)'):document.querySelector('[data-render-variant="'+id+'"]'),method+' opens latest render directly');
           assert(new URL(location.href).searchParams.get('alternative')===id,'Selected method missing from refresh URL');
-          if(id!=='pressure-pulse'){
+          if(id==='vibratory-injection'){
+            assert(document.querySelector('[data-vibratory-version="2"]'),'Latest C field workspace missing');
+            await wait(()=>document.querySelector('.vib-scene canvas'),'original opening in private C workspace');
+            button('Simulation Version').click();await delay(20);document.querySelector('[data-parent="4.2.3"]').click();
+            await wait(()=>document.querySelector('.fire-sequence-shell:not(.method-render)')&&alive.size===0,'C route disposal restores protected original');
+          }else if(id!=='pressure-pulse'){
             await wait(()=>document.querySelector('[data-original-animation="fire-spread-and-drilling"] canvas'),'read-only original animation reused');
             assert(Number(document.querySelector('[data-original-animation]').dataset.originalContextTime)<=38,'Alternative context replayed original treatment');
             if(id!=='nanoparticles'){
