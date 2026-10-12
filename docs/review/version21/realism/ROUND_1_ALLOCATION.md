@@ -1,5 +1,7 @@
 # Shared revision round1 — exclusive allocation
 
+> Coordination update: [PARALLEL_HANDOFF.md](PARALLEL_HANDOFF.md) supersedes shared barriers/counter and central re-review scheduling below. Approved ownership/corrections remain; A/B/C each uses its own independent reviewer and remaining local retry budget without waiting for the others. Preserve all completed audits/passes; do not restart.
+
 Initial independent audits are complete and signed. Each alternative has used1 scored pass; this is the first of at most3 revision/review retries. Same rubric, benchmark solutions and tolerances. Reviewers remain independent and read-only. A failed review is not completion: continue assigned justified corrections while retries remain. Essential missing physics/data may require finishing below7; no authored effects, labels or larger test counts repair a central-mechanism cap.
 
 Original4.2.3 retains all57 protected identities against `161e7a4a1f8c35765e1878c132db79977be1f5ea`. **Reuse its existing fire-spreading and initial drilling animations read-only; never recreate them.** Every worker keeps its existing exclusive branch/checkouts and private source/test/doc trees. Root alone changes shared code, integrates exact frozen commits and publishes main/releases/Mac app. No reset/rebase/force-push, protected changes or device/destructive-pressure design.

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import AlternativeWorker from '../worker/alternatives.worker.ts?worker'
+import { ALTERNATIVE_CONTACT_STEP_S } from '../alternatives/contactAdapter'
 import { VARIANTS, ENGINES, MEDIA, PARAMETERS, compatible, variant, type VariantId, type EngineId, type MediumId } from '../alternatives/registry'
 import { acceptsMessage, duplicatePanel, freshPanel, linkedCompatibility, type AcceptedState, type PanelConfig, type RunMessage, type WorkerCommand } from '../alternatives/model'
 import { readComparison, serializeComparison, SESSION_KEY, SESSION_SCHEMA } from '../alternatives/persistence'
@@ -132,7 +133,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
   function add(id: VariantId) { if (configs.length >= MAX_PANELS) return; mutate(old => [...old,freshPanel(uid(),id)]); setTab('compare') }
   function exportRun() {
     const contents = JSON.stringify({ format: 'zombie-fire-live-alternatives', schema: SESSION_SCHEMA, applicationVersion: '0.21.0', engineVersions: { contact: 'contactCooling-0.20-public-reference/v21.2', 'peat-fem': 'q1-five-step-0.20', concept: 'stages-1' },
-      units: RECORD_UNITS, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
+      units: RECORD_UNITS, numerics: { contactIntegrationStepS: ALTERNATIVE_CONTACT_STEP_S, outputCheckpointStepS: .5 }, sourceStatus: 'Abstract pressure source unspecified; no thermodynamic prediction',
       linkedPhysicalTime: linked, fairness: comparisonNotes(configs), panels: configs.map(config => {
         const result=resultRef.current[config.id]
         return { config, result: currentRecord(config, result) }
@@ -146,7 +147,7 @@ export default function AlternativesWorkspace({ selectedVariant, onSelectedVaria
       if (configs.length >= MAX_PANELS) mutate(old => [...old.slice(0,-1),freshPanel(old.at(-1)!.id,v.id)])
       else add(v.id)
       setTab('compare')
-    }}>{v.engines.length ? configs.length >= MAX_PANELS ? 'Replace last comparison panel' : 'Add independent comparison panel' : v.id==='pressure-pulse' ? 'Live comparison unavailable · original preserved' : 'Execution disabled · mechanism unspecified'}</button><button onClick={() => setTab('science')}>Read implemented equations ↗</button></article></section>}
+    }}>{v.engines.length ? configs.length >= MAX_PANELS ? 'Replace last comparison panel' : 'Add independent comparison panel' : v.id==='pressure-pulse' ? 'Live comparison unavailable · original preserved' : v.id==='vibratory-injection' ? 'Vibration comparison unavailable' : 'Execution disabled · mechanism unspecified'}</button><button onClick={() => setTab('science')}>Read implemented equations ↗</button></article></section>}
     <section hidden={tab !== 'compare'} className="alt-compare" aria-label="Independent live alternative comparison">
       <div className="alt-comparison-toolbar"><div><span className="alt-eyebrow">LIVE ALTERNATIVES · {configs.length} INDEPENDENT JOBS</span><p>Accepted solver states. Archived replay clocks remain in Previous simulations.</p></div><div><button onClick={() => { if (linked && !linkReason) { command('pause'); target.current=null;setLinkedRunning(true) } else command('run') }}>Start / resume all</button><button onClick={() => { setLinkedRunning(false);target.current=null;command('pause') }}>Pause all</button><button onClick={() => { setLinkedRunning(false);target.current=null;command('reset') }}>Reset all</button><button disabled={configs.length >= MAX_PANELS} onClick={() => add(selectedVariant === 'nanoparticles' ? 'baseline' : selectedVariant)}>Add panel</button><button onClick={exportRun}>Export records</button></div></div>
       <div className="alt-fairness"><label><input type="checkbox" aria-label="Link physical time" checked={linked} disabled={!!linkReason} onChange={e => { command('pause');target.current=null;setLinkedRunning(false);setLinked(e.target.checked) }}/> Link accepted physical time</label><span>{linkReason ?? (linked ? 'Barrier coordination at 0.5 s checkpoints; individual control unlinks all.' : 'Same engine supports linked physical checkpoints.')}</span><button onClick={() => mutate(old => old.map(c => ({ ...c, thermal: { ...c.thermal, initialK: old[0].thermal.initialK, inletK: old[0].thermal.inletK, endS: old[0].thermal.endS, seed: old[0].thermal.seed }, fem: structuredClone(old[0].fem) })))}>Match initial conditions & window</button><button onClick={() => mutate(old => {

@@ -1,5 +1,7 @@
 # Frozen scientific-realism rubric — round 0
 
+> Workflow update: the human's revised parallel-review prompt supersedes ONLY the shared barriers/counter described historically below. [PARALLEL_HANDOFF.md](PARALLEL_HANDOFF.md) governs independent local loops and preserved per-alternative counters. The scoring weights/evidence/failure gates and frozen benchmarks in this document are unchanged.
+
 Human-invoked source: `/Users/kadensmith/Downloads/V21_Realism_Review_Loop.md`. This engineering assessment is not certification or experimental validation. Published before any realism implementation changes. Existing in-flight work has been preserved and frozen; reviewers do not edit implementation files.
 
 ## Snapshot and ownership
