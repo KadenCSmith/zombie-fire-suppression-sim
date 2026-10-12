@@ -1,3 +1,5 @@
+> Revised original-protection checkpoint: the original render is **4.2.3**, not 4.2.1. Read `review/version21/ORIGINAL_AUDIT.md` and `alternatives/CONTRACT_V21_2.md`; earlier original mapping and three-variant pressure scaffolding below are superseded. Original restoration confirmation and valid replacement READY remain pending. No worker edits are authorized yet.
+
 # Version21 local implementation
 
 Version 0.21.0 extends the existing React/Vite/Electron app from `main` at `4b2088e926662aee357cde680f2b22c4fbf24f79`. Work is local on `integration/v21-alternatives`; no release, deployment, installed-app update is part of this preview; normal pushes are restricted to the owned integration/worker branches. Original licensing and third-party notices are preserved.

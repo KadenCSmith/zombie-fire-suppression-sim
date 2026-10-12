@@ -1,0 +1,57 @@
+# Alternative module API v21.2
+
+Status: coordinator contract prepared; worker edits remain gated by the replacement verified READY record. Supersedes v21.1's incorrect original-render mapping and combined pressure ownership. Types retain the same structural interface, with version `v21.2`, disjoint pressure-child modules, and a separate concept host. Workers must acknowledge this version and merge the exact published base through their own branches before editing. No instruction or contract authorizes editing protected original files.
+
+## Protected original and callable entry point
+
+Base 4.2.3 is the existing `src/ui/FireSequenceWorkspace.tsx`, invoking the existing `FireSequenceScene` with `realistic straightBore cinematic connectedSupply` and unchanged session/defaults. `docs/review/version21/original-preservation.json` lists exact protected files and SHA-256 identities from verified V20 commit 161e7a4a1f8c35765e1878c132db79977be1f5ea, identical at inherited 4b2088e. The original scene, source, timing, camera, defaults, assets/results and original-only dependencies remain in place and read-only for ALL agents, including coordinator.
+
+`src/alternatives/originalPressurePulse.ts` supplies metadata only. It does not implement a replacement, numerical adapter, clock or copied scene. The original's accepted fields and separate contact readout remain available through unchanged calls in its workspace. There is no compatible independent live-comparison adapter for the full original: execution is disabled in new comparison panels and metrics are N/A with that reason. Normal original selection remains available. No fake retrofit is required.
+
+## Actual supported external seam
+
+`src/alternatives/contactAdapter.ts` calls the original's already-public `simulateContactCooling(target,'gradual',overrides,patches)` unchanged. It owns cloned inputs and outputs, keeps a monotonic accepted timestamp, rejects nonfinite/backward/out-of-window targets and re-evaluates the deterministic reference from initial conditions. It does not copy the protected integrator or add exports, change the original cache, or invoke its presentation clock. This recomputation costs more than the earlier appended incremental helper; two/four-panel measurements must be refreshed.
+
+The shared `model.ts` constructs separate runs through `hooks.supportedRun(config)`. Contact is an isolated finite-inventory calorimeter with three independent 0.5 kg specimens; it is not field injection or peat combustion. The optional direct CO₂ contact proxy is separate from supplied water and is not tank prechilling, pressure generation, or species transport. Configured water/solid inventories are finite. Only its existing supported energy/mass ledgers are credited. Existing Peat Fire FEM is available only for the untreated baseline; it has no supported treatment source hook. A conceptual stage has null physical metrics. Pressure-only has no liquid or contact solver. Nanoparticle execution remains disabled because its mechanism is unspecified.
+
+No pressure propagation, pressure-wave transport, fracture/collapse, soil rearrangement, field infiltration, permeability-vibration or oxygen-removal hook exists. Child modules must label those stages illustrative and report unsupported outputs unavailable. No pressure-system/device/dose/trigger/containment interface is exposed. Pressure input is an abstract black-box environmental disturbance without invented thermodynamics.
+
+## Narrow module exports and exclusive ownership
+
+A owns only `src/alternatives/sublimation-injection/**`, `tests/alternatives/sublimation-injection/**`, `docs/alternatives/sublimation-injection/**`.
+
+B owns two disjoint child trees only: `src/alternatives/pressure-pulse-liquid-waves/**`, `tests/alternatives/pressure-pulse-liquid-waves/**`, `docs/alternatives/pressure-pulse-liquid-waves/**`; and corresponding three `pressure-pulse-pressure-only/**` trees. B does NOT own base 4.2.3 or the old new-but-superseded `pressure-pulse/**` scaffold. That scaffold remains preserved in history/current checkout but unregistered; it is not the protected original and must not be used to replace it.
+
+C owns only the corresponding `src/alternatives/vibratory-injection/**`, `tests/alternatives/vibratory-injection/**`, `docs/alternatives/vibratory-injection/**` trees.
+
+Each source tree exports `methodModule`/`variants` from `index.ts`, `MethodCues({id,time})` from `scene.tsx`, and `MethodScience()` from `science.tsx`. Index files are data/model-only: no React/Three/UI imports into workers. Private modules never self-register. Coordinator alone edits shared dispatchers, routing/menus/registry, contracts, comparison/persistence, global tests/docs and package metadata, outside protected originals. Fixtures, evidence and any private harness scripts belong within each worker's assigned tests/docs subtree. Never claim a parent glob containing another owner or protected files.
+
+`AlternativeModule`: literal apiVersion `v21.2`; method `4.2.1`/`4.2.3`/`4.2.4`; stable descriptors with variant number and parent method; `defaultSettings(id)` partial thermal overrides; `createRun(config,hooks)`; and `presentation(id,timeS)` returning pure authored cues. IDs are `sublimation-injection`, `liquid-waves`, `pressure-only`, `vibratory-injection`. The four capstone parents remain the primary navigation. Base `pressure-pulse` is external original metadata, not a delegated module.
+
+Descriptors declare compatible medium and engine separately, serializable parameter/provenance metadata, assumptions/validity limits, illustrative/modeled/experimentallyValidated status, and missing physics. Stable shared parameter schema/ranges remain authoritative. Workers may add private explanatory schemas/exports but must request coordinator registration. Existing defaults/configuration must not be silently changed.
+
+## Run ownership, lifecycle, physical time and diagnostics
+
+Actual types: `PanelConfig`, `AcceptedState`, `Metrics`, `WorkerCommand` and `RunMessage` in `src/alternatives/model.ts`; `AlternativeRun` and `SupportedAdapterHooks` in `contract.ts`. `PanelConfig` is serializable: stable panel ID, variant, engine, medium/source-property sentinel, thermal SI values/seed/enabled flag and existing FEM settings. `AlternativeRun` has readonly `endS`, `snapshot()` and `advanceTo(targetS)`. Targets are finite monotonic seconds within the observation window; returned snapshots are caller-owned and cannot mutate a run. Every createRun call creates independent state; duplication copies configuration only. No global mutable run state or background timer belongs in private modules.
+
+The shared worker `src/worker/alternatives.worker.ts` owns lifecycle: init constructs a fresh run, run/resume starts scheduling, pause cancels its timer without changing accepted state, advance requests an accepted target, reset terminates/replaces the worker with a fresh run ID, and removal/navigation terminates resources. Messages carry stable panel ID plus fresh independent run ID and must pass both identity and current-worker checks. A stale run or foreign panel cannot advance/overwrite a new run. Failure returns the last accepted snapshot and reason.
+
+Physical contact integration is the existing fixed 0.05 s/event-boundary reference. Shared output checkpoints are 0.5 physical seconds. Wall time only schedules jobs, and requestAnimationFrame only displays history. Concept preview time is explicitly presentation time and cannot join linked physical time. Compatible engines/windows plus disclosed initial/boundary conditions, geometry, seed and resources are required for fair comparisons; no illustrative winner/ranking. Linked barrier waits for actual accepted timestamps. Individual control breaks linking and pauses the others as documented in shared UI.
+
+Snapshots/exports include accepted physical time (s), temperature (K), inventories/species (kg), energy/residuals (J), reaction power (W), solve/wall times (ms), settings, seed, method/engine/media, source status, version, and resource disclosure. Missing oxygen/fuel/reaction values are null/N/A for the contact proxy. Contact ledger tracks finite supply/remaining/contacted/bypass/liquid/vapor water; dry ice remaining/sublimated/exported; peat, water sensible and vapor/latent enthalpy; residuals. External heat cannot enter twice, and CO₂ is never oxygen. Intervention off removes all modeled sources. Do not add the separate calorimeter's heat to the original accepted field history.
+
+## Independent new scene and preview harnesses
+
+`src/ui/AlternativeScene.tsx` is a small independently authored concept Canvas, outside the original. It mounts private cues through `AlternativeMethodModules.tsx`. It does not import/copy the original scene, equipment, timeline, camera, textures or defaults. Private MethodPresentation fields are authored contextTime, access/pulse/waves/injection booleans, vibration displacement and contact count; they do not enter numerical state. Workers may replace their private cues while preserving this boundary. Do not mount new method cues inside the original scene.
+
+Standalone URL: ordinary app `?alternative=<private-id>&method-preview=1` on assigned port. Original `?alternative=pressure-pulse` always invokes the original, even if a preview flag is supplied. New workspace clock is separate from original and numerical clocks. Initial ordinary app selection is original 4.2.3 in rapid mode after approved routing correction. Existing header/menu smoothness and legacy destinations remain additive shared UI.
+
+Ports/checkouts: coordinator 5173; A 5174; B 5175; C 5176. Each owns its own dependencies, output directory and test userData. Nobody launches in another owner's checkout. Coordinator alone controls Chrome and keeps four separate windows, with storage separated by port. Workers use assigned private tests/harnesses and report server readiness. Use explicit assigned workdir for every command.
+
+## Verification and handoff
+
+Require valid filled READY, exact remote-reachable base, branch ownership, clean status and absolute checkout confirmation before edits. Run original hash guard read-only, focused private tests, typecheck/lint/build and applicable tests. Numeric checks are not physical experiments. Cite official reference data/primary literature for implemented properties/equations, units, assumptions/validity. Proposed empirical validation must be labeled unperformed; sourceable approximate costs are evidence, not fabricated equipment pricing.
+
+Shared requests include API version, exact path/API, rationale/suggested patch, compatibility/original-render impact and tests. Pause only affected work. No coordinator request authorizes protected edits; user confirmation is necessary if such an edit is unavoidable. Version updates require affected owner acknowledgment and an ordinary checkpoint merge by each owner, never a force rebase or tracking moving tips.
+
+Commit/push only owned paths/branch, open/attach draft PR into integration and freeze delivered HEAD_SHA. Handoff in private docs/HANDOFF.md plus final message: exact SHA/branch/PR, entry points/changed paths, contract version, original hashes, commands/results, source/conservation evidence, citations, unavailable physics and integration needs. Coordinator alone reviews/merges each accepted immutable SHA sequentially, checking protected identities and original selection/defaults/results after each. No main merge, tags, release or deployment.

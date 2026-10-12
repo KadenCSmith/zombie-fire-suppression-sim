@@ -1,3 +1,9 @@
+# Version21 original protection checkpoint — NOT READY
+
+The revised Prompt 1 identifies original 4.2.3 as the existing V20 FireSequenceWorkspace/Scene. Read `docs/review/version21/ORIGINAL_AUDIT.md`, exact prior patch and per-file SHA-256 manifest. Workers are read-only pending the user's specific restoration confirmation for FireSequenceScene.tsx and contactCooling.ts plus routing correction. No restoration has been attempted; earlier v21.1 READY is superseded. Do not treat the earlier altered original as a preservation baseline.
+
+Safe additive work is preserved: separate new concept scene host, external adapter using original public simulateContactCooling unchanged, two disjoint pressure-child scaffolds and prepared v21.2 contract. Original independent comparison is unavailable; no replacement solver is registered for it. Source/adapter typecheck passed; all **1781 tests / 94 files** passed (6.00 s), build passed (5.09 s); lint has 16 inherited warnings, whitespace check passed. New external adapter checks match public original API exactly, own inputs/outputs and reject invalid targets. These software checks do not establish original preservation: two protected file mismatches and original selection mapping are still unresolved, and updated native/hash gates are pending. Two/four-panel performance must be refreshed for the external recomputing adapter. Main preview remains running at port 5173; worker servers have not started.
+
 # Verification and validation status
 
 

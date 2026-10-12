@@ -1,6 +1,6 @@
 import type { Variant, VariantId, ThermalSettings } from './registry'
 import type { PanelConfig, AcceptedState } from './model'
-export const ALTERNATIVE_API_VERSION = 'v21.1' as const
+export const ALTERNATIVE_API_VERSION = 'v21.2' as const
 export interface AlternativeRun {
   readonly endS: number
   snapshot(): AcceptedState

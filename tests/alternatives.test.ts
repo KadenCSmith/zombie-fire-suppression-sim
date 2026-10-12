@@ -17,6 +17,11 @@ describe('Version21 alternatives contract', () => {
     expect(compatible('sublimation-injection', 'contact', 'unspecified')).toContain('no thermodynamic')
     expect(compatible('sublimation-injection', 'concept', 'unspecified')).toBeNull()
   })
+  it('keeps the original render out of unsupported new live comparison', () => {
+    const p=freshPanel('original','pressure-pulse')
+    expect(compatible(p.variantId,p.engine,p.medium)).toContain('Protected original render')
+    expect(()=>createRun(p)).toThrow('Protected original render')
+  })
   it('runs two independent computations and copies only configuration', () => {
     const p = freshPanel('a', 'sublimation-injection'), q = duplicatePanel(p, 'b')
     q.thermal.waterKg = .1
@@ -47,7 +52,7 @@ describe('Version21 alternatives contract', () => {
     expect(m.oxygenKg).toBeNull(); expect(m.reactionW).toBeNull()
   })
   it('recovers reproducible checkpoint partitioning at fixed solver steps', () => {
-    const p = freshPanel('a', 'pressure-pulse'), a = createRun(p), b = createRun(p)
+    const p = freshPanel('a', 'liquid-waves'), a = createRun(p), b = createRun(p)
     for (let t = .5; t <= 20; t += .5) a.advanceTo(t)
     b.advanceTo(20)
     expect(a.snapshot().contact).toEqual(b.snapshot().contact)
@@ -90,7 +95,7 @@ describe('Version21 alternatives contract', () => {
     b.engine = 'contact'; b.thermal.endS = 20; expect(linkedCompatibility([a,b])).toContain('windows')
   })
   it('migrates settings safely without touching legacy gallery selections', () => {
-    const p = freshPanel('a', 'pressure-pulse'); p.thermal.waterKg = .2
+    const p = freshPanel('a', 'liquid-waves'); p.thermal.waterKg = .2
     expect(readComparison(serializeComparison([p]))[0]).toEqual(p)
     expect(readComparison(JSON.stringify({schema:1,panels:[{variantId:'pressure-only'}]}))[0].variantId).toBe('pressure-only')
     expect(readComparison('{bad')).toHaveLength(2)

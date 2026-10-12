@@ -1,5 +1,6 @@
 import { findMethodModule } from './modules'
-import { createContactCoolingSession, type ContactCoolingState, type ContactPatchSpec } from '../story/contactCooling'
+import { type ContactCoolingState, type ContactPatchSpec } from '../story/contactCooling'
+import { createContactCoolingSession } from './contactAdapter'
 import { compatible, defaultThermal, variant, type VariantId, type EngineId, type MediumId, type ThermalSettings } from './registry'
 import { DEFAULT_SETTINGS, PeatSolver, totals, type Settings, type Frame } from '../peatfem/coupled'
 export interface PanelConfig { id: string; variantId: VariantId; engine: EngineId; medium: MediumId; sourceStatus: 'unspecified' | 'known-contact-properties'; thermal: ThermalSettings; fem: Settings }
@@ -12,11 +13,11 @@ export function buildContact(config: PanelConfig) {
   const { thermal: s } = config, active = s.enabled && config.variantId !== 'baseline'
   const water = active && (config.medium === 'water' || config.medium === 'co2-water')
   const dry = active && config.medium === 'co2-water'
-  const multi = config.variantId === 'pressure-pulse', count = 3
+  const count = 3
   const patches: ContactPatchSpec[] = Array.from({ length: count }, (_, i) => ({
     id: `specimen-${i}`, xM: 0, yM: -(i + 1) * .1, radiusM: .04, peatMassKg: .5,
     dryIceConductanceWK: dry && i === 0 ? 8 : 0, waterConductanceWK: water ? s.conductanceWK : 0,
-    waterArrivalTimeS: s.contactStartS + (multi ? i * 2 : 0), waterShare: 1 / count,
+    waterArrivalTimeS: s.contactStartS, waterShare: 1 / count,
   }))
   return createContactCoolingSession({ startTimeS: 0, endTimeS: s.endS, rapidRemovalTimeS: s.endS,
     waterStartTimeS: s.contactStartS, stepS: .05, initialTemperatureK: s.initialK, waterInletK: s.inletK,

@@ -16,7 +16,7 @@ describe('independent alternatives worker lifecycle', () => {
   })
   it('replaces a run atomically and ignores canceled run and foreign panel commands', () => {
     send('run'); vi.advanceTimersByTime(100)
-    send('init','r2','a',{config:freshPanel('a','pressure-pulse')})
+    send('init','r2','a',{config:freshPanel('a','liquid-waves')})
     const count=messages.length;send('run','r1');send('advance','r2','b',{targetS:20});vi.advanceTimersByTime(1000)
     expect(messages).toHaveLength(count);expect(messages.at(-1)!.state!.timeS).toBe(0)
   })

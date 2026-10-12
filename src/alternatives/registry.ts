@@ -1,4 +1,5 @@
 import { METHOD_MODULES, findMethodModule } from './modules'
+import { ORIGINAL_PRESSURE_PULSE } from './originalPressurePulse'
 export type EngineId = 'contact' | 'peat-fem' | 'concept'
 export type MediumId = 'none' | 'water' | 'co2-water' | 'unspecified'
 export type VariantId = 'baseline' | 'sublimation-injection' | 'nanoparticles' | 'pressure-pulse' | 'liquid-waves' | 'pressure-only' | 'vibratory-injection'
@@ -25,7 +26,7 @@ const SHARED_VARIANTS: readonly Variant[] = [
   { id: 'baseline', method: 'baseline', number: '00', label: 'No-treatment baseline', subtitle: 'Untreated smoldering reference / isolated thermal reference', engines: ['peat-fem', 'contact', 'concept'], media: ['none'], defaultMedium: 'none', defaultEngine: 'contact', stages: ['Initial conditions', 'No intervention', 'Observe reference'], limitation: 'Contact reference is an isolated hot specimen with no combustion. Select Peat Fire FEM for reacting smoldering physics.', status: status('FEM combustion or isolated contact reference'), provenance: 'Existing peat FEM and contact-cooling models' },
   { id: 'nanoparticles', method: '4.2.2', number: '4.2.2', label: 'Solid Inert Gas Nano Particles', subtitle: 'TBD / mechanism unspecified', engines: [], media: ['unspecified'], defaultMedium: 'unspecified', defaultEngine: 'concept', stages: ['Definition pending'], limitation: 'Only a heading was supplied. Missing material, particle size/distribution, transport, phase behavior, delivery mechanism, kinetics and boundary inputs. Predictive execution disabled.', status: status('Unavailable — mechanism unspecified'), provenance: 'User-supplied heading only' },
 ]
-export const VARIANTS: readonly Variant[] = [SHARED_VARIANTS[0], ...METHOD_MODULES[0].variants, SHARED_VARIANTS[1], ...METHOD_MODULES[1].variants, ...METHOD_MODULES[2].variants]
+export const VARIANTS: readonly Variant[] = [SHARED_VARIANTS[0], ...METHOD_MODULES[0].variants, SHARED_VARIANTS[1], ORIGINAL_PRESSURE_PULSE, ...METHOD_MODULES[1].variants, ...METHOD_MODULES[2].variants, ...METHOD_MODULES[3].variants]
 export const METHODS = ['4.2.1', '4.2.2', '4.2.3', '4.2.4'] as const
 export function variant(id: string): Variant { return VARIANTS.find(v => v.id === id) ?? VARIANTS[0] }
 export function compatible(id: VariantId, engine: EngineId, medium: MediumId): string | null {

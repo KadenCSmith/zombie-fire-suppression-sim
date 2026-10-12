@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Play, Pause, RotateCcw } from 'lucide-react'
 import { variant, type VariantId } from '../alternatives/registry'
-import { FireSequenceScene } from './FireSequenceScene'
+import { AlternativeScene } from './AlternativeScene'
 import { FinderPortal, ToolboxPortal, useCinematicUI } from './CinematicUI'
 import './alternatives.css'
 
@@ -44,7 +44,7 @@ export default function AlternativeRenderWorkspace({ id, onCompare, onDetails }:
   return <div className="fire-sequence-shell cinematic-sequence method-render" data-render-variant={id}>
     <div ref={hero} className="cinematic-hero-scroll" style={{ '--scroll-progress': progress } as CSSProperties}>
       <main className="cinematic-hero-sticky" aria-label={`${v.number} ${v.label} latest render`}>
-        <div className="cinematic-render"><FireSequenceScene time={time} mode="gradual" view="natural" layers={{fire:true,gas:false,water:false,anatomy:true}} resetToken={resetToken} cameraDistance={cameraDistance} realistic straightBore cinematic alternative={id}/></div>
+        <div className="cinematic-render"><AlternativeScene id={id} time={time} resetToken={resetToken} cameraDistance={cameraDistance}/></div>
         <div className="method-render-caption"><span>{v.number} · LATEST RENDER · ILLUSTRATIVE</span><h1>{v.label}</h1><p>{v.id === 'nanoparticles' ? 'TBD / mechanism unspecified. Context only; execution unavailable.' : v.subtitle}</p></div>
         <div className="cinematic-scroll-hint" style={{opacity:1-progress}}><span>SCROLL TO ENTER THE SIMULATION</span><span>↓</span></div>
         <div className="cinematic-scene-meta" style={{opacity:progress}}><span>{v.stages[stage]}</span><span>Presentation time · no predicted pressure, penetration or suppression</span></div>

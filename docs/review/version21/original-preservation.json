@@ -1,0 +1,582 @@
+{
+  "schemaVersion": 1,
+  "status": "NOT READY: exact restoration awaiting user confirmation",
+  "originalCommit": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "originalIdentification": "Commit 161e7a4 adds the V20 cinematic interface and connected-supply render; its package version is 0.20.0. All recorded original paths also match inherited 4b2088e. This is source-history identification, not a reset target.",
+  "inheritedCommit": "4b2088e926662aee357cde680f2b22c4fbf24f79",
+  "priorVersion21Commit": "eae833684ec41475eb6f84e642e6b06c5c350714",
+  "protectedFiles": [
+    {
+      "path": "src/ui/FireSequenceWorkspace.tsx",
+      "sha256": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "2b91e2bfbd1bb0b8a2fba4ece2c23c2ac0d369263bff7d2977e9a3e723a04d50",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireSequenceScene.tsx",
+      "sha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "275e8d6eac4bcd0ec31b323e5d6bb4d32793c6e0e58b410d432ca7d9a37e8360",
+      "currentMatchesOriginal": false
+    },
+    {
+      "path": "src/ui/FireSequenceEquipment.tsx",
+      "sha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireSequenceGrass.tsx",
+      "sha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireExcavator.tsx",
+      "sha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireWaterTruck.tsx",
+      "sha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireInterventionEquipment.tsx",
+      "sha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireGroundGeometry.ts",
+      "sha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FireExperimentControls.tsx",
+      "sha256": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "48514e3f9f5ea16fae804160e8d81a73a60816773780328b6c963b1b563e678f",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/fire-sequence.css",
+      "sha256": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "5b10c2ee06e864d0f86c0c092229ae96b8a73c4a944d923423a61430dce298b0",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/story/fireSequence.ts",
+      "sha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/story/firePresentation.ts",
+      "sha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/story/fireAppearance.ts",
+      "sha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/story/contactCooling.ts",
+      "sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "3bfe6194645b30972b8a211affb5cda46e80ccb18543eb952ff72038c49e2078",
+      "currentMatchesOriginal": false
+    },
+    {
+      "path": "src/coupled/fireProtocol.ts",
+      "sha256": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "3b7a9a07d2025e6ab8adecd23768170852ecde1b0b7f38b829ff3a6604a8fb68",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/fireProtocolRunner.ts",
+      "sha256": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "497bd17ec50121eab89e27896539a18ec66e3a64fc2b14249b2d97642cfa1ed7",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/worker/fireProtocol.worker.ts",
+      "sha256": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "42abfef2b28dcde2202e1b26409cf687046ceb640d2552df47d2d3f5719d85b2",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/fire-sequence-cache.json",
+      "sha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "212b82c7e51157c3d3f0bdd25408d7c383c00a324d3b60bf1e68828f6b9b25a0",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/fire-sequence-contract.json",
+      "sha256": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "74697b2c950a1ee67d0d8977a6f3f30a364c84bfb8ee23d83ba237f2edb6c47f",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/contact-cooling.json",
+      "sha256": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "8bbc44d768e13df92fd1b421add33ff77360223d70b53619222ece6017e4eb1c",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/fire-appearance.json",
+      "sha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "dcd87b3631509b0ee071849a20e6514b5c0023d9fa3d9f2eef7dd9e686beb5b5",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "scripts/smoke-fire-sequence.cjs",
+      "sha256": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "2eb32cea8d6cb08a5f03de239ff52cf9123593d358bc19b97d75ce17c6838809",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/fireSequence.test.ts",
+      "sha256": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "9adf2b05a0d0497dba88822efa95b1526b4b38e6d247ab55feb048c342a93d7d",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/firePresentation.test.ts",
+      "sha256": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "a59fb70d056d40ad6e60917ba783d27849782bdd74f8edbc70d38cf99788c4f5",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/fireAppearance.test.ts",
+      "sha256": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "d6fd3eb3f603e361df8d19fe45ebd3b831e92a6f545300e00700533b472087c7",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/contactCooling.test.ts",
+      "sha256": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "ac5065dcb41ee8939d2dad3d82d4477418dee4a76f95415ac456bbee8939fa71",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/fireProtocol.test.ts",
+      "sha256": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "a7621fee266a2d0ef3adfcebd556557a776ca82b5aefb24a739260b4d94c8724",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "tests/fireProtocolRunner.test.ts",
+      "sha256": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "16c4dc60deb08537b3a4279cab97312c33f682b31ebf45a26ff38be98296864b",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "docs/review/unified/fire-sequence-audit.md",
+      "sha256": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "7ea6bb4a2fe79114ea680a5cdb64386da644ab24063ed54ffefd4afc441ba823",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "docs/review/unified/fire-runner-equivalence.json",
+      "sha256": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "c749faac2a724122ee3f69ea9bfd8c97702bd83942201b0277683e422d7ae371",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "docs/review/unified/fire-controls-smoke.json",
+      "sha256": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "ab31a646644eb106ab5295fed1292e04ff7ce62ab774195afb68bb221e038bfa",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/history/v0.12/accepted-checkpoint-review.manifest.json",
+      "sha256": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "28fd3a5421c4e41aadb9ea099539f2d8fd23e30c031a5537d2ebaa1444ea1210",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/history/v0.12/accepted-checkpoint-review.mp4",
+      "sha256": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "e47d31ec6eff3607d1c219fe68caefa6ab6a44215bdcb597b544ea539b909988",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/history/v0.14/manifest.json",
+      "sha256": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "422a74b19bf1da5ba5414bbabf1f8ffd89490a44131105d5899d21f288029dfa",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/history/v0.14/peat-fire-gradual.mp4",
+      "sha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "a610e010ae198e44a2f6ee4860922416b4e93d34a3f40e80d58fb82cb0f34fc8",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/history/v0.14/peat-fire-rapid.mp4",
+      "sha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "1b9d0341f53b628073f6b53d3fc25f7cbc1ca021cc5adc416676af7e9d0d20de",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/models/dry-ice-reference-animation.glb",
+      "sha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "f7111e78a4ff08250d0df226203ebbb50347f4c347e972bbf1990349fe439d15",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/models/dry-ice-reference-animation.manifest.json",
+      "sha256": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "c2e0c70b65ef97e3f775b8cdcccaab534b887ce9bc822e1ce11bf9e4cce02bf0",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/models/peat-study.glb",
+      "sha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "7ff750685cc49289805d3af7b1f8e524e9586f106d9300e6ec0636523bea7305",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/models/peat-study.manifest.json",
+      "sha256": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "70a9b171025da3c896bdeb43ac11112040e9e4f128344b5201017a21fe2f0c93",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/renders/Fire_Sequence_Contact_Sheet.png",
+      "sha256": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "8ac513883909020ee00e1f8c2c657e29312341942748f618a12533acf9de5e16",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/renders/Fire_Sequence_Poster.png",
+      "sha256": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "fcb10ecf1cc850226683aec260cd542497cd748ed982316552d770c267c15c29",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/renders/manifest.json",
+      "sha256": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "87ea39454a502cc882e2590e87ed4b7dc825da927b4012d2470521c2643657b6",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/renders/peat-fire-gradual.mp4",
+      "sha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "04bf83a46a05001ab803a821c30b24b3b0d8e87d21601d4b3924019d79a9eb00",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "public/renders/peat-fire-rapid.mp4",
+      "sha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "e3f27de064e12f3ff3a2cfa44971fb8b59aad7b7cdfe83156d71b4fe194c86b2",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/README.md",
+      "sha256": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "e23a3ebefc6906288d200127c6528a037517650dfa03f7e4fc7bbd04bc286ce2",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/build_fire_sequence.py",
+      "sha256": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "564a444c108dfae0d9784c36d7d753f2f61c9f8803006b509f3afe47ed7089f8",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/contact_assets.py",
+      "sha256": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "e560e69394d91ec4ca0b322c0b574a6a6cb371a0ed92dc7fcac17f8319923447",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/create_contact_sheet.py",
+      "sha256": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "a9452cec8ac6be579a7ad21cec1c36821d90c0dbdebb17cfcc09be4a9cb5b116",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/package_render_assets.py",
+      "sha256": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "dc68b6f3c9f0468c527ab3a160b9214bd01ce6753663fee7836c56b93aaad9d7",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/render_delivery.py",
+      "sha256": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "ac2b6f147470d10a27c3c10ae766417624123533af59fdfbd797998797ca6921",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/render_fire_sequence.py",
+      "sha256": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "8991ce7266e29b1bc79bb4b606e73a62a0c4fb8c1b76d1a92cbd49f64beaab90",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/rupture_geometry.py",
+      "sha256": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "7867ed8d87c0dbc73aaa7ceebc649e301e0013956cb05bee151f660a276dff37",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/storyboard.json",
+      "sha256": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "6c95f61366739f5036e7007b35aa9281653405eb3bf301b736d19268f0b67514",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/verify_fire_sequence.py",
+      "sha256": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "4a04fe892d248b0690a50adb490d464761627cb4497f199706a7886d467af231",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/verify_movies.py",
+      "sha256": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "dee16d4f5c10ee44743c73554b1a619c4ad9c985758ed667d2aeca7206e6480c",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "integrations/blender-study/fire-sequence/visual_assets.py",
+      "sha256": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "inheritedMatchesOriginal": true,
+      "currentSha256": "685f8a1d0e67739ff47eb95bae586671ec75872c4afc1ab1a10fabc497a2c30a",
+      "currentMatchesOriginal": true
+    }
+  ],
+  "sharedDependencies": [
+    {
+      "path": "src/coupled/cap.ts",
+      "sha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "currentSha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/linear.ts",
+      "sha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "currentSha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/model.ts",
+      "sha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "currentSha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/remap.ts",
+      "sha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "currentSha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/source.ts",
+      "sha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "currentSha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/coupled/thermodynamics.ts",
+      "sha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "currentSha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/sim/materials.ts",
+      "sha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "currentSha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/sim/researchProfiles.ts",
+      "sha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "currentSha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/sim/scenario.ts",
+      "sha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "currentSha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/sim/solver.ts",
+      "sha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "currentSha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/sim/types.ts",
+      "sha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "currentSha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/CinematicUI.tsx",
+      "sha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "currentSha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/CoupledNaturalContext.tsx",
+      "sha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "currentSha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/FractureStudy.tsx",
+      "sha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "currentSha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/ModelSelector.tsx",
+      "sha256": "3a103ff5f7013930950157bcd4911b5974265b9a2f8b3585ef15d2e20dc570b8",
+      "currentSha256": "5eea2884e1747aaab1752f8de68ca3d518018caff273d130eab29b9f174c2327",
+      "currentMatchesOriginal": false
+    },
+    {
+      "path": "src/ui/OakTree.tsx",
+      "sha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "currentSha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/WideSoilScene.tsx",
+      "sha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "currentSha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/operations.css",
+      "sha256": "cdb79496efab533bdec2e276cc8994bff1278bdc4265692fbb3f273159e65846",
+      "currentSha256": "cdb79496efab533bdec2e276cc8994bff1278bdc4265692fbb3f273159e65846",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/soilParticleModel.ts",
+      "sha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "currentSha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "currentMatchesOriginal": true
+    },
+    {
+      "path": "src/ui/studyModel.ts",
+      "sha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "currentSha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "currentMatchesOriginal": true
+    }
+  ],
+  "changedProtectedPaths": [
+    "src/ui/FireSequenceScene.tsx",
+    "src/story/contactCooling.ts"
+  ],
+  "changedSharedPaths": [
+    "src/ui/ModelSelector.tsx"
+  ],
+  "cacheSummary": {
+    "topLevelKeys": [
+      "schemaVersion",
+      "kind",
+      "generatedAt",
+      "sourceHashes",
+      "domain",
+      "coordinateConvention",
+      "source",
+      "ignitionSource",
+      "treatmentSource",
+      "treatmentDurationS",
+      "initialization",
+      "config",
+      "scenario",
+      "status",
+      "stopReason",
+      "elapsedS",
+      "ignitionEndS",
+      "treatmentStartS",
+      "propagationResolved",
+      "assumptions",
+      "evidence",
+      "frames"
+    ],
+    "frameCount": 65,
+    "firstTimeS": 0,
+    "lastTimeS": 86430,
+    "finalDryIceKg": 3.998211470103149,
+    "finalMetrics": {
+      "maxTemperatureK": 795.5505599849323,
+      "reactedFuelKg": 4.254278857572075,
+      "reactingCellDepthM": 0.16,
+      "heatedCellDepthM": 0.48
+    }
+  },
+  "contactSummary": {
+    "topLevelKeys": [
+      "schemaVersion",
+      "role",
+      "config",
+      "modes"
+    ]
+  }
+}

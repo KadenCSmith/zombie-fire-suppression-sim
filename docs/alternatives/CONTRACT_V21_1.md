@@ -1,3 +1,5 @@
+> SUPERSEDED by prepared API v21.2. This historical record has incorrect original-render mapping and B ownership. Do not launch workers from it; require the replacement verified READY.
+
 # Alternative module API v21.1
 
 This is the frozen interface for the three exclusive method owners. Types are in `src/alternatives/contract.ts`; shared registration is in `modules.ts`, `registry.ts`, `model.ts`, `presentation.ts` and `ui/AlternativeMethodModules.tsx`. Do not edit those shared files from a worker branch. Import them read-only. Request a versioned change from the coordinator when necessary.
