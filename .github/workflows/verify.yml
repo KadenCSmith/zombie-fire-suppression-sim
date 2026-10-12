@@ -21,9 +21,12 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Preserve original 4.2.3 byte identities
+        run: node scripts/check-original-preservation.mjs
       - run: npm run typecheck
       - run: npm run lint
-      - run: npm test
+      # Bound CPU contention on hosted runners; keep every test and its timeout.
+      - run: npm test -- --maxWorkers=2
       - run: npm run build
       - name: Desktop startup and worker smoke (macOS / Windows)
         if: runner.os != 'Linux'

@@ -13,7 +13,9 @@ export function readComparison(raw: string | null): PanelConfig[] {
     return saved.panels.slice(0, 4).map((p: Partial<PanelConfig>, i: number) => {
       const known = VARIANTS.find(v => v.id === p.variantId)
       if (!known) throw new Error('Unknown alternative')
-      const next = freshPanel(typeof p.id === 'string' && p.id.length < 100 && !ids.has(p.id) ? p.id : `migrated-${i}`, known.id)
+      let id = typeof p.id === 'string' && p.id.length > 0 && p.id.length < 100 && !ids.has(p.id) ? p.id : `migrated-${i}`
+      for (let suffix = 1; ids.has(id); suffix++) id = `migrated-${i}-${suffix}`
+      const next = freshPanel(id, known.id)
       ids.add(next.id)
       next.engine = ['contact', 'peat-fem', 'concept'].includes(p.engine ?? '') ? p.engine! : variant(known.id).defaultEngine
       next.medium = ['none', 'water', 'co2-water', 'unspecified'].includes(p.medium ?? '') ? p.medium! : next.medium

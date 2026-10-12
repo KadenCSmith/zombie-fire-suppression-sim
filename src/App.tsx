@@ -201,6 +201,7 @@ function App() {
 
   const [referenceVariant,setReferenceVariant]=useState<VariantId|undefined>()
   const [selectedAlternative, setSelectedAlternative] = useState<VariantId>(()=>VARIANTS.find(v=>v.id===new URLSearchParams(window.location.search).get('alternative'))?.id??'pressure-pulse')
+  useEffect(()=>{const url=new URL(window.location.href);url.searchParams.set('alternative',selectedAlternative);window.history.replaceState(window.history.state,'',url)},[selectedAlternative])
   useEffect(()=>{const selected=VARIANTS.find(v=>v.id===selectedAlternative)!;document.title=`Zombie Fire · Version21 · ${selected.number} ${selected.label}`},[selectedAlternative])
   const [alternativeNavigation,setAlternativeNavigation]=useState({tab:'alternatives' as 'alternatives'|'compare',revision:0})
   const [studyVersion, setStudyVersion] = useState<StudyVersion>('rupture')
