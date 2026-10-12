@@ -21,7 +21,7 @@ For a physical interval Δt, `Cp = mp cp`, `Cw = mw cw`, `Qeq = (Tp − Tw)/(1/C
 
 The optional `co2-water` selection supplies separate direct solid CO₂ contact only to the first specimen, starting at physical time zero. Its requested heat is the exponential lumped-specimen/contact solution, limited by the finite `md Lsub` budget and specimen sensible heat above inlet temperature. `Δmd = Qd/Lsub`; this term stops at the hot-calorimeter lower validity boundary, not a predicted phase equilibrium. It never pre-cools incoming water or supplies oxygen. Missing material properties use the explicit `unspecified` sentinel: contact execution is rejected, while conceptual preview has null physical metrics.
 
-The unchanged public `simulateContactCooling` reference runs at 0.05 s with arrival/event boundaries. The external shared adapter recomputes from initial conditions at accepted targets; output checkpoints normally occur every 0.5 physical seconds. Any monotonic target in the configured window is accepted without using frame rate as an integration step. The 90 s presentation timeline is separate: surface media appear at 22.5 s, phase-change concept at 45 s, delivery at 67.5 s. There is no mapping from these cues to the default 8 s physical water arrival.
+The external alternative adapter calls the unchanged public `simulateContactCooling` reference with 0.00625 s steps and arrival/event boundaries. The independently selected original retains its own 0.05 s defaults/cache. The adapter recomputes from initial conditions at accepted targets; output checkpoints normally occur every 0.5 physical seconds. Any monotonic target in the configured window is accepted without using frame rate as an integration step. The separate 90 s presentation shows the truck arriving at 38–48 s, hose connection at 48–56 s, open bucket loading at 55–66 s, lid closure at 68.5–71.3 s and an authored flow increase at 71.5–77.5 s. Bubbles start on water contact before closure; no simulated pressure law is inferred. No visual cue sets the default 8 s physical water arrival. The visibly supported loading arm, gravity-shaped falls and contact effects remain authored illustrations.
 
 Default contact assumptions: uniform 823.15 K specimens, 293.15 K water, 0.5 kg liquid, 0.025 kg/s delivery, 8 s arrival, each specimen UA 24 W/K and a 60 s observation window. The optional direct solid inventory is 0.05 kg with first-specimen UA 8 W/K. These are demonstration/calorimeter assumptions, not a proposed field dose or calibrated treatment.
 
@@ -65,11 +65,13 @@ Run from this owned checkout:
 
 ```sh
 npm ci
-npm test -- tests/alternatives/sublimation-injection
+npm test -- tests/alternatives/sublimation-injection --exclude 'work/**'
 npm run typecheck
 npm run lint
 npm run build
 node scripts/check-original-preservation.mjs
 ```
 
-Private deterministic ledger evidence can be refreshed explicitly with `V21_CAPTURE_SUBLIMATION_EVIDENCE=1 npm test -- tests/alternatives/sublimation-injection/evidence.test.ts`. Ordinary tests do not write evidence. `numerical-evidence.json` records accepted states, settings and exact ledgers for water, optional direct CO₂ and source-off configurations; it is numerical evidence, not an experiment. `HANDOFF.md` records actual checks, frozen delivery SHA/PR and limits. The coordinator owns final global checks, browser captures, shared documentation and integration.
+Private deterministic ledger evidence can be refreshed explicitly with `V21_CAPTURE_SUBLIMATION_EVIDENCE=1 npm test -- tests/alternatives/sublimation-injection/evidence.test.ts --exclude 'work/**'`. Ordinary tests do not write evidence. The current0.00625s capture is `numerical-evidence-round1.json`; the original0.05s `numerical-evidence.json` remains historical evidence. Both record accepted states, settings and exact ledgers for water, optional direct CO₂ and source-off configurations, not experiments. `HANDOFF.md` is historical; `ROUND_1.md` preserves the first reviewed revision and `ROUND_2.md` records the new vehicle and signed second retry; `ROUND_3.md` records the final pump/plumbing correction. A's dedicated reviewer owns local scientific review; the coordinator owns shared decisions and final combined checks/integration.
+
+Final frozen source, scorecard, signed review and integration limits: [FINAL_REVIEW_HANDOFF.md](FINAL_REVIEW_HANDOFF.md).

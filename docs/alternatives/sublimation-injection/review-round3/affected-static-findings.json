@@ -1,0 +1,45 @@
+{
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "scope": "Three changed private source files and one maintained test; actual appearance unverified",
+  "coordinates": "Authored display coordinates, not equipment dimensions/performance",
+  "previousFindings": {
+    "A2-GEOM-1": "Resolved within inspected pump/reel primitive scope: moved pump motor/head/fins/base and fittings lie entirely behind reel along X. Pump+base maximumX=-1.53; reel base minimumX=-1.12 gives.41 gap.",
+    "A2-PLUMB-1": "Resolved within inspected route/port scope: separate tank\u2192pump inlet and pump outlet\u2192vessel lines; neither sampled route nor actual tube vertices enter motor or either reel flange."
+  },
+  "pumpBayLocal": [
+    -1.75,
+    0.89,
+    0.64
+  ],
+  "hoseReelLocal": [
+    -0.88,
+    0.78,
+    0.63
+  ],
+  "ports": {
+    "inletLocal": [
+      -1.9,
+      1.02,
+      0.86
+    ],
+    "outletLocal": [
+      -1.9,
+      1.21,
+      0.64
+    ],
+    "inletRootZ": 0.74,
+    "headCenterZ": 0.64,
+    "outletRootY": 1.09,
+    "headCenterY": 1.02,
+    "headRadius": 0.105,
+    "rootsIntersectHeadAsIntended": true
+  },
+  "independentGeometry": "Two finite capped-cylinder signed-distance checks for actual curve arclength10001points per route and539realTubeGeometryvertices per route against motor and both flanges; include.036radius on centerline. Intended port/head contact excluded from clearance obstruction set. Not universal all-mesh collision or GPU evidence.",
+  "minimumSampledRadiusAdjustedClearance": 0.05603553618587511,
+  "minimumActualTubeVertexPrimitiveDistance": 0.05733697728100971,
+  "topology": "Fixed feed rendered under moving truck transform with progress1; staged world hose begins only after truck parking. Distinct fitting roots and endpoints agree.",
+  "resourceOwnership": "ServiceHose owns per-route memoized curve/geometry, layout drawRange and disposal effect. Route constants stable; new moving feed creates a separate geometry. Source supports intended ownership, browser/StrictMode/GPU behavior remains unverified.",
+  "unchangedSequence": "Returned loader before68.5cover start; cover closed71.3; authoredboost71.5/quench72..85/fireoff86. No computed pressure/suppression/transport.",
+  "remainingSourceDetail": "Minor nominal boxed tread penetrationy=-.0045atpark remains unchanged; perceived grounding unverified. No other new actionable source failure identified in changed scope.",
+  "aestheticStatus": "UNVERIFIED; no new screenshot/app observation"
+}

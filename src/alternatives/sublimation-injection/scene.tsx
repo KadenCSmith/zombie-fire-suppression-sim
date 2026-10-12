@@ -1,23 +1,15 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { Html } from '@react-three/drei/web/Html.js'
 import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
 import type { MethodSceneProps } from '../contract'
-import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from './visuals'
+import { DELIVERY_ROUTE, MEDIA_MOUNT, MEDIA_SCALE, TREATMENT_PARKED, WORLD_STAGING, preparationVisuals } from './visuals'
 import { IllustrativeQuench } from './quench'
+import { Annotation } from './annotation'
+import { LoadingAssembly, WaterContact } from './loading'
+import { WaterSupply } from './supply'
 
 const TEAL = '#78bac2'
 const SILVER = '#9aa9a1'
-const labelStyle = {
-  display: 'block', width: 124, textAlign: 'center', color: '#c0cec6',
-  fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: 11,
-  fontWeight: 400, letterSpacing: '.035em', lineHeight: 1.5,
-  textShadow: '0 1px 8px #000, 0 1px 2px #000', pointerEvents: 'none',
-} as const
-
-function Annotation({ position, children }: { position: [number, number, number]; children: string }) {
-  return <Html center position={position} zIndexRange={[4, 0]}><span style={labelStyle}>{children}</span></Html>
-}
 
 function Rim({ y, radius = .72 }: { y: number; radius?: number }) {
   return <mesh position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -26,8 +18,8 @@ function Rim({ y, radius = .72 }: { y: number; radius?: number }) {
   </mesh>
 }
 
-/** A deliberately open, non-dimensional cutaway: no closure, pressure gauge,
- * containment/trigger mechanism or construction specifications. */
+/** Non-dimensional cutaway with an authored closing cover. No pressure law,
+ * containment/trigger design or equipment construction specifications. */
 function MediaCutaway({ time }: { time: number }) {
   const visual = preparationVisuals(time)
   return <group userData={{ scientificRole: 'Illustrative open solid/liquid cutaway; not a pressure vessel model or design' }}>
@@ -45,6 +37,11 @@ function MediaCutaway({ time }: { time: number }) {
       <meshPhysicalMaterial color="#b2d2c8" transparent opacity={.1} roughness={.13} metalness={.22} depthWrite={false} side={THREE.DoubleSide}/>
     </mesh>
     <Rim y={-.57}/><Rim y={.65}/>
+    <group position={[0, .68, -.72]} rotation={[-1.45 * (1 - visual.lid), 0, 0]}>
+      <mesh position={[0, 0, .72]} castShadow><cylinderGeometry args={[.75, .75, .055, 64]}/>
+        <meshStandardMaterial color="#85938a" metalness={.5} roughness={.5}/>
+      </mesh>
+    </group>
     {[-1, 1].map(side => <mesh key={side} position={[side * .72, .04, 0]}>
       <cylinderGeometry args={[.018, .018, 1.23, 8]}/><meshStandardMaterial color="#b0bab2" metalness={.75} roughness={.24}/>
     </mesh>)}
@@ -54,21 +51,7 @@ function MediaCutaway({ time }: { time: number }) {
     <mesh position={[0, visual.surfaceOffset, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <circleGeometry args={[.685, 64]}/><meshPhysicalMaterial color={TEAL} transparent opacity={.83} metalness={.26} roughness={.17} side={THREE.DoubleSide}/>
     </mesh>
-    {[0, 1, 2].map(i => <mesh key={i} position={[-.15, visual.surfaceOffset + .005, .13]} rotation={[-Math.PI / 2, 0, 0]} scale={1 + .06 * Math.sin(time * .7 + i)}>
-      <ringGeometry args={[.12 + i * .13, .124 + i * .13, 56]}/>
-      <meshBasicMaterial color="#c4e3e0" transparent opacity={.16 - i * .035} side={THREE.DoubleSide} depthWrite={false}/>
-    </mesh>)}
-    {Array.from({ length: 9 }, (_, i) => {
-      return <mesh key={i} position={solidCuePosition(time, i)} castShadow
-        rotation={[i * .37, i * .71, i * .23]} scale={visual.solidScale * (.12 + (i % 3) * .035)}>
-        <dodecahedronGeometry args={[1, 0]}/>
-        <meshPhysicalMaterial color="#d6e3dc" metalness={.06} roughness={.37} clearcoat={.4} clearcoatRoughness={.22}/>
-      </mesh>
-    })}
-    <group position={[.88, -.45 + visual.lift * 1.48, 0]} rotation={[0, 0, visual.loading * .48]}>
-      <mesh><boxGeometry args={[.43, .045, .45]}/><meshStandardMaterial color="#68786e" metalness={.45} roughness={.5}/></mesh>
-      {[-.22, .22].map(z => <mesh key={z} position={[0, .1, z]}><boxGeometry args={[.43, .2, .025]}/><meshStandardMaterial color="#7d8b80" metalness={.5} roughness={.45}/></mesh>)}
-    </group>
+    <WaterContact time={time}/>
   </group>
 }
 
@@ -88,14 +71,18 @@ function softParticleTexture() {
 function PhaseChange({ time }: { time: number }) {
   const texture = useMemo(softParticleTexture, [])
   useEffect(() => () => texture.dispose(), [texture])
-  const amount = preparationVisuals(time).phaseChange
+  const visual = preparationVisuals(time)
+  const amount = visual.phaseChange * (1 - visual.lid)
   return <group userData={{ scientificRole: 'Authored phase-change cue; no calculated pressure, cooling or gas transport' }}>
-    {Array.from({ length: 18 }, (_, i) => {
-      const age = (time * .11 + i / 18) % 1, angle = i * 2.39996
-      const width = .19 + age * .48
-      return <sprite key={i} position={[Math.cos(angle) * (.19 + age * .22), .37 + age * 1.1, Math.sin(angle) * .22]}
+    {Array.from({ length: 26 }, (_, i) => {
+      const age = (time * .15 + i / 26) % 1, angle = i * 2.39996
+      const overflow = Math.max(0, (age - .35) / .65)
+      const radius = age < .35 ? .15 + age * 1.5 : .675 + overflow * .65
+      const height = age < .35 ? .04 + age * 1.8 : .67 - overflow * .72
+      const width = .13 + age * .4
+      return <sprite key={i} position={[Math.cos(angle) * radius, height, Math.sin(angle) * radius]}
         scale={[width, width, 1]}>
-        <spriteMaterial map={texture} color="#c0d7d0" transparent opacity={amount * Math.sin(age * Math.PI) * .32} depthWrite={false}/>
+        <spriteMaterial map={texture} color="#d5ddd6" transparent opacity={amount * Math.sin(age * Math.PI) * .21} depthWrite={false}/>
       </sprite>
     })}
   </group>
@@ -112,51 +99,15 @@ function DeliveryPath({ time }: { time: number }) {
   }, [geometry, water, visual.hose, visual.delivery])
   useEffect(() => () => { geometry.dispose(); water.dispose() }, [geometry, water])
   return <group userData={{ scientificRole: 'Illustrative prescribed delivery path; no infiltration, soil response or suppression' }}>
-    <mesh geometry={geometry} castShadow><meshStandardMaterial color="#56756b" transparent opacity={.48} depthWrite={false} metalness={.3} roughness={.5}/></mesh>
-    <mesh geometry={water}><meshStandardMaterial color={TEAL} emissive="#4093a3" emissiveIntensity={.18 + visual.boost * .25} transparent opacity={.5 + visual.boost * .25}/></mesh>
-    {Array.from({ length: 24 }, (_, i) => {
-      const position = (visual.flowTravel + i / 24) % 1
+    <mesh geometry={geometry} castShadow><meshStandardMaterial color="#283a32" transparent opacity={.62} depthWrite={false} metalness={.08} roughness={.8}/></mesh>
+    <mesh geometry={water}><meshStandardMaterial color="#649ba8" emissive="#4093a3" emissiveIntensity={.06 + visual.boost * .08} transparent opacity={.42 + visual.boost * .18}/></mesh>
+    {Array.from({ length: 16 }, (_, i) => {
+      const position = (visual.flowTravel + i / 16) % 1
       const point = curve.getPointAt(position)
       return <mesh key={i} position={point} visible={position <= visual.delivery && visual.delivery > 0}>
-        <sphereGeometry args={[.038, 8, 6]}/><meshStandardMaterial color="#a5dcdf" emissive="#4c9da8" emissiveIntensity={.6} roughness={.25} transparent opacity={i % 2 ? visual.boost : .85}/>
+        <sphereGeometry args={[.018, 8, 6]}/><meshStandardMaterial color="#a5c9cc" emissive="#4c9da8" emissiveIntensity={.08} roughness={.25} transparent opacity={i % 2 ? visual.boost * .6 : .6}/>
       </mesh>
     })}
-  </group>
-}
-
-function SupplyTruck({ time }: { time: number }) {
-  const visual = preparationVisuals(time)
-  return <group position={[TRUCK_PARKED[0] + visual.truckTravel, TRUCK_PARKED[1], TRUCK_PARKED[2]]}
-    userData={{ scientificRole: 'Authored flatbed arrival with open demonstration payload; no vehicle or pressure-system dynamics' }}>
-    <RoundedBox position={[.03, .5, 0]} args={[2.9, .18, 1.22]} radius={.055} smoothness={3} castShadow>
-      <meshStandardMaterial color="#354139" metalness={.45} roughness={.6}/>
-    </RoundedBox>
-    <RoundedBox position={[.46, .73, 0]} args={[2.12, .12, 1.35]} radius={.025} smoothness={2} castShadow>
-      <meshStandardMaterial color="#77897b" metalness={.55} roughness={.47}/>
-    </RoundedBox>
-    <RoundedBox position={[-1.01, 1.06, 0]} args={[.91, 1, 1.23]} radius={.1} smoothness={3} castShadow>
-      <meshStandardMaterial color="#899a85" metalness={.28} roughness={.52}/>
-    </RoundedBox>
-    <mesh position={[-1.476, 1.25, 0]} rotation={[0, 0, -.12]}><boxGeometry args={[.022, .4, .99]}/><meshStandardMaterial color="#304e4d" metalness={.3} roughness={.18}/></mesh>
-    {[-.628, .628].map(z => <group key={z}>
-      <mesh position={[-.99, 1.28, z]}><boxGeometry args={[.62, .38, .018]}/><meshStandardMaterial color="#3e5d57" metalness={.3} roughness={.2}/></mesh>
-      <mesh position={[-.92, .93, z * 1.015]}><boxGeometry args={[.15, .025, .025]}/><meshStandardMaterial color="#b3c0af" metalness={.8} roughness={.3}/></mesh>
-      <mesh position={[-1.48, .8, z * .77]}><boxGeometry args={[.022, .12, .15]}/><meshStandardMaterial color="#dedbc2" emissive="#d9cc9c" emissiveIntensity={.17}/></mesh>
-    </group>)}
-    <mesh position={[-1.49, .6, 0]}><boxGeometry args={[.1, .12, 1.33]}/><meshStandardMaterial color="#8a9888" metalness={.7} roughness={.4}/></mesh>
-    {[-.97, 1.02].flatMap(x => [-.67, .67].map(z => <group key={x + ':' + z} position={[x, .32, z]} rotation={[Math.PI / 2, 0, 0]}>
-      <group rotation={[0, visual.truckTravel / .3, 0]}>
-        <mesh castShadow><cylinderGeometry args={[.3, .3, .2, 28]}/><meshStandardMaterial color="#151c17" roughness={.92}/></mesh>
-        <mesh><cylinderGeometry args={[.15, .15, .215, 18]}/><meshStandardMaterial color="#a3afa0" metalness={.8} roughness={.35}/></mesh>
-        {[0, 1, 2, 3, 4].map(i => <mesh key={i} position={[Math.cos(i * Math.PI * .4) * .095, z > 0 ? -.112 : .112, Math.sin(i * Math.PI * .4) * .095]}>
-          <sphereGeometry args={[.02, 6, 4]}/><meshStandardMaterial color="#46554a" metalness={.7} roughness={.4}/>
-        </mesh>)}
-      </group>
-    </group>))}
-    <group position={[...MEDIA_MOUNT]}>
-      <MediaCutaway time={time}/>
-      <PhaseChange time={time}/>
-    </group>
   </group>
 }
 
@@ -183,12 +134,16 @@ export function MethodCues({ time }: MethodSceneProps) {
   const visual = preparationVisuals(time)
   if (visual.time < WORLD_STAGING.arrive) return null
   return <group userData={{ scientificRole: '4.2.1 world-space authored truck, dry-ice loading and faster liquid cues; no predicted pressure or suppression' }}>
-    <SupplyTruck time={visual.time}/>
+    <WaterSupply time={visual.time}>
+      <MediaCutaway time={visual.time}/>
+      <LoadingAssembly time={visual.time}/>
+      <PhaseChange time={visual.time}/>
+    </WaterSupply>
     <DeliveryPath time={visual.time}/>
     <ContactSteam time={visual.time}/>
     <IllustrativeQuench progress={visual.quench}/>
-    {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TRUCK_PARKED[0] + MEDIA_MOUNT[0], 3, TRUCK_PARKED[2]]}>
-      {visual.boost > 0 ? 'Faster flow · illustrative' : 'Dry ice added to water'}
+    {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TREATMENT_PARKED[0] + MEDIA_MOUNT[0], MEDIA_MOUNT[1] + 2.1 * MEDIA_SCALE, TREATMENT_PARKED[2]]}>
+      {visual.boost > 0 ? 'Faster flow · illustrative' : visual.lid === 1 ? 'Capped preparation · illustrative' : visual.lid > 0 ? 'Closing lid · illustrative' : 'Dry ice added to water'}
     </Annotation>}
     {visual.time >= 75 && <Annotation position={[.4, -.7, .3]}>Illustrative quenching</Annotation>}
   </group>

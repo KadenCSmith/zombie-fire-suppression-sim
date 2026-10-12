@@ -1,0 +1,48 @@
+
+> zombie-fire-suppression-sim@0.21.0 test
+> vitest run tests/alternatives/sublimation-injection tests/alternatives-contact-adapter.test.ts tests/alternatives-infusion-accuracy.test.ts tests/contactCooling.test.ts tests/alternativeSceneComposition.test.tsx tests/alternatives.test.ts tests/independent-realism-a.test.ts tests/independent-realism-a-current.test.ts --maxWorkers=1
+
+
+ RUN  v5.0.2 /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568
+
+ ❯ tests/independent-realism-a-current.test.ts (0 test)
+
+ Test Files  1 failed | 13 passed (14)
+      Tests  97 passed (97)
+   Start at  01:35:56
+   Duration  2.34s (tests 47%, import 28%, transform 23%, worker 2%)
+
+    Isolate  14 workers spawned · ~62ms startup each (spawn + environment, per file)
+             at least ~800ms faster with isolate: false — reuses workers across files instead of one per file
+
+(node:28437) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:28439) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/independent-realism-a-current.test.ts [ tests/independent-realism-a-current.test.ts ]
+Error: Transform failed with 1 error:
+/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568/tests/independent-realism-a-current.test.ts:12:9: ERROR: Expected identifier but found "return"
+  Plugin: vite:esbuild
+  File: /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568/tests/independent-realism-a-current.test.ts:12:9
+  
+  Expected identifier but found "return"
+  10 |   const fill=(v:number)=>{const z=k*v;let term=1,sum=1;for(let n=1;n<200;n++){term*=z/n;const a=term*b/(b+n);sum+=a;if...
+  11 |   if(u===0)return return350();const cw=.5/3*c,eq=C*delta/(C+cw);return return293()+ (u<=te?fill(u):eq+(fill(te)-eq)*Ma...
+  12 |  function return return350(){return 350} function return293(){return 293.15}
+     |           ^
+  13 |  function balance(s:ContactCoolingState){const l=s.ledger;result.residuals.massKg=Math.max(result.residuals.massKg,Mat...
+  14 |  afterAll(()=>writeFileSync('current-numerical-results.json',JSON.stringify(result,null,2)+'\n'))
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

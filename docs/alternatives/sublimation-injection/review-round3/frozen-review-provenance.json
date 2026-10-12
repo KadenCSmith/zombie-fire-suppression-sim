@@ -1,0 +1,107 @@
+{
+  "reviewer": "/root/realism_a_review",
+  "preparedUtc": "2026-10-12T09:38:51.349951+00:00",
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "liveStatus": "",
+  "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "archiveSha256": "8af628a681ecff35a283818abff1f794c4e5984d9f2b1ce16608a11ba5ba5866",
+  "snapshotPath": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-3/snapshot-a0e0826",
+  "manifestSha256": "af6db029f80e604272632588b942674f7690e63c5e8584b8f39e7e73da18c59f",
+  "changedSourceAndTestsVsPass3": [
+    "src/alternatives/sublimation-injection/visuals.ts",
+    "src/alternatives/sublimation-injection/supply.tsx",
+    "src/alternatives/sublimation-injection/vehicle.tsx",
+    "tests/alternatives/sublimation-injection/supply.test.ts"
+  ],
+  "unchangedNumericalCallPath": {
+    "src/alternatives/contactAdapter.ts": {
+      "sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "pass3Sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "same": true
+    },
+    "src/alternatives/model.ts": {
+      "sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "pass3Sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "same": true
+    },
+    "src/alternatives/contract.ts": {
+      "sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "pass3Sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "same": true
+    },
+    "src/alternatives/registry.ts": {
+      "sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "pass3Sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "same": true
+    },
+    "src/alternatives/sublimation-injection/science.tsx": {
+      "sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "pass3Sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "same": true
+    },
+    "src/alternatives/sublimation-injection/evidence.ts": {
+      "sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "pass3Sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "same": true
+    },
+    "src/story/contactCooling.ts": {
+      "sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "pass3Sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "same": true
+    },
+    "src/worker/alternatives.worker.ts": {
+      "sha256": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6",
+      "pass3Sha256": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6",
+      "same": true
+    },
+    "src/ui/AlternativeScene.tsx": {
+      "sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "pass3Sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "same": true
+    },
+    "src/ui/AlternativesWorkspace.tsx": {
+      "sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "pass3Sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "same": true
+    },
+    "src/ui/AlternativeRenderWorkspace.tsx": {
+      "sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "pass3Sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "same": true
+    }
+  },
+  "localCheckProvenanceSha256": "7c42c052748324cdc2cd665f0d162cad037112c660661891c4601befea9af040",
+  "localHashesMatch": true,
+  "packageTreesVerified": 8,
+  "packageFilesVerified": 2414,
+  "dependenciesCopiedFrom": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-2/snapshot-b27486d/node_modules",
+  "dependencyInstallRun": false,
+  "priorSignedPass3ReportSha256": "e03fb90fada1775c187ba0654096b0d5a860cf424fc712c2710c80cefdfae4cc",
+  "reusedEvidenceHashes": {
+    "work/realism-review/round-1/benchmark-spec.json": "a958a214cf3e39e54c4e0787198cdd64f7016f905dddedb4aa01dcdfef94daf3",
+    "work/realism-review/round-1/benchmark-results-final.json": "287147e271040c195cad40d6f828d41ccb34d85222c072e8a4638d136805ba1e",
+    "work/realism-review/round-2/current-numerical-results-final.json": "ff47fc0b9f42cc68fd7c2b5335baf8e9961a85d990369d4c5b1112c212f108f6",
+    "work/realism-review/round-2/round1-primary-source-digest.md": "cfc9403b5f640392a2d86de43011325a55e30c72ed7d9738df6aff63e6ad2905",
+    "work/realism-review/round-2/browser-policy-denial.log": "babd5d8148718b7aa130ce1c4e268477ecaae7c1accbfc80ed57d3dce900bf45"
+  },
+  "runtime": {
+    "node": "v26.8.2",
+    "npm": "11.19.1",
+    "python": "3.13.15",
+    "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "load": [
+      29.119140625,
+      26.79248046875,
+      26.48828125
+    ],
+    "hardware": [
+      "Mac15,7",
+      "12",
+      "38654705664",
+      "Apple M3 Pro"
+    ]
+  },
+  "transitiveClosureFiles": 75,
+  "browser": "Unresolved administrator-policy verification denial; no new browser attempt or alternate route authorized"
+}

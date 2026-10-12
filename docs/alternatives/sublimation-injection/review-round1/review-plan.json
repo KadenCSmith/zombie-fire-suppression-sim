@@ -1,0 +1,69 @@
+{
+  "reviewer": "/root/realism_a_review",
+  "scope": "4.2.1 only",
+  "stage": "prepared; awaiting exact frozen SHA; no score",
+  "preparedAtUtc": "2026-10-12T08:21:12.496335+00:00",
+  "scoredPassesUsedBeforeRetry": 1,
+  "scoredRetriesUsedBeforeRetry": 0,
+  "maxScoredRetries": 3,
+  "maxTotalScoredPasses": 4,
+  "initialReviewer": "/root/realism_a_round0",
+  "initialScore": "4.1",
+  "initialSourceA": "22a60811f9c9381ea38085e4cc03aff6e559dbec",
+  "interimNumericalSnapshot": "d07d03fe54b453677c2cd8684e8e2c5eb97112a6",
+  "interimIsScored": false,
+  "rubricWeights": [
+    30,
+    20,
+    20,
+    20,
+    10
+  ],
+  "centralUnsupportedMechanismCap": 6,
+  "seriousFailureGate": [
+    "conservation",
+    "SI units/Kelvin/fraction bases",
+    "numerical stability"
+  ],
+  "reviewInputsSha256": {
+    "/Users/kadensmith/Downloads/V21_Realism_Review_Loop (1).md": "8055145ae2ef9afa7c217fb6c0df7b0cfa333ff9729ef4cd198e402a1693c99a",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/AGENTS.md": "0b5834ba9956553a14db117cbd2b0c2bfe8ce08bbec2634ba618bf52e98cde86",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/realism/RUBRIC.md": "45bc393762563f19d43012dfca0b7a8cbb3f88e5a4d02eeb5cf5417c36e9710c",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/realism/ROUND_0_A.md": "bb21d61019f213aabe5fa4d78661d736e235ee3697d71b1a1ad94e702948b848",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/realism/LEDGER.md": "277d111631672a24ec689a1b034149a68ac93a41509fe19f5635ab3a73e975bf",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/realism/ROUND_1_ALLOCATION.md": "e474941997ecc3d1cc1fcf948199ec9dcc4a246283b355a1d08f69e35304ca6d",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/READY.md": "16e0f8e960907011018f2b6e29dbdc6f8d1a29ef02c72ccbb6d3e4ce18a920ce",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/CHECKPOINT_WORLD.md": "12c92d42386b0e8e018f047e149685b616b2d8f0d89cf35747c215cf72c692b4",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/CHECKPOINT_A_VISUAL.md": "7de64caf1d0cd363462f8a507bd16ce06b806962c47ecaa33d6e8b4135b93fe8",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/CHECKPOINT_VISUAL.md": "0670fef5cbb3b2dd33a6322e984cb2614ac3fa203269b60412a1473b7dbed7b0",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/ORIGINAL_AUDIT.md": "1ca52c5ce7f68f2b41dd2dcd2f44b2089ad18081e188eb8636b6660c93d90f4e",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/review/version21/original-preservation.json": "a0ad327b424f60aa039c4c94f63331683e357aa3b707fe1d63881353f1480889",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/alternatives/CONTRACT_V21_2.md": "c9603d0f07e00a8167f918461e7251963a49b30e2948b41de312f4ac1ec5ee87",
+    "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/docs/alternatives/sublimation-injection/HANDOFF.md": "3324205d7de398d79800f17f012b94b9f842e80ce0f846f58868ce435cf280a8"
+  },
+  "originalBenchmarkSpecSha256": "a958a214cf3e39e54c4e0787198cdd64f7016f905dddedb4aa01dcdfef94daf3",
+  "runtime": {
+    "node": "v26.8.2",
+    "npm": "11.19.1",
+    "OS": "macOS 27.0 arm64",
+    "hardware": "Mac15,7 / Apple M3 Pro / 12 CPUs / 38654705664 bytes RAM"
+  },
+  "requiredFrozenProvenance": [
+    "exact commit",
+    "binary tracked diff SHA256 including empty diff",
+    "untracked implementation hashes if any",
+    "source/dependency closure hashes",
+    "lockfile/config/runtime/dependency hashes",
+    "scenario/seed",
+    "commands/executor/run IDs",
+    "CPU/load observation",
+    "57 original protected SHA256 checks"
+  ],
+  "plannedCommands": [
+    "npm test -- tests/alternatives/sublimation-injection tests/alternatives-contact-adapter.test.ts tests/alternatives-infusion-accuracy.test.ts tests/contactCooling.test.ts tests/independent-realism-a.test.ts --maxWorkers=1"
+  ],
+  "reusePolicy": "Unchanged equations and baseline evidence may be reused only after exact relevant hashes/config/runtime/dependencies match; shared contact-policy effects independently rerun. Presentation and lifecycle changed evidence invalidated. No initial report/log edits, no live-source edits, no redundant npm install. Copy verified existing dependency environment for isolated execution with its own writable cache.",
+  "browser": "CUA inventory succeeded; actual independent app observation deferred until frozen snapshot; no policy bypass permitted.",
+  "scopeLimits": "No surface outlet/pre-cooling/pressure/soil transport/reaction mechanism claimed. Authored visual improvements receive no physics credit. No experimental calibration invented.",
+  "finder": "Only nested ignored runtime outputs created; no new top-level project/output folder created."
+}

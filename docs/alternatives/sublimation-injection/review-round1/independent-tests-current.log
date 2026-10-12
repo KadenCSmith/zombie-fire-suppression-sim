@@ -1,0 +1,13 @@
+
+> zombie-fire-suppression-sim@0.21.0 test
+> vitest run tests/independent-realism-a-current.test.ts --maxWorkers=1
+
+
+ RUN  v5.0.2 /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  01:36:18
+   Duration  251ms (transform 49%, tests 41%, import 9%, worker 1%)
+

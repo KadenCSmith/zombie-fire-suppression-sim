@@ -1,0 +1,66 @@
+{
+  "publishedBeforeExecution": "2026-10-12T07:46:52.996753+00:00",
+  "reviewer": "independent /root/realism_a_round0; not implementation author",
+  "reviewRound": 0,
+  "alternative": "4.2.1",
+  "snapshot": {
+    "commit": "9ebda6fae2e4101c80cd7b4e35f7ea13444263f9",
+    "diffSha256": "25c643abe579096acc7a401cc27aced343f1bd738660bc05d5209ba102a52062",
+    "A": "22a60811f9c9381ea38085e4cc03aff6e559dbec",
+    "rubricOnly": "3b21c23",
+    "currentHead": "3b21c23d464d48c839f5d19d8715294204a042a7"
+  },
+  "tolerances": {
+    "massKg": "1e-9 + 1e-9*initial inventory scale",
+    "energyJ": "1e-4 + 1e-9*initial energy scale",
+    "dryAnalyticalTemperatureK": 1e-08,
+    "postExhaustionExponentialK": 1e-08,
+    "finiteBudgetHeatJ": 1e-05,
+    "continuousInfusionDefaultMaxErrorK": 0.15,
+    "continuousInfusionRefinedMaxErrorK": 0.05,
+    "refinement": "strictly decreasing maximum temperature error at h=0.2,0.1,0.05,0.025,0.0125 s against independent exact series; no mesh for lumped ODE"
+  },
+  "benchmarks": [
+    {
+      "id": "D1",
+      "settings": "1 independent 0.5kg specimen; cp=1840J/kg/K; Td=194.67K; Tp0=823.15K; Tin=293.15K; Ud=8W/K; md=1kg; no water; physical t=0,1,10,60s; dt=.05s",
+      "expected": "Tp=Td+(Tp0-Td)*exp(-Ud*t/Cp), Q=Cp*(Tp0-Tp), dm=Q/Lsub; latent capacity and lower bound inactive"
+    },
+    {
+      "id": "D2",
+      "settings": "as D1, md=.001kg; t=60s",
+      "expected": "solid exhausted; Q=md*Lsub and Tp=Tp0-Q/Cp; no free heat; other specimens unchanged in actual adapter"
+    },
+    {
+      "id": "W1",
+      "settings": "actual 3x0.5kg adapter specimens, water only, Tp0=350K,Tin=293.15K; UA=24W/K each; total r=.025kg/s; m=.5kg; arrival8s; t=8,8.5,9,18,28,60; h=.2,.1,.05,.025,.0125; direct core refinement uses same geometry/support",
+      "expected": "Before arrival unchanged. For tau in (0,te=m/r): x=Tp-Tin = Delta*exp(-k*tau)*sum(n=0..infinity, (k*tau)^n/n!*b/(b+n)); k=UA/Cp,b=UA/(r/3*cw). Water energy conservation gives Tw. After te=20s, x=xeq+(x(te)-xeq)*exp(-UA*(1/Cp+1/Cw)*(tau-te)); xeq=Cp*Delta/(Cp+Cw). Derived from continuous mass influx at Tin and conservative exchange, independent of implementation. No boiling anywhere."
+    },
+    {
+      "id": "W2",
+      "settings": "same W1; compare times28 and60s",
+      "expected": "Once supply exhausted, exact two-body exponential from t0=28s state to60s; a conditional continuation test only, no credit for preceding infusion accuracy"
+    },
+    {
+      "id": "P1",
+      "settings": "core thermodynamic limit; single1kg specimen Tp0=1000K; water0.1kg at293.15K; flow0.1kg/s, UA=1e9W/K, step1s, end1s; no dry",
+      "expected": "All0.1kg vaporized. Q=.1*(4186*(373.15-293.15)+2260000) J. Tp=1000-Q/1840K. This checks complete phase-budget limit only, not finite-UA continuous infusion."
+    },
+    {
+      "id": "L1",
+      "settings": "actual adapter default plus water/co2-water interventionoff; zero water,zero flow,zero UA,latearrival50>end10,zero dry, equal Tin=Tp=300K; default water0.5kg; default co2-water plus finite water.03kg/dry.001kg,UA100,end120,flow.2; inlet273.15/350; peak1000/350 with initial>=inlet",
+      "expected": "No source heat in off/no-inventory/no-flow/no-UA/late-arrival/equal-temperature water limits; off matches independently initialized baseline. Finite mass bounds, temperatures finite; Tin<=Tp<=initial and Tin<=Tw<=Tb; all ledgers close."
+    },
+    {
+      "id": "BROWSER",
+      "settings": "own Chrome tab http://127.0.0.1:5173/?alternative=sublimation-injection; inspect representative early/late narrative and computed comparison at initial/final state if tools available",
+      "expected": "Computed SVG temperatures/readouts agree with exported accepted states. Narrative cues excluded from physics evidence; unavailable observation marked unverified."
+    }
+  ],
+  "runtime": {
+    "platform": "Darwin Kadens-MacBook-Pro.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:06:24 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6030 arm64",
+    "node": "v26.8.2",
+    "npm": "11.19.1"
+  },
+  "isolation": "copied frozen source/tests/config, own npm ci node_modules; only workspace tests/report artifacts mutated; no root implementation/dependencies touched"
+}

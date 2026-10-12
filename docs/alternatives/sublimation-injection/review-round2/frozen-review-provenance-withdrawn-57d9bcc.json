@@ -1,0 +1,153 @@
+{
+  "reviewer": "/root/realism_a_review",
+  "preparedUtc": "2026-10-12T09:13:21.655168+00:00",
+  "commit": "57d9bcc7f2b3ff0ccb2bd8763513bb3d3d14f5f1",
+  "status": "",
+  "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "archiveSha256": "1a389c988f9103fb084781854e7731d466b3812be41509fecf697bbf4f61ec0d",
+  "snapshotPath": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-2/snapshot-57d9bcc",
+  "manifestSha256": "efb73394e3e762ca34d58fc42cc89a09e7e63438c70ed84be2a8d1ab2e2bffd5",
+  "changedSourceAndTestsVsRound1": [
+    "src/alternatives/sublimation-injection/visuals.ts",
+    "src/alternatives/sublimation-injection/supply.tsx",
+    "src/alternatives/sublimation-injection/loading.tsx",
+    "src/alternatives/sublimation-injection/vehicle.tsx",
+    "src/alternatives/sublimation-injection/index.ts",
+    "src/alternatives/sublimation-injection/scene.tsx",
+    "tests/alternatives/sublimation-injection/supply.test.ts",
+    "tests/alternatives/sublimation-injection/visuals.test.ts"
+  ],
+  "unchangedNumericalCallPath": {
+    "src/alternatives/contactAdapter.ts": {
+      "sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "round1Sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "same": true
+    },
+    "src/alternatives/model.ts": {
+      "sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "round1Sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "same": true
+    },
+    "src/alternatives/contract.ts": {
+      "sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "round1Sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "same": true
+    },
+    "src/alternatives/registry.ts": {
+      "sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "round1Sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "same": true
+    },
+    "src/alternatives/sublimation-injection/science.tsx": {
+      "sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "round1Sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "same": true
+    },
+    "src/alternatives/sublimation-injection/evidence.ts": {
+      "sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "round1Sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "same": true
+    },
+    "src/story/contactCooling.ts": {
+      "sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "round1Sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "same": true
+    },
+    "src/worker/alternatives.worker.ts": {
+      "sha256": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6",
+      "round1Sha256": "adaa4471214791b7d8cb0446937a04b627e5f8690fa2ed4a8a378542d22666f6",
+      "same": true
+    },
+    "src/ui/AlternativeScene.tsx": {
+      "sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "round1Sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "same": true
+    },
+    "src/ui/AlternativesWorkspace.tsx": {
+      "sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "round1Sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "same": true
+    },
+    "src/ui/AlternativeRenderWorkspace.tsx": {
+      "sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "round1Sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "same": true
+    }
+  },
+  "localCheckProvenanceSha256": "8bc4d017395091be1b1b2b6b4415c0fd4673595de6173eb6787f67f76a0b620c",
+  "allLocalProvenanceHashesMatch": true,
+  "copiedDependenciesFrom": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1/snapshot-de48568/node_modules",
+  "dependencyInstallRun": false,
+  "dependencyMetadata": {
+    "node_modules/@react-three/drei/package.json": {
+      "sha256": "7e38b2dec648fc3841c20f4e545fa531417fcc594e1a03a9ebecd577dedf3f31",
+      "matchesLocal": true,
+      "version": "10.7.8"
+    },
+    "node_modules/@react-three/fiber/package.json": {
+      "sha256": "08cdd95784a1ecaa7a5c8d895d5da659bc23780301b7d6873916c03236cb198b",
+      "matchesLocal": true,
+      "version": "9.8.1"
+    },
+    "node_modules/react-dom/package.json": {
+      "sha256": "136d4af63de473392ea79d6a21932b0ed9eb37fe518ce70f4621250f3d79e9bb",
+      "matchesLocal": true,
+      "version": "19.3.0"
+    },
+    "node_modules/react/package.json": {
+      "sha256": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+      "matchesLocal": true,
+      "version": "19.3.0"
+    },
+    "node_modules/three/package.json": {
+      "sha256": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+      "matchesLocal": true,
+      "version": "0.186.1"
+    },
+    "node_modules/typescript/package.json": {
+      "sha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+      "matchesLocal": true,
+      "version": "7.0.2"
+    },
+    "node_modules/vite/package.json": {
+      "sha256": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+      "matchesLocal": true,
+      "version": "7.3.6"
+    },
+    "node_modules/vitest/package.json": {
+      "sha256": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+      "matchesLocal": true,
+      "version": "5.0.2"
+    }
+  },
+  "reusedEvidenceFrom": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-1",
+  "reusedEvidenceHashes": {
+    "benchmark-spec.json": "a958a214cf3e39e54c4e0787198cdd64f7016f905dddedb4aa01dcdfef94daf3",
+    "retry-execution-spec.json": "6c3fb64fe1ffc2b3248a87de134013be06e2e0dbddc415cb42e552f08abe6dc7",
+    "report.json": "bbad0389f3e0f10698bd5dbcd10ca5d864730c4966549b99a3a103a19f64a69e",
+    "benchmark-results-final.json": "287147e271040c195cad40d6f828d41ccb34d85222c072e8a4638d136805ba1e",
+    "current-numerical-results-final.json": "33f78c8c3b03e7ab52752abfcda7983789c5f7c50643e25479d752bfaeebaf08",
+    "signed-evidence-sha256.json": "82d534d4db8c7d919fae20acb0d07d9be4296bfed7dd24d21eb8a0c0add29d3b",
+    "primary-source-digest.md": "cfc9403b5f640392a2d86de43011325a55e30c72ed7d9738df6aff63e6ad2905"
+  },
+  "runtime": {
+    "node": "v26.8.2",
+    "npm": "11.19.1",
+    "python": "3.13.15",
+    "os": "macOS-27.0-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "load": [
+      29.46875,
+      22.72802734375,
+      25.25
+    ],
+    "hardware": [
+      "Mac15,7",
+      "12",
+      "38654705664",
+      "Apple M3 Pro"
+    ]
+  },
+  "transitiveFiles": 75,
+  "setupRepair": "First provenance script used science.ts instead of actual science.tsx and stopped before tests. Repaired reviewer metadata path only; snapshot/dependencies unchanged."
+}

@@ -1,0 +1,18 @@
+
+ RUN  v5.0.2 /Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-3/snapshot-a0e0826
+
+
+ Test Files  12 passed (12)
+      Tests  81 passed (81)
+   Start at  02:39:48
+   Duration  2.33s (import 37%, tests 37%, transform 25%, worker 1%)
+
+    Isolate  12 workers spawned · ~64ms startup each (spawn + environment, per file)
+             at least ~702ms faster with isolate: false — reuses workers across files instead of one per file
+
+(node:41114) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:41115) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

@@ -9,8 +9,8 @@ export const variants: readonly Variant[] = [{
   subtitle: 'Truck-delivered water + dry ice → illustrative flow and quenching',
   engines: ['contact', 'concept'], media: ['water', 'co2-water', 'unspecified'],
   defaultMedium: 'water', defaultEngine: 'contact',
-  stages: ['Fire spread + access', 'Drilling + truck delivery', 'Water + dry-ice loading', 'Illustrative flow + quenching'],
-  limitation: 'Truck delivery, dry-ice loading, faster water motion and visible quenching are illustrative. Finite contact heat and inventory are modeled separately in three isolated specimens; tank pressure, liquid pre-cooling, accelerated field injection, penetration, suppression, re-ignition and cost savings are unavailable predictions. The CO₂ option is direct solid contact, not predicted tank pre-cooling.',
+  stages: ['Fire spread + access', 'Drilling + truck delivery', 'Load dry ice + close lid', 'Preparation, flow + quenching'],
+  limitation: 'Truck delivery, dry-ice loading, lid closure, faster water motion and visible quenching are illustrative. Finite contact heat and inventory are modeled separately in three isolated specimens; tank pressure, liquid pre-cooling, accelerated field injection, penetration, suppression, re-ignition and cost savings are unavailable predictions. The CO₂ option is direct solid contact, not predicted tank pre-cooling.',
   status: { illustrative: true, modeled: 'Finite contact heat / inventory only · unvalidated', experimentallyValidated: false },
   provenance,
 }]

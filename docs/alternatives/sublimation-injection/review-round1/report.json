@@ -1,0 +1,136 @@
+{
+  "signedBy": "/root/realism_a_review",
+  "signedAtUtc": "2026-10-12T08:44:27.250177+00:00",
+  "reviewerIndependence": "Read-only scientific reviewer; no implementation edits, no delegation",
+  "alternative": "4.2.1",
+  "snapshot": "de48568ef636dcebc89316bcf6d77d9d6df15265",
+  "trackedDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "implementationDeltaBase": "d07d03fe54b453677c2cd8684e8e2c5eb97112a6",
+  "actualPrivateChangedFileCount": 14,
+  "initialEvidence": {
+    "reviewer": "/root/realism_a_round0",
+    "Acommit": "22a60811f9c9381ea38085e4cc03aff6e559dbec",
+    "score": "4.1",
+    "scoredPass": 1,
+    "preserved": true
+  },
+  "retryAccounting": {
+    "thisIsScoredPass": 2,
+    "thisIsScoredRevisionRetry": 1,
+    "totalScoredPassesUsed": 2,
+    "scoredRetriesUsed": 1,
+    "scoredRetriesRemaining": 2,
+    "maximumTotalScoredPasses": 4,
+    "interimD07NumericalRecheckScored": false,
+    "candidate303Scored": false,
+    "reviewerHarnessRepairConsumesScoredRetry": false,
+    "laterRequestedVisualRevision": "not covered; future scored review consumes next pass if executed"
+  },
+  "criterionScores": [
+    {
+      "name": "Governing physics and conservation",
+      "weight": 30,
+      "score": 5,
+      "reason": "Finite conservative lumped contact verified; surface source/outlet, gas/liquid transport and reacting field absent."
+    },
+    {
+      "name": "Medium/soil properties and constitutive behavior",
+      "weight": 20,
+      "score": 3,
+      "reason": "Local water/CO2 constants have primary support; specimen heat capacity and UA uncalibrated; peat hydraulic/thermal/reaction relations absent."
+    },
+    {
+      "name": "Numerical verification and independent validation",
+      "weight": 20,
+      "score": 6,
+      "reason": "99 checks passed independently across14files, frozen exact/refinement/phase-budget/limits retained; .00625s improves continuous-influx error. No matched measurements/uncertainty or independent finite-UA phase-event timing validation."
+    },
+    {
+      "name": "Method-specific mechanism accuracy and coupling",
+      "weight": 20,
+      "score": 2,
+      "reason": "No finite surface solid-water/outlet energy state or pressure-assisted flow/soil-response equations. CO2 separately cools specimen1; inlet/flow prescribed."
+    },
+    {
+      "name": "Visual correspondence to computed states",
+      "weight": 10,
+      "score": 4,
+      "reason": "Independent current readouts/SVG agree with computed states; seek/remount/resize/navigation succeeded. New loading/lid/bubbles/flow/quench remain authored time-only cues without accepted-state coupling."
+    }
+  ],
+  "weightedArithmeticUnrounded": "4.1",
+  "centralMechanismUnsupported": true,
+  "centralMechanismCap": 6,
+  "finalScore": "4.1",
+  "verifiedAtLeast7": false,
+  "seriousConservationSIUnitNumericalStabilityFailureFound": false,
+  "originalPreservation": {
+    "baseline": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+    "checked": 57,
+    "mismatches": 0
+  },
+  "independentExecution": {
+    "testsPassed": 99,
+    "testFilesPassed": 14,
+    "finalImplementationFailures": 0,
+    "run1": "97 tests/13 files passed; reviewer new file failed transformation before any new tests.2.34s; initial output retained.",
+    "run2": "Only reviewer new file after declaration typo repair,2tests/1file PASS,.251s",
+    "harnessIssue": "Reviewer-only function-declaration typo; exact input/reference/tolerance unchanged; no live implementation mutation.",
+    "commands": [
+      "npm test -- tests/alternatives/sublimation-injection tests/alternatives-contact-adapter.test.ts tests/alternatives-infusion-accuracy.test.ts tests/contactCooling.test.ts tests/alternativeSceneComposition.test.tsx tests/alternatives.test.ts tests/independent-realism-a.test.ts tests/independent-realism-a-current.test.ts --maxWorkers=1",
+      "npm test -- tests/independent-realism-a-current.test.ts --maxWorkers=1"
+    ],
+    "runtime": "Node v26.8.2/npm11.19.1,macOS27 arm64,Apple M3 Pro,12CPUs,36GiB",
+    "loadBeforeRuns": [
+      [
+        20.11083984375,
+        26.109375,
+        29.94970703125
+      ],
+      [
+        21.36767578125,
+        25.9921875,
+        29.81689453125
+      ]
+    ],
+    "dependencyInstallation": "No reinstall; copied preserved isolated interim dependency environment, own writable cache, exact lock/config/package versions and relevant package metadata hashes verified.",
+    "numericalRefinement": [
+      {
+        "stepS": 0.05,
+        "maximumErrorK": 0.019203044476910236
+      },
+      {
+        "stepS": 0.00625,
+        "maximumErrorK": 0.0026181586201232676
+      },
+      {
+        "stepS": 0.003125,
+        "maximumErrorK": 0.0013229686160229903
+      }
+    ],
+    "maximumTestedResiduals": {
+      "massKg": 6.861178292183467e-14,
+      "energyJ": 3.6694109439849854e-07
+    },
+    "frozenTolerancesUnchanged": true
+  },
+  "scopeAndReuse": "Frozen source/archive/73-file transitive import closure and unchanged initial-to-final hashes recorded. Shared contactAdapter/model timestep change independently rechecked. Original core, properties, equation structure, API, config/lock and unchanged benchmark references reused only where byte identity matched. Presentation/lifecycle reviewed afresh. Parent local74tests/type/lint/build/57hash results remain supplied evidence, not reviewer execution.",
+  "appEvidence": "browser-observations.json",
+  "remainingBlockers": [
+    "Additive finite surface solid/liquid state, initial media temperatures/loading history, calibrated or prescribed contact area/UA and ambient losses, phase/freezing validity, gas export enthalpy, conservative computed liquid outlet mass/enthalpy seam.",
+    "Supported abstract pressure/source state and pressure-to-liquid-flow boundary/coupling, material/domain/boundary data and independent validation; none supplied or invented.",
+    "Conservative liquid/CO2 transport into reacting porous peat with source geometry/boundaries,density/porosity/moisture basis,retention/relative permeability/permeability/thermal properties/kinetics and measured uncertainties.",
+    "Held-out matched thermal/mass/evaporation measurements; suppression/reignition requires supported oxygen/fuel/moisture/reaction histories and observation window.",
+    "Current MethodSceneProps carries id/time only; calculated visuals need additive accepted-state seam.",
+    "Coordinator final combined/full/native/production-GPU checks pending; later visual changes invalidate affected runtime/source evidence."
+  ],
+  "unrunByReviewer": [
+    "Full project suite/typecheck/lint/build (valid exact local reports reused as supplied)",
+    "Native window/production GPU/full combined navigation",
+    "Experimental validation",
+    "Independent finite-UA phase-event timing benchmark",
+    "Spatial mesh refinement (no spatial mesh in proxy)"
+  ],
+  "stoppingAssessment": "This retry supports improved local numerical accuracy and artwork/lifecycle robustness but no supported scientific path to>=7 inside current data/seams. Recommend preserve honest below7 result; any human-requested artwork follow-up must retain cap and counter.",
+  "finderTag": "Only nested ignored runtime outputs created; no new top-level project/output folder, so no tag attempt required."
+}

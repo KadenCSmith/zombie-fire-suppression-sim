@@ -1,0 +1,21 @@
+{
+  "recordedUtc": "2026-10-12T09:14:51.331777+00:00",
+  "candidate": "57d9bcc7f2b3ff0ccb2bd8763513bb3d3d14f5f1",
+  "status": "Explicitly withdrawn by implementer before independent affected-test execution or GUI observations, during static preparation",
+  "sourceAndEvidencePreserved": true,
+  "scientificScoreAssigned": false,
+  "completedReviewDiscarded": false,
+  "countersUnchanged": {
+    "scoredPassesUsed": 2,
+    "scoredRetriesUsed": 1,
+    "remaining": 2
+  },
+  "finding": {
+    "file": "src/alternatives/sublimation-injection/vehicle.tsx",
+    "issue": "Wheel angles travel/.322 rotate backward for x=parked+travel; no-slip rotation around +Z requires -travel/R. Current bottom-point x velocity is 2*d(travel)/dt instead of zero.",
+    "independentlyConfirmed": true,
+    "firstRaisedBy": "Implementer static review, confirmed independently before execution",
+    "classification": "Authored vehicle correspondence defect; no numerical/contact source changed"
+  },
+  "setupRepair": "Provenance script typo science.ts repaired to actual science.tsx; no tests executed during failed preparation command."
+}

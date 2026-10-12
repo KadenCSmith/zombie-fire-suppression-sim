@@ -1,0 +1,85 @@
+{
+  "executor": "A implementer /root",
+  "scope": "Local checks; not independent scoring or GPU proof",
+  "createdUTC": "2026-10-12T08:26:39.225068+00:00",
+  "commit": "303a5942bd0c00622b32ee2861f737bca4f14113",
+  "uncommittedDiffSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceDependencySHA256": {
+    "src/alternatives/sublimation-injection/quench.tsx": "ebd38bf23eebf73bca0de76306a941e570b619e0eed1128a8d7519ecbe56ec5d",
+    "src/alternatives/sublimation-injection/evidence.ts": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+    "src/alternatives/sublimation-injection/visuals.ts": "1c377de2943acb606a1a9890d211009f295862b60367acc4654896247bf6ec8a",
+    "src/alternatives/sublimation-injection/science.tsx": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+    "src/alternatives/sublimation-injection/annotation.tsx": "12e4b33a6e1de6cfe918a14caa3e8c7a2cf587e2ab59cc4fb2ac5cb5d8d1ee6b",
+    "src/alternatives/sublimation-injection/loading.tsx": "8aae8a4d6152249406577889ea0cc9e5b640cd7edd6a9d52c0f85ab5ca7fdcd4",
+    "src/alternatives/sublimation-injection/index.ts": "95f1538db3473128191e1519ea362a2087f12a8c57359f5664a9fec0cab8d5b2",
+    "src/alternatives/sublimation-injection/scene.tsx": "245f6293e4af60bfa494c52da6c386559c3826861febc77eac9c94d90820d315",
+    "tests/alternatives/sublimation-injection/annotation.test.ts": "6795d6a6fbcbb7ff1f92f4fa39ae5a5f3cf3a1ef7e5996e050ae822e26389e45",
+    "tests/alternatives/sublimation-injection/quench.test.ts": "bbd650b5d63861da82b3a13aa9263fc35b1e220c0721ebc23f6d34c6d3d9cfb1",
+    "tests/alternatives/sublimation-injection/adapter.test.ts": "b27b1470a3edd550d109ad50a7ce1a7ed7287c7238c3241df5096eb1437d4e96",
+    "tests/alternatives/sublimation-injection/evidence.test.ts": "e296a7697c6822c72766c810b1bc0ceb257afe1f1bd80e6b4d69342b829ae323",
+    "tests/alternatives/sublimation-injection/visuals.test.ts": "ba57614e4e4f62448a6d98db0b7f74698c97a7e114c0457a19a69884cc5b7b28",
+    "tests/alternatives/sublimation-injection/quench.lifecycle.test.ts": "fa4cf282e60db9ffb8eb296a3e68c60c4aace8d8b283a75d45b3a2847be31152",
+    "tests/alternatives/sublimation-injection/loading.test.ts": "6a943ea0aa3443a9df179d8cc226a92b1cc6dfa0869277179b6cc829a5829220",
+    "src/alternatives/contactAdapter.ts": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+    "src/alternatives/model.ts": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+    "src/alternatives/contract.ts": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+    "src/alternatives/registry.ts": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+    "src/story/contactCooling.ts": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+    "src/ui/AlternativeScene.tsx": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+    "package.json": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83",
+    "package-lock.json": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d",
+    "vite.config.ts": "228c2a56f103ee9cc741a1a3db72f8a200243191f6f98faf9b7c459022ad260b",
+    "tsconfig.json": "c01bd0d5b7475c0459740889e507747788f1185bee35ea070fb68250496fc936",
+    "node_modules/react/package.json": "6e003e4e9ed25afa7fdd55613f8aa877cefa9b359d9c13f81ee704030248e24e",
+    "node_modules/react-dom/package.json": "136d4af63de473392ea79d6a21932b0ed9eb37fe518ce70f4621250f3d79e9bb",
+    "node_modules/three/package.json": "f9c474a27c920b9435353a6235968f4453436bee0444fac7e5fd289c8fa463de",
+    "node_modules/@react-three/fiber/package.json": "08cdd95784a1ecaa7a5c8d895d5da659bc23780301b7d6873916c03236cb198b",
+    "node_modules/@react-three/drei/package.json": "7e38b2dec648fc3841c20f4e545fa531417fcc594e1a03a9ebecd577dedf3f31",
+    "node_modules/vitest/package.json": "943ddc2cfd3676087e243b5adc450ea8c25ad941ba678b48a679b68f67ef297a",
+    "node_modules/vite/package.json": "e5ed0f85215f871fe22a48987dcd77fcfbe14064a53c0c9f7f48186a6b7e2cf0",
+    "node_modules/typescript/package.json": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e"
+  },
+  "runtime": {
+    "node": "v26.8.2",
+    "npm": "11.19.1",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "hardware": "Apple M3 Pro",
+    "previewNode": "/opt/homebrew/opt/node@22/bin/node",
+    "previewPID": 23895
+  },
+  "checks": [
+    {
+      "command": "npm test -- tests/alternatives/sublimation-injection tests/alternativeSceneComposition.test.tsx tests/alternatives.test.ts tests/alternatives-infusion-accuracy.test.ts --maxWorkers=1",
+      "result": "PASS 73 tests/10 files",
+      "durationS": 1.88
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run lint",
+      "result": "PASS with 16 inherited warnings"
+    },
+    {
+      "command": "npm run build",
+      "result": "PASS with inherited warnings",
+      "durationS": 2.65
+    },
+    {
+      "command": "node scripts/check-original-preservation.mjs",
+      "result": "PASS 57/57 against161e7a4a1f8c35765e1878c132db79977be1f5ea"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "V21_CAPTURE_SUBLIMATION_EVIDENCE=1 npm test -- tests/alternatives/sublimation-injection/evidence.test.ts --maxWorkers=1",
+      "result": "PASS 3 tests/1 file; separate round1 capture",
+      "durationS": 0.344
+    }
+  ],
+  "validity": "Commands executed on these unchanged source/test/config/dependency bytes immediately before committing; subsequent changes only documented their outcomes. Initial0.05s evidence is preserved separately. Final combined/native/browser checks belong to coordinator/reviewer."
+}
