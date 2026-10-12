@@ -1,0 +1,73 @@
+{
+  "frozenCommit": "0937d7b60db98d1ef1ed544bd745660c10e94f7c",
+  "base": "9a7350cfdc52e7b160e77dd8f30f01db826ee2c7",
+  "readyPublication": "44aa38f277d71d8d7d21f84070e02379edf1fc08",
+  "branch": "feature/v21-particle-injection",
+  "api": "v21.3",
+  "executor": "D implementer; independent review recorded separately",
+  "sourceHashes": {
+    "docs/alternatives/fine-dry-ice-injection/FROZEN_CRITERIA.json": "e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d",
+    "docs/alternatives/fine-dry-ice-injection/INITIAL_REVIEW_85f49eb.md": "53422dad47974c8aee40a7b04fa9ec59fa09157938cde2b7f9dce28a4db4519a",
+    "docs/alternatives/fine-dry-ice-injection/INITIAL_REVIEW_85f49eb.signature.json": "a8da8093c8973440c07a34b05998a18f57e378ba0cbb1a0ec9cda5321b6336b9",
+    "docs/alternatives/fine-dry-ice-injection/PRIMARY_REFERENCES.md": "a63649cbd5674832d393b1802f469a51a8efc459b55115bd0515dbc5f29a72ff",
+    "docs/alternatives/fine-dry-ice-injection/PR_DESCRIPTION.md": "b2c696c510799ecef60957c4437385e0efeed92e783cb74ccd91d4c18edb7109",
+    "docs/alternatives/fine-dry-ice-injection/README.md": "cf4a8c9e4c6ce08a18b34283c5fbeff4cd1c37b373f669f3adc19ad8396539a4",
+    "docs/alternatives/fine-dry-ice-injection/REALISM_LEDGER.md": "71b1263aab456e9601bbc70706ca035368684acf4c755aea46a456714503df06",
+    "docs/alternatives/fine-dry-ice-injection/initial-review-evidence.tar.gz": "99434b22cfd3cb3e4f703f176f4c8448ef8d2dc2e2ef21a86c60abfba0c8d9fe",
+    "docs/alternatives/fine-dry-ice-injection/numerical-evidence.json": "a01f0adaaeaf8fc56c5d9079b7d34b0393d02f66fd9e2068f205f683ce281355",
+    "src/alternatives/fine-dry-ice-injection/comparison.tsx": "05596b18db284545859b665d65906d4d7c4278181f556e2370cae4664ae3f22a",
+    "src/alternatives/fine-dry-ice-injection/config.ts": "674aa909592f58a8355ccee007501fc488d3ae5bd2ee89ef5af3b0ae9ae1519d",
+    "src/alternatives/fine-dry-ice-injection/index.ts": "64f5e04583a0962437a09bd0dc83d2eab91f793f83927df04d9ef5f354ae533d",
+    "src/alternatives/fine-dry-ice-injection/physics.ts": "a1298f7cf2fc1a2f5200f38699914a8d4edfa88e4b117a396d3bc79aa180b750",
+    "src/alternatives/fine-dry-ice-injection/scenarios.ts": "22ff3af0f5a95670a600690a1b8a65ec99ea32d8f287c9144e486c72cc9ce25f",
+    "src/alternatives/fine-dry-ice-injection/scene.tsx": "25a5c9276279f39c39f6219ccfcc1d45be5beff0e1823fa622e85b476688a288",
+    "src/alternatives/fine-dry-ice-injection/science.tsx": "acb1bc03c077386fdd463123867665892d52229f943cd81e8e841806a1b32a48",
+    "src/alternatives/fine-dry-ice-injection/style.css": "c70aad1c5cabb825e9f2a8188a129d74617b4fbd0781a81ebcda357a7ef3d6ec",
+    "src/alternatives/fine-dry-ice-injection/types.ts": "336bc4bb8f3294aea7f3c5def68094a34fdf6987e795396caf09f97fadc6b544",
+    "src/alternatives/fine-dry-ice-injection/workspace.tsx": "3efcc299d6799c82e02deffaedeabd5fa4c22201d2e6d9a8ba0c63aec44bb92a",
+    "tests/alternatives/fine-dry-ice-injection/benchmarks.ts": "de5cb7773872315ff52f313440913f4e2e041a760d95aefe1a2eacd65d97c9de",
+    "tests/alternatives/fine-dry-ice-injection/numerics.test.ts": "1e79c7ad6cb5ce1fa2351eebbcef06784204fad78dcb60b18d5fdd681c86a289",
+    "tests/alternatives/fine-dry-ice-injection/physics.test.ts": "3aa0ed187af7518571af25e1f8dfeb63e7163291c48376050a6bc884360889da"
+  },
+  "packageLockSha256": "7a49fa111bc72e8afbd486195bc35bcbc20573f6d3c6f82824e0e1a538b5aa7d",
+  "packageSha256": "c6bf3fa3435265d4cb84f3baefc49963c7909481e6380d2244952d08a9395a83",
+  "viteConfigSha256": "228c2a56f103ee9cc741a1a3db72f8a200243191f6f98faf9b7c459022ad260b",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "node": "v26.8.2",
+  "npm": "11.19.1",
+  "scenarioSeed": 21,
+  "criteriaSha256": "e9f4409dd874714ae06d12834f48c54c4bdf67c0e1c412866d37236fdf99f31d",
+  "commands": {
+    "typecheck": "PASS",
+    "lint": "PASS;16 inherited warnings",
+    "ownedTests": "13 PASS in2 files",
+    "build": "PASS; inherited large chunk/use-client warnings",
+    "originalGuard": "57/57 PASS",
+    "whitespace": "PASS",
+    "actualCandidateUi": "UNVERIFIED in D; browser security policy verification denied; no workaround",
+    "fullSuiteAtOwnedSourceFreeze": "1905 PASS /3 FAIL of1908;113 PASS /3 FAIL files of116. Three coordinator-owned obsolete D placeholder assertions, retained in full-suite-4d780df.log.",
+    "affectedSeamTestsAtFinalFreeze": "35 PASS /3 FAIL of38 in5 files; D13/13 PASS, three same stale assertions; see seam-tests-0937d7b.log.",
+    "typecheckAtFinalFreeze": "PASS",
+    "lintAtFinalFreeze": "PASS;16 inherited warnings",
+    "buildAtFinalFreeze": "PASS; inherited large chunk/use-client warnings",
+    "originalGuardAtFinalFreeze": "57/57 PASS"
+  },
+  "ownedSourceFrozenCommit": "4d780df7d8ef963d1abc95ff4c8f5486782586af",
+  "coordinatorCheckpointMerged": "fcd1776909af93477133afec1b4fb70941b2064c",
+  "freezeHistory": [
+    {
+      "commit": "4d780df7d8ef963d1abc95ff4c8f5486782586af",
+      "purpose": "first implemented candidate; retry1 began; full suite recorded"
+    },
+    {
+      "commit": "0937d7b60db98d1ef1ed544bd745660c10e94f7c",
+      "purpose": "ordinary coordinator checkpoint merge before retry1 signed; D-owned committed bytes identical"
+    }
+  ],
+  "checkArtifactHashes": {
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/build-0937d7b.log": "cc6321b48dc09299a7a69c997f96a72b853763ffb5e9301dfd3280acf9f3aad1",
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/full-suite-4d780df.log": "3c7cc5122b64db3a8034cd8a8cea5e3c88dfd90f392c71f7c1024aa5edfed75b",
+    "docs/alternatives/fine-dry-ice-injection/implementer-checks/seam-tests-0937d7b.log": "e91deb85e4bbf63f5dab4b0e44860c8bc5f0dcb687abf9e9533f9ebae0694dbe"
+  },
+  "checkArtifactStorage": "Verbatim log bytes stored at their named implementer-checks paths inside implementer-checks.tar.gz; not normalized to satisfy source whitespace checks."
+}

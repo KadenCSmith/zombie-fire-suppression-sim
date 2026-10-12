@@ -1,0 +1,13 @@
+{
+  "frozenBeforeImplementation": true,
+  "weights": {"physicsConservation":0.30,"soilConstitutive":0.20,"numericsValidation":0.20,"mechanismCoupling":0.20,"visualCorrespondence":0.10},
+  "scoreAnchors":"1-3 illustrative/incorrect;4-6 major gaps;7-8 credible within tested bounds;9-10 exceptional independent validation",
+  "unsupportedCentralMechanismCap":6,
+  "reviewBudget":{"initialAudits":1,"maximumRetries":3,"maximumScoredPasses":4},
+  "passGates":["unrounded weighted score >=7","no serious conservation/unit/stability failure","actual UI inspection","all required evidence available"],
+  "criticalChecks":["SI/kelvin dimensional audit","finite nonnegative source/delivery/soil inventories","CO2 and water mass conservation","species accounting without oxygen deletion","total energy conservation including downstream enthalpy","source depletion","intervention off","zero particles equal matched water-only","full upstream sublimation => zero probe solids","deterministic replay","time step and parcel/discretization convergence","independent run and caller snapshot isolation","visual quantities correspond to computed accepted states"],
+  "benchmarks":["isolated spherical thermal conduction: Qdot=4*pi*k*r*(T-Ts), r^2=r0^2-2*k*(T-Ts)*t/(rho*L) for fixed far-field temperature and latent-only reference","closed-system enthalpy accounting with finite water sensible heat and CO2 latent plus gas sensible heat","finite prescribed water withdrawal min(flow*duration,initialWater)","analytical two-capacity heat exchange with UA=constant","bulk freezing boundary rejects continuation rather than artificially preserving liquid"],
+  "tolerances":{"massResidualKg":1e-10,"energyResidualRelativeToInitialEnthalpy":1e-9,"analyticalSphereRelative":1e-10,"monotonicConvergence":true,"asymptoticOutputRelative":0.02},
+  "evidenceRequired":["exact frozen commit/source/dependency/lock/runtime hashes","scenario/seed/numerics/window/units/provenance","executor and run identity","primary references","actual UI evidence with source identity","independent reviewer executable outputs","honest unavailable coupling"],
+  "validationRule":"Numerical verification and labels never constitute experiments; unmeasured heat transfer/residence/filtration are assumptions, not validated apparatus. Central unsupported liquid/particle/peat coupling remains capped."
+}
