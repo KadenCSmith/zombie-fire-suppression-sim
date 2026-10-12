@@ -1,0 +1,774 @@
+{
+  "entries": [
+    "src/alternatives/model.ts",
+    "src/alternatives/sublimation-injection/index.ts",
+    "src/alternatives/sublimation-injection/scene.tsx",
+    "src/ui/AlternativeScene.tsx",
+    "src/ui/AlternativeRenderWorkspace.tsx",
+    "src/ui/AlternativesWorkspace.tsx"
+  ],
+  "closure": [
+    {
+      "path": "src/alternatives/contactAdapter.ts",
+      "sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "pass3Sha256": "8fcc66e954dabf39303db45a7d4535378712ca2c3eac3d222cdbeccc8d25d5d0",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/contract.ts",
+      "sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "pass3Sha256": "a8a059f7fc918ce76f7b317955ce62f098732cdc0bb2610c4463d3a9356d77c7",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/model.ts",
+      "sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "pass3Sha256": "9cf10d0d8a45562f356d73c42d20e7ea3662bb50a49a912b3153e97156983e17",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/modules.ts",
+      "sha256": "b2d965a3adbb6904c7e52678457c007fb36c23fa24ca69a7e2302fed97277d39",
+      "pass3Sha256": "b2d965a3adbb6904c7e52678457c007fb36c23fa24ca69a7e2302fed97277d39",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/originalPressurePulse.ts",
+      "sha256": "7c3301a45ad961395de07cd0104acaa59cb66ffc99fd900ca3245eb12d72b66c",
+      "pass3Sha256": "7c3301a45ad961395de07cd0104acaa59cb66ffc99fd900ca3245eb12d72b66c",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/persistence.ts",
+      "sha256": "6fb6bf726edce9ed4c216a943b1714ec50b2cafc735167435dcbf174c07d0174",
+      "pass3Sha256": "6fb6bf726edce9ed4c216a943b1714ec50b2cafc735167435dcbf174c07d0174",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/animation.ts",
+      "sha256": "94f0c501d5241c0c917a9d969339af06772782e9ebcb20db696d97d28451d58f",
+      "pass3Sha256": "94f0c501d5241c0c917a9d969339af06772782e9ebcb20db696d97d28451d58f",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/extinguish.tsx",
+      "sha256": "e55e8c204fb43b4a1e0f91b348d2ea5d604e4740a31f5b21389f78f68e2209ff",
+      "pass3Sha256": "e55e8c204fb43b4a1e0f91b348d2ea5d604e4740a31f5b21389f78f68e2209ff",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/index.ts",
+      "sha256": "a7bc1f863178edd2413821de1bc2f57ad83b7816b600b745f4e7270342e1ded4",
+      "pass3Sha256": "a7bc1f863178edd2413821de1bc2f57ad83b7816b600b745f4e7270342e1ded4",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/model.ts",
+      "sha256": "299fe8034ecf804cd432c6dde0a16e4ca6b2cbf07ae5301b90a4168d3cbe9a80",
+      "pass3Sha256": "299fe8034ecf804cd432c6dde0a16e4ca6b2cbf07ae5301b90a4168d3cbe9a80",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/scene.tsx",
+      "sha256": "9d07846c8a32e52f39f2c3e87c9ffc3b5a01f698612af577cac79e249a369c86",
+      "pass3Sha256": "9d07846c8a32e52f39f2c3e87c9ffc3b5a01f698612af577cac79e249a369c86",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-liquid-waves/science.tsx",
+      "sha256": "df769200be54e631b6fd5e6e87dfad9a0bf8db6b38c251e8726645b72d36c92d",
+      "pass3Sha256": "df769200be54e631b6fd5e6e87dfad9a0bf8db6b38c251e8726645b72d36c92d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-pressure-only/animation.ts",
+      "sha256": "ffd1ad3587f22922d81d7f9cdaf8832d55a1a5ab3b9cec36dab25c7db8ad6545",
+      "pass3Sha256": "ffd1ad3587f22922d81d7f9cdaf8832d55a1a5ab3b9cec36dab25c7db8ad6545",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-pressure-only/index.ts",
+      "sha256": "70d7bbf76f419dbd97653813189f2b689fd696fb7127d906de8c3319cbc3483d",
+      "pass3Sha256": "70d7bbf76f419dbd97653813189f2b689fd696fb7127d906de8c3319cbc3483d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-pressure-only/model.ts",
+      "sha256": "c6235ce6bac115d5f4de85d32161c1944be7c80a72df1052c9dc2220b1fe89ed",
+      "pass3Sha256": "c6235ce6bac115d5f4de85d32161c1944be7c80a72df1052c9dc2220b1fe89ed",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-pressure-only/scene.tsx",
+      "sha256": "798bde4c2102cec2f44ad171481ff4ffc483182b76624a58956367efbcf20072",
+      "pass3Sha256": "798bde4c2102cec2f44ad171481ff4ffc483182b76624a58956367efbcf20072",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/pressure-pulse-pressure-only/science.tsx",
+      "sha256": "b9b86b713f54bafb4761bd5b83b8290fd94de37c635738dd76dc9aebff792d08",
+      "pass3Sha256": "b9b86b713f54bafb4761bd5b83b8290fd94de37c635738dd76dc9aebff792d08",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/records.ts",
+      "sha256": "7ced43518674c02fd511e1dc3ad1f7db70d3efacf0fa9efae28a51d104e20958",
+      "pass3Sha256": "7ced43518674c02fd511e1dc3ad1f7db70d3efacf0fa9efae28a51d104e20958",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/registry.ts",
+      "sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "pass3Sha256": "7ef3b69655f4027355599e85f1d1b3c8eb337dfe7c8adb5c1abc8be636185e7d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/annotation.tsx",
+      "sha256": "12e4b33a6e1de6cfe918a14caa3e8c7a2cf587e2ab59cc4fb2ac5cb5d8d1ee6b",
+      "pass3Sha256": "12e4b33a6e1de6cfe918a14caa3e8c7a2cf587e2ab59cc4fb2ac5cb5d8d1ee6b",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/evidence.ts",
+      "sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "pass3Sha256": "695008a3dc10c7d454fe735bc22010adc6aa80277ec56882f690740f6ffae995",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/index.ts",
+      "sha256": "bc43cc3afb7c28809e6301c88793352215f21237f16937e82ed57fba83aac300",
+      "pass3Sha256": "bc43cc3afb7c28809e6301c88793352215f21237f16937e82ed57fba83aac300",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/loading.tsx",
+      "sha256": "a5948f22b4af70d1e6c5df9efb2e1a394cccbbfa5cc1bc72d46b56c973834612",
+      "pass3Sha256": "a5948f22b4af70d1e6c5df9efb2e1a394cccbbfa5cc1bc72d46b56c973834612",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/quench.tsx",
+      "sha256": "ebd38bf23eebf73bca0de76306a941e570b619e0eed1128a8d7519ecbe56ec5d",
+      "pass3Sha256": "ebd38bf23eebf73bca0de76306a941e570b619e0eed1128a8d7519ecbe56ec5d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/scene.tsx",
+      "sha256": "df7f86a4bd1d116187f2e77112d12ae8cd0f4569b32a996146d9daba0dacbdad",
+      "pass3Sha256": "df7f86a4bd1d116187f2e77112d12ae8cd0f4569b32a996146d9daba0dacbdad",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/science.tsx",
+      "sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "pass3Sha256": "1861d509fd89ff68db6f5ca60d0306303b569739d5123f1bd012c0c0e21b7a60",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/supply.tsx",
+      "sha256": "874bfff18f193591f1e58f318b1406e79307934ac35c0ad63865bbff23e82d70",
+      "pass3Sha256": "077108457549145f59d3e8187cfa1933b5e09a8f5eb76372c8bf4702fbb05740",
+      "unchangedFromPass3": false
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/vehicle.tsx",
+      "sha256": "60f11bed85a77a9b17a2418aa2004602dba8d1c55567f7db97cc1d7d8dbe043a",
+      "pass3Sha256": "6f039731c1a60c3e614d31b8c8168b13390276de15d636d3d1017fd76f946e71",
+      "unchangedFromPass3": false
+    },
+    {
+      "path": "src/alternatives/sublimation-injection/visuals.ts",
+      "sha256": "57a4861914ed7ec0c4b8a48dda029d648c85db2aaab97ca28448d9c63e0965db",
+      "pass3Sha256": "16cbd5efb3a91b719ac26983e4cc7c668679641a40287f3016f663d95e12518a",
+      "unchangedFromPass3": false
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/effects.tsx",
+      "sha256": "6a9b30d591efbdb419a547444b701f0697d031de79380f24254fcc4909a1366c",
+      "pass3Sha256": "6a9b30d591efbdb419a547444b701f0697d031de79380f24254fcc4909a1366c",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/index.ts",
+      "sha256": "9f86994ac92f339f726ec963e6c2efe49e24119d5e9729019757059e8a87ff48",
+      "pass3Sha256": "9f86994ac92f339f726ec963e6c2efe49e24119d5e9729019757059e8a87ff48",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/model.ts",
+      "sha256": "3df51cc41599535c9f2831fdca25bf0cc5d09cb3f1c839772f9c057d910d1d74",
+      "pass3Sha256": "3df51cc41599535c9f2831fdca25bf0cc5d09cb3f1c839772f9c057d910d1d74",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/scene.tsx",
+      "sha256": "cf44d69b74ed281c2b9a70cbafbf8ee5e9e278041e157047f8cbaab56a7eba9e",
+      "pass3Sha256": "cf44d69b74ed281c2b9a70cbafbf8ee5e9e278041e157047f8cbaab56a7eba9e",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/science.tsx",
+      "sha256": "47cc4eb281beaea9dd628c98a2388af49839eddc22577ae8df03142c4d18fd8d",
+      "pass3Sha256": "47cc4eb281beaea9dd628c98a2388af49839eddc22577ae8df03142c4d18fd8d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/alternatives/vibratory-injection/visuals.ts",
+      "sha256": "c9f03e2e9c0d8dcd5788a03a12097bfb95b1c5a3b43414e029247a85d9b8421b",
+      "pass3Sha256": "c9f03e2e9c0d8dcd5788a03a12097bfb95b1c5a3b43414e029247a85d9b8421b",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/cap.ts",
+      "sha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "pass3Sha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/linear.ts",
+      "sha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "pass3Sha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/model.ts",
+      "sha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "pass3Sha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/remap.ts",
+      "sha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "pass3Sha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/source.ts",
+      "sha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "pass3Sha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/coupled/thermodynamics.ts",
+      "sha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "pass3Sha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/peatfem/chemistry.ts",
+      "sha256": "f627c6a9e3a69eaf2cc5f6e541fda69e5e8f1fcc7e4525b22c87a6b01cef2aeb",
+      "pass3Sha256": "f627c6a9e3a69eaf2cc5f6e541fda69e5e8f1fcc7e4525b22c87a6b01cef2aeb",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/peatfem/coupled.ts",
+      "sha256": "352d360b5a94ea77ab220fbb5ceaf27a676d73daae7f1881bbd2341b94542211",
+      "pass3Sha256": "352d360b5a94ea77ab220fbb5ceaf27a676d73daae7f1881bbd2341b94542211",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/peatfem/model.ts",
+      "sha256": "c8f9add3c76bbce3625b5015e6b610dcf6b749e56dd6f6f5f114f0b302a3eb5d",
+      "pass3Sha256": "c8f9add3c76bbce3625b5015e6b610dcf6b749e56dd6f6f5f114f0b302a3eb5d",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/peatfem/operators.ts",
+      "sha256": "2b0996cde3551eb9e672aa262d58bee04f00f0a97727c0b58dfe0d7adfbd47dd",
+      "pass3Sha256": "2b0996cde3551eb9e672aa262d58bee04f00f0a97727c0b58dfe0d7adfbd47dd",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/sim/materials.ts",
+      "sha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "pass3Sha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/sim/researchProfiles.ts",
+      "sha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "pass3Sha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/sim/scenario.ts",
+      "sha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "pass3Sha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/sim/solver.ts",
+      "sha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "pass3Sha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/sim/types.ts",
+      "sha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "pass3Sha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/story/contactCooling.ts",
+      "sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "pass3Sha256": "ff39288463fcd9ea187dc6549747a4f2579a2a279b682aa3114a98f8ecd92622",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/story/fireAppearance.ts",
+      "sha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "pass3Sha256": "1519434f8f175877240b9d702e63f50f766f6d0e066ffc8450ef65ec80151080",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/story/firePresentation.ts",
+      "sha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "pass3Sha256": "9ff4c580d5ad1670bc4fecfffc7305906c50acd86b41a3ec722235d4786273f8",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/story/fireSequence.ts",
+      "sha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "pass3Sha256": "42fdcbf3cb41ca19694d8f97a6b6209074f1d01a628c0e196994343d11bc54c6",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/AlternativeMethodModules.tsx",
+      "sha256": "3c990e7be1250232c3aef98d6ba200d06367aa03fd85c304be58beb79121cc11",
+      "pass3Sha256": "3c990e7be1250232c3aef98d6ba200d06367aa03fd85c304be58beb79121cc11",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/AlternativeRenderWorkspace.tsx",
+      "sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "pass3Sha256": "94e2154d547c467083cd1b0d4cb2788f213a6d5ed78e0759c1f7e9d05408d638",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/AlternativeScene.tsx",
+      "sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "pass3Sha256": "bdf35ac39c03639ba5d744facb06f0fa775953d17aef0662761c55fffdb9ed4c",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/AlternativeScience.tsx",
+      "sha256": "60ebf68f0efb847f6e6e07b22d4e6c96b3d09ab6bfd97d0670abbdbe861407a0",
+      "pass3Sha256": "60ebf68f0efb847f6e6e07b22d4e6c96b3d09ab6bfd97d0670abbdbe861407a0",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/AlternativesWorkspace.tsx",
+      "sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "pass3Sha256": "1c6770e6c85b70e84a82c9740ab32d3d12917131e7f9eb7a7a466b4fff440818",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/CinematicUI.tsx",
+      "sha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "pass3Sha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/CoupledNaturalContext.tsx",
+      "sha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "pass3Sha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireExcavator.tsx",
+      "sha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "pass3Sha256": "7a3c2b04ef131dd8fa7d10d2b4e2892dfd1995dae481285be38c770be1276cbe",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireGroundGeometry.ts",
+      "sha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "pass3Sha256": "9ef8140b02c3303da958a82b56be092d03f17d136269cc16ba66ceeb049fe647",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireInterventionEquipment.tsx",
+      "sha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "pass3Sha256": "060b90894e2bad07d3ae19a6ec3933ca27f201724f3bb060c8fc7c3555bbd578",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireSequenceEquipment.tsx",
+      "sha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "pass3Sha256": "d6d79166da5b6b15d1a53b7d1335b531947aeba9e0370a113bc5807a7ce5ad52",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireSequenceGrass.tsx",
+      "sha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "pass3Sha256": "5b3587668cfe7e3bfe89a240a59302174565db7cacb2cf191c9ae6266be5e56e",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireSequenceScene.tsx",
+      "sha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "pass3Sha256": "3df13c15a17ec47d588eb632ce2aca2b251fc074790d963eba30d29430e50661",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FireWaterTruck.tsx",
+      "sha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "pass3Sha256": "41b41aa7cce6b272a7171a4c18bd542387e3751baddb9c92541ba97cc1fe79c0",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/FractureStudy.tsx",
+      "sha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "pass3Sha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/OakTree.tsx",
+      "sha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "pass3Sha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/PeatFemScene.tsx",
+      "sha256": "efacf3d052201908300a19ae9a0b77a030a1b6bfb5d35a596a0c0069438bb739",
+      "pass3Sha256": "efacf3d052201908300a19ae9a0b77a030a1b6bfb5d35a596a0c0069438bb739",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/WideSoilScene.tsx",
+      "sha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "pass3Sha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/alternatives.css",
+      "sha256": "e6e0b9b1b6faab7a1a10290ff1ac8fcced5ea5a14024adb3c9b694fb77343235",
+      "pass3Sha256": "e6e0b9b1b6faab7a1a10290ff1ac8fcced5ea5a14024adb3c9b694fb77343235",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/soilParticleModel.ts",
+      "sha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "pass3Sha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "unchangedFromPass3": true
+    },
+    {
+      "path": "src/ui/studyModel.ts",
+      "sha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "pass3Sha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "unchangedFromPass3": true
+    }
+  ],
+  "imports": {
+    "src/alternatives/originalPressurePulse.ts": [
+      "src/alternatives/registry.ts"
+    ],
+    "src/alternatives/registry.ts": [
+      "src/alternatives/modules.ts",
+      "src/alternatives/originalPressurePulse.ts"
+    ],
+    "src/alternatives/contract.ts": [
+      "src/alternatives/registry.ts",
+      "src/alternatives/model.ts"
+    ],
+    "src/alternatives/sublimation-injection/index.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/model.ts"
+    ],
+    "src/story/fireSequence.ts": [],
+    "src/story/firePresentation.ts": [
+      "src/story/fireSequence.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/animation.ts": [
+      "src/story/fireSequence.ts",
+      "src/story/firePresentation.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/model.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/model.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/animation.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/index.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/model.ts"
+    ],
+    "src/alternatives/pressure-pulse-pressure-only/model.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/model.ts",
+      "src/alternatives/registry.ts"
+    ],
+    "src/alternatives/pressure-pulse-pressure-only/index.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/pressure-pulse-pressure-only/model.ts"
+    ],
+    "src/alternatives/vibratory-injection/model.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/model.ts",
+      "src/alternatives/registry.ts"
+    ],
+    "src/alternatives/vibratory-injection/index.ts": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/vibratory-injection/model.ts",
+      "src/alternatives/vibratory-injection/model.ts"
+    ],
+    "src/alternatives/modules.ts": [
+      "src/alternatives/sublimation-injection/index.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/index.ts",
+      "src/alternatives/pressure-pulse-pressure-only/index.ts",
+      "src/alternatives/vibratory-injection/index.ts"
+    ],
+    "src/story/contactCooling.ts": [
+      "src/story/fireSequence.ts"
+    ],
+    "src/alternatives/contactAdapter.ts": [
+      "src/story/contactCooling.ts"
+    ],
+    "src/peatfem/model.ts": [],
+    "src/peatfem/chemistry.ts": [],
+    "src/peatfem/operators.ts": [
+      "src/peatfem/model.ts",
+      "src/peatfem/chemistry.ts"
+    ],
+    "src/peatfem/coupled.ts": [
+      "src/peatfem/model.ts",
+      "src/peatfem/chemistry.ts",
+      "src/peatfem/operators.ts"
+    ],
+    "src/alternatives/model.ts": [
+      "src/alternatives/modules.ts",
+      "src/story/contactCooling.ts",
+      "src/alternatives/contactAdapter.ts",
+      "src/alternatives/registry.ts",
+      "src/peatfem/coupled.ts"
+    ],
+    "src/alternatives/sublimation-injection/visuals.ts": [],
+    "src/alternatives/sublimation-injection/quench.tsx": [],
+    "src/alternatives/sublimation-injection/annotation.tsx": [],
+    "src/alternatives/sublimation-injection/loading.tsx": [
+      "src/alternatives/sublimation-injection/visuals.ts"
+    ],
+    "src/alternatives/sublimation-injection/vehicle.tsx": [
+      "src/alternatives/sublimation-injection/visuals.ts"
+    ],
+    "src/alternatives/sublimation-injection/supply.tsx": [
+      "src/alternatives/sublimation-injection/vehicle.tsx",
+      "src/alternatives/sublimation-injection/visuals.ts"
+    ],
+    "src/alternatives/sublimation-injection/scene.tsx": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/sublimation-injection/visuals.ts",
+      "src/alternatives/sublimation-injection/quench.tsx",
+      "src/alternatives/sublimation-injection/annotation.tsx",
+      "src/alternatives/sublimation-injection/loading.tsx",
+      "src/alternatives/sublimation-injection/supply.tsx"
+    ],
+    "src/story/fireAppearance.ts": [
+      "src/story/fireSequence.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/extinguish.tsx": [
+      "src/story/fireAppearance.ts",
+      "src/story/fireSequence.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/scene.tsx": [
+      "src/alternatives/contract.ts",
+      "src/story/fireSequence.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/model.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/animation.ts",
+      "src/alternatives/pressure-pulse-liquid-waves/extinguish.tsx"
+    ],
+    "src/alternatives/pressure-pulse-pressure-only/animation.ts": [],
+    "src/alternatives/pressure-pulse-pressure-only/scene.tsx": [
+      "src/alternatives/contract.ts",
+      "src/story/fireSequence.ts",
+      "src/alternatives/pressure-pulse-pressure-only/model.ts",
+      "src/alternatives/pressure-pulse-pressure-only/animation.ts"
+    ],
+    "src/ui/FireExcavator.tsx": [
+      "src/story/fireSequence.ts",
+      "src/story/firePresentation.ts"
+    ],
+    "src/ui/FireSequenceGrass.tsx": [
+      "src/story/fireSequence.ts",
+      "src/story/fireAppearance.ts"
+    ],
+    "src/ui/FireSequenceEquipment.tsx": [
+      "src/ui/FireExcavator.tsx",
+      "src/ui/FireSequenceGrass.tsx"
+    ],
+    "src/ui/FireWaterTruck.tsx": [
+      "src/story/firePresentation.ts",
+      "src/story/fireSequence.ts"
+    ],
+    "src/alternatives/vibratory-injection/visuals.ts": [],
+    "src/alternatives/vibratory-injection/effects.tsx": [
+      "src/alternatives/vibratory-injection/visuals.ts"
+    ],
+    "src/alternatives/vibratory-injection/scene.tsx": [
+      "src/alternatives/contract.ts",
+      "src/ui/FireSequenceEquipment.tsx",
+      "src/ui/FireWaterTruck.tsx",
+      "src/story/fireSequence.ts",
+      "src/alternatives/vibratory-injection/effects.tsx",
+      "src/alternatives/vibratory-injection/visuals.ts"
+    ],
+    "src/alternatives/sublimation-injection/evidence.ts": [],
+    "src/alternatives/sublimation-injection/science.tsx": [
+      "src/alternatives/sublimation-injection/index.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/sublimation-injection/evidence.ts"
+    ],
+    "src/alternatives/pressure-pulse-liquid-waves/science.tsx": [],
+    "src/alternatives/pressure-pulse-pressure-only/science.tsx": [],
+    "src/alternatives/vibratory-injection/science.tsx": [
+      "src/alternatives/vibratory-injection/model.ts"
+    ],
+    "src/ui/AlternativeMethodModules.tsx": [
+      "src/alternatives/contract.ts",
+      "src/alternatives/sublimation-injection/scene.tsx",
+      "src/alternatives/pressure-pulse-liquid-waves/scene.tsx",
+      "src/alternatives/pressure-pulse-pressure-only/scene.tsx",
+      "src/alternatives/vibratory-injection/scene.tsx",
+      "src/alternatives/sublimation-injection/science.tsx",
+      "src/alternatives/pressure-pulse-liquid-waves/science.tsx",
+      "src/alternatives/pressure-pulse-pressure-only/science.tsx",
+      "src/alternatives/vibratory-injection/science.tsx"
+    ],
+    "src/ui/studyModel.ts": [],
+    "src/ui/soilParticleModel.ts": [
+      "src/ui/studyModel.ts"
+    ],
+    "src/ui/FractureStudy.tsx": [
+      "src/ui/soilParticleModel.ts",
+      "src/ui/studyModel.ts"
+    ],
+    "src/ui/WideSoilScene.tsx": [
+      "src/ui/soilParticleModel.ts",
+      "src/ui/FractureStudy.tsx",
+      "src/ui/studyModel.ts"
+    ],
+    "src/ui/OakTree.tsx": [
+      "src/ui/WideSoilScene.tsx",
+      "src/ui/soilParticleModel.ts",
+      "src/ui/FractureStudy.tsx"
+    ],
+    "src/coupled/cap.ts": [],
+    "src/sim/scenario.ts": [
+      "src/sim/materials.ts",
+      "src/sim/types.ts"
+    ],
+    "src/sim/researchProfiles.ts": [
+      "src/sim/types.ts",
+      "src/sim/materials.ts",
+      "src/sim/scenario.ts"
+    ],
+    "src/sim/types.ts": [
+      "src/sim/researchProfiles.ts",
+      "src/sim/materials.ts"
+    ],
+    "src/sim/materials.ts": [
+      "src/sim/types.ts"
+    ],
+    "src/sim/solver.ts": [
+      "src/sim/materials.ts",
+      "src/sim/scenario.ts",
+      "src/sim/types.ts"
+    ],
+    "src/coupled/linear.ts": [],
+    "src/coupled/remap.ts": [],
+    "src/coupled/thermodynamics.ts": [],
+    "src/coupled/source.ts": [
+      "src/coupled/thermodynamics.ts"
+    ],
+    "src/coupled/model.ts": [
+      "src/coupled/cap.ts",
+      "src/sim/solver.ts",
+      "src/sim/scenario.ts",
+      "src/sim/types.ts",
+      "src/coupled/linear.ts",
+      "src/coupled/remap.ts",
+      "src/coupled/source.ts",
+      "src/coupled/thermodynamics.ts"
+    ],
+    "src/ui/CoupledNaturalContext.tsx": [
+      "src/coupled/model.ts"
+    ],
+    "src/ui/FireInterventionEquipment.tsx": [
+      "src/story/fireSequence.ts",
+      "src/story/fireAppearance.ts",
+      "src/story/firePresentation.ts"
+    ],
+    "src/ui/FireGroundGeometry.ts": [
+      "src/ui/WideSoilScene.tsx",
+      "src/story/fireAppearance.ts"
+    ],
+    "src/ui/FireSequenceScene.tsx": [
+      "src/story/contactCooling.ts",
+      "src/ui/OakTree.tsx",
+      "src/ui/FractureStudy.tsx",
+      "src/ui/FireSequenceEquipment.tsx",
+      "src/ui/CoupledNaturalContext.tsx",
+      "src/ui/FireInterventionEquipment.tsx",
+      "src/ui/FireGroundGeometry.ts",
+      "src/story/fireAppearance.ts",
+      "src/story/fireSequence.ts",
+      "src/story/firePresentation.ts",
+      "src/ui/FireWaterTruck.tsx"
+    ],
+    "src/ui/AlternativeScene.tsx": [
+      "src/ui/AlternativeMethodModules.tsx",
+      "src/ui/FireSequenceScene.tsx",
+      "src/alternatives/registry.ts"
+    ],
+    "src/ui/CinematicUI.tsx": [],
+    "src/ui/alternatives.css": [],
+    "src/ui/AlternativeRenderWorkspace.tsx": [
+      "src/alternatives/registry.ts",
+      "src/ui/AlternativeScene.tsx",
+      "src/ui/CinematicUI.tsx",
+      "src/ui/alternatives.css"
+    ],
+    "src/alternatives/persistence.ts": [
+      "src/peatfem/coupled.ts",
+      "src/alternatives/registry.ts",
+      "src/alternatives/model.ts"
+    ],
+    "src/alternatives/records.ts": [
+      "src/alternatives/model.ts"
+    ],
+    "src/ui/PeatFemScene.tsx": [
+      "src/peatfem/model.ts",
+      "src/peatfem/coupled.ts"
+    ],
+    "src/ui/AlternativeScience.tsx": [
+      "src/ui/AlternativeMethodModules.tsx",
+      "src/alternatives/registry.ts"
+    ],
+    "src/ui/AlternativesWorkspace.tsx": [
+      "src/alternatives/registry.ts",
+      "src/alternatives/model.ts",
+      "src/alternatives/persistence.ts",
+      "src/alternatives/records.ts",
+      "src/peatfem/model.ts",
+      "src/ui/PeatFemScene.tsx",
+      "src/ui/AlternativeScience.tsx",
+      "src/ui/alternatives.css"
+    ]
+  },
+  "externalImports": [
+    "@react-three/drei/core/Line.js",
+    "@react-three/drei/core/OrbitControls.js",
+    "@react-three/drei/core/RoundedBox.js",
+    "@react-three/fiber",
+    "lucide-react",
+    "react",
+    "react-dom",
+    "three",
+    "three-stdlib",
+    "three/examples/jsm/utils/BufferGeometryUtils.js"
+  ]
+}

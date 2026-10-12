@@ -1,0 +1,33 @@
+{
+  "executor": "/root/realism_a_review",
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/alternatives/sublimation-injection",
+    "tests/alternativeSceneComposition.test.tsx",
+    "tests/alternatives.test.ts",
+    "tests/alternatives-infusion-accuracy.test.ts",
+    "tests/independent-realism-a-geometry.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/kadensmith/Documents/Codex/2026-10-11/1-extinguishing-methods-1-extinguishing-medium/outputs/v21-agent-sublimation/work/realism-review/round-3/snapshot-a0e0826",
+  "startedUtc": "2026-10-12T09:39:47.722755+00:00",
+  "durationWallS": 2.9784062079852447,
+  "exitCode": 0,
+  "loadBefore": [
+    29.67724609375,
+    27.55224609375,
+    26.8017578125
+  ],
+  "loadAfter": [
+    29.67724609375,
+    27.55224609375,
+    26.8017578125
+  ],
+  "seed": "unchanged model seed21; authored geometry deterministic",
+  "configuration": "frozen config/lock and verified existing dependency bytes; single worker",
+  "reviewerHarnessSha256": "c8099b81bbebbc191b56b46ae7c18a3a01b2e172006742a7f4b277f2761c8ddf",
+  "coverage": "79 maintained affected tests plus2 independent geometry/topology tests; physics benchmarks reused only for unchanged numerical source scope"
+}

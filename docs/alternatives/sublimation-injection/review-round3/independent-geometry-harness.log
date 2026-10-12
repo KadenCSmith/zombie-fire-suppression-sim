@@ -1,0 +1,41 @@
+import { afterAll, describe, expect, it } from 'vitest'
+import { writeFileSync } from 'node:fs'
+import { CatmullRomCurve3, TubeGeometry, Vector3 } from 'three'
+import { WaterSupply } from '../src/alternatives/sublimation-injection/supply'
+import { FILL_ROUTE, HOSE_REEL_LOCAL, PUMP_BAY_LOCAL, PUMP_INLET_LOCAL, PUMP_OUTLET_LOCAL, SUPPLY_OUTLET_LOCAL, TANK_PUMP_ROUTE_LOCAL, TRUCK_PARKED, preparationVisuals } from '../src/alternatives/sublimation-injection/visuals'
+const results: unknown[] = []
+const motor = { center: new Vector3(PUMP_BAY_LOCAL[0]+.08,PUMP_BAY_LOCAL[1]+.13,PUMP_BAY_LOCAL[2]), axis: 'x', half: .135, radius: .11 }
+const flanges = [-.12,.12].map(z=>({center:new Vector3(HOSE_REEL_LOCAL[0],HOSE_REEL_LOCAL[1],HOSE_REEL_LOCAL[2]+z),axis:'z',half:.0175,radius:.235}))
+function sdf(p:Vector3,c:typeof motor){const d=p.clone().sub(c.center);const axial=(c.axis==='x'?Math.abs(d.x):Math.abs(d.z))-c.half;const radial=(c.axis==='x'?Math.hypot(d.y,d.z):Math.hypot(d.x,d.y))-c.radius;return Math.hypot(Math.max(axial,0),Math.max(radial,0))+Math.min(Math.max(axial,radial),0)}
+afterAll(()=>writeFileSync('independent-geometry-results.json',JSON.stringify(results,null,2)+'\n'))
+describe('Independent finite-primitive/topology checks for final A artwork',()=>{
+ it('checks actual tube vertices and arc-length curves against motor and both reel flanges',()=>{
+  const localFill=FILL_ROUTE.map(p=>p.map((v,i)=>v-TRUCK_PARKED[i]) as [number,number,number]);
+  for(const [id,route] of [['tankToPump',TANK_PUMP_ROUTE_LOCAL],['pumpToVessel',localFill]] as const){
+   const curve=new CatmullRomCurve3(route.map(p=>new Vector3(...p)),false,'centripetal');const geometry=new TubeGeometry(curve,48,.036,10,false);const positions=geometry.getAttribute('position');
+   for(const [index,primitive] of [motor,...flanges].entries()){
+    let centerlineMin=Infinity,vertexMin=Infinity;
+    for(let i=0;i<=10000;i++)centerlineMin=Math.min(centerlineMin,sdf(curve.getPointAt(i/10000),primitive));
+    for(let i=0;i<positions.count;i++)vertexMin=Math.min(vertexMin,sdf(new Vector3(positions.getX(i),positions.getY(i),positions.getZ(i)),primitive));
+    results.push({id,primitive:index===0?'motor':`flange${index}`,centerlineSamples:10001,centerlineMinimumSignedDistance:centerlineMin,hoseRadius:.036,minimumCenterlineTubeClearance:centerlineMin-.036,actualTubeVertices:positions.count,minimumVertexSignedDistance:vertexMin});
+    expect(centerlineMin).toBeGreaterThan(.036+1e-9);expect(vertexMin).toBeGreaterThan(0)
+   }
+   geometry.dispose()
+  }
+ })
+ it('keeps fixed feed on the moving truck and stages the distinct port-to-vessel line only after parking',()=>{
+  for(const time of [38,44,48,55,56,69,86]){
+   const root=WaterSupply({time,children:null}),[moving,staged]=root.props.children;
+   const feed=moving.props.children[1],travel=preparationVisuals(time).truckTravel;
+   expect(feed.props.route).toBe(TANK_PUMP_ROUTE_LOCAL);expect(feed.props.progress).toBe(1);expect(moving.props.position[0]).toBe(TRUCK_PARKED[0]+travel)
+   expect(feed.props.route[0]).toEqual(SUPPLY_OUTLET_LOCAL);expect(feed.props.route.at(-1)).toEqual(PUMP_INLET_LOCAL)
+   expect(staged.props.route).toBe(FILL_ROUTE);expect(staged.props.route[0]).toEqual(TRUCK_PARKED.map((v,i)=>v+PUMP_OUTLET_LOCAL[i]))
+   if(time<=48)expect(staged.props.progress).toBe(0);if(staged.props.progress>0)expect(travel).toBe(0)
+  }
+  const inletRootZ=PUMP_INLET_LOCAL[2]-.12,headZ=PUMP_BAY_LOCAL[2],headR=.105;
+  const outletRootY=PUMP_OUTLET_LOCAL[1]-.12,headY=PUMP_BAY_LOCAL[1]+.13;
+  expect(inletRootZ).toBeLessThan(headZ+headR);expect(inletRootZ).toBeGreaterThan(headZ-headR)
+  expect(outletRootY).toBeLessThan(headY+headR);expect(outletRootY).toBeGreaterThan(headY-headR)
+  results.push({id:'topology',times:[38,44,48,55,56,69,86],fixedFeedMovesWithTruck:true,stagedFeedStartsAfterParking:true,inletRootZ,headZ,outletRootY,headY,headR})
+ })
+})

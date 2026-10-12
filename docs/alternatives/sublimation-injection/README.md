@@ -73,3 +73,5 @@ node scripts/check-original-preservation.mjs
 ```
 
 Private deterministic ledger evidence can be refreshed explicitly with `V21_CAPTURE_SUBLIMATION_EVIDENCE=1 npm test -- tests/alternatives/sublimation-injection/evidence.test.ts --exclude 'work/**'`. Ordinary tests do not write evidence. The current0.00625s capture is `numerical-evidence-round1.json`; the original0.05s `numerical-evidence.json` remains historical evidence. Both record accepted states, settings and exact ledgers for water, optional direct CO₂ and source-off configurations, not experiments. `HANDOFF.md` is historical; `ROUND_1.md` preserves the first reviewed revision and `ROUND_2.md` records the new vehicle and signed second retry; `ROUND_3.md` records the final pump/plumbing correction. A's dedicated reviewer owns local scientific review; the coordinator owns shared decisions and final combined checks/integration.
+
+Final frozen source, scorecard, signed review and integration limits: [FINAL_REVIEW_HANDOFF.md](FINAL_REVIEW_HANDOFF.md).

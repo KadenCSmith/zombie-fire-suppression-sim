@@ -1,0 +1,78 @@
+{
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "algorithm": "sorted relative path + NUL + file bytes + NUL per complete package, excluding external writable caches/bin links",
+  "packages": [
+    {
+      "package": "react",
+      "files": 27,
+      "isolatedSha256": "c0dd307dc11f25b979d7b79e71035c9cd60ff98af509b7e01c03dea0d8fead83",
+      "pass3Sha256": "c0dd307dc11f25b979d7b79e71035c9cd60ff98af509b7e01c03dea0d8fead83",
+      "liveSha256": "c0dd307dc11f25b979d7b79e71035c9cd60ff98af509b7e01c03dea0d8fead83",
+      "same": true,
+      "version": "19.3.0"
+    },
+    {
+      "package": "react-dom",
+      "files": 43,
+      "isolatedSha256": "8add712a526fa702a3b128ce4370dc8cad34f3b1433a2f1a40d01e648e4d462c",
+      "pass3Sha256": "8add712a526fa702a3b128ce4370dc8cad34f3b1433a2f1a40d01e648e4d462c",
+      "liveSha256": "8add712a526fa702a3b128ce4370dc8cad34f3b1433a2f1a40d01e648e4d462c",
+      "same": true,
+      "version": "19.3.0"
+    },
+    {
+      "package": "three",
+      "files": 1263,
+      "isolatedSha256": "2186529b0ec005459fec19c9b544ac09c11bb800048926bde736c79ee595da5b",
+      "pass3Sha256": "2186529b0ec005459fec19c9b544ac09c11bb800048926bde736c79ee595da5b",
+      "liveSha256": "2186529b0ec005459fec19c9b544ac09c11bb800048926bde736c79ee595da5b",
+      "same": true,
+      "version": "0.186.1"
+    },
+    {
+      "package": "@react-three/fiber",
+      "files": 40,
+      "isolatedSha256": "38c3d05667c38ff5621043a8c2f66dee79883ac559396e920dec0d3d2b1ce17f",
+      "pass3Sha256": "38c3d05667c38ff5621043a8c2f66dee79883ac559396e920dec0d3d2b1ce17f",
+      "liveSha256": "38c3d05667c38ff5621043a8c2f66dee79883ac559396e920dec0d3d2b1ce17f",
+      "same": true,
+      "version": "9.8.1"
+    },
+    {
+      "package": "@react-three/drei",
+      "files": 483,
+      "isolatedSha256": "1cb965f302631601308b2498038474666a871c4729dd654fc93b4a3ac51707d9",
+      "pass3Sha256": "1cb965f302631601308b2498038474666a871c4729dd654fc93b4a3ac51707d9",
+      "liveSha256": "1cb965f302631601308b2498038474666a871c4729dd654fc93b4a3ac51707d9",
+      "same": true,
+      "version": "10.7.8"
+    },
+    {
+      "package": "vitest",
+      "files": 103,
+      "isolatedSha256": "2c8cc49cec65a045fba6a32ee7e1f703f6f57d86f03788c64bdaad31a9c8d184",
+      "pass3Sha256": "2c8cc49cec65a045fba6a32ee7e1f703f6f57d86f03788c64bdaad31a9c8d184",
+      "liveSha256": "2c8cc49cec65a045fba6a32ee7e1f703f6f57d86f03788c64bdaad31a9c8d184",
+      "same": true,
+      "version": "5.0.2"
+    },
+    {
+      "package": "vite",
+      "files": 39,
+      "isolatedSha256": "b995dbae381c6b3f6d7387f33d1e285cb72ffe0f6f0ee74270432ad6d73b53fd",
+      "pass3Sha256": "b995dbae381c6b3f6d7387f33d1e285cb72ffe0f6f0ee74270432ad6d73b53fd",
+      "liveSha256": "b995dbae381c6b3f6d7387f33d1e285cb72ffe0f6f0ee74270432ad6d73b53fd",
+      "same": true,
+      "version": "7.3.6"
+    },
+    {
+      "package": "typescript",
+      "files": 416,
+      "isolatedSha256": "79437fde2373d55d7a80ec1c8a98fc8d08fff4f676cb3376002e8e6c7bb84b0a",
+      "pass3Sha256": "79437fde2373d55d7a80ec1c8a98fc8d08fff4f676cb3376002e8e6c7bb84b0a",
+      "liveSha256": "79437fde2373d55d7a80ec1c8a98fc8d08fff4f676cb3376002e8e6c7bb84b0a",
+      "same": true,
+      "version": "7.0.2"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "publishedBeforeExecutionUtc": "2026-10-12T09:38:51.349951+00:00",
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "scoredPass": 4,
+  "revisionRetry": 3,
+  "weights": [
+    0.3,
+    0.2,
+    0.2,
+    0.2,
+    0.1
+  ],
+  "centralCap": 6,
+  "physicsBenchmarkAndTolerancesUnchanged": true,
+  "criticalExecution": "79 maintained affected A/composition/registry/contact accuracy checks plus independent authored geometry/topology harness; one worker; no full audit/npmci",
+  "independentGeometryReference": "Analytical signed distance to finite motor and both flange cylinders; curve arclength samples10001 each including radius.036. Actual TubeGeometry vertices tested against unexpanded primitives. No physical dimensions/performance inferred.",
+  "independentGeometryBounds": "Centerline SDF>.036+1e-9; rendered vertices SDF>0; intended pump-head/port contact outside motor/flange clearance checks. Sampled bounds, not universal collision certificate.",
+  "gui": "Do not retry unresolved policy denial; mark all current actual appearance/navigation/runtime unverified",
+  "reuse": "Only unchanged physical analytical/conservation evidence from prior99-check audit is reused; affected old renderer checks superseded. Current private changes never enter physics source path."
+}

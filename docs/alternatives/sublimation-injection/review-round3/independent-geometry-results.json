@@ -1,0 +1,81 @@
+[
+  {
+    "id": "tankToPump",
+    "primitive": "motor",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.09203553618587511,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.05603553618587511,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.05733697728100971
+  },
+  {
+    "id": "tankToPump",
+    "primitive": "flange1",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.14497561881124296,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.10897561881124296,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.10940955028029595
+  },
+  {
+    "id": "tankToPump",
+    "primitive": "flange2",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.19432104842918976,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.15832104842918976,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.15843708156407638
+  },
+  {
+    "id": "pumpToVessel",
+    "primitive": "motor",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.12419742348374216,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.08819742348374215,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.09940648987930262
+  },
+  {
+    "id": "pumpToVessel",
+    "primitive": "flange1",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.6419895436731685,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.6059895436731685,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.6119662170142466
+  },
+  {
+    "id": "pumpToVessel",
+    "primitive": "flange2",
+    "centerlineSamples": 10001,
+    "centerlineMinimumSignedDistance": 0.7412682201374096,
+    "hoseRadius": 0.036,
+    "minimumCenterlineTubeClearance": 0.7052682201374095,
+    "actualTubeVertices": 539,
+    "minimumVertexSignedDistance": 0.7068850950965201
+  },
+  {
+    "id": "topology",
+    "times": [
+      38,
+      44,
+      48,
+      55,
+      56,
+      69,
+      86
+    ],
+    "fixedFeedMovesWithTruck": true,
+    "stagedFeedStartsAfterParking": true,
+    "inletRootZ": 0.74,
+    "headZ": 0.64,
+    "outletRootY": 1.0899999999999999,
+    "headY": 1.02,
+    "headR": 0.105
+  }
+]

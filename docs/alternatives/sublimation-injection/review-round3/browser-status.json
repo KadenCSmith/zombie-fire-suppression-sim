@@ -1,0 +1,22 @@
+{
+  "snapshot": "a0e0826db17d8e06dfc79fa6baeb6850bb9ab383",
+  "requiredVisualEvidence": "UNVERIFIED",
+  "newBrowserAttempt": false,
+  "reason": "Prior administrator-policy verification denial remains unresolved; explicit instruction not to retry/bypass.",
+  "priorDeniedSnapshot": "b27486d5ef2bbe8311282f6e6bec2eb0cf44a38b",
+  "diagnosticCopiedVerbatim": "prior-browser-policy-denial.log",
+  "newAppFramesObserved": 0,
+  "newRuntimeChecksExecuted": 0,
+  "screenshotObtained": false,
+  "oldTruckEvidenceUsedForNewTruck": false,
+  "alternateRoutesAttempted": false,
+  "unrun": [
+    "Actual55/60/63/66/69/72/75/86 appearance",
+    "Visible whole-truck/cab proportions/grounding/supports/occlusion",
+    "Visible boom/bucket/solids/contact/cover/fasterflow/quench",
+    "Actual0\u219275\u21920\u219275\u21924.2.2 navigation, restart/seek/remount/resize/leave",
+    "Browser console/GPU/native/full combined checks",
+    "Representative screenshot"
+  ],
+  "noAppFailureInferredFromPolicyDenial": true
+}
