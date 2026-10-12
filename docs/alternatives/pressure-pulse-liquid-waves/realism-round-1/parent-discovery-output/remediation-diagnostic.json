@@ -1,0 +1,71 @@
+{
+  "kind": "unscored post-freeze diagnostic requested by coordinator; does not revise initial failures",
+  "outputs": [
+    {
+      "inlet": 273.15,
+      "stepS": 0.00625,
+      "expectedTp": 358.6707294664827,
+      "expectedTw": 308.2076844004554,
+      "actualTp": 358.66672969381545,
+      "actualTw": 308.3131729103624,
+      "errorK": 0.1054885099070475,
+      "toleranceK": 0.2,
+      "pass": true
+    },
+    {
+      "inlet": 273.15,
+      "stepS": 0.003125,
+      "expectedTp": 358.6707294664827,
+      "expectedTw": 308.2076844004554,
+      "actualTp": 358.6687083613941,
+      "actualTw": 308.2609882709262,
+      "errorK": 0.05330387047081331,
+      "toleranceK": 0.2,
+      "pass": true
+    },
+    {
+      "inlet": 293.15,
+      "stepS": 0.00625,
+      "expectedTp": 358.97683667051666,
+      "expectedTw": 320.1345273709892,
+      "actualTp": 358.9737579738812,
+      "actualTw": 320.21572376577706,
+      "errorK": 0.08119639478786667,
+      "toleranceK": 0.2,
+      "pass": true
+    },
+    {
+      "inlet": 293.15,
+      "stepS": 0.003125,
+      "expectedTp": 358.97683667051666,
+      "expectedTw": 320.1345273709892,
+      "actualTp": 358.9752809897433,
+      "actualTw": 320.17555631446646,
+      "errorK": 0.04102894347727215,
+      "toleranceK": 0.2,
+      "pass": true
+    },
+    {
+      "inlet": 350,
+      "stepS": 0.00625,
+      "expectedTp": 359.84694639798306,
+      "expectedTw": 354.03657851473247,
+      "actualTp": 359.8464858599674,
+      "actualTw": 354.0487245722928,
+      "errorK": 0.012146057560357804,
+      "toleranceK": 0.2,
+      "pass": true
+    },
+    {
+      "inlet": 350,
+      "stepS": 0.003125,
+      "expectedTp": 359.84694639798306,
+      "expectedTw": 354.03657851473247,
+      "actualTp": 359.8467136858257,
+      "actualTw": 354.0427159782299,
+      "errorK": 0.0061374634974527,
+      "toleranceK": 0.2,
+      "pass": true
+    }
+  ]
+}

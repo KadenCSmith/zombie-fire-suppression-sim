@@ -1,4 +1,3 @@
-import { Line } from '@react-three/drei/core/Line.js'
 import type { MethodSceneProps } from '../contract'
 import { FIRE_SEQUENCE_GEOMETRY as G } from '../../story/fireSequence'
 import { liquidWavesPresentation } from './model'
@@ -17,23 +16,7 @@ export function MethodCues({ id, time }: MethodSceneProps) {
     <PipeTruck time={f.time}/>
     {f.injection && <group>
       <WetPeat progress={f.extinguishing}/>
-      <Line points={[[sourceX + .035, .13, .12], [sourceX + .035, -G.sourceDepthM, .12]]} color="#436b73" lineWidth={3} transparent opacity={.5}/>
-      {f.drops.map((drop, i) => <mesh key={i} position={[sourceX + drop.x, drop.y, .16]} scale={[drop.scale, drop.scale * 1.8, drop.scale]}>
-        <sphereGeometry args={[.025, 10, 6]}/><meshStandardMaterial color="#9ed5df" roughness={.2} metalness={.15} emissive="#426c78" emissiveIntensity={.35} transparent opacity={drop.opacity}/>
-      </mesh>)}
       <GroundFissures opening={f.opening} strength={f.strength}/>
-      {f.opening > 0 && [-3, -2, -1, 0, 1, 2, 3].map(branch => {
-        const extent = Math.min(1, f.opening * 1.12 + .08)
-        return <group key={branch}>
-          {[0, 1, 2, 3, 4].map(i => {
-            const progress = (f.flowClock * .7 + i / 5 + (branch + 3) * .13) % 1
-            const p = liquidContactPath(branch, progress * extent)
-            return <mesh key={i} position={[p[0],p[1],p[2]+.025]} scale={[1.5, .8, .7]}>
-              <sphereGeometry args={[.025, 10, 6]}/><meshBasicMaterial color="#b5e5eb" transparent opacity={.65 * (1 - progress * .5)}/>
-            </mesh>
-          })}
-        </group>
-      })}
       {f.strength > .003 && Array.from({ length: 42 }, (_, i) => {
         const branch = i % 7 - 3, along = .12 + (i * .173) % .82
         const point = liquidContactPath(branch, along * Math.min(1, f.opening * 1.12 + .08))

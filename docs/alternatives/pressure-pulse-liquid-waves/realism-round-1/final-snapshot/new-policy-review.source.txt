@@ -1,0 +1,122 @@
+import { afterAll, describe, expect, it } from 'vitest'
+import { writeFileSync } from 'node:fs'
+import { performance } from 'node:perf_hooks'
+import { createRun, freshPanel, type PanelConfig } from './src/alternatives/model'
+import { ALTERNATIVE_CONTACT_STEP_S } from './src/alternatives/contactAdapter'
+import { CONTACT_COOLING_CONFIG, simulateContactCooling, type ContactPatchSpec } from './src/story/contactCooling'
+import { liquidAnimationFrame } from './src/alternatives/pressure-pulse-liquid-waves/animation'
+import { pressureAnimationFrame } from './src/alternatives/pressure-pulse-pressure-only/animation'
+import { createPressureOnlyRun } from './src/alternatives/pressure-pulse-pressure-only/model'
+
+const began = performance.now()
+const result: any = {reviewer:'/root/pressure_realism_reviewer',round:1,runId:'B-round1-final-baa392a',frozenSource:'baa392aa2ed3e2fa3447e7c9215e3793431d433d',startedAt:new Date().toISOString(),seed:21,checks:[],outputs:{},kind:'independent reviewer execution, numerical verification only'}
+function check(name:string,pass:boolean,actual:any,expected:any){result.checks.push({name,pass,actual,expected})}
+function near(name:string,a:number,b:number,tol:number){check(name,Number.isFinite(a)&&Math.abs(a-b)<=tol,{actual:a,error:a-b},{expected:b,tolerance:tol})}
+function assertFrom(from:number){expect(result.checks.slice(from).filter((x:any)=>!x.pass)).toEqual([])}
+const liquid=(changes:Partial<PanelConfig['thermal']>={})=>{const c=freshPanel('review-production','liquid-waves');Object.assign(c.thermal,changes);return c}
+const patches:ContactPatchSpec[]=[0,1,2].map(i=>({id:'specimen-'+i,xM:0,yM:-(i+1)*.1,radiusM:.04,peatMassKg:.5,dryIceConductanceWK:0,waterConductanceWK:24,waterArrivalTimeS:12,waterShare:1/3}))
+const raw=(elapsed:number,inlet:number,dt:number,initial=360)=>simulateContactCooling(12+elapsed,'gradual',{startTimeS:0,endTimeS:60,rapidRemovalTimeS:60,waterStartTimeS:12,stepS:dt,initialTemperatureK:initial,waterInletK:inlet,waterInitialKg:.5,waterFlowKgS:.025,dryIceInitialKg:0},patches)
+// Frozen round0 independent positive-series continuous-fill solution.
+// Cp*theta_p'=-UA*(theta_p-theta_w); d(r*t*cw*theta_w)/dt=UA*(theta_p-theta_w).
+function reference(elapsed:number,inlet:number){
+ const Cp=.5*1840,r=.025/3,UA=24,cw=4186,M=.5/3,theta0=360-inlet,tfill=M/r,t=Math.min(Math.max(elapsed,0),tfill)
+ if(t===0)return{Tp:360,Tw:inlet}
+ const alpha=UA/Cp,beta=UA/(r*cw),z=alpha*t
+ let sum=1,termExp=1
+ for(let n=1;n<10000;n++){termExp*=z/n;const term=termExp*beta/(beta+n);sum+=term;if(Math.abs(term)<Math.abs(sum)*1e-15)break;if(n===9999)throw Error('Series did not converge')}
+ const theta=theta0*Math.exp(-z)*sum
+ let Tp=inlet+theta,Tw=inlet+(Cp*theta0-Cp*theta)/(r*t*cw)
+ if(elapsed>tfill){const Cw=M*cw,Teq=inlet+Cp*theta0/(Cp+Cw),delta=(Tp-Tw)*Math.exp(-UA*(1/Cp+1/Cw)*(elapsed-tfill));Tp=Teq+Cw/(Cp+Cw)*delta;Tw=Teq-Cp/(Cp+Cw)*delta}
+ return{Tp,Tw}
+}
+function rawBalance(label:string,c:PanelConfig,s:ReturnType<ReturnType<typeof createRun>['snapshot']>){
+ const t=c.thermal,p=s.contact!.patches,l=s.contact!.ledger
+ const initial=p.reduce((sum,q)=>sum+q.peatMassKg*1840*(t.initialK-t.inletK),0)
+ const final=p.reduce((sum,q)=>sum+q.peatMassKg*1840*(q.temperatureK-t.inletK)+q.liquidWaterKg*4186*(q.waterTemperatureK-t.inletK)+q.waterVaporKg*(4186*(373.15-t.inletK)+2260000),0)
+ const mass=t.waterKg-l.waterRemainingSupplyKg-l.waterBypassKg-p.reduce((sum,q)=>sum+q.liquidWaterKg+q.waterVaporKg,0)
+ near(label+' raw mass',mass,0,1e-9+1e-9*t.waterKg)
+ near(label+' raw energy',initial-final,0,1e-4+1e-9*Math.abs(initial))
+ check(label+' finite bounds',p.every(q=>Number.isFinite(q.temperatureK)&&Number.isFinite(q.waterTemperatureK)&&q.temperatureK>=t.inletK-1e-8&&q.temperatureK<=t.initialK+1e-8&&q.waterTemperatureK<=373.15+1e-8&&q.liquidWaterKg>=-1e-12&&q.waterVaporKg>=-1e-12),p.map(q=>({Tp:q.temperatureK,Tw:q.waterTemperatureK,liquid:q.liquidWaterKg,vapor:q.waterVaporKg})),'bounded and nonnegative')
+ check(label+' no reaction state',s.metrics!.oxygenKg===null&&s.metrics!.fuelKg===null&&s.metrics!.reactionW===null&&!s.fem,s.metrics,'O2/fuel/reaction unavailable; no field')
+ return{timeS:s.timeS,massResidualKg:mass,energyResidualJ:initial-final}
+}
+afterAll(()=>{result.finishedAt=new Date().toISOString();result.durationS=(performance.now()-began)/1000;result.summary={checks:result.checks.length,passed:result.checks.filter((x:any)=>x.pass).length,failed:result.checks.filter((x:any)=>!x.pass).length};writeFileSync('new-policy-results.json',JSON.stringify(result,null,2)+'\n')})
+describe('independent B round1 changed production policy',()=>{
+ it('actual production adapter meets the same continuous-fill analytical references',()=>{
+  const from=result.checks.length,outputs=[]
+  near('new alternative production policy',ALTERNATIVE_CONTACT_STEP_S,.00625,0);near('protected original default',CONTACT_COOLING_CONFIG.stepS,.05,0)
+  for(const inletK of[273.15,293.15,350]){
+   const c=liquid({initialK:360,inletK}),run=createRun(c)
+   for(const elapsed of[1,5,20,48]){
+    const s=run.advanceTo(12+elapsed),e=reference(elapsed,inletK)
+    for(const p of s.contact!.patches){near('production specimen '+inletK+'/'+elapsed+'/'+p.id,p.temperatureK,e.Tp,.2);near('production water '+inletK+'/'+elapsed+'/'+p.id,p.waterTemperatureK,e.Tw,.2)}
+    check('actual adapter equals explicit new-step reference '+inletK+'/'+elapsed,JSON.stringify(s.contact)===JSON.stringify(raw(elapsed,inletK,.00625)),s.contact!.patches[0],'identical unchanged reference with 0.00625 s policy')
+    near('finite supplied '+inletK+'/'+elapsed,s.contact!.ledger.waterSuppliedKg,Math.min(.5,.025*elapsed),1.5e-9)
+    outputs.push({inletK,elapsed,expected:e,actual:{Tp:s.contact!.patches[0].temperatureK,Tw:s.contact!.patches[0].waterTemperatureK},balance:rawBalance('analytic '+inletK+'/'+elapsed,c,s)})
+   }
+  }
+  result.outputs.productionContinuousFill=outputs;assertFrom(from)
+ })
+ it('same physical input converges under further temporal halving',()=>{
+  const from=result.checks.length,outputs=[]
+  for(const inlet of[273.15,293.15,350]){
+   const errors=[]
+   for(const dt of[.025,.0125,.00625,.003125,.0015625]){
+    let maxError=0
+    for(const elapsed of[1,5,20,48]){const p=raw(elapsed,inlet,dt).patches[0],e=reference(elapsed,inlet),err=Math.max(Math.abs(p.temperatureK-e.Tp),Math.abs(p.waterTemperatureK-e.Tw));maxError=Math.max(maxError,err);outputs.push({inlet,dt,elapsed,errorK:err,actual:{Tp:p.temperatureK,Tw:p.waterTemperatureK},expected:e})}
+    errors.push(maxError)
+   }
+   for(let i=1;i<errors.length;i++)check('monotonic analytic refinement '+inlet+'/'+i,errors[i]<errors[i-1]||errors[i]<1e-8,errors[i],'<'+errors[i-1])
+   const order=Math.log2(errors[2]/errors[3]);check('production further-halving order '+inlet,order>=.7&&order<=1.3,{errors,order},'0.7..1.3')
+  }
+  const final=[.025,.0125,.00625,.003125,.0015625].map(dt=>({dt,T:raw(48,293.15,dt,823.15).patches[0].temperatureK}))
+  const finest=final.at(-1)!.T;let previous=Infinity
+  for(const x of final.slice(0,-1)){const errorK=Math.abs(x.T-finest);check('boiling final refinement '+x.dt,errorK<previous,errorK,'strictly decreasing');if(x.dt===.00625)near('production boiling versus finest',x.T,finest,.2);previous=errorK}
+  result.outputs.refinement={continuous:outputs,boiling:final};assertFrom(from)
+ })
+ it('source-off, zero limits, finite exhaustion and independent ownership remain valid',()=>{
+  const from=result.checks.length,outputs=[],c=liquid(),run=createRun(c)
+  for(const time of[0,11.999,12,12.01,31.999,32,32.001,60]){
+   const s=run.advanceTo(time),l=s.contact!.ledger
+   near('supply event '+time,l.waterSuppliedKg,Math.min(.5,.025*Math.max(0,time-12)),1.5e-9)
+   near('no hidden solid '+time,l.dryIceInitialKg+l.dryIceSublimatedKg+l.heatToDryIceJ,0,0)
+   outputs.push(rawBalance('event '+time,c,s))
+  }
+  for(const limit of[{enabled:false},{waterKg:0},{flowKgS:0},{conductanceWK:0}]){
+   const c=liquid(limit),s=createRun(c).advanceTo(60)
+   near('limit heat '+JSON.stringify(limit),s.metrics!.energyJ,0,0);near('limit specimen '+JSON.stringify(limit),s.metrics!.maximumK,823.15,0)
+  }
+  const off=createRun(liquid({enabled:false})).advanceTo(60),base=freshPanel('base','baseline');base.thermal.contactStartS=12
+  check('matched source-off reference',JSON.stringify(off)===JSON.stringify(createRun(base).advanceTo(60)),off,'identical baseline')
+  const original=liquid(),expected=createRun(original).advanceTo(60),owned=createRun(original)
+  Object.assign(original.thermal,{waterKg:5,flowKgS:.2,inletK:350,initialK:1000,endS:120})
+  owned.advanceTo(13);const copy=owned.snapshot();copy.contact!.patches[0].temperatureK=-1;copy.metrics!.energyJ=-1
+  const final=owned.advanceTo(60)
+  check('caller config and exported snapshot independent',JSON.stringify(final)===JSON.stringify(expected),final.metrics,expected.metrics)
+  const direct=createRun(liquid()).advanceTo(60),staged=createRun(liquid());for(const time of[.5,12.01,17.3,32,60])staged.advanceTo(time)
+  check('accepted checkpoints not integration steps',JSON.stringify(direct)===JSON.stringify(staged.snapshot()),staged.snapshot().metrics,direct.metrics)
+  for(let t=0;t<=90;t+=.2)liquidAnimationFrame(t)
+  check('authored cues no physical benefit',JSON.stringify(createRun(liquid()).advanceTo(60))===JSON.stringify(direct),direct.metrics,'identical physical state')
+  result.outputs.events=outputs;result.outputs.defaultFinal=direct;assertFrom(from)
+ })
+ it('pressure-only keeps null metrics and rejects liquid/physical engines',()=>{
+  const from=result.checks.length,c=freshPanel('pressure-review','pressure-only')
+  Object.assign(c.thermal,{enabled:true,waterKg:5,dryIceKg:1,flowKgS:.2,conductanceWK:100})
+  const original=structuredClone(c);let forwarded:any
+  createPressureOnlyRun(c,{supportedRun:(x:any)=>{forwarded=x;return{endS:60,snapshot:()=>({timeS:0,metrics:null}),advanceTo:(timeS:number)=>({timeS,metrics:null})}}})
+  check('stale source settings sanitized',!forwarded.thermal.enabled&&forwarded.thermal.waterKg===0&&forwarded.thermal.dryIceKg===0&&forwarded.thermal.flowKgS===0&&forwarded.thermal.conductanceWK===0,forwarded.thermal,'no modeled treatment sources')
+  check('input ownership',JSON.stringify(original)===JSON.stringify(c),c,'caller unchanged')
+  const run=createRun(c),out=[]
+  for(const timeS of[0,12,38,48,60]){const s=run.advanceTo(timeS);check('null physical state '+timeS,JSON.stringify(s)===JSON.stringify({timeS,metrics:null}),s,{timeS,metrics:null});out.push(s)}
+  for(const change of[{engine:'contact'},{engine:'peat-fem'},{medium:'water'},{medium:'co2-water'}]){
+   let rejected=false
+   try{createPressureOnlyRun({...c,...change}as any,{supportedRun:()=>{throw Error('forbidden hook executed')}})}catch(e){rejected=(e as Error).message!=='forbidden hook executed'}
+   check('reject unsupported '+JSON.stringify(change),rejected,rejected,true)
+  }
+  for(let t=0;t<=90;t+=.2)pressureAnimationFrame(t)
+  check('authored pressure cue no calculated state',JSON.stringify(run.snapshot())===JSON.stringify({timeS:60,metrics:null}),run.snapshot(),{timeS:60,metrics:null})
+  c.thermal.endS=120;const exported=run.snapshot();exported.timeS=-1
+  check('pressure config/snapshot independence',JSON.stringify(run.snapshot())===JSON.stringify({timeS:60,metrics:null})&&run.endS===60,run.snapshot(),{timeS:60,metrics:null})
+  result.outputs.pressureOnly=out;assertFrom(from)
+ })
+})

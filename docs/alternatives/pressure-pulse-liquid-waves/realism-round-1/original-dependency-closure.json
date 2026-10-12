@@ -1,0 +1,170 @@
+{
+  "capturedAtUTC": "2026-10-12T08:31:58.897232+00:00",
+  "baseline": "161e7a4a1f8c35765e1878c132db79977be1f5ea",
+  "dependencies": [
+    {
+      "path": "src/coupled/cap.ts",
+      "currentSha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "baselineSha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "baselineEqual": true,
+      "initialReviewSha256": "7a9d42eccfb09f0f13557addaa658504b862882ce592a4e37c3dcbc6c7c437cc",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/coupled/linear.ts",
+      "currentSha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "baselineSha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "baselineEqual": true,
+      "initialReviewSha256": "13795e6f0d3ec545a9bfb70b0f04c988fe1728c39d28467f1bf11b962ee650bd",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/coupled/model.ts",
+      "currentSha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "baselineSha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "baselineEqual": true,
+      "initialReviewSha256": "5fc5a3e9b2b47a4754ea76d56e6abab31e61a44f37fb375619394fe89700ad00",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/coupled/remap.ts",
+      "currentSha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "baselineSha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "baselineEqual": true,
+      "initialReviewSha256": "315d6ed3cfbcae55da7e39649c178dc5e2007d28362c6614517859d88543d045",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/coupled/source.ts",
+      "currentSha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "baselineSha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "baselineEqual": true,
+      "initialReviewSha256": "8516b1ebdb4611b5d36a377c30714d61c85bf3880ab557d38c554d8bb2c774d8",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/coupled/thermodynamics.ts",
+      "currentSha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "baselineSha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "baselineEqual": true,
+      "initialReviewSha256": "2357d56e9ab5e7f86b649d7bb908bf22e6bfa23ab9630ea2e2d21e603a3b7e20",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/sim/materials.ts",
+      "currentSha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "baselineSha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "baselineEqual": true,
+      "initialReviewSha256": "4ff448fdcb7182df32c874d3f01c7170adcaad45e3583de5b9d3884ea77ee5fb",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/sim/researchProfiles.ts",
+      "currentSha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "baselineSha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "baselineEqual": true,
+      "initialReviewSha256": "31601f1ed11259b9b45016bab7bf13c62d512dcdb20337df5d6c88e3f7ac5f41",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/sim/scenario.ts",
+      "currentSha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "baselineSha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "baselineEqual": true,
+      "initialReviewSha256": "ddcb448a979d0a4429cb7c42e70de1ebcd083dc5ebb2536df18c8de9a104165a",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/sim/solver.ts",
+      "currentSha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "baselineSha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "baselineEqual": true,
+      "initialReviewSha256": "eaf6cd8cf82479000c7e3cad617e36032dd20a95133c26ff9956e841418fbd70",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/sim/types.ts",
+      "currentSha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "baselineSha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "baselineEqual": true,
+      "initialReviewSha256": "8fa391fc0449286dbe2e10a5313f924c72da377ba5b2cb928e39a75900403b4e",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/CinematicUI.tsx",
+      "currentSha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "baselineSha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "baselineEqual": true,
+      "initialReviewSha256": "6e257b8bfe011f92490e4a60b9bdbdfbdff1de749c8d2217969779477ad10f0c",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/CoupledNaturalContext.tsx",
+      "currentSha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "baselineSha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "baselineEqual": true,
+      "initialReviewSha256": "93e3432307b68ef3ecf248d6aec565fcd16598f43ea8ba053ab71510efe5ab0a",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/FractureStudy.tsx",
+      "currentSha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "baselineSha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "baselineEqual": true,
+      "initialReviewSha256": "6aa132dfd2aae5805478ec64a9189e19bf18eba6894563f138b6e40ad50d183b",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/ModelSelector.tsx",
+      "currentSha256": "5eea2884e1747aaab1752f8de68ca3d518018caff273d130eab29b9f174c2327",
+      "baselineSha256": "3a103ff5f7013930950157bcd4911b5974265b9a2f8b3585ef15d2e20dc570b8",
+      "baselineEqual": false,
+      "initialReviewSha256": "5eea2884e1747aaab1752f8de68ca3d518018caff273d130eab29b9f174c2327",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/OakTree.tsx",
+      "currentSha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "baselineSha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "baselineEqual": true,
+      "initialReviewSha256": "4634bd673a53bbd51ab7a4f15b87e5ab0d26ac1df10bc3a3f3ad7398165a9f61",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/WideSoilScene.tsx",
+      "currentSha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "baselineSha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "baselineEqual": true,
+      "initialReviewSha256": "1c98a209b29bf34d8ce889df1f1006e4d9f47677e915bf1e142e9a812fdea1bb",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/operations.css",
+      "currentSha256": "cdb79496efab533bdec2e276cc8994bff1278bdc4265692fbb3f273159e65846",
+      "baselineSha256": "cdb79496efab533bdec2e276cc8994bff1278bdc4265692fbb3f273159e65846",
+      "baselineEqual": true,
+      "initialReviewSha256": "cdb79496efab533bdec2e276cc8994bff1278bdc4265692fbb3f273159e65846",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/soilParticleModel.ts",
+      "currentSha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "baselineSha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "baselineEqual": true,
+      "initialReviewSha256": "baf0de8809e65f599c940a66ff08a3ada24b9228f3b2d2fff400e691a34fcdb0",
+      "initialReviewEqual": true
+    },
+    {
+      "path": "src/ui/studyModel.ts",
+      "currentSha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "baselineSha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "baselineEqual": true,
+      "initialReviewSha256": "2e80c8a253369a61eb7a2b033e4615ca873bbf556e0d55f387b355f7d4097ff5",
+      "initialReviewEqual": true
+    }
+  ],
+  "unmatchedOriginal": [
+    "src/ui/ModelSelector.tsx"
+  ],
+  "changedSinceInitialReview": []
+}

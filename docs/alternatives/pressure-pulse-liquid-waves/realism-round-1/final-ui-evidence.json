@@ -1,0 +1,123 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "source": "03bae79560d893f716dca9dc8f7fdc80f4f3c747",
+  "tabId": "862380280",
+  "url": "http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1",
+  "controls": "Own audit tab, native normal timeline, pause, orbit and camera distance control only.",
+  "observations": [
+    {
+      "time": 58,
+      "at": "2026-10-12T08:50:14.305Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\n1 AXWebArea Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection, URL: 127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\n\t2 container root\n\t\t3 container\n\t\t\t4 button Fire Simulation home\n\t\t\t\t5 text Fire Simulation\n\t\t\t\t6 text Ver.[\n\t\t\t\t7 text 0.21.0\n\t\t\t\t8 text ]\n\t\t\t9 button (collapsed) Description: Simulation Version, Secondary Actions: Expand\n\t\t\t14 button (collapsed) Description: Open Finder, Secondary Actions: Expand\n\t\t\t18 button (collapsed) Description: Open Toolbox, Help: Edit simulation variables, Secondary Actions: Expand\n\t\t19 container 4.2.3.1 Liquid-pressure waves then injection latest render\n\t\t\t20 container\n\t\t\t\t21 text 4.2.3.1  · LATEST RENDER · ILLUSTRATIVE\n\t\t\t\t22 heading Liquid-pressure waves then injection, Value: 1\n\t\t\t\t\t23 text Liquid-pressure waves then injection\n\t\t\t\t24 text Original 4.2.3 sequence · opposing trucks, rigid pipe and intermittent ground pulses\n\t\t\t25 container\n\t\t\t\t26 text SCROLL TO ENTER THE SIMULATION ↓\n\t\t\t27 container\n\t\t\t\t28 text Original dry-ice release and truck deployment Presentation time · no predicted pressure, penetration or suppression\n\t\t\t29 container Method render playback\n\t\t\t\t30 button Play method render\n\t\t\t\t31 button Restart method render\n\t\t\t\t32 text Original dry-ice release and truck deployment\n\t\t\t\t33 container\n\t\t\t\t\t34 text 58.0 / 90 s presentation\n\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 58\n\t\t\t\t36 button Open method render controls\n\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 58",
+      "path": "final-03-58.jpg"
+    },
+    {
+      "time": 65,
+      "at": "2026-10-12T08:50:14.668Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\n1 AXWebArea Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection, URL: 127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\n\t2 container root\n\t\t3 container\n\t\t\t4 button Fire Simulation home\n\t\t\t\t5 text Fire Simulation\n\t\t\t\t6 text Ver.[\n\t\t\t\t7 text 0.21.0\n\t\t\t\t8 text ]\n\t\t\t9 button (collapsed) Description: Simulation Version, Secondary Actions: Expand\n\t\t\t14 button (collapsed) Description: Open Finder, Secondary Actions: Expand\n\t\t\t18 button (collapsed) Description: Open Toolbox, Help: Edit simulation variables, Secondary Actions: Expand\n\t\t19 container 4.2.3.1 Liquid-pressure waves then injection latest render\n\t\t\t20 container\n\t\t\t\t21 text 4.2.3.1  · LATEST RENDER · ILLUSTRATIVE\n\t\t\t\t22 heading Liquid-pressure waves then injection, Value: 1\n\t\t\t\t\t23 text Liquid-pressure waves then injection\n\t\t\t\t24 text Original 4.2.3 sequence · opposing trucks, rigid pipe and intermittent ground pulses\n\t\t\t25 container\n\t\t\t\t26 text SCROLL TO ENTER THE SIMULATION ↓\n\t\t\t27 container\n\t\t\t\t28 text Normal pumping with hydraulic pulses Presentation time · no predicted pressure, penetration or suppression\n\t\t\t29 container Method render playback\n\t\t\t\t30 button Play method render\n\t\t\t\t31 button Restart method render\n\t\t\t\t32 text Normal pumping with hydraulic pulses\n\t\t\t\t33 container\n\t\t\t\t\t34 text 65.0 / 90 s presentation\n\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 65\n\t\t\t\t36 button Open method render controls\n\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 65",
+      "path": "final-03-65.jpg"
+    },
+    {
+      "time": 66,
+      "at": "2026-10-12T08:50:15.031Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 66.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 66\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 66",
+      "path": "final-03-66.jpg"
+    },
+    {
+      "time": 67,
+      "at": "2026-10-12T08:50:16.425Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 67.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 67\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 67",
+      "path": "final-03-67.jpg"
+    },
+    {
+      "time": 68.2,
+      "at": "2026-10-12T08:50:26.485Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 68.2 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 68.19999694824219, Details: 68.2\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 68.19999694824219, Details: 68.2",
+      "path": "final-03-68.2.jpg"
+    },
+    {
+      "time": 68.8,
+      "at": "2026-10-12T08:50:26.912Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 68.8 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 68.80000305175781, Details: 68.8\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 68.80000305175781, Details: 68.8",
+      "path": "final-03-68.8.jpg"
+    },
+    {
+      "time": 69.5,
+      "at": "2026-10-12T08:50:54.563Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 69.5 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 69.5\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 69.5",
+      "path": "final-03-69.5.jpg"
+    },
+    {
+      "time": 69.6,
+      "at": "2026-10-12T08:50:55.000Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 69.6 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 69.5999984741211, Details: 69.6\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 69.5999984741211, Details: 69.6",
+      "path": "final-03-69.6.jpg"
+    },
+    {
+      "time": 70,
+      "at": "2026-10-12T08:50:55.941Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 70.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 70\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 70",
+      "path": "final-03-70.jpg"
+    },
+    {
+      "time": 70.9,
+      "at": "2026-10-12T08:50:56.310Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 70.9 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 70.9000015258789, Details: 70.9\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 70.9000015258789, Details: 70.9",
+      "path": "final-03-70.9.jpg"
+    },
+    {
+      "time": 71.5,
+      "at": "2026-10-12T08:50:56.640Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 71.5 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 71.5\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 71.5",
+      "path": "final-03-71.5.jpg"
+    },
+    {
+      "time": 72,
+      "at": "2026-10-12T08:50:57.229Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 72.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 72\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 72",
+      "path": "final-03-72.jpg"
+    },
+    {
+      "time": 76.1,
+      "at": "2026-10-12T08:51:08.213Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 76.1 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 76.0999984741211, Details: 76.1\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 76.0999984741211, Details: 76.1",
+      "path": "final-03-76.1.jpg"
+    },
+    {
+      "time": 76.2,
+      "at": "2026-10-12T08:51:08.598Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 76.2 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 76.19999694824219, Details: 76.2\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 76.19999694824219, Details: 76.2",
+      "path": "final-03-76.2.jpg"
+    },
+    {
+      "time": 78,
+      "at": "2026-10-12T08:51:09.096Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 78.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 78\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 78",
+      "path": "final-03-78.jpg"
+    },
+    {
+      "time": 89,
+      "at": "2026-10-12T08:51:09.558Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 89.0 / 90 s presentation\n~\t\t\t\t35 slider (settable, integer) Description: Method render time, Value: 89\nThe focused UI element is 35 slider (settable, integer) Description: Method render time, Value: 89",
+      "path": "final-03-89.jpg"
+    },
+    {
+      "time": 89.5,
+      "at": "2026-10-12T08:51:09.935Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 89.5 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 89.5\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 89.5",
+      "path": "final-03-89.5.jpg"
+    },
+    {
+      "time": 70.9,
+      "at": "2026-10-12T08:51:20.578Z",
+      "state": "Browser tab: 862380280, Title: \"Zombie Fire · Version21 · 4.2.3.1 Liquid-pressure waves then injection\", URL: \"http://127.0.0.1:5175/?alternative=liquid-waves&method-preview=1\".\nThe following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.\n~\t\t\t\t\t34 text 70.9 / 90 s presentation\n~\t\t\t\t35 slider (settable, float) Description: Method render time, Value: 70.9000015258789, Details: 70.9\nThe focused UI element is 35 slider (settable, float) Description: Method render time, Value: 70.9000015258789, Details: 70.9",
+      "path": "final-03-backward-70.9.jpg",
+      "backwardFrom": 89.5
+    }
+  ],
+  "additionalScreenshot": "final-03-77.jpg",
+  "closeScreenshot": "final-03-feet-77-close.jpg",
+  "precisionLimit": "69.55 rejected by normal 0.1 s timeline; 69.5/69.6 observed. 76.15 bracketed by 76.1/76.2.",
+  "errors": [],
+  "limitations": "Bounded visual sequence observations; static ground-contact appearance partially hidden by grass. No physical stability/contact load, calibrated pressure response, FPS or field-suppression proof."
+}

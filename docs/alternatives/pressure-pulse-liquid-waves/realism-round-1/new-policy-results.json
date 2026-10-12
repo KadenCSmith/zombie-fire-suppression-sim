@@ -1,0 +1,4733 @@
+{
+  "reviewer": "/root/pressure_realism_reviewer",
+  "round": 1,
+  "runId": "B-round1-new-policy-4ec3dca",
+  "frozenSource": "4ec3dca4e6322e30a96f9876664470dc66512354",
+  "startedAt": "2026-10-12T08:23:29.398Z",
+  "seed": 21,
+  "checks": [
+    {
+      "name": "new alternative production policy",
+      "pass": true,
+      "actual": {
+        "actual": 0.00625,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0.00625,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "protected original default",
+      "pass": true,
+      "actual": {
+        "actual": 0.05,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0.05,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "production specimen 273.15/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 358.66672969381545,
+        "error": -0.003999772667270918
+      },
+      "expected": {
+        "expected": 358.6707294664827,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 308.3131729103624,
+        "error": 0.1054885099070475
+      },
+      "expected": {
+        "expected": 308.2076844004554,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 358.66672969381545,
+        "error": -0.003999772667270918
+      },
+      "expected": {
+        "expected": 358.6707294664827,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 308.3131729103624,
+        "error": 0.1054885099070475
+      },
+      "expected": {
+        "expected": 308.2076844004554,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 358.66672969381545,
+        "error": -0.003999772667270918
+      },
+      "expected": {
+        "expected": 358.6707294664827,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 308.3131729103624,
+        "error": 0.1054885099070475
+      },
+      "expected": {
+        "expected": 308.2076844004554,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 273.15/1",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 358.66672969381545,
+        "heatRemovedJ": 1226.6086816898078,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 1226.6086816898078,
+        "waterReceivedKg": 0.008333333333333323,
+        "liquidWaterKg": 0.008333333333333323,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 1226.6086816898078,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 308.3131729103624,
+        "wetness": 0.05555555555555549,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 273.15/1",
+      "pass": true,
+      "actual": {
+        "actual": 0.02499999999999994,
+        "error": -6.245004513516506e-17
+      },
+      "expected": {
+        "expected": 0.025,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/1 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -3.164135620181696e-15,
+        "error": -3.164135620181696e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/1 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -8.731149137020111e-11,
+        "error": -8.731149137020111e-11
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00033970600000000006
+      }
+    },
+    {
+      "name": "analytic 273.15/1 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 358.66672969381545,
+          "Tw": 308.3131729103624,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 358.66672969381545,
+          "Tw": 308.3131729103624,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 358.66672969381545,
+          "Tw": 308.3131729103624,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 273.15/1 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 358.66672969381545,
+        "waterUsedKg": 0.02499999999999994,
+        "dryIceUsedKg": 0,
+        "energyJ": 3679.8260450694233,
+        "energyResidualJ": -1.0368239600211382e-10,
+        "massResidualKg": 3.164135620181696e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 273.15/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 353.59964852692696,
+        "error": -0.0037732199899096486
+      },
+      "expected": {
+        "expected": 353.60342174691687,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 306.9100956821408,
+        "error": 0.01990269884532836
+      },
+      "expected": {
+        "expected": 306.8901929832955,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 353.59964852692696,
+        "error": -0.0037732199899096486
+      },
+      "expected": {
+        "expected": 353.60342174691687,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 306.9100956821408,
+        "error": 0.01990269884532836
+      },
+      "expected": {
+        "expected": 306.8901929832955,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 353.59964852692696,
+        "error": -0.0037732199899096486
+      },
+      "expected": {
+        "expected": 353.60342174691687,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 306.9100956821408,
+        "error": 0.01990269884532836
+      },
+      "expected": {
+        "expected": 306.8901929832955,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 273.15/5",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 353.59964852692696,
+        "heatRemovedJ": 5888.323355226779,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 5888.323355226779,
+        "waterReceivedKg": 0.041666666666667004,
+        "liquidWaterKg": 0.041666666666667004,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 5888.323355226779,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 306.9100956821408,
+        "wetness": 0.27777777777778007,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 273.15/5",
+      "pass": true,
+      "actual": {
+        "actual": 0.1250000000000009,
+        "error": 8.881784197001252e-16
+      },
+      "expected": {
+        "expected": 0.125,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/5 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -1.3433698597964394e-14,
+        "error": -1.3433698597964394e-14
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/5 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 1.280568540096283e-9,
+        "error": 1.280568540096283e-9
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00033970600000000006
+      }
+    },
+    {
+      "name": "analytic 273.15/5 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 353.59964852692696,
+          "Tw": 306.9100956821408,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 353.59964852692696,
+          "Tw": 306.9100956821408,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 353.59964852692696,
+          "Tw": 306.9100956821408,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 273.15/5 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 353.59964852692696,
+        "waterUsedKg": 0.1250000000000009,
+        "dryIceUsedKg": 0,
+        "energyJ": 17664.97006568034,
+        "energyResidualJ": 1.2732925824820995e-9,
+        "massResidualKg": 1.3433698597964394e-14,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 273.15/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 337.7014009010383,
+        "error": -0.002856441863002601
+      },
+      "expected": {
+        "expected": 337.7042573429013,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 302.5547460645658,
+        "error": 0.003766736523630243
+      },
+      "expected": {
+        "expected": 302.55097932804216,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 337.7014009010383,
+        "error": -0.002856441863002601
+      },
+      "expected": {
+        "expected": 337.7042573429013,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 302.5547460645658,
+        "error": 0.003766736523630243
+      },
+      "expected": {
+        "expected": 302.55097932804216,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 337.7014009010383,
+        "error": -0.002856441863002601
+      },
+      "expected": {
+        "expected": 337.7042573429013,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 302.5547460645658,
+        "error": 0.003766736523630243
+      },
+      "expected": {
+        "expected": 302.55097932804216,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 273.15/20",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 337.7014009010383,
+        "heatRemovedJ": 20514.71117104477,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 20514.71117104477,
+        "waterReceivedKg": 0.16666666666666158,
+        "liquidWaterKg": 0.16666666666666158,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 20514.71117104477,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 302.5547460645658,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 273.15/20",
+      "pass": true,
+      "actual": {
+        "actual": 0.49999999999999734,
+        "error": -2.6645352591003757e-15
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/20 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.275957200481571e-15,
+        "error": -2.275957200481571e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/20 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.1641532182693481e-10,
+        "error": -1.1641532182693481e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00033970600000000006
+      }
+    },
+    {
+      "name": "analytic 273.15/20 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 337.7014009010383,
+          "Tw": 302.5547460645658,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 337.7014009010383,
+          "Tw": 302.5547460645658,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 337.7014009010383,
+          "Tw": 302.5547460645658,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 273.15/20 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 337.7014009010383,
+        "waterUsedKg": 0.49999999999999734,
+        "dryIceUsedKg": 0,
+        "energyJ": 61544.133513134315,
+        "energyResidualJ": -5.093170329928398e-11,
+        "massResidualKg": 2.275957200481571e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 273.15/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 325.33014082154494,
+        "error": -0.0005251513675830211
+      },
+      "expected": {
+        "expected": 325.3306659729125,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 318.86849561994103,
+        "error": 0.0006925072981971425
+      },
+      "expected": {
+        "expected": 318.86780311264283,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 325.33014082154494,
+        "error": -0.0005251513675830211
+      },
+      "expected": {
+        "expected": 325.3306659729125,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 318.86849561994103,
+        "error": 0.0006925072981971425
+      },
+      "expected": {
+        "expected": 318.86780311264283,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 273.15/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 325.33014082154494,
+        "error": -0.0005251513675830211
+      },
+      "expected": {
+        "expected": 325.3306659729125,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 273.15/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 318.86849561994103,
+        "error": 0.0006925072981971425
+      },
+      "expected": {
+        "expected": 318.86780311264283,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 273.15/48",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 325.33014082154494,
+        "heatRemovedJ": 31896.270444179027,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 31896.270444179027,
+        "waterReceivedKg": 0.16666666666666743,
+        "liquidWaterKg": 0.16666666666666743,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 31896.270444179027,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 318.86849561994103,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 273.15/48",
+      "pass": true,
+      "actual": {
+        "actual": 0.5000000000000149,
+        "error": 1.4876988529977098e-14
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/48 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.3314683517128287e-15,
+        "error": -2.3314683517128287e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 273.15/48 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.1059455573558807e-9,
+        "error": -1.1059455573558807e-9
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00033970600000000006
+      }
+    },
+    {
+      "name": "analytic 273.15/48 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 325.33014082154494,
+          "Tw": 318.86849561994103,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 325.33014082154494,
+          "Tw": 318.86849561994103,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 325.33014082154494,
+          "Tw": 318.86849561994103,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 273.15/48 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 325.33014082154494,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 95688.81133253708,
+        "energyResidualJ": -1.1204974725842476e-9,
+        "massResidualKg": 2.3314683517128287e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 293.15/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 358.9737579738812,
+        "error": -0.003078696635441247
+      },
+      "expected": {
+        "expected": 358.97683667051666,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 320.21572376577706,
+        "error": 0.08119639478746876
+      },
+      "expected": {
+        "expected": 320.1345273709896,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 358.9737579738812,
+        "error": -0.003078696635441247
+      },
+      "expected": {
+        "expected": 358.97683667051666,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 320.21572376577706,
+        "error": 0.08119639478746876
+      },
+      "expected": {
+        "expected": 320.1345273709896,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 358.9737579738812,
+        "error": -0.003078696635441247
+      },
+      "expected": {
+        "expected": 358.97683667051666,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 320.21572376577706,
+        "error": 0.08119639478746876
+      },
+      "expected": {
+        "expected": 320.1345273709896,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 293.15/1",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 358.9737579738812,
+        "heatRemovedJ": 944.1426640295235,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 944.1426640295235,
+        "waterReceivedKg": 0.008333333333333323,
+        "liquidWaterKg": 0.008333333333333323,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 944.1426640295235,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 320.21572376577706,
+        "wetness": 0.05555555555555549,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 293.15/1",
+      "pass": true,
+      "actual": {
+        "actual": 0.02499999999999994,
+        "error": -6.245004513516506e-17
+      },
+      "expected": {
+        "expected": 0.025,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/1 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -3.164135620181696e-15,
+        "error": -3.164135620181696e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/1 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -7.566995918750763e-10,
+        "error": -7.566995918750763e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00028450600000000007
+      }
+    },
+    {
+      "name": "analytic 293.15/1 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 358.9737579738812,
+          "Tw": 320.21572376577706,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 358.9737579738812,
+          "Tw": 320.21572376577706,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 358.9737579738812,
+          "Tw": 320.21572376577706,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 293.15/1 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 358.9737579738812,
+        "waterUsedKg": 0.02499999999999994,
+        "dryIceUsedKg": 0,
+        "energyJ": 2832.4279920885706,
+        "energyResidualJ": -7.526068657170981e-10,
+        "massResidualKg": 3.164135620181696e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 293.15/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 355.0735348765129,
+        "error": -0.002904314982743017
+      },
+      "expected": {
+        "expected": 355.07643919149564,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 319.1357501019129,
+        "error": 0.01531946364804071
+      },
+      "expected": {
+        "expected": 319.12043063826485,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 355.0735348765129,
+        "error": -0.002904314982743017
+      },
+      "expected": {
+        "expected": 355.07643919149564,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 319.1357501019129,
+        "error": 0.01531946364804071
+      },
+      "expected": {
+        "expected": 319.12043063826485,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 355.0735348765129,
+        "error": -0.002904314982743017
+      },
+      "expected": {
+        "expected": 355.07643919149564,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 319.1357501019129,
+        "error": 0.01531946364804071
+      },
+      "expected": {
+        "expected": 319.12043063826485,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 293.15/5",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 355.0735348765129,
+        "heatRemovedJ": 4532.347913608683,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 4532.347913608683,
+        "waterReceivedKg": 0.041666666666667004,
+        "liquidWaterKg": 0.041666666666667004,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 4532.347913608683,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 319.1357501019129,
+        "wetness": 0.27777777777778007,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 293.15/5",
+      "pass": true,
+      "actual": {
+        "actual": 0.1250000000000009,
+        "error": 8.881784197001252e-16
+      },
+      "expected": {
+        "expected": 0.125,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/5 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -1.3433698597964394e-14,
+        "error": -1.3433698597964394e-14
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/5 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.6589183360338211e-9,
+        "error": -1.6589183360338211e-9
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00028450600000000007
+      }
+    },
+    {
+      "name": "analytic 293.15/5 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 355.0735348765129,
+          "Tw": 319.1357501019129,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 355.0735348765129,
+          "Tw": 319.1357501019129,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 355.0735348765129,
+          "Tw": 319.1357501019129,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 293.15/5 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 355.0735348765129,
+        "waterUsedKg": 0.1250000000000009,
+        "dryIceUsedKg": 0,
+        "energyJ": 13597.043740826048,
+        "energyResidualJ": -1.6589183360338211e-9,
+        "massResidualKg": 1.3433698597964394e-14,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 293.15/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 342.8363690297577,
+        "error": -0.0021986544444416722
+      },
+      "expected": {
+        "expected": 342.83856768420213,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 315.7833595212002,
+        "error": 0.0028993245437050064
+      },
+      "expected": {
+        "expected": 315.7804601966565,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 342.8363690297577,
+        "error": -0.0021986544444416722
+      },
+      "expected": {
+        "expected": 342.83856768420213,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 315.7833595212002,
+        "error": 0.0028993245437050064
+      },
+      "expected": {
+        "expected": 315.7804601966565,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 342.8363690297577,
+        "error": -0.0021986544444416722
+      },
+      "expected": {
+        "expected": 342.83856768420213,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 315.7833595212002,
+        "error": 0.0028993245437050064
+      },
+      "expected": {
+        "expected": 315.7804601966565,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 293.15/20",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 342.8363690297577,
+        "heatRemovedJ": 15790.54049262356,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 15790.54049262356,
+        "waterReceivedKg": 0.16666666666666158,
+        "liquidWaterKg": 0.16666666666666158,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 15790.54049262356,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 315.7833595212002,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 293.15/20",
+      "pass": true,
+      "actual": {
+        "actual": 0.49999999999999734,
+        "error": -2.6645352591003757e-15
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/20 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.275957200481571e-15,
+        "error": -2.275957200481571e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/20 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.8917489796876907e-9,
+        "error": -1.8917489796876907e-9
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00028450600000000007
+      }
+    },
+    {
+      "name": "analytic 293.15/20 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 342.8363690297577,
+          "Tw": 315.7833595212002,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 342.8363690297577,
+          "Tw": 315.7833595212002,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 342.8363690297577,
+          "Tw": 315.7833595212002,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 293.15/20 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 342.8363690297577,
+        "waterUsedKg": 0.49999999999999734,
+        "dryIceUsedKg": 0,
+        "energyJ": 47371.62147787068,
+        "energyResidualJ": -1.9208528101444244e-9,
+        "massResidualKg": 2.275957200481571e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 293.15/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 333.3139886461742,
+        "error": -0.00040421841066518027
+      },
+      "expected": {
+        "expected": 333.3143928645849,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 328.3403446424072,
+        "error": 0.0005330352664714155
+      },
+      "expected": {
+        "expected": 328.33981160714075,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 333.3139886461742,
+        "error": -0.00040421841066518027
+      },
+      "expected": {
+        "expected": 333.3143928645849,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 328.3403446424072,
+        "error": 0.0005330352664714155
+      },
+      "expected": {
+        "expected": 328.33981160714075,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 293.15/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 333.3139886461742,
+        "error": -0.00040421841066518027
+      },
+      "expected": {
+        "expected": 333.3143928645849,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 293.15/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 328.3403446424072,
+        "error": 0.0005330352664714155
+      },
+      "expected": {
+        "expected": 328.33981160714075,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 293.15/48",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 333.3139886461742,
+        "heatRemovedJ": 24551.13044551955,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 24551.13044551955,
+        "waterReceivedKg": 0.16666666666666743,
+        "liquidWaterKg": 0.16666666666666743,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 24551.13044551955,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 328.3403446424072,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 293.15/48",
+      "pass": true,
+      "actual": {
+        "actual": 0.5000000000000149,
+        "error": 1.4876988529977098e-14
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/48 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.3314683517128287e-15,
+        "error": -2.3314683517128287e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 293.15/48 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 4.656612873077393e-10,
+        "error": 4.656612873077393e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.00028450600000000007
+      }
+    },
+    {
+      "name": "analytic 293.15/48 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 333.3139886461742,
+          "Tw": 328.3403446424072,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 333.3139886461742,
+          "Tw": 328.3403446424072,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 333.3139886461742,
+          "Tw": 328.3403446424072,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 293.15/48 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 333.3139886461742,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 73653.39133655865,
+        "energyResidualJ": 5.384208634495735e-10,
+        "massResidualKg": 2.3314683517128287e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 350/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 359.8464858599674,
+        "error": -0.00046053801565903996
+      },
+      "expected": {
+        "expected": 359.84694639798306,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/1/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 354.0487245722928,
+        "error": 0.012146057559903056
+      },
+      "expected": {
+        "expected": 354.0365785147329,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 359.8464858599674,
+        "error": -0.00046053801565903996
+      },
+      "expected": {
+        "expected": 359.84694639798306,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/1/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 354.0487245722928,
+        "error": 0.012146057559903056
+      },
+      "expected": {
+        "expected": 354.0365785147329,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 359.8464858599674,
+        "error": -0.00046053801565903996
+      },
+      "expected": {
+        "expected": 359.84694639798306,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/1/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 354.0487245722928,
+        "error": 0.012146057559903056
+      },
+      "expected": {
+        "expected": 354.0365785147329,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 350/1",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 359.8464858599674,
+        "heatRemovedJ": 141.23300883014724,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 141.23300883014724,
+        "waterReceivedKg": 0.008333333333333323,
+        "liquidWaterKg": 0.008333333333333323,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 141.23300883014724,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 354.0487245722928,
+        "wetness": 0.05555555555555549,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 350/1",
+      "pass": true,
+      "actual": {
+        "actual": 0.02499999999999994,
+        "error": -6.245004513516506e-17
+      },
+      "expected": {
+        "expected": 0.025,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 350/1 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -3.164135620181696e-15,
+        "error": -3.164135620181696e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 350/1 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -4.765752237290144e-10,
+        "error": -4.765752237290144e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0001276
+      }
+    },
+    {
+      "name": "analytic 350/1 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 359.8464858599674,
+          "Tw": 354.0487245722928,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 359.8464858599674,
+          "Tw": 354.0487245722928,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        },
+        {
+          "Tp": 359.8464858599674,
+          "Tw": 354.0487245722928,
+          "liquid": 0.008333333333333323,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 350/1 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 359.8464858599674,
+        "waterUsedKg": 0.02499999999999994,
+        "dryIceUsedKg": 0,
+        "energyJ": 423.6990264904417,
+        "energyResidualJ": -4.730509317596443e-10,
+        "massResidualKg": 3.164135620181696e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 350/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 359.26305682520734,
+        "error": -0.00043445250327067697
+      },
+      "expected": {
+        "expected": 359.2634912777106,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/5/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 353.88717279011405,
+        "error": 0.0022916175987575116
+      },
+      "expected": {
+        "expected": 353.8848811725153,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 359.26305682520734,
+        "error": -0.00043445250327067697
+      },
+      "expected": {
+        "expected": 359.2634912777106,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/5/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 353.88717279011405,
+        "error": 0.0022916175987575116
+      },
+      "expected": {
+        "expected": 353.8848811725153,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 359.26305682520734,
+        "error": -0.00043445250327067697
+      },
+      "expected": {
+        "expected": 359.2634912777106,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/5/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 353.88717279011405,
+        "error": 0.0022916175987575116
+      },
+      "expected": {
+        "expected": 353.8848811725153,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 350/5",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 359.26305682520734,
+        "heatRemovedJ": 677.9877208090668,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 677.9877208090668,
+        "waterReceivedKg": 0.041666666666667004,
+        "liquidWaterKg": 0.041666666666667004,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 677.9877208090668,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 353.88717279011405,
+        "wetness": 0.27777777777778007,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 350/5",
+      "pass": true,
+      "actual": {
+        "actual": 0.1250000000000009,
+        "error": 8.881784197001252e-16
+      },
+      "expected": {
+        "expected": 0.125,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 350/5 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -1.3433698597964394e-14,
+        "error": -1.3433698597964394e-14
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 350/5 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 5.384208634495735e-10,
+        "error": 5.384208634495735e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0001276
+      }
+    },
+    {
+      "name": "analytic 350/5 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 359.26305682520734,
+          "Tw": 353.88717279011405,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 359.26305682520734,
+          "Tw": 353.88717279011405,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        },
+        {
+          "Tp": 359.26305682520734,
+          "Tw": 353.88717279011405,
+          "liquid": 0.041666666666667004,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 350/5 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 359.26305682520734,
+        "waterUsedKg": 0.1250000000000009,
+        "dryIceUsedKg": 0,
+        "energyJ": 2033.9631624272004,
+        "energyResidualJ": 5.313722795108333e-10,
+        "massResidualKg": 1.3433698597964394e-14,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 350/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 357.4325159356405,
+        "error": -0.0003288937091383559
+      },
+      "expected": {
+        "expected": 357.4328448293496,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/20/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 353.38569327168267,
+        "error": 0.0004337059898489315
+      },
+      "expected": {
+        "expected": 353.3852595656928,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 357.4325159356405,
+        "error": -0.0003288937091383559
+      },
+      "expected": {
+        "expected": 357.4328448293496,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/20/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 353.38569327168267,
+        "error": 0.0004337059898489315
+      },
+      "expected": {
+        "expected": 353.3852595656928,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 357.4325159356405,
+        "error": -0.0003288937091383559
+      },
+      "expected": {
+        "expected": 357.4328448293496,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/20/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 353.38569327168267,
+        "error": 0.0004337059898489315
+      },
+      "expected": {
+        "expected": 353.3852595656928,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 350/20",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 357.4325159356405,
+        "heatRemovedJ": 2362.085339210539,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 2362.085339210539,
+        "waterReceivedKg": 0.16666666666666158,
+        "liquidWaterKg": 0.16666666666666158,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 2362.085339210539,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 353.38569327168267,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 350/20",
+      "pass": true,
+      "actual": {
+        "actual": 0.49999999999999734,
+        "error": -2.6645352591003757e-15
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 350/20 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.275957200481571e-15,
+        "error": -2.275957200481571e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 350/20 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 6.584741640836e-10,
+        "error": 6.584741640836e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0001276
+      }
+    },
+    {
+      "name": "analytic 350/20 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 357.4325159356405,
+          "Tw": 353.38569327168267,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 357.4325159356405,
+          "Tw": 353.38569327168267,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        },
+        {
+          "Tp": 357.4325159356405,
+          "Tw": 353.38569327168267,
+          "liquid": 0.16666666666666158,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 350/20 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 357.4325159356405,
+        "waterUsedKg": 0.49999999999999734,
+        "dryIceUsedKg": 0,
+        "energyJ": 7086.256017631617,
+        "energyResidualJ": 6.557456799782813e-10,
+        "massResidualKg": 2.275957200481571e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "production specimen 350/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 356.0080760876858,
+        "error": -0.00006046647797575133
+      },
+      "expected": {
+        "expected": 356.0081365541638,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/48/specimen-0",
+      "pass": true,
+      "actual": {
+        "actual": 355.26407548876693,
+        "error": 0.0000797360158912852
+      },
+      "expected": {
+        "expected": 355.26399575275104,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 356.0080760876858,
+        "error": -0.00006046647797575133
+      },
+      "expected": {
+        "expected": 356.0081365541638,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/48/specimen-1",
+      "pass": true,
+      "actual": {
+        "actual": 355.26407548876693,
+        "error": 0.0000797360158912852
+      },
+      "expected": {
+        "expected": 355.26399575275104,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production specimen 350/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 356.0080760876858,
+        "error": -0.00006046647797575133
+      },
+      "expected": {
+        "expected": 356.0081365541638,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "production water 350/48/specimen-2",
+      "pass": true,
+      "actual": {
+        "actual": 355.26407548876693,
+        "error": 0.0000797360158912852
+      },
+      "expected": {
+        "expected": 355.26399575275104,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "actual adapter equals explicit new-step reference 350/48",
+      "pass": true,
+      "actual": {
+        "id": "specimen-0",
+        "xM": 0,
+        "yM": -0.1,
+        "radiusM": 0.04,
+        "peatMassKg": 0.5,
+        "dryIceConductanceWK": 0,
+        "waterConductanceWK": 24,
+        "waterArrivalTimeS": 12,
+        "waterShare": 0.3333333333333333,
+        "temperatureK": 356.0080760876858,
+        "heatRemovedJ": 3672.5699993297526,
+        "heatToDryIceJ": 0,
+        "heatToWaterJ": 3672.5699993297526,
+        "waterReceivedKg": 0.16666666666666743,
+        "liquidWaterKg": 0.16666666666666743,
+        "waterVaporKg": 0,
+        "liquidWaterSensibleJ": 3672.5699993297526,
+        "vaporEnthalpyJ": 0,
+        "waterTemperatureK": 355.26407548876693,
+        "wetness": 1,
+        "dryCoolingDomainLimitReached": false
+      },
+      "expected": "identical unchanged reference with 0.00625 s policy"
+    },
+    {
+      "name": "finite supplied 350/48",
+      "pass": true,
+      "actual": {
+        "actual": 0.5000000000000149,
+        "error": 1.4876988529977098e-14
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "analytic 350/48 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.3314683517128287e-15,
+        "error": -2.3314683517128287e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "analytic 350/48 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -2.117303665727377e-9,
+        "error": -2.117303665727377e-9
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0001276
+      }
+    },
+    {
+      "name": "analytic 350/48 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 356.0080760876858,
+          "Tw": 355.26407548876693,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 356.0080760876858,
+          "Tw": 355.26407548876693,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        },
+        {
+          "Tp": 356.0080760876858,
+          "Tw": 355.26407548876693,
+          "liquid": 0.16666666666666743,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "analytic 350/48 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 356.0080760876858,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 11017.709997989257,
+        "energyResidualJ": -2.1263986127451062e-9,
+        "massResidualKg": 2.3314683517128287e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "monotonic analytic refinement 273.15/1",
+      "pass": true,
+      "actual": 0.20744807291902134,
+      "expected": "<0.4038643873107617"
+    },
+    {
+      "name": "monotonic analytic refinement 273.15/2",
+      "pass": true,
+      "actual": 0.1054885099070475,
+      "expected": "<0.20744807291902134"
+    },
+    {
+      "name": "monotonic analytic refinement 273.15/3",
+      "pass": true,
+      "actual": 0.05330387047081331,
+      "expected": "<0.1054885099070475"
+    },
+    {
+      "name": "monotonic analytic refinement 273.15/4",
+      "pass": true,
+      "actual": 0.026828425779171994,
+      "expected": "<0.05330387047081331"
+    },
+    {
+      "name": "production further-halving order 273.15",
+      "pass": true,
+      "actual": {
+        "errors": [
+          0.4038643873107617,
+          0.20744807291902134,
+          0.1054885099070475,
+          0.05330387047081331,
+          0.026828425779171994
+        ],
+        "order": 0.9847736671904012
+      },
+      "expected": "0.7..1.3"
+    },
+    {
+      "name": "monotonic analytic refinement 293.15/1",
+      "pass": true,
+      "actual": 0.15967649596575484,
+      "expected": "<0.3108616498757897"
+    },
+    {
+      "name": "monotonic analytic refinement 293.15/2",
+      "pass": true,
+      "actual": 0.08119639478746876,
+      "expected": "<0.15967649596575484"
+    },
+    {
+      "name": "monotonic analytic refinement 293.15/3",
+      "pass": true,
+      "actual": 0.04102894347687425,
+      "expected": "<0.08119639478746876"
+    },
+    {
+      "name": "monotonic analytic refinement 293.15/4",
+      "pass": true,
+      "actual": 0.020650319669869077,
+      "expected": "<0.04102894347687425"
+    },
+    {
+      "name": "production further-halving order 293.15",
+      "pass": true,
+      "actual": {
+        "errors": [
+          0.3108616498757897,
+          0.15967649596575484,
+          0.08119639478746876,
+          0.04102894347687425,
+          0.020650319669869077
+        ],
+        "order": 0.984773667194506
+      },
+      "expected": "0.7..1.3"
+    },
+    {
+      "name": "monotonic analytic refinement 350/1",
+      "pass": true,
+      "actual": 0.023885788476491143,
+      "expected": "<0.04650136871742916"
+    },
+    {
+      "name": "monotonic analytic refinement 350/2",
+      "pass": true,
+      "actual": 0.012146057559903056,
+      "expected": "<0.023885788476491143"
+    },
+    {
+      "name": "monotonic analytic refinement 350/3",
+      "pass": true,
+      "actual": 0.0061374634969979525,
+      "expected": "<0.012146057559903056"
+    },
+    {
+      "name": "monotonic analytic refinement 350/4",
+      "pass": true,
+      "actual": 0.0030890530545093497,
+      "expected": "<0.0061374634969979525"
+    },
+    {
+      "name": "production further-halving order 350",
+      "pass": true,
+      "actual": {
+        "errors": [
+          0.04650136871742916,
+          0.023885788476491143,
+          0.012146057559903056,
+          0.0061374634969979525,
+          0.0030890530545093497
+        ],
+        "order": 0.984773667183503
+      },
+      "expected": "0.7..1.3"
+    },
+    {
+      "name": "boiling final refinement 0.025",
+      "pass": true,
+      "actual": 0.022486939143448126,
+      "expected": "strictly decreasing"
+    },
+    {
+      "name": "boiling final refinement 0.0125",
+      "pass": true,
+      "actual": 0.011350977179290567,
+      "expected": "strictly decreasing"
+    },
+    {
+      "name": "boiling final refinement 0.00625",
+      "pass": true,
+      "actual": 0.0051978831737642395,
+      "expected": "strictly decreasing"
+    },
+    {
+      "name": "production boiling versus finest",
+      "pass": true,
+      "actual": {
+        "actual": 501.78986826987546,
+        "error": -0.0051978831737642395
+      },
+      "expected": {
+        "expected": 501.7950661530492,
+        "tolerance": 0.2
+      }
+    },
+    {
+      "name": "boiling final refinement 0.003125",
+      "pass": true,
+      "actual": 0.001829677013233777,
+      "expected": "strictly decreasing"
+    },
+    {
+      "name": "supply event 0",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 0",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 0 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 0 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 0 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 0 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 823.15,
+        "waterUsedKg": 0,
+        "dryIceUsedKg": 0,
+        "energyJ": 0,
+        "energyResidualJ": 0,
+        "massResidualKg": 0,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 11.999",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 11.999",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 11.999 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 11.999 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 11.999 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 11.999 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 823.15,
+        "waterUsedKg": 0,
+        "dryIceUsedKg": 0,
+        "energyJ": 0,
+        "energyResidualJ": 0,
+        "massResidualKg": 0,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 12",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 12",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 12 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 12 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 12 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        },
+        {
+          "Tp": 823.15,
+          "Tw": 293.15,
+          "liquid": 0,
+          "vapor": 0
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 12 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 823.15,
+        "waterUsedKg": 0,
+        "dryIceUsedKg": 0,
+        "energyJ": 0,
+        "energyResidualJ": 0,
+        "massResidualKg": 0,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 12.01",
+      "pass": true,
+      "actual": {
+        "actual": 0.0002499999999999947,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0.0002499999999999947,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 12.01",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 12.01 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -2.222614453595284e-17,
+        "error": -2.222614453595284e-17
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 12.01 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": 2.3283064365386963e-10,
+        "error": 2.3283064365386963e-10
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 12.01 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 823.0306237382962,
+          "Tw": 373.15,
+          "liquid": 0.00004708576957192733,
+          "vapor": 0.000036247563761404225
+        },
+        {
+          "Tp": 823.0306237382962,
+          "Tw": 373.15,
+          "liquid": 0.00004708576957192733,
+          "vapor": 0.000036247563761404225
+        },
+        {
+          "Tp": 823.0306237382962,
+          "Tw": 373.15,
+          "liquid": 0.00004708576957192733,
+          "vapor": 0.000036247563761404225
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 12.01 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 823.0306237382962,
+        "waterUsedKg": 0.0002499999999999947,
+        "dryIceUsedKg": 0,
+        "energyJ": 329.47848230231887,
+        "energyResidualJ": -4.058620106661692e-11,
+        "massResidualKg": 2.2199039481640703e-17,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 31.999",
+      "pass": true,
+      "actual": {
+        "actual": 0.4999749999999973,
+        "error": -2.7200464103316335e-15
+      },
+      "expected": {
+        "expected": 0.499975,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 31.999",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 31.999 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -8.992806499463768e-15,
+        "error": -8.992806499463768e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 31.999 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.816079020500183e-8,
+        "error": -1.816079020500183e-8
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 31.999 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 640.2111483903731,
+          "Tw": 373.15,
+          "liquid": 0.11688258076067688,
+          "vapor": 0.049775752572653584
+        },
+        {
+          "Tp": 640.2111483903731,
+          "Tw": 373.15,
+          "liquid": 0.11688258076067688,
+          "vapor": 0.049775752572653584
+        },
+        {
+          "Tp": 640.2111483903731,
+          "Tw": 373.15,
+          "liquid": 0.11688258076067688,
+          "vapor": 0.049775752572653584
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 31.999 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 640.2111483903731,
+        "waterUsedKg": 0.4999749999999973,
+        "dryIceUsedKg": 0,
+        "energyJ": 504911.23044258845,
+        "energyResidualJ": -1.798616722226143e-8,
+        "massResidualKg": 8.992806499463768e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 32",
+      "pass": true,
+      "actual": {
+        "actual": 0.49999999999999734,
+        "error": -2.6645352591003757e-15
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 32",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 32 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -8.93729534823251e-15,
+        "error": -8.93729534823251e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 32 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.83936208486557e-8,
+        "error": -1.83936208486557e-8
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 32 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 640.2041812964187,
+          "Tw": 373.15,
+          "liquid": 0.11688931274012908,
+          "vapor": 0.04977735392653473
+        },
+        {
+          "Tp": 640.2041812964187,
+          "Tw": 373.15,
+          "liquid": 0.11688931274012908,
+          "vapor": 0.04977735392653473
+        },
+        {
+          "Tp": 640.2041812964187,
+          "Tw": 373.15,
+          "liquid": 0.11688931274012908,
+          "vapor": 0.04977735392653473
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 32 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 640.2041812964187,
+        "waterUsedKg": 0.49999999999999734,
+        "dryIceUsedKg": 0,
+        "energyJ": 504930.4596219026,
+        "energyResidualJ": -1.816079020500183e-8,
+        "massResidualKg": 8.93729534823251e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 32.001",
+      "pass": true,
+      "actual": {
+        "actual": 0.5000000000000149,
+        "error": 1.4876988529977098e-14
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 32.001",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 32.001 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -8.992806499463768e-15,
+        "error": -8.992806499463768e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 32.001 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -1.792795956134796e-8,
+        "error": -1.792795956134796e-8
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 32.001 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 640.1972147564705,
+          "Tw": 373.15,
+          "liquid": 0.11688647680351975,
+          "vapor": 0.04978018986314991
+        },
+        {
+          "Tp": 640.1972147564705,
+          "Tw": 373.15,
+          "liquid": 0.11688647680351975,
+          "vapor": 0.04978018986314991
+        },
+        {
+          "Tp": 640.1972147564705,
+          "Tw": 373.15,
+          "liquid": 0.11688647680351975,
+          "vapor": 0.04978018986314991
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 32.001 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 640.1972147564705,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 504949.6872721594,
+        "energyResidualJ": -1.8102582544088364e-8,
+        "massResidualKg": 8.965050923848139e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "supply event 60",
+      "pass": true,
+      "actual": {
+        "actual": 0.5000000000000149,
+        "error": 1.4876988529977098e-14
+      },
+      "expected": {
+        "expected": 0.5,
+        "tolerance": 1.5e-9
+      }
+    },
+    {
+      "name": "no hidden solid 60",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "event 60 raw mass",
+      "pass": true,
+      "actual": {
+        "actual": -8.548717289613705e-15,
+        "error": -8.548717289613705e-15
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 1.5000000000000002e-9
+      }
+    },
+    {
+      "name": "event 60 raw energy",
+      "pass": true,
+      "actual": {
+        "actual": -2.2351741790771484e-8,
+        "error": -2.2351741790771484e-8
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0.0015628
+      }
+    },
+    {
+      "name": "event 60 finite bounds",
+      "pass": true,
+      "actual": [
+        {
+          "Tp": 501.78986826987546,
+          "Tw": 373.1500000000004,
+          "liquid": 0.06054366318950687,
+          "vapor": 0.10612300347716265
+        },
+        {
+          "Tp": 501.78986826987546,
+          "Tw": 373.1500000000004,
+          "liquid": 0.06054366318950687,
+          "vapor": 0.10612300347716265
+        },
+        {
+          "Tp": 501.78986826987546,
+          "Tw": 373.1500000000004,
+          "liquid": 0.06054366318950687,
+          "vapor": 0.10612300347716265
+        }
+      ],
+      "expected": "bounded and nonnegative"
+    },
+    {
+      "name": "event 60 no reaction state",
+      "pass": true,
+      "actual": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "O2/fuel/reaction unavailable; no field"
+    },
+    {
+      "name": "limit heat {\"enabled\":false}",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit specimen {\"enabled\":false}",
+      "pass": true,
+      "actual": {
+        "actual": 823.15,
+        "error": 0
+      },
+      "expected": {
+        "expected": 823.15,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit heat {\"waterKg\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit specimen {\"waterKg\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 823.15,
+        "error": 0
+      },
+      "expected": {
+        "expected": 823.15,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit heat {\"flowKgS\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit specimen {\"flowKgS\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 823.15,
+        "error": 0
+      },
+      "expected": {
+        "expected": 823.15,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit heat {\"conductanceWK\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 0,
+        "error": 0
+      },
+      "expected": {
+        "expected": 0,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "limit specimen {\"conductanceWK\":0}",
+      "pass": true,
+      "actual": {
+        "actual": 823.15,
+        "error": 0
+      },
+      "expected": {
+        "expected": 823.15,
+        "tolerance": 0
+      }
+    },
+    {
+      "name": "matched source-off reference",
+      "pass": true,
+      "actual": {
+        "timeS": 60,
+        "contact": {
+          "storyTimeS": 60,
+          "modelTimeS": 60,
+          "initialTemperatureK": 823.15,
+          "patches": [
+            {
+              "id": "specimen-0",
+              "xM": 0,
+              "yM": -0.1,
+              "radiusM": 0.04,
+              "peatMassKg": 0.5,
+              "dryIceConductanceWK": 0,
+              "waterConductanceWK": 0,
+              "waterArrivalTimeS": 12,
+              "waterShare": 0.3333333333333333,
+              "temperatureK": 823.15,
+              "heatRemovedJ": 0,
+              "heatToDryIceJ": 0,
+              "heatToWaterJ": 0,
+              "waterReceivedKg": 0,
+              "liquidWaterKg": 0,
+              "waterVaporKg": 0,
+              "liquidWaterSensibleJ": 0,
+              "vaporEnthalpyJ": 0,
+              "waterTemperatureK": 293.15,
+              "wetness": 0,
+              "dryCoolingDomainLimitReached": false
+            },
+            {
+              "id": "specimen-1",
+              "xM": 0,
+              "yM": -0.2,
+              "radiusM": 0.04,
+              "peatMassKg": 0.5,
+              "dryIceConductanceWK": 0,
+              "waterConductanceWK": 0,
+              "waterArrivalTimeS": 12,
+              "waterShare": 0.3333333333333333,
+              "temperatureK": 823.15,
+              "heatRemovedJ": 0,
+              "heatToDryIceJ": 0,
+              "heatToWaterJ": 0,
+              "waterReceivedKg": 0,
+              "liquidWaterKg": 0,
+              "waterVaporKg": 0,
+              "liquidWaterSensibleJ": 0,
+              "vaporEnthalpyJ": 0,
+              "waterTemperatureK": 293.15,
+              "wetness": 0,
+              "dryCoolingDomainLimitReached": false
+            },
+            {
+              "id": "specimen-2",
+              "xM": 0,
+              "yM": -0.30000000000000004,
+              "radiusM": 0.04,
+              "peatMassKg": 0.5,
+              "dryIceConductanceWK": 0,
+              "waterConductanceWK": 0,
+              "waterArrivalTimeS": 12,
+              "waterShare": 0.3333333333333333,
+              "temperatureK": 823.15,
+              "heatRemovedJ": 0,
+              "heatToDryIceJ": 0,
+              "heatToWaterJ": 0,
+              "waterReceivedKg": 0,
+              "liquidWaterKg": 0,
+              "waterVaporKg": 0,
+              "liquidWaterSensibleJ": 0,
+              "vaporEnthalpyJ": 0,
+              "waterTemperatureK": 293.15,
+              "wetness": 0,
+              "dryCoolingDomainLimitReached": false
+            }
+          ],
+          "ledger": {
+            "initialPeatEnergyJ": 1462800,
+            "peatEnergyJ": 1462800,
+            "heatToDryIceJ": 0,
+            "heatToWaterJ": 0,
+            "waterStoredSensibleJ": 0,
+            "vaporEnthalpyJ": 0,
+            "energyResidualJ": 0,
+            "dryIceInitialKg": 0,
+            "dryIceRemainingKg": 0,
+            "dryIceSublimatedKg": 0,
+            "dryIceExportedKg": 0,
+            "dryIceMassResidualKg": 0,
+            "waterInitialKg": 0,
+            "waterRemainingSupplyKg": 0,
+            "waterSuppliedKg": 0,
+            "waterBypassKg": 0,
+            "waterLiquidKg": 0,
+            "waterVaporKg": 0,
+            "waterMassResidualKg": 0
+          }
+        },
+        "metrics": {
+          "maximumK": 823.15,
+          "waterUsedKg": 0,
+          "dryIceUsedKg": 0,
+          "energyJ": 0,
+          "energyResidualJ": 0,
+          "massResidualKg": 0,
+          "oxygenKg": null,
+          "fuelKg": null,
+          "reactionW": null
+        }
+      },
+      "expected": "identical baseline"
+    },
+    {
+      "name": "caller config and exported snapshot independent",
+      "pass": true,
+      "actual": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      }
+    },
+    {
+      "name": "accepted checkpoints not integration steps",
+      "pass": true,
+      "actual": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      }
+    },
+    {
+      "name": "authored cues no physical benefit",
+      "pass": true,
+      "actual": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      },
+      "expected": "identical physical state"
+    },
+    {
+      "name": "stale source settings sanitized",
+      "pass": true,
+      "actual": {
+        "initialK": 823.15,
+        "waterKg": 0,
+        "flowKgS": 0,
+        "inletK": 293.15,
+        "contactStartS": 8,
+        "conductanceWK": 0,
+        "dryIceKg": 0,
+        "endS": 60,
+        "enabled": false,
+        "seed": 21
+      },
+      "expected": "no modeled treatment sources"
+    },
+    {
+      "name": "input ownership",
+      "pass": true,
+      "actual": {
+        "id": "pressure-review",
+        "variantId": "pressure-only",
+        "engine": "concept",
+        "medium": "none",
+        "sourceStatus": "unspecified",
+        "thermal": {
+          "initialK": 823.15,
+          "waterKg": 5,
+          "flowKgS": 0.2,
+          "inletK": 293.15,
+          "contactStartS": 8,
+          "conductanceWK": 100,
+          "dryIceKg": 1,
+          "endS": 120,
+          "enabled": true,
+          "seed": 21
+        },
+        "fem": {
+          "n": 4,
+          "lengthM": 0.1,
+          "ambientK": 300,
+          "oxygenMassFraction": 0.233,
+          "moistureRatio": 0.1,
+          "dryDensityKgM3": 123,
+          "ambientPressurePa": 101325,
+          "ignitionW": 8,
+          "ignitionS": 180,
+          "ignitionWidthM": 0.025,
+          "heatTransfer": 10,
+          "transferKgM2S": 0.01,
+          "permeabilityM2": 1e-12,
+          "poreRadiationM": 0.0005,
+          "gasDiffusivityM2S": 0.00002,
+          "gasViscosityPaS": 0.000018,
+          "emissivity": 0.95,
+          "gravityMS2": 0,
+          "maxStepS": 1,
+          "endS": 600,
+          "chemistry": true,
+          "closed": false
+        }
+      },
+      "expected": "caller unchanged"
+    },
+    {
+      "name": "null physical state 0",
+      "pass": true,
+      "actual": {
+        "timeS": 0,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 0,
+        "metrics": null
+      }
+    },
+    {
+      "name": "null physical state 12",
+      "pass": true,
+      "actual": {
+        "timeS": 12,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 12,
+        "metrics": null
+      }
+    },
+    {
+      "name": "null physical state 38",
+      "pass": true,
+      "actual": {
+        "timeS": 38,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 38,
+        "metrics": null
+      }
+    },
+    {
+      "name": "null physical state 48",
+      "pass": true,
+      "actual": {
+        "timeS": 48,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 48,
+        "metrics": null
+      }
+    },
+    {
+      "name": "null physical state 60",
+      "pass": true,
+      "actual": {
+        "timeS": 60,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 60,
+        "metrics": null
+      }
+    },
+    {
+      "name": "reject unsupported {\"engine\":\"contact\"}",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "reject unsupported {\"engine\":\"peat-fem\"}",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "reject unsupported {\"medium\":\"water\"}",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "reject unsupported {\"medium\":\"co2-water\"}",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "authored pressure cue no calculated state",
+      "pass": true,
+      "actual": {
+        "timeS": 60,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 60,
+        "metrics": null
+      }
+    },
+    {
+      "name": "pressure config/snapshot independence",
+      "pass": true,
+      "actual": {
+        "timeS": 60,
+        "metrics": null
+      },
+      "expected": {
+        "timeS": 60,
+        "metrics": null
+      }
+    }
+  ],
+  "outputs": {
+    "productionContinuousFill": [
+      {
+        "inletK": 273.15,
+        "elapsed": 1,
+        "expected": {
+          "Tp": 358.6707294664827,
+          "Tw": 308.2076844004554
+        },
+        "actual": {
+          "Tp": 358.66672969381545,
+          "Tw": 308.3131729103624
+        },
+        "balance": {
+          "timeS": 13,
+          "massResidualKg": -3.164135620181696e-15,
+          "energyResidualJ": -8.731149137020111e-11
+        }
+      },
+      {
+        "inletK": 273.15,
+        "elapsed": 5,
+        "expected": {
+          "Tp": 353.60342174691687,
+          "Tw": 306.8901929832955
+        },
+        "actual": {
+          "Tp": 353.59964852692696,
+          "Tw": 306.9100956821408
+        },
+        "balance": {
+          "timeS": 17,
+          "massResidualKg": -1.3433698597964394e-14,
+          "energyResidualJ": 1.280568540096283e-9
+        }
+      },
+      {
+        "inletK": 273.15,
+        "elapsed": 20,
+        "expected": {
+          "Tp": 337.7042573429013,
+          "Tw": 302.55097932804216
+        },
+        "actual": {
+          "Tp": 337.7014009010383,
+          "Tw": 302.5547460645658
+        },
+        "balance": {
+          "timeS": 32,
+          "massResidualKg": -2.275957200481571e-15,
+          "energyResidualJ": -1.1641532182693481e-10
+        }
+      },
+      {
+        "inletK": 273.15,
+        "elapsed": 48,
+        "expected": {
+          "Tp": 325.3306659729125,
+          "Tw": 318.86780311264283
+        },
+        "actual": {
+          "Tp": 325.33014082154494,
+          "Tw": 318.86849561994103
+        },
+        "balance": {
+          "timeS": 60,
+          "massResidualKg": -2.3314683517128287e-15,
+          "energyResidualJ": -1.1059455573558807e-9
+        }
+      },
+      {
+        "inletK": 293.15,
+        "elapsed": 1,
+        "expected": {
+          "Tp": 358.97683667051666,
+          "Tw": 320.1345273709896
+        },
+        "actual": {
+          "Tp": 358.9737579738812,
+          "Tw": 320.21572376577706
+        },
+        "balance": {
+          "timeS": 13,
+          "massResidualKg": -3.164135620181696e-15,
+          "energyResidualJ": -7.566995918750763e-10
+        }
+      },
+      {
+        "inletK": 293.15,
+        "elapsed": 5,
+        "expected": {
+          "Tp": 355.07643919149564,
+          "Tw": 319.12043063826485
+        },
+        "actual": {
+          "Tp": 355.0735348765129,
+          "Tw": 319.1357501019129
+        },
+        "balance": {
+          "timeS": 17,
+          "massResidualKg": -1.3433698597964394e-14,
+          "energyResidualJ": -1.6589183360338211e-9
+        }
+      },
+      {
+        "inletK": 293.15,
+        "elapsed": 20,
+        "expected": {
+          "Tp": 342.83856768420213,
+          "Tw": 315.7804601966565
+        },
+        "actual": {
+          "Tp": 342.8363690297577,
+          "Tw": 315.7833595212002
+        },
+        "balance": {
+          "timeS": 32,
+          "massResidualKg": -2.275957200481571e-15,
+          "energyResidualJ": -1.8917489796876907e-9
+        }
+      },
+      {
+        "inletK": 293.15,
+        "elapsed": 48,
+        "expected": {
+          "Tp": 333.3143928645849,
+          "Tw": 328.33981160714075
+        },
+        "actual": {
+          "Tp": 333.3139886461742,
+          "Tw": 328.3403446424072
+        },
+        "balance": {
+          "timeS": 60,
+          "massResidualKg": -2.3314683517128287e-15,
+          "energyResidualJ": 4.656612873077393e-10
+        }
+      },
+      {
+        "inletK": 350,
+        "elapsed": 1,
+        "expected": {
+          "Tp": 359.84694639798306,
+          "Tw": 354.0365785147329
+        },
+        "actual": {
+          "Tp": 359.8464858599674,
+          "Tw": 354.0487245722928
+        },
+        "balance": {
+          "timeS": 13,
+          "massResidualKg": -3.164135620181696e-15,
+          "energyResidualJ": -4.765752237290144e-10
+        }
+      },
+      {
+        "inletK": 350,
+        "elapsed": 5,
+        "expected": {
+          "Tp": 359.2634912777106,
+          "Tw": 353.8848811725153
+        },
+        "actual": {
+          "Tp": 359.26305682520734,
+          "Tw": 353.88717279011405
+        },
+        "balance": {
+          "timeS": 17,
+          "massResidualKg": -1.3433698597964394e-14,
+          "energyResidualJ": 5.384208634495735e-10
+        }
+      },
+      {
+        "inletK": 350,
+        "elapsed": 20,
+        "expected": {
+          "Tp": 357.4328448293496,
+          "Tw": 353.3852595656928
+        },
+        "actual": {
+          "Tp": 357.4325159356405,
+          "Tw": 353.38569327168267
+        },
+        "balance": {
+          "timeS": 32,
+          "massResidualKg": -2.275957200481571e-15,
+          "energyResidualJ": 6.584741640836e-10
+        }
+      },
+      {
+        "inletK": 350,
+        "elapsed": 48,
+        "expected": {
+          "Tp": 356.0081365541638,
+          "Tw": 355.26399575275104
+        },
+        "actual": {
+          "Tp": 356.0080760876858,
+          "Tw": 355.26407548876693
+        },
+        "balance": {
+          "timeS": 60,
+          "massResidualKg": -2.3314683517128287e-15,
+          "energyResidualJ": -2.117303665727377e-9
+        }
+      }
+    ],
+    "refinement": {
+      "continuous": [
+        {
+          "inlet": 273.15,
+          "dt": 0.025,
+          "elapsed": 1,
+          "errorK": 0.4038643873107617,
+          "actual": {
+            "Tp": 358.6554162751307,
+            "Tw": 308.61154878776614
+          },
+          "expected": {
+            "Tp": 358.6707294664827,
+            "Tw": 308.2076844004554
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.025,
+          "elapsed": 5,
+          "errorK": 0.07846568265154019,
+          "actual": {
+            "Tp": 353.5885459612474,
+            "Tw": 306.96865866594703
+          },
+          "expected": {
+            "Tp": 353.60342174691687,
+            "Tw": 306.8901929832955
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.025,
+          "elapsed": 20,
+          "errorK": 0.014988852979911371,
+          "actual": {
+            "Tp": 337.69289079605835,
+            "Tw": 302.5659681810221
+          },
+          "expected": {
+            "Tp": 337.7042573429013,
+            "Tw": 302.55097932804216
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.025,
+          "elapsed": 48,
+          "errorK": 0.0027556719233530202,
+          "actual": {
+            "Tp": 325.3285762550369,
+            "Tw": 318.8705587845662
+          },
+          "expected": {
+            "Tp": 325.3306659729125,
+            "Tw": 318.86780311264283
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0125,
+          "elapsed": 1,
+          "errorK": 0.20744807291902134,
+          "actual": {
+            "Tp": 358.6628637270513,
+            "Tw": 308.4151324733744
+          },
+          "expected": {
+            "Tp": 358.6707294664827,
+            "Tw": 308.2076844004554
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0125,
+          "elapsed": 5,
+          "errorK": 0.03958440635875604,
+          "actual": {
+            "Tp": 353.5959172032117,
+            "Tw": 306.92977738965425
+          },
+          "expected": {
+            "Tp": 353.60342174691687,
+            "Tw": 306.8901929832955
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0125,
+          "elapsed": 20,
+          "errorK": 0.007518500838102682,
+          "actual": {
+            "Tp": 337.6985558131002,
+            "Tw": 302.55849782888026
+          },
+          "expected": {
+            "Tp": 337.7042573429013,
+            "Tw": 302.55097932804216
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0125,
+          "elapsed": 48,
+          "errorK": 0.0013822619858956386,
+          "actual": {
+            "Tp": 325.32961775757605,
+            "Tw": 318.8691853746287
+          },
+          "expected": {
+            "Tp": 325.3306659729125,
+            "Tw": 318.86780311264283
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.00625,
+          "elapsed": 1,
+          "errorK": 0.1054885099070475,
+          "actual": {
+            "Tp": 358.66672969381545,
+            "Tw": 308.3131729103624
+          },
+          "expected": {
+            "Tp": 358.6707294664827,
+            "Tw": 308.2076844004554
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.00625,
+          "elapsed": 5,
+          "errorK": 0.01990269884532836,
+          "actual": {
+            "Tp": 353.59964852692696,
+            "Tw": 306.9100956821408
+          },
+          "expected": {
+            "Tp": 353.60342174691687,
+            "Tw": 306.8901929832955
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.00625,
+          "elapsed": 20,
+          "errorK": 0.003766736523630243,
+          "actual": {
+            "Tp": 337.7014009010383,
+            "Tw": 302.5547460645658
+          },
+          "expected": {
+            "Tp": 337.7042573429013,
+            "Tw": 302.55097932804216
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.00625,
+          "elapsed": 48,
+          "errorK": 0.0006925072981971425,
+          "actual": {
+            "Tp": 325.33014082154494,
+            "Tw": 318.86849561994103
+          },
+          "expected": {
+            "Tp": 325.3306659729125,
+            "Tw": 318.86780311264283
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.003125,
+          "elapsed": 1,
+          "errorK": 0.05330387047081331,
+          "actual": {
+            "Tp": 358.6687083613941,
+            "Tw": 308.2609882709262
+          },
+          "expected": {
+            "Tp": 358.6707294664827,
+            "Tw": 308.2076844004554
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.003125,
+          "elapsed": 5,
+          "errorK": 0.009985971449509634,
+          "actual": {
+            "Tp": 353.6015285731626,
+            "Tw": 306.900178954745
+          },
+          "expected": {
+            "Tp": 353.60342174691687,
+            "Tw": 306.8901929832955
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.003125,
+          "elapsed": 20,
+          "errorK": 0.001885694822988171,
+          "actual": {
+            "Tp": 337.70282735766375,
+            "Tw": 302.55286502286515
+          },
+          "expected": {
+            "Tp": 337.7042573429013,
+            "Tw": 302.55097932804216
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.003125,
+          "elapsed": 48,
+          "errorK": 0.00034668138619053934,
+          "actual": {
+            "Tp": 325.3304030728668,
+            "Tw": 318.868149794029
+          },
+          "expected": {
+            "Tp": 325.3306659729125,
+            "Tw": 318.86780311264283
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0015625,
+          "elapsed": 1,
+          "errorK": 0.026828425779171994,
+          "actual": {
+            "Tp": 358.66971222200596,
+            "Tw": 308.23451282623455
+          },
+          "expected": {
+            "Tp": 358.6707294664827,
+            "Tw": 308.2076844004554
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0015625,
+          "elapsed": 5,
+          "errorK": 0.005003810370226347,
+          "actual": {
+            "Tp": 353.6024731078682,
+            "Tw": 306.8951967936657
+          },
+          "expected": {
+            "Tp": 353.60342174691687,
+            "Tw": 306.8901929832955
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0015625,
+          "elapsed": 20,
+          "errorK": 0.0009435702089604092,
+          "actual": {
+            "Tp": 337.70354180216475,
+            "Tw": 302.5519228982511
+          },
+          "expected": {
+            "Tp": 337.7042573429013,
+            "Tw": 302.55097932804216
+          }
+        },
+        {
+          "inlet": 273.15,
+          "dt": 0.0015625,
+          "elapsed": 48,
+          "errorK": 0.00017347358067354435,
+          "actual": {
+            "Tp": 325.3305344221217,
+            "Tw": 318.8679765862235
+          },
+          "expected": {
+            "Tp": 325.3306659729125,
+            "Tw": 318.86780311264283
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.025,
+          "elapsed": 1,
+          "errorK": 0.3108616498757897,
+          "actual": {
+            "Tp": 358.9650498329588,
+            "Tw": 320.4453890208654
+          },
+          "expected": {
+            "Tp": 358.97683667051666,
+            "Tw": 320.1345273709896
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.025,
+          "elapsed": 5,
+          "errorK": 0.060396440820397856,
+          "actual": {
+            "Tp": 355.0649890329233,
+            "Tw": 319.18082707908525
+          },
+          "expected": {
+            "Tp": 355.07643919149564,
+            "Tw": 319.12043063826485
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.025,
+          "elapsed": 20,
+          "errorK": 0.01153718850559926,
+          "actual": {
+            "Tp": 342.8298186495856,
+            "Tw": 315.7919973851621
+          },
+          "expected": {
+            "Tp": 342.83856768420213,
+            "Tw": 315.7804601966565
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.025,
+          "elapsed": 48,
+          "errorK": 0.002121090018306404,
+          "actual": {
+            "Tp": 333.3127843713213,
+            "Tw": 328.34193269715905
+          },
+          "expected": {
+            "Tp": 333.3143928645849,
+            "Tw": 328.33981160714075
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0125,
+          "elapsed": 1,
+          "errorK": 0.15967649596575484,
+          "actual": {
+            "Tp": 358.97078227004437,
+            "Tw": 320.29420386695534
+          },
+          "expected": {
+            "Tp": 358.97683667051666,
+            "Tw": 320.1345273709896
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0125,
+          "elapsed": 5,
+          "errorK": 0.030468826310539043,
+          "actual": {
+            "Tp": 355.0706628098404,
+            "Tw": 319.1508994645754
+          },
+          "expected": {
+            "Tp": 355.07643919149564,
+            "Tw": 319.12043063826485
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0125,
+          "elapsed": 20,
+          "errorK": 0.005787124709343061,
+          "actual": {
+            "Tp": 342.83417911463175,
+            "Tw": 315.78624732136586
+          },
+          "expected": {
+            "Tp": 342.83856768420213,
+            "Tw": 315.7804601966565
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0125,
+          "elapsed": 48,
+          "errorK": 0.0010639517991535286,
+          "actual": {
+            "Tp": 333.3135860344721,
+            "Tw": 328.3408755589399
+          },
+          "expected": {
+            "Tp": 333.3143928645849,
+            "Tw": 328.33981160714075
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.00625,
+          "elapsed": 1,
+          "errorK": 0.08119639478746876,
+          "actual": {
+            "Tp": 358.9737579738812,
+            "Tw": 320.21572376577706
+          },
+          "expected": {
+            "Tp": 358.97683667051666,
+            "Tw": 320.1345273709896
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.00625,
+          "elapsed": 5,
+          "errorK": 0.01531946364804071,
+          "actual": {
+            "Tp": 355.0735348765129,
+            "Tw": 319.1357501019129
+          },
+          "expected": {
+            "Tp": 355.07643919149564,
+            "Tw": 319.12043063826485
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.00625,
+          "elapsed": 20,
+          "errorK": 0.0028993245437050064,
+          "actual": {
+            "Tp": 342.8363690297577,
+            "Tw": 315.7833595212002
+          },
+          "expected": {
+            "Tp": 342.83856768420213,
+            "Tw": 315.7804601966565
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.00625,
+          "elapsed": 48,
+          "errorK": 0.0005330352664714155,
+          "actual": {
+            "Tp": 333.3139886461742,
+            "Tw": 328.3403446424072
+          },
+          "expected": {
+            "Tp": 333.3143928645849,
+            "Tw": 328.33981160714075
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.003125,
+          "elapsed": 1,
+          "errorK": 0.04102894347687425,
+          "actual": {
+            "Tp": 358.9752809897433,
+            "Tw": 320.17555631446646
+          },
+          "expected": {
+            "Tp": 358.97683667051666,
+            "Tw": 320.1345273709896
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.003125,
+          "elapsed": 5,
+          "errorK": 0.00768638101800434,
+          "actual": {
+            "Tp": 355.0749819817615,
+            "Tw": 319.12811701928285
+          },
+          "expected": {
+            "Tp": 355.07643919149564,
+            "Tw": 319.12043063826485
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.003125,
+          "elapsed": 20,
+          "errorK": 0.001451453067318198,
+          "actual": {
+            "Tp": 342.83746699896034,
+            "Tw": 315.78191164972384
+          },
+          "expected": {
+            "Tp": 342.83856768420213,
+            "Tw": 315.7804601966565
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.003125,
+          "elapsed": 48,
+          "errorK": 0.00026684686844191674,
+          "actual": {
+            "Tp": 333.314190505711,
+            "Tw": 328.3400784540092
+          },
+          "expected": {
+            "Tp": 333.3143928645849,
+            "Tw": 328.33981160714075
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0015625,
+          "elapsed": 1,
+          "errorK": 0.020650319669869077,
+          "actual": {
+            "Tp": 358.9760536792295,
+            "Tw": 320.15517769065946
+          },
+          "expected": {
+            "Tp": 358.97683667051666,
+            "Tw": 320.1345273709896
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0015625,
+          "elapsed": 5,
+          "errorK": 0.0038515224324555675,
+          "actual": {
+            "Tp": 355.07570900703564,
+            "Tw": 319.1242821606973
+          },
+          "expected": {
+            "Tp": 355.07643919149564,
+            "Tw": 319.12043063826485
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0015625,
+          "elapsed": 20,
+          "errorK": 0.0007262828842158342,
+          "actual": {
+            "Tp": 342.8380169196878,
+            "Tw": 315.78118647954074
+          },
+          "expected": {
+            "Tp": 342.83856768420213,
+            "Tw": 315.7804601966565
+          }
+        },
+        {
+          "inlet": 293.15,
+          "dt": 0.0015625,
+          "elapsed": 48,
+          "errorK": 0.00013352572239000438,
+          "actual": {
+            "Tp": 333.31429160758756,
+            "Tw": 328.33994513286314
+          },
+          "expected": {
+            "Tp": 333.3143928645849,
+            "Tw": 328.33981160714075
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.025,
+          "elapsed": 1,
+          "errorK": 0.04650136871742916,
+          "actual": {
+            "Tp": 359.84518322108596,
+            "Tw": 354.08307988345035
+          },
+          "expected": {
+            "Tp": 359.84694639798306,
+            "Tw": 354.0365785147329
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.025,
+          "elapsed": 5,
+          "errorK": 0.00903462091559959,
+          "actual": {
+            "Tp": 359.2617784641622,
+            "Tw": 353.8939157934309
+          },
+          "expected": {
+            "Tp": 359.2634912777106,
+            "Tw": 353.8848811725153
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.025,
+          "elapsed": 20,
+          "errorK": 0.0017258322372413204,
+          "actual": {
+            "Tp": 357.43153607323654,
+            "Tw": 353.38698539793006
+          },
+          "expected": {
+            "Tp": 357.4328448293496,
+            "Tw": 353.3852595656928
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.025,
+          "elapsed": 48,
+          "errorK": 0.00031729095275068175,
+          "actual": {
+            "Tp": 356.0078959418585,
+            "Tw": 355.2643130437038
+          },
+          "expected": {
+            "Tp": 356.0081365541638,
+            "Tw": 355.26399575275104
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0125,
+          "elapsed": 1,
+          "errorK": 0.023885788476491143,
+          "actual": {
+            "Tp": 359.84604072850306,
+            "Tw": 354.0604643032094
+          },
+          "expected": {
+            "Tp": 359.84694639798306,
+            "Tw": 354.0365785147329
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0125,
+          "elapsed": 5,
+          "errorK": 0.004557790023852704,
+          "actual": {
+            "Tp": 359.2626271966845,
+            "Tw": 353.88943896253915
+          },
+          "expected": {
+            "Tp": 359.2634912777106,
+            "Tw": 353.8848811725153
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0125,
+          "elapsed": 20,
+          "errorK": 0.0008656880638682196,
+          "actual": {
+            "Tp": 357.4321883492331,
+            "Tw": 353.3861252537567
+          },
+          "expected": {
+            "Tp": 357.4328448293496,
+            "Tw": 353.3852595656928
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0125,
+          "elapsed": 48,
+          "errorK": 0.00015915509220576496,
+          "actual": {
+            "Tp": 356.0080158615501,
+            "Tw": 355.26415490784325
+          },
+          "expected": {
+            "Tp": 356.0081365541638,
+            "Tw": 355.26399575275104
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.00625,
+          "elapsed": 1,
+          "errorK": 0.012146057559903056,
+          "actual": {
+            "Tp": 359.8464858599674,
+            "Tw": 354.0487245722928
+          },
+          "expected": {
+            "Tp": 359.84694639798306,
+            "Tw": 354.0365785147329
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.00625,
+          "elapsed": 5,
+          "errorK": 0.0022916175987575116,
+          "actual": {
+            "Tp": 359.26305682520734,
+            "Tw": 353.88717279011405
+          },
+          "expected": {
+            "Tp": 359.2634912777106,
+            "Tw": 353.8848811725153
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.00625,
+          "elapsed": 20,
+          "errorK": 0.0004337059898489315,
+          "actual": {
+            "Tp": 357.4325159356405,
+            "Tw": 353.38569327168267
+          },
+          "expected": {
+            "Tp": 357.4328448293496,
+            "Tw": 353.3852595656928
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.00625,
+          "elapsed": 48,
+          "errorK": 0.0000797360158912852,
+          "actual": {
+            "Tp": 356.0080760876858,
+            "Tw": 355.26407548876693
+          },
+          "expected": {
+            "Tp": 356.0081365541638,
+            "Tw": 355.26399575275104
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.003125,
+          "elapsed": 1,
+          "errorK": 0.0061374634969979525,
+          "actual": {
+            "Tp": 359.8467136858257,
+            "Tw": 354.0427159782299
+          },
+          "expected": {
+            "Tp": 359.84694639798306,
+            "Tw": 354.0365785147329
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.003125,
+          "elapsed": 5,
+          "errorK": 0.001149795215951599,
+          "actual": {
+            "Tp": 359.2632732957012,
+            "Tw": 353.88603096773124
+          },
+          "expected": {
+            "Tp": 359.2634912777106,
+            "Tw": 353.8848811725153
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.003125,
+          "elapsed": 20,
+          "errorK": 0.00021712087800551672,
+          "actual": {
+            "Tp": 357.4326801793525,
+            "Tw": 353.3854766865708
+          },
+          "expected": {
+            "Tp": 357.4328448293496,
+            "Tw": 353.3852595656928
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.003125,
+          "elapsed": 48,
+          "errorK": 0.00003991725895957643,
+          "actual": {
+            "Tp": 356.0081062835786,
+            "Tw": 355.26403567001
+          },
+          "expected": {
+            "Tp": 356.0081365541638,
+            "Tw": 355.26399575275104
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0015625,
+          "elapsed": 1,
+          "errorK": 0.0030890530545093497,
+          "actual": {
+            "Tp": 359.84682927138823,
+            "Tw": 354.03966756778743
+          },
+          "expected": {
+            "Tp": 359.84694639798306,
+            "Tw": 354.0365785147329
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0015625,
+          "elapsed": 5,
+          "errorK": 0.0005761439691127634,
+          "actual": {
+            "Tp": 359.26338205041753,
+            "Tw": 353.8854573164844
+          },
+          "expected": {
+            "Tp": 359.2634912777106,
+            "Tw": 353.8848811725153
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0015625,
+          "elapsed": 20,
+          "errorK": 0.00010864366345231247,
+          "actual": {
+            "Tp": 357.4327624412427,
+            "Tw": 353.3853682093563
+          },
+          "expected": {
+            "Tp": 357.4328448293496,
+            "Tw": 353.3852595656928
+          }
+        },
+        {
+          "inlet": 350,
+          "dt": 0.0015625,
+          "elapsed": 48,
+          "errorK": 0.000019973932126049476,
+          "actual": {
+            "Tp": 356.00812140727226,
+            "Tw": 355.26401572668317
+          },
+          "expected": {
+            "Tp": 356.0081365541638,
+            "Tw": 355.26399575275104
+          }
+        }
+      ],
+      "boiling": [
+        {
+          "dt": 0.025,
+          "T": 501.7725792139058
+        },
+        {
+          "dt": 0.0125,
+          "T": 501.78371517586993
+        },
+        {
+          "dt": 0.00625,
+          "T": 501.78986826987546
+        },
+        {
+          "dt": 0.003125,
+          "T": 501.793236476036
+        },
+        {
+          "dt": 0.0015625,
+          "T": 501.7950661530492
+        }
+      ]
+    },
+    "events": [
+      {
+        "timeS": 0,
+        "massResidualKg": 0,
+        "energyResidualJ": 0
+      },
+      {
+        "timeS": 11.999,
+        "massResidualKg": 0,
+        "energyResidualJ": 0
+      },
+      {
+        "timeS": 12,
+        "massResidualKg": 0,
+        "energyResidualJ": 0
+      },
+      {
+        "timeS": 12.01,
+        "massResidualKg": -2.222614453595284e-17,
+        "energyResidualJ": 2.3283064365386963e-10
+      },
+      {
+        "timeS": 31.999,
+        "massResidualKg": -8.992806499463768e-15,
+        "energyResidualJ": -1.816079020500183e-8
+      },
+      {
+        "timeS": 32,
+        "massResidualKg": -8.93729534823251e-15,
+        "energyResidualJ": -1.83936208486557e-8
+      },
+      {
+        "timeS": 32.001,
+        "massResidualKg": -8.992806499463768e-15,
+        "energyResidualJ": -1.792795956134796e-8
+      },
+      {
+        "timeS": 60,
+        "massResidualKg": -8.548717289613705e-15,
+        "energyResidualJ": -2.2351741790771484e-8
+      }
+    ],
+    "defaultFinal": {
+      "timeS": 60,
+      "contact": {
+        "storyTimeS": 60,
+        "modelTimeS": 60,
+        "initialTemperatureK": 823.15,
+        "patches": [
+          {
+            "id": "specimen-0",
+            "xM": 0,
+            "yM": -0.1,
+            "radiusM": 0.04,
+            "peatMassKg": 0.5,
+            "dryIceConductanceWK": 0,
+            "waterConductanceWK": 24,
+            "waterArrivalTimeS": 12,
+            "waterShare": 0.3333333333333333,
+            "temperatureK": 501.78986826987546,
+            "heatRemovedJ": 295651.32119172224,
+            "heatToDryIceJ": 0,
+            "heatToWaterJ": 295651.32119172224,
+            "waterReceivedKg": 0.16666666666666743,
+            "liquidWaterKg": 0.06054366318950687,
+            "waterVaporKg": 0.10612300347716265,
+            "liquidWaterSensibleJ": 20274.861928902163,
+            "vaporEnthalpyJ": 275376.4592628208,
+            "waterTemperatureK": 373.1500000000004,
+            "wetness": 0.40362442126337916,
+            "dryCoolingDomainLimitReached": false
+          },
+          {
+            "id": "specimen-1",
+            "xM": 0,
+            "yM": -0.2,
+            "radiusM": 0.04,
+            "peatMassKg": 0.5,
+            "dryIceConductanceWK": 0,
+            "waterConductanceWK": 24,
+            "waterArrivalTimeS": 12,
+            "waterShare": 0.3333333333333333,
+            "temperatureK": 501.78986826987546,
+            "heatRemovedJ": 295651.32119172224,
+            "heatToDryIceJ": 0,
+            "heatToWaterJ": 295651.32119172224,
+            "waterReceivedKg": 0.16666666666666743,
+            "liquidWaterKg": 0.06054366318950687,
+            "waterVaporKg": 0.10612300347716265,
+            "liquidWaterSensibleJ": 20274.861928902163,
+            "vaporEnthalpyJ": 275376.4592628208,
+            "waterTemperatureK": 373.1500000000004,
+            "wetness": 0.40362442126337916,
+            "dryCoolingDomainLimitReached": false
+          },
+          {
+            "id": "specimen-2",
+            "xM": 0,
+            "yM": -0.30000000000000004,
+            "radiusM": 0.04,
+            "peatMassKg": 0.5,
+            "dryIceConductanceWK": 0,
+            "waterConductanceWK": 24,
+            "waterArrivalTimeS": 12,
+            "waterShare": 0.3333333333333333,
+            "temperatureK": 501.78986826987546,
+            "heatRemovedJ": 295651.32119172224,
+            "heatToDryIceJ": 0,
+            "heatToWaterJ": 295651.32119172224,
+            "waterReceivedKg": 0.16666666666666743,
+            "liquidWaterKg": 0.06054366318950687,
+            "waterVaporKg": 0.10612300347716265,
+            "liquidWaterSensibleJ": 20274.861928902163,
+            "vaporEnthalpyJ": 275376.4592628208,
+            "waterTemperatureK": 373.1500000000004,
+            "wetness": 0.40362442126337916,
+            "dryCoolingDomainLimitReached": false
+          }
+        ],
+        "ledger": {
+          "initialPeatEnergyJ": 1462800,
+          "peatEnergyJ": 575846.0364248564,
+          "heatToDryIceJ": 0,
+          "heatToWaterJ": 886953.9635751667,
+          "waterStoredSensibleJ": 60824.58578670649,
+          "vaporEnthalpyJ": 826129.3777884623,
+          "energyResidualJ": -2.5262124836444855e-8,
+          "dryIceInitialKg": 0,
+          "dryIceRemainingKg": 0,
+          "dryIceSublimatedKg": 0,
+          "dryIceExportedKg": 0,
+          "dryIceMassResidualKg": 0,
+          "waterInitialKg": 0.5,
+          "waterRemainingSupplyKg": 0,
+          "waterSuppliedKg": 0.5000000000000149,
+          "waterBypassKg": 0,
+          "waterLiquidKg": 0.1816309895685206,
+          "waterVaporKg": 0.31836901043148796,
+          "waterMassResidualKg": -8.604228440844963e-15
+        }
+      },
+      "metrics": {
+        "maximumK": 501.78986826987546,
+        "waterUsedKg": 0.5000000000000149,
+        "dryIceUsedKg": 0,
+        "energyJ": 886953.9635751667,
+        "energyResidualJ": -2.5262124836444855e-8,
+        "massResidualKg": 8.604228440844963e-15,
+        "oxygenKg": null,
+        "fuelKg": null,
+        "reactionW": null
+      }
+    },
+    "pressureOnly": [
+      {
+        "timeS": 0,
+        "metrics": null
+      },
+      {
+        "timeS": 12,
+        "metrics": null
+      },
+      {
+        "timeS": 38,
+        "metrics": null
+      },
+      {
+        "timeS": 48,
+        "metrics": null
+      },
+      {
+        "timeS": 60,
+        "metrics": null
+      }
+    ]
+  },
+  "kind": "independent reviewer execution, numerical verification only",
+  "finishedAt": "2026-10-12T08:23:29.627Z",
+  "durationS": 0.22952325,
+  "summary": {
+    "checks": 239,
+    "passed": 239,
+    "failed": 0
+  }
+}
