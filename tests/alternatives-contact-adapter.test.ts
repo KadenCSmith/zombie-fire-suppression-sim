@@ -20,4 +20,11 @@ describe('external adapter over unchanged original API',()=>{
     const run=createContactCoolingSession(config,patches);run.advanceTo(10)
     for(const t of [9,NaN,Infinity,61])expect(()=>run.advanceTo(t)).toThrow()
   })
+  it('keeps its original observation window when caller input is mutated',()=>{
+    const input=structuredClone(config),run=createContactCoolingSession(input,patches)
+    input.endTimeS=120
+    expect(()=>run.advanceTo(61)).toThrow()
+    input.endTimeS=10
+    expect(run.advanceTo(60).storyTimeS).toBe(60)
+  })
 })

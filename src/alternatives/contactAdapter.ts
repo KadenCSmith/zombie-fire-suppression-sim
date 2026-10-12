@@ -5,11 +5,12 @@ import { simulateContactCooling, type ContactCoolingConfig, type ContactPatchSpe
  * copies the protected integrator, its cache, or its presentation defaults. */
 export function createContactCoolingSession(overrides: Partial<ContactCoolingConfig>, patches: readonly ContactPatchSpec[]) {
   const ownedConfig = structuredClone(overrides), ownedPatches = structuredClone(patches)
-  let timeS = overrides.startTimeS ?? 44
+  const endS = ownedConfig.endTimeS ?? 90
+  let timeS = ownedConfig.startTimeS ?? 44
   let state = simulateContactCooling(timeS, 'gradual', ownedConfig, ownedPatches)
   return {
     advanceTo(targetS: number) {
-      if (!Number.isFinite(targetS) || targetS < timeS || targetS > (overrides.endTimeS ?? 90)) throw new Error('Contact time must advance monotonically inside the observation window.')
+      if (!Number.isFinite(targetS) || targetS < timeS || targetS > endS) throw new Error('Contact time must advance monotonically inside the observation window.')
       state = simulateContactCooling(targetS, 'gradual', ownedConfig, ownedPatches)
       timeS = targetS
       return structuredClone(state)
