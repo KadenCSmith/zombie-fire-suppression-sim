@@ -1,3 +1,7 @@
+## Current integration check follow-up (2026-10-12)
+
+GitHub run38233329756 at b0c6b74 failed its vibration fixture on macOS/Windows and the four-panel frame target on Linux. The fixture had assumed initial vibration ON despite honoring the OS reduced-motion preference; it now explicitly establishes ON before testing OFF. Production animation is unchanged. The Linux performance failure remains unresolved; the next fixture records both measured windows in its failure output, preserving the 50ms target. These are not new scientific scores. D's separately reviewed numerical guard remains pending. Final combined checks, main merge, release and installation are pending.
+
 # Version21 world-scene follow-up in progress
 
 A's exact94fab52 world revision was reviewed and integrated at05414c176cbf4504641727b8a37b73973fba0fe6 (seven owned files, numerical adapters/ledgers unchanged,57 original identities pass). The users' latest visible-quenching requests add only public fire-layer ending controls in the external host: A86s and liquid-waves89s; private gradual authored fades remain pending. Five focused composition checks, typecheck and build2.50s pass. These movie endings are expressly illustrative, not calculated extinction or experimental validation; pressure-only is unaffected.

@@ -86,7 +86,8 @@ app.on('browser-window-created',(_event,win)=>{
         const perf=()=>{const e=document.querySelector('.alt-performance');return {panels:panels().length,p50Ms:Number(e.dataset.frameP50),p95Ms:Number(e.dataset.frameP95),samples:Number(e.dataset.frameSamples),physicalTimes:panels().map(time)}};
         await wait(()=>perf().samples===120,'two-panel frame sample');const two=perf();button('Pause all').click();button('Duplicate',panels()[0]).click();await wait(()=>panels().length===3,'third panel');button('Duplicate',panels()[1]).click();await wait(()=>panels().length===4&&alive.size===4,'four independent workers');
         button('Reset all').click();await delay(100);button('Start / resume all').click();await wait(()=>panels().every(p=>time(p)>=1),'four simultaneous computations');await delay(2200);await wait(()=>perf().samples===120,'four-panel frame sample');const four=perf();
-        assert(four.p95Ms<50,'Four-panel presentation p95 exceeds 50 ms on this fixture');
+        console.log('ALT_PERFORMANCE: '+JSON.stringify({two,four}));
+        assert(four.p95Ms<50,'Four-panel presentation p95 exceeds 50 ms on this fixture: '+JSON.stringify(four));
         const began=performance.now();button('Pause all').click();await wait(()=>panels().every(p=>p.dataset.running==='false'),'four-panel pause responsive');const pauseMs=performance.now()-began;
         const beforeFailure=panels().map(p=>({id:p.dataset.panelId,time:time(p)})),failedWorker=[...alive][0];
         failedWorker.dispatchEvent(new ErrorEvent('error',{message:'Injected lifecycle failure',cancelable:true}));

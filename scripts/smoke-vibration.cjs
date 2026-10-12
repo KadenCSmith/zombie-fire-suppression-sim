@@ -79,6 +79,13 @@ async function check() {
   }
   const toggle = workspace().querySelector('.vib-shortcuts input[type="checkbox"]');
   assert(toggle, 'Vibration display toggle missing');
+  // The native app respects the operating system's reduced-motion preference.
+  // Establish ON explicitly before checking ON -> OFF on every runner.
+  const initiallyEnabled = toggle.checked;
+  if (!initiallyEnabled) {
+    toggle.click();
+    await wait(() => toggle.checked && !workspace().textContent.includes('Original context · vibration off'), 'display explicitly enabled for toggle check');
+  }
   setRange('Earthquake animation time', 90); await wait(() => displayedTime() === 90, 'ending before display toggle');
   toggle.click();
   await wait(() => workspace().textContent.includes('Original context · vibration off'), 'off caption matches original context');
@@ -111,6 +118,6 @@ async function check() {
   assert(!panel.querySelector('.alt-history') && Number(panel.dataset.time) === 0, 'Unsupported vibration acquired calculated history');
   click('Simulation Version'); await wait(() => document.querySelector('[data-parent="4.2.3"]'), 'original return entry'); document.querySelector('[data-parent="4.2.3"]').click();
   await wait(() => document.querySelector('.fire-sequence-shell:not(.method-render)') && alive.size === 0, 'comparison disposal');
-  return { times, oneCanvasAcrossSeeks: true, noLiquidJobs: true, predictionUnavailable: true, originalRestored: true, workerCleanup: true };
+  return { times, initiallyEnabled, oneCanvasAcrossSeeks: true, noLiquidJobs: true, predictionUnavailable: true, originalRestored: true, workerCleanup: true };
 }
 require('../electron/main.cjs');
