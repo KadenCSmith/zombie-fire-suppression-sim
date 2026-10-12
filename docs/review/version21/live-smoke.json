@@ -1,0 +1,41 @@
+{
+  "two": {
+    "panels": 2,
+    "p50Ms": 8.300000000000182,
+    "p95Ms": 9.200000000000728,
+    "samples": 120,
+    "physicalTimes": [
+      20.5,
+      20.5
+    ]
+  },
+  "four": {
+    "panels": 4,
+    "p50Ms": 8.300000000001091,
+    "p95Ms": 9.299999999999272,
+    "samples": 120,
+    "physicalTimes": [
+      21.5,
+      21.5,
+      21.5,
+      21.5
+    ]
+  },
+  "pauseMs": 51,
+  "workerCleanup": true,
+  "tests": [
+    "default rapid mode",
+    "implicit render and five secondary sections under every method",
+    "pressure variants",
+    "independent pause/reset",
+    "configuration-only duplicate",
+    "removal cleanup",
+    "all defined variants",
+    "unspecified rejection",
+    "linked physical time",
+    "two/four panel performance"
+  ],
+  "date": "2026-10-12T04:54:25.038Z",
+  "environment": "darwin arm64",
+  "scope": "software/numerical checks only; no physical validation"
+}

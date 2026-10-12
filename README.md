@@ -1,7 +1,15 @@
 # Zombie Fire Unified Physics Lab
 
 
-## Current app — 0.20.0
+## Current local preview — Version21 / 0.21.0
+
+The app opens on the rapid dry-ice sequence with the V20 header. Each capstone method in **Simulation Version** opens its latest render directly; its disclosure keeps Coupled FEA/FVM, Porous gas & heat, Soil mechanics & tensile lab, Fast demonstration, Previous simulations and Peat Fire FEM underneath. Pressure-pulse variants remain nested. Header size and sublinks now change gradually while scrolling.
+
+**Compare Alternatives** runs two to four independent instances with individual/all controls, optional accepted physical-time coordination, finite resource accounting and JSON export. The contact calculation is a limited thermal proxy. Pressure/vibration cues are illustrative, nanoparticles remain unspecified, and no treatment has matched experimental validation. [Version21 implementation, launch instructions, evidence and acceptance checklist](docs/ALTERNATIVES_V21.md).
+
+Run `npm ci`, then `npm run dev -- --host 127.0.0.1`; open the printed local address in Chrome. This source preview does not update the installed Mac app. The last published cinematic release remains [0.20.0](https://github.com/KadenCSmith/zombie-fire-suppression-sim/releases/tag/v0.20.0).
+
+## Preserved cinematic sequence — 0.20.0
 
 The cinematic black interface opens the latest cutaway. Scroll into the bottom playback bar to begin. **Simulation Version** selects rendering, FEA/FVM workspaces and previous-simulation comparison. **Finder** provides searchable guides, live values and the full cited physics documentation. The outlined **Toolbox** icon opens all editable controls and the retained import/export, results, probes, verification, tensile and appearance features.
 

@@ -1,3 +1,5 @@
+import { AlternativeScience } from './AlternativeScience'
+import './alternatives.css'
 import { BookOpen, ArrowLeft, ArrowUpRight } from 'lucide-react'
 import convergence from '../../docs/review/unified/convergence-study.json'
 import { ModelSelector, type PhysicsWorkspace } from './ModelSelector'
@@ -172,6 +174,7 @@ export default function FormulaReferenceWorkspace({ onWorkspace }: { onWorkspace
       <div className="formula-hero"><span className="formula-eyebrow"><BookOpen size={15} /> MODEL BASIS / RESEARCH NOTES</span><h1>What equations drive the simulation?</h1><p>Equation families, source papers, implementation paths and limits for the current application. The app combines a finite-volume gas and heat solver with optional finite-element soil mechanics. Its natural fire sequence also contains authored actions and a separate contact-cooling demonstration.</p></div>
       <div className="formula-alert"><strong>About the linked paper</strong><p><a href={paper} target="_blank" rel="noreferrer">An et al. (2025), <em>Fire</em> 8(1), 13 <ArrowUpRight size={12} aria-hidden="true" /></a> studies methane migration in a coal mining face and goaf. It is useful as finite-volume gas-flow context, but its coal geometry, methane transport, ventilation and validation data do not describe peat fire suppression. This app does not reproduce that paper’s experiment.</p></div>
       <nav className="formula-nav" aria-label="Formula categories">{sections.map(section => <a key={section.id} href={`#formula-${section.id}`}>{section.title}</a>)}<a href="#formula-convergence">Convergence</a><a href="#formula-next">Next steps</a></nav>
+      <AlternativeScience/>
       <div className="formula-sections">{sections.map(section => <section className="formula-section" id={`formula-${section.id}`} key={section.id}><div className="formula-section-heading"><h2>{section.title}</h2><span>{section.status}</span></div><div className="formula-cards">{section.entries.map(entry => <article className="formula-card" key={entry.name}><h3>{entry.name}</h3><div className="formula-equation">{entry.equation}</div><p>{entry.meaning}</p><p className="formula-choice"><strong>Why this model:</strong> {entry.choice}</p><SourceLinks entry={entry} /></article>)}</div>{section.note && <p className="formula-section-note">{section.note}</p>}</section>)}</div>
       <section className="formula-section formula-evidence" id="formula-convergence">
         <div className="formula-section-heading"><h2>Convergence & error evidence</h2><span>Numerical comparison only</span></div>

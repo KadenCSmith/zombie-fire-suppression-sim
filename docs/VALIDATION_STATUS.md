@@ -1,5 +1,14 @@
 # Verification and validation status
 
+
+## Version21 integrated preview / parallel handoff (2026-10-11)
+
+Version 0.21.0 preserves the V20 header and rapid initial sequence, interpolates its scroll transition, and makes each capstone parent open its latest render directly. The redundant Latest render submenu row is removed; other reference views and nested pressure variants remain. Live comparisons own separate contact/FEM/concept jobs, settings, accepted histories and resources. Contact physics is a limited finite-inventory thermal proxy; pressure/vibration views are explicitly illustrative, nanoparticles remain unspecified, and no capstone field validation is claimed.
+
+Before the parallel handoff, typecheck, lint (16 inherited warnings), **1777 tests in 93 files**, production build and alternatives/fire-sequence/comparison/FEM Electron checks passed. The final measured lightweight fixture recorded two-panel p95 9.2 ms, four-panel p95 9.3 ms and 51 ms pause response on this macOS arm64 machine. Chrome's measured p95 was about 34.2 ms and activated a display-only chart budget. These are fixture-specific observations, not arbitrary-mesh FPS guarantees. The contract extraction is checked again before publishing its immutable starting commit. Worker-specific and final integration results will be recorded after delivery.
+
+Scientific source models and accepted-state integration remain unchanged. The new shared API routes private method descriptors, adapters, presentation cues and evidence through existing supported model hooks. See [Version21 scope and acceptance](ALTERNATIVES_V21.md) and [parallel API contract](alternatives/CONTRACT_V21_1.md). No installed application, main branch merge or release is included.
+
 ## Peat FEM M2 reacting porous transport (2026-10-02)
 
 Feature branch `feat/peat-fire-fem` adds five conservative condensed inventories and four gas species, source-normalized drying/pyrolysis/peat and char oxidation, evolving material properties, compressible Darcy storage, species transport and gas sensible enthalpy. Pressure/species and heat iterate together; a new boundary regression exposed and corrected a 4.208 Pa thermal-expansion pressure drift. The active worker, scene, fields and schema-2 recordings use this solver. Main remains published v20.
