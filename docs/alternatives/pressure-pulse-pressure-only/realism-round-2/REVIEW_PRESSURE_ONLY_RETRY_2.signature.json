@@ -1,0 +1,50 @@
+{
+  "signedBy": "/root/pressure_realism_reviewer",
+  "signedAtUTC": "2026-10-12T09:27:42.568571+00:00",
+  "source": "2d6ab8f0a4d74b7aee9c6a449533afb4c5343911",
+  "pressureOnly": {
+    "criteria": [
+      1,
+      1,
+      2,
+      1,
+      2
+    ],
+    "weightedArithmetic": "1.3",
+    "centralCap": 6,
+    "effective": "1.3",
+    "verifiedAtLeast7": false,
+    "freshVisualCriterion": "Unverified; no new observation/aesthetic credit",
+    "scoredPassesUsed": 3,
+    "revisionRetriesUsed": 2,
+    "retriesUnused": 1
+  },
+  "liquid": {
+    "rescored": false,
+    "retainedScore": "4.1",
+    "scoredPassesUsed": 2,
+    "revisionRetriesUsed": 1,
+    "retriesUnused": 2
+  },
+  "independentFocusedTests": "16/16PASS",
+  "originalProtected": "57/57PASS",
+  "decision": "Stop scientific work below7: essential measured data/coupling/validation absent; current fresh UI also unverified because admin-policy access denied.",
+  "artifactsSha256": {
+    "REVIEW_PRESSURE_ONLY_RETRY_2.md": "70632e01d78a29c8053742a1f54439f10607ba37dc5c55b73a8c87e2042b44ba",
+    "baseline.json": "7adb2432f38c53c9db504460bd986db49b86b5d29c6de52c398a4903f27dfc34",
+    "accounting-amendment.json": "27b60e1286d614e4a2fa99ed9f9bb1c4f0df1a2306207229fd81d7a02a022546",
+    "planning-relocation.json": "7761f1ec5f90b662b66e19e9fcb08e397d2b902af088ba2ac8316c7f9af57aac",
+    "browser-unverified.json": "a1e79c3dd6a7d4eafd6ffb5e72226d9924eff820d6ee87587ba49754d488f17f",
+    "parent-failed-checkpoint.json": "2a06a7d37a0faf5c4a8b52fdb244a192687b71201cb3d4645ebd28afb88fdde9",
+    "logic-source-provenance.json": "c4570549b7ba52f1dc8b80e3397330e1fc36fcbc6833d3de942b9889fed79771",
+    "final-source-provenance.json": "0af21b09367fd570fa6b72b1511fe7e784bb15a5b138542675e7555b1831950a",
+    "source-03-to-6137.diff": "714ffcafaa88cc0a8b40abdc109ba347d78c9ac1ed0d5c3e36ec94f785dc629a",
+    "source-6137-to-2d6.diff": "e659b8f53ca2b364b9f66442b43b2f4dccb22a4327dc862651b945b055e92046",
+    "execution-and-reuse.json": "da6fcb46f0ff857e01bddc5147a5bf9763682a31664da34fbd643f56c051c2ef",
+    "snapshot-2d6/pressure-only-retry2.report.json": "bac10cf2b8fdbccaa46aafbfbf843ce5af32b0ee1a83197e8ef4f0b432da33f4",
+    "snapshot-2d6/pressure-only-retry2.log": "fff4d580b3834cac3a896b6dfb49d9fe8ec979d20131a4b990a94d6187522c37",
+    "model.test.ts.source.txt": "55732606c7c58b0cc436d20d68ad8e4f9c8ba77476f4a7bed4a5468209d943fc",
+    "animation.test.ts.source.txt": "b50869bf7694a33e2ae1c571e315b445559aa9dcfdfa7b8096aa47e861d07fae",
+    "alternativeSceneComposition.test.tsx.source.txt": "c9cd535201f31c3abbb0a6a066b171987cd71b64fde156eb8bdb2ec416a13caf"
+  }
+}
