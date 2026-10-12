@@ -7,6 +7,7 @@ import { SequenceExcavator } from '../../../src/ui/FireSequenceEquipment'
 import { fireSequencePose } from '../../../src/story/fireSequence'
 import { composeVibrationScene } from '../../../src/alternatives/vibratory-injection/vibration-scene'
 import { vibrationPose } from '../../../src/alternatives/vibratory-injection/vibration'
+import { COMPACTION_GROUPS } from '../../../src/alternatives/vibratory-injection/compaction-pass'
 
 type Element=ReactElement<Record<string,unknown>>
 function elements(node:ReactNode):Element[]{
@@ -16,22 +17,25 @@ function elements(node:ReactNode):Element[]{
 }
 const options={vibration:true,cameraDistance:15.75,resetToken:0}
 describe('continuous original vibration scene',()=>{
-  it('retains exactly one original Canvas, original ground and one original excavator across the old handover',()=>{
+  it('retains one original Canvas/world and a hidden same-geometry fire-off reference through both boundaries',()=>{
     for(const time of [0,18,23.9,24,25,26,27,31,33,38,74,90,25]){
       const scene=composeVibrationScene({...options,time}),all=elements(scene)
       const contextTime=Math.min(time,33)
-      const original=FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire:time<74,gas:false,water:false,anatomy:true},resetToken:0,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:15.75})
+      const original=FireSequenceScene({time:contextTime,mode:'rapid',view:'natural',layers:{fire:true,gas:false,water:false,anatomy:true},resetToken:0,realistic:true,straightBore:true,cinematic:true,connectedSupply:true,cameraDistance:15.75})
       const {children:_actual,...actualProps}=scene.props,{children:_expected,...expectedProps}=original.props
       expect(all.filter(e=>e.type===Canvas)).toHaveLength(1)
       expect(actualProps).toEqual(expectedProps)
       const ground=all.filter(e=>typeof e.props.fire==='boolean'&&typeof e.props.water==='boolean')
       const originalGround=elements(original).find(e=>typeof e.props.fire==='boolean')!
-      expect(ground).toHaveLength(1)
+      expect(ground).toHaveLength(2)
       expect(ground[0].type).toBe(originalGround.type)
       expect(ground[0].props).toEqual(originalGround.props)
+      expect(ground[1].type).toBe(originalGround.type)
+      expect(ground[1].props).toEqual({...originalGround.props,fire:false})
+      expect(all.find(e=>e.props.name===COMPACTION_GROUPS.settled)?.props.visible).toBe(false)
       expect(all.filter(e=>e.type===SequenceExcavator)).toHaveLength(1)
       expect(all.filter(e=>e.type===FireWaterTruck)).toHaveLength(0)
-      expect(ground[0].props.fire).toBe(time<74)
+      expect(ground[0].props.fire).toBe(true)
       expect(ground[0].props.water).toBe(false)
       expect(fireSequencePose(contextTime,'rapid')).toMatchObject({sourceVisible:false,capVisible:false,gas:0,water:0})
     }
