@@ -6,17 +6,17 @@ const provenance = 'User-supplied Version21 capstone concept; material reference
 export const variants: readonly Variant[] = [{
   id: 'sublimation-injection', method: '4.2.1', number: '4.2.1',
   label: 'Extinguishing Medium Sublimation and Injection',
-  subtitle: 'Surface solid + liquid preparation → proposed delivery → prescribed contact',
+  subtitle: 'Truck-delivered water + dry ice → illustrative liquid acceleration',
   engines: ['contact', 'concept'], media: ['water', 'co2-water', 'unspecified'],
   defaultMedium: 'water', defaultEngine: 'contact',
-  stages: ['Excavator-drilled access', 'Surface solid + liquid concept', 'Proposed pressurization / cooling', 'Prescribed liquid contact'],
-  limitation: 'Surface preparation and injection are illustrative. Finite contact heat and inventory are modeled separately in three isolated specimens; tank pressure, liquid pre-cooling, field penetration, suppression, re-ignition and cost savings are unavailable. The CO₂ option is direct solid contact, not predicted tank pre-cooling.',
+  stages: ['Fire spread + access', 'Drilling + truck delivery', 'Water + dry-ice loading', 'Illustrative flow increase'],
+  limitation: 'Truck delivery, dry-ice loading and faster water motion are illustrative. Finite contact heat and inventory are modeled separately in three isolated specimens; tank pressure, liquid pre-cooling, accelerated field injection, penetration, suppression, re-ignition and cost savings are unavailable. The CO₂ option is direct solid contact, not predicted tank pre-cooling.',
   status: { illustrative: true, modeled: 'Finite contact heat / inventory only · unvalidated', experimentallyValidated: false },
   provenance,
 }]
 
 /** Presentation seconds only. These values never set accepted physical time. */
-export const PRESENTATION_TIMING = { surfaceS: 22.5, preparationS: 45, injectionS: 67.5, endS: 90 } as const
+export const PRESENTATION_TIMING = { surfaceS: 38, preparationS: 59, injectionS: 56, endS: 90 } as const
 
 /** Frozen v21.2 bounds mirrored for boundary validation without importing the
  * registry back into a module it registers. A regression test checks every
@@ -29,7 +29,7 @@ export const THERMAL_LIMITS = {
 export function sublimationPresentation(timeS: number) {
   const time = Number.isFinite(timeS) ? Math.max(0, Math.min(PRESENTATION_TIMING.endS, timeS)) : 0
   const injection = time >= PRESENTATION_TIMING.injectionS
-  return { contextTime: Math.min(time, 36), access: true, pulse: false, waves: false, injection, vibration: 0, contacts: injection ? 1 : 0 }
+  return { contextTime: Math.min(time, 38), access: true, pulse: false, waves: false, injection, vibration: 0, contacts: injection ? 1 : 0 }
 }
 
 /** Validate at the adapter boundary, including direct callers outside the UI.

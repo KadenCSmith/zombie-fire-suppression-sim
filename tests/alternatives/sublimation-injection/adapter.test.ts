@@ -153,8 +153,8 @@ describe('4.2.1 accepted runs and source ledgers', () => {
       expect(pose.pulse).toBe(false); expect(pose.waves).toBe(false); expect(pose.vibration).toBe(0)
       expect(Number.isFinite(pose.contextTime)).toBe(true)
     }
-    expect(sublimationPresentation(67.4).injection).toBe(false)
-    expect(sublimationPresentation(67.5).injection).toBe(true)
+    expect(sublimationPresentation(55.9).injection).toBe(false)
+    expect(sublimationPresentation(56).injection).toBe(true)
     const run = createRun(config()), before = run.snapshot()
     for (let t = 0; t <= 90; t += .1) sublimationPresentation(t)
     expect(run.snapshot()).toEqual(before)

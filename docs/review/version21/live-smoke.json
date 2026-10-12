@@ -2,7 +2,7 @@
   "two": {
     "panels": 2,
     "p50Ms": 8.300000000000182,
-    "p95Ms": 9,
+    "p95Ms": 8.800000000000182,
     "samples": 120,
     "physicalTimes": [
       20.5,
@@ -12,22 +12,23 @@
   "four": {
     "panels": 4,
     "p50Ms": 8.300000000000182,
-    "p95Ms": 8.5,
+    "p95Ms": 8.799999999999272,
     "samples": 120,
     "physicalTimes": [
       21.5,
       21.5,
-      22,
+      21.5,
       21.5
     ]
   },
-  "pauseMs": 51.300000071525574,
+  "pauseMs": 51,
   "workerCleanup": true,
   "tests": [
     "default rapid mode",
     "implicit render and five secondary sections under every method",
     "selected method refresh URL",
     "read-only original fire/drilling reuse before treatment",
+    "prominent method animation after original introduction",
     "pressure variants",
     "independent pause/reset",
     "configuration-only duplicate",
@@ -41,7 +42,7 @@
     "reset after failure",
     "stale terminated-worker error rejected"
   ],
-  "date": "2026-10-12T06:33:22.545Z",
+  "date": "2026-10-12T07:02:52.503Z",
   "environment": "darwin arm64",
   "scope": "software/numerical checks only; no physical validation"
 }
