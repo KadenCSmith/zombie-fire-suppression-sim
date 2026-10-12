@@ -21,7 +21,7 @@ export function createPressureOnlyRun(config: PanelConfig, hooks: SupportedAdapt
 export function pressureOnlyPresentation(id: VariantId, timeS: number): MethodPresentation {
   if (id !== 'pressure-only') throw new Error('4.2.3.2 presentation requires pressure-only identity.')
   const time = Number.isFinite(timeS) ? Math.max(0, Math.min(90, timeS)) : 0
-  return { contextTime: Math.min(time, 36), access: true, pulse: time >= 48 && time < 54,
+  return { contextTime: Math.min(time, 36), access: true, pulse: time >= 38 && time < 66,
     waves: false, injection: false, vibration: 0, contacts: 0 }
 }
 

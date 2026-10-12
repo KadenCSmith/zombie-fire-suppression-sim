@@ -1,7 +1,7 @@
 export function MethodScience() {
   return <section data-method-science="4.2.3.1">
     <h3>4.2.3.1 · Liquid-pressure waves then injection</h3>
-    <p>The cyan rings show the proposed order of events. Wave propagation, infiltration, fracture and permeability changes are unavailable. They contribute no calculated cooling. The independent contact proxy starts ordinary water at a prescribed arrival; its physical clock is separate from the 90 s illustration.</p>
+    <p>Cyan wave fronts animate in the existing cutaway after drilling, followed by the existing water truck and hose, moving liquid and illustrative contact routes. Wave propagation, infiltration, fracture and permeability changes are unavailable. They contribute no calculated cooling. The independent contact proxy starts ordinary water at a prescribed arrival; its physical clock is separate from the 90 s illustration.</p>
     <p><strong>Modeled boundary.</strong> Three independent 0.5 kg hot specimens, finite liquid inventory, constant specimen heat capacity 1840 J/(kg K), water heat capacity 4186 J/(kg K), boiling plateau 373.15 K and latent heat 2.26 MJ/kg. These inherited approximations are uncalibrated. No combustion, oxygen, suppression or re-ignition result is produced.</p>
     <p><code>Cp = mp cp; Cw = mw cw; ΔQ = (Tp − Tw)/(1/Cp + 1/Cw) × [1 − exp(−UA (1/Cp + 1/Cw) Δt)]</code></p>
     <p>Sensible exchange stops at the boiling plateau; further accepted heat vaporizes no more than the retained liquid mass. Supply is bounded by remaining inventory. The unchanged 0.05 s reference reports mass and enthalpy residuals; numerical balance is not experimental validation. Water is retained in specimens, and vapor exports sensible plus latent enthalpy once.</p>
