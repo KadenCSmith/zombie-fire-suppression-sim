@@ -1,3 +1,4 @@
+/** HISTORICAL V2 liquid experiment. Inactive in the current vibration-only workspace; not vibration validation. */
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei/core/OrbitControls.js'

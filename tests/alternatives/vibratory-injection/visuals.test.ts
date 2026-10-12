@@ -2,7 +2,7 @@ import { describe,expect,it } from 'vitest'
 import { injectionLevels,treatmentVisual } from '../../../src/alternatives/vibratory-injection/visuals'
 import { VibratoryFieldRun } from '../../../src/alternatives/vibratory-injection/field'
 
-describe('reference-sketch treatment choreography',()=>{
+describe('historical V2 liquid choreography — off-scope for vibration only',()=>{
   it('shakes during injection, wets the peat, removes authored embers and settles',()=>{
     expect(treatmentVisual(24).shake).toBe(0)
     expect(treatmentVisual(35).active).toBe(true)
