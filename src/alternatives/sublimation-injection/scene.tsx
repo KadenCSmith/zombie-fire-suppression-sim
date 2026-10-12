@@ -4,6 +4,7 @@ import { RoundedBox } from '@react-three/drei/core/RoundedBox.js'
 import * as THREE from 'three'
 import type { MethodSceneProps } from '../contract'
 import { DELIVERY_ROUTE, MEDIA_MOUNT, TRUCK_PARKED, WORLD_STAGING, preparationVisuals, solidCuePosition } from './visuals'
+import { IllustrativeQuench } from './quench'
 
 const TEAL = '#78bac2'
 const SILVER = '#9aa9a1'
@@ -159,6 +160,23 @@ function SupplyTruck({ time }: { time: number }) {
   </group>
 }
 
+function ContactSteam({ time }: { time: number }) {
+  const texture = useMemo(softParticleTexture, [])
+  useEffect(() => () => texture.dispose(), [texture])
+  const visual = preparationVisuals(time)
+  return <group userData={{ scientificRole: 'Authored contact steam accompanying illustrative quenching; no calculated evaporation or extinction' }}>
+    {Array.from({ length: 26 }, (_, i) => {
+      const age = (time * .13 + i / 26) % 1
+      const radius = visual.quench * 2.35 * ((i % 7) / 6)
+      const angle = i * 2.39996
+      const width = .22 + age * .42
+      return <sprite key={i} position={[.4 + Math.cos(angle) * radius, -1.3 + Math.sin(angle) * radius * .35 + age * .55, .17 + age * .08]} scale={[width, width, 1]}>
+        <spriteMaterial map={texture} color="#cad4ce" transparent opacity={visual.steam * Math.sin(age * Math.PI) * .29} depthWrite={false}/>
+      </sprite>
+    })}
+  </group>
+}
+
 /** Mounted in the shared world by the external coordinator adapter. Original
  * fire, grass, excavator, lighting, camera and depth buffer are reused unchanged. */
 export function MethodCues({ time }: MethodSceneProps) {
@@ -167,8 +185,11 @@ export function MethodCues({ time }: MethodSceneProps) {
   return <group userData={{ scientificRole: '4.2.1 world-space authored truck, dry-ice loading and faster liquid cues; no predicted pressure or suppression' }}>
     <SupplyTruck time={visual.time}/>
     <DeliveryPath time={visual.time}/>
+    <ContactSteam time={visual.time}/>
+    <IllustrativeQuench progress={visual.quench}/>
     {visual.time >= WORLD_STAGING.iceStart && visual.time < 75 && <Annotation position={[TRUCK_PARKED[0] + MEDIA_MOUNT[0], 3, TRUCK_PARKED[2]]}>
       {visual.boost > 0 ? 'Faster flow · illustrative' : 'Dry ice added to water'}
     </Annotation>}
+    {visual.time >= 75 && <Annotation position={[.4, -.7, .3]}>Illustrative quenching</Annotation>}
   </group>
 }

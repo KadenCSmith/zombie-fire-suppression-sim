@@ -37,6 +37,8 @@ export function preparationVisuals(timeS: number) {
     delivery: ease(time, WORLD_STAGING.hoseReady, 60),
     contact: ease(time, 60, 64),
     boost,
+    quench: ease(time, 68, 85),
+    steam: Math.sin(Math.PI * ease(time, 60, 87)),
     flowTravel: .08 * Math.max(0, time - WORLD_STAGING.hoseReady) + .18 * rampIntegral,
     surfaceOffset: .006 * Math.sin(time * .8),
     solidScale: 1 - .16 * ease(time, 68, 84),
